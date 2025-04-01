@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -41,8 +42,8 @@ export default {
           foreground: 'hsl(var(--muted-foreground))'
         },
         accent: {
-          DEFAULT: 'hsl(var(--yellow-500))',
-          foreground: 'hsl(var(--primary-foreground))'
+          DEFAULT: 'hsl(var(--accent))',
+          foreground: 'hsl(var(--accent-foreground))'
         },
         popover: {
           DEFAULT: 'hsl(var(--popover))',
@@ -53,14 +54,23 @@ export default {
           foreground: 'hsl(var(--card-foreground))'
         },
         sidebar: {
-          DEFAULT: 'hsl(var(--sidebar-background))',
+          DEFAULT: 'hsl(var(--sidebar))',
           foreground: 'hsl(var(--sidebar-foreground))',
-          primary: 'hsl(var(--sidebar-primary))',
-          'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
           accent: 'hsl(var(--sidebar-accent))',
           'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
           border: 'hsl(var(--sidebar-border))',
-          ring: 'hsl(var(--sidebar-ring))'
+        },
+        yellow: {
+          50: 'hsl(var(--yellow-50))',
+          100: 'hsl(var(--yellow-100))',
+          200: 'hsl(var(--yellow-200))',
+          300: 'hsl(var(--yellow-300))',
+          400: 'hsl(var(--yellow-400))',
+          500: 'hsl(var(--yellow-500))',
+          600: 'hsl(var(--yellow-600))',
+          700: 'hsl(var(--yellow-700))',
+          800: 'hsl(var(--yellow-800))',
+          900: 'hsl(var(--yellow-900))',
         },
         architect: {
           50: '#f7f7f7',
@@ -87,19 +97,6 @@ export default {
           800: '#7e4334',
           900: '#673a2f',
           950: '#371c16',
-        },
-        yellow: {
-          50: '#fefce8',
-          100: '#fef9c3',
-          200: '#fef08a',
-          300: '#fde047',
-          400: '#facc15',
-          500: '#eab308',
-          600: '#ca8a04',
-          700: '#a16207',
-          800: '#854d0e',
-          900: '#713f12',
-          950: '#422006',
         },
       },
       borderRadius: {

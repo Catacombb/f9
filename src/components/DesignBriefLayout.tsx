@@ -14,18 +14,18 @@ interface DesignBriefLayoutProps {
 }
 
 export function DesignBriefLayout({ children }: DesignBriefLayoutProps) {
-  const { lastSaved, formData, currentSection } = useDesignBrief();
+  const { projectData, currentSection } = useDesignBrief();
   
   // Create a form instance to provide FormContext
   const formMethods = useForm();
   
-  const lastSavedFormatted = lastSaved 
-    ? formatDistanceToNow(new Date(lastSaved), { addSuffix: true })
+  const lastSavedFormatted = projectData.lastSaved 
+    ? formatDistanceToNow(new Date(projectData.lastSaved), { addSuffix: true })
     : 'Not saved yet';
   
   // Create dynamic title based on client name and address
-  const clientName = formData?.projectInfo?.clientName || '';
-  const projectAddress = formData?.projectInfo?.projectAddress || '';
+  const clientName = projectData?.formData?.projectInfo?.clientName || '';
+  const projectAddress = projectData?.formData?.projectInfo?.projectAddress || '';
   
   const headerTitle = clientName ? `${clientName} Brief` : 'Design Brief';
   const headerSubtitle = projectAddress 

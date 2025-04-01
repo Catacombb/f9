@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -25,7 +26,7 @@ const sections = [
 ];
 
 export function DesignBriefSidebar() {
-  const { currentSection, setCurrentSection, formData } = useDesignBrief();
+  const { currentSection, setCurrentSection, projectData } = useDesignBrief();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const isMobile = useIsMobile();
   
@@ -48,32 +49,32 @@ export function DesignBriefSidebar() {
     // Skip progress for intro and summary sections
     if (sectionId === 'intro' || sectionId === 'summary') return 0;
     
-    // Make sure formData is defined before accessing properties
-    if (!formData) return 0;
+    // Make sure projectData is defined before accessing properties
+    if (!projectData || !projectData.formData) return 0;
     
     // Calculate based on filled fields for each section
     switch (sectionId) {
       case 'projectInfo':
-        return calculateProgress(formData.projectInfo);
+        return calculateProgress(projectData.formData.projectInfo);
       case 'budget':
-        return calculateProgress(formData.budget);
+        return calculateProgress(projectData.formData.budget);
       case 'lifestyle':
-        return calculateProgress(formData.lifestyle);
+        return calculateProgress(projectData.formData.lifestyle);
       case 'site':
-        return calculateProgress(formData.site);
+        return calculateProgress(projectData.formData.site);
       case 'spaces':
-        return formData.spaces && formData.spaces.rooms && formData.spaces.rooms.length > 0 ? 
-          Math.min(100, Math.round((formData.spaces.rooms.length / 4) * 100)) : 0;
+        return projectData.formData.spaces && projectData.formData.spaces.rooms && projectData.formData.spaces.rooms.length > 0 ? 
+          Math.min(100, Math.round((projectData.formData.spaces.rooms.length / 4) * 100)) : 0;
       case 'architecture':
-        return calculateProgress(formData.architecture);
+        return calculateProgress(projectData.formData.architecture);
       case 'contractors':
-        return formData.contractors && 
-          (formData.contractors.preferredBuilder || 
-           formData.contractors.professionals && formData.contractors.professionals.length > 0) ? 
-          Math.min(100, formData.contractors.professionals ? 
-            Math.round((formData.contractors.professionals.length / 3) * 50) + 
-            (formData.contractors.preferredBuilder ? 50 : 0) : 
-            (formData.contractors.preferredBuilder ? 50 : 0)) : 0;
+        return projectData.formData.contractors && 
+          (projectData.formData.contractors.preferredBuilder || 
+           projectData.formData.contractors.professionals && projectData.formData.contractors.professionals.length > 0) ? 
+          Math.min(100, projectData.formData.contractors.professionals ? 
+            Math.round((projectData.formData.contractors.professionals.length / 3) * 50) + 
+            (projectData.formData.contractors.preferredBuilder ? 50 : 0) : 
+            (projectData.formData.contractors.preferredBuilder ? 50 : 0)) : 0;
       case 'inspiration':
       case 'uploads':
         return 0; // Will implement when files are handled
@@ -96,8 +97,8 @@ export function DesignBriefSidebar() {
   };
 
   // Get client name and address from the project info
-  const clientName = formData?.projectInfo?.clientName || '';
-  const clientAddress = formData?.projectInfo?.projectAddress || '';
+  const clientName = projectData?.formData?.projectInfo?.clientName || '';
+  const clientAddress = projectData?.formData?.projectInfo?.projectAddress || '';
 
   // Create dynamic title and subtitle
   const briefTitle = clientName ? `${clientName} Brief` : 'Design Brief';
