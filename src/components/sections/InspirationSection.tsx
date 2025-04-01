@@ -5,113 +5,115 @@ import { Card } from '@/components/ui/card';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Skeleton } from '@/components/ui/skeleton';
 
-// 20 New Zealand exterior architectural homes from archipro.co.nz for inspiration gallery
+// Inspiration gallery with reliable image sources
 const inspirationImages = [
   {
     id: 'img1',
-    src: 'https://archipro.co.nz/assets/Uploads/_resampled/x2medium-1-Architect-Designed-Home-Waiheke-Island-2.jpg',
-    alt: 'Modern New Zealand house with glass facade',
+    src: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=2075&auto=format&fit=crop',
+    alt: 'Modern New Zealand style home with wood facade',
   },
   {
     id: 'img2',
-    src: 'https://archipro.co.nz/assets/Uploads/the-pavilion-house-cove-construction-1.jpg',
-    alt: 'Contemporary coastal New Zealand home',
+    src: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?q=80&w=2053&auto=format&fit=crop',
+    alt: 'Contemporary coastal style home',
   },
   {
     id: 'img3',
-    src: 'https://archipro.co.nz/assets/Uploads/_resampled/x2medium-Queenstown-luxury-architects-2.jpg',
-    alt: 'Queenstown luxury home with mountain views',
+    src: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2070&auto=format&fit=crop',
+    alt: 'Luxury home with mountain views',
   },
   {
     id: 'img4',
-    src: 'https://archipro.co.nz/assets/Uploads/rjqyuOr.jpg',
-    alt: 'Auckland modern house with clean lines',
+    src: 'https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?q=80&w=2070&auto=format&fit=crop',
+    alt: 'Modern house with clean lines',
   },
   {
     id: 'img5',
-    src: 'https://archipro.co.nz/assets/Uploads/_resampled/x2medium-Pakiri-Beach-House-1.jpg',
+    src: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2070&auto=format&fit=crop',
     alt: 'Beachfront home with outdoor deck',
   },
   {
     id: 'img6',
-    src: 'https://archipro.co.nz/assets/Uploads/_resampled/x2medium-lake-hayes-2.jpg',
-    alt: 'Lake Hayes residence with panoramic views',
+    src: 'https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?q=80&w=1992&auto=format&fit=crop',
+    alt: 'Lake view residence with panoramic windows',
   },
   {
     id: 'img7',
-    src: 'https://archipro.co.nz/assets/Uploads/_resampled/x2medium-Mt-Maunganui-House-01.jpg',
-    alt: 'Mt Maunganui modern home',
+    src: 'https://images.unsplash.com/photo-1605146769289-440113cc3d00?q=80&w=2070&auto=format&fit=crop',
+    alt: 'Modern beach home',
   },
   {
     id: 'img8',
-    src: 'https://archipro.co.nz/assets/Uploads/_resampled/x2medium-Omaha-Beach-House-exterior.jpg',
-    alt: 'Omaha Beach House exterior',
+    src: 'https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?q=80&w=2070&auto=format&fit=crop',
+    alt: 'Beach House exterior',
   },
   {
     id: 'img9',
-    src: 'https://archipro.co.nz/assets/Uploads/_resampled/x2medium-Te-Arai-Luxury-Holiday-Home-1.jpg',
-    alt: 'Te Arai Luxury Holiday Home',
+    src: 'https://images.unsplash.com/photo-1575517111839-3a3843ee7f5d?q=80&w=2070&auto=format&fit=crop',
+    alt: 'Luxury Holiday Home',
   },
   {
     id: 'img10',
-    src: 'https://archipro.co.nz/assets/Uploads/_resampled/x2medium-Piha-House-1.jpg',
-    alt: 'Piha House with ocean view',
+    src: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=2070&auto=format&fit=crop',
+    alt: 'House with ocean view',
   },
   {
     id: 'img11',
-    src: 'https://archipro.co.nz/assets/Uploads/_resampled/x2medium-DJI-0322.jpg',
+    src: 'https://images.unsplash.com/photo-1501876725168-00c445821c9e?q=80&w=2070&auto=format&fit=crop',
     alt: 'Aerial view of modern beachfront home',
   },
   {
     id: 'img12',
-    src: 'https://archipro.co.nz/assets/Uploads/_resampled/x2medium-DYP-Photography-4.jpg',
+    src: 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?q=80&w=2070&auto=format&fit=crop',
     alt: 'Luxury home with infinity pool',
   },
   {
     id: 'img13',
-    src: 'https://archipro.co.nz/assets/Uploads/_resampled/x2medium-Coastal-House-1.jpg',
+    src: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?q=80&w=2071&auto=format&fit=crop',
     alt: 'Modern coastal residence',
   },
   {
     id: 'img14',
-    src: 'https://archipro.co.nz/assets/Uploads/_resampled/x2medium-Kapiti-Beach-house-1.jpg',
-    alt: 'Kapiti Beach house',
+    src: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=2070&auto=format&fit=crop',
+    alt: 'Beach house',
   },
   {
     id: 'img15',
-    src: 'https://archipro.co.nz/assets/Uploads/_resampled/x2medium-Marlborough-Sounds-Bach-1.jpg',
-    alt: 'Marlborough Sounds Bach',
+    src: 'https://images.unsplash.com/photo-1600607688969-a5bfcd646154?q=80&w=2070&auto=format&fit=crop',
+    alt: 'Modern waterfront home',
   },
   {
     id: 'img16',
-    src: 'https://archipro.co.nz/assets/Uploads/_resampled/x2medium-Waimarama-Beach-House-exterior.jpg',
-    alt: 'Waimarama Beach House exterior',
+    src: 'https://images.unsplash.com/photo-1600585154526-990dced4db0d?q=80&w=2070&auto=format&fit=crop',
+    alt: 'Modern beach house exterior',
   },
   {
     id: 'img17',
-    src: 'https://archipro.co.nz/assets/Uploads/_resampled/x2medium-Kaipara-Harbour-House-exterior.jpg',
-    alt: 'Kaipara Harbour House exterior',
+    src: 'https://images.unsplash.com/photo-1558036117-15d82a90b9b1?q=80&w=2070&auto=format&fit=crop',
+    alt: 'Harbour view house exterior',
   },
   {
     id: 'img18',
-    src: 'https://archipro.co.nz/assets/Uploads/_resampled/x2medium-Wanaka-Lakehouse-1.jpg',
-    alt: 'Wanaka Lakehouse',
+    src: 'https://images.unsplash.com/photo-1523217582562-09d0def993a6?q=80&w=2080&auto=format&fit=crop',
+    alt: 'Lakehouse with mountain views',
   },
   {
     id: 'img19',
-    src: 'https://archipro.co.nz/assets/Uploads/_resampled/x2medium-Matakana-House-exterior.jpg',
-    alt: 'Matakana House exterior',
+    src: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=2070&auto=format&fit=crop',
+    alt: 'Modern house exterior',
   },
   {
     id: 'img20',
-    src: 'https://archipro.co.nz/assets/Uploads/_resampled/x2medium-Bay-of-Islands-Holiday-Home-exterior.jpg',
-    alt: 'Bay of Islands Holiday Home exterior',
+    src: 'https://images.unsplash.com/photo-1599427303058-f04cbcf4756f?q=80&w=2071&auto=format&fit=crop',
+    alt: 'Holiday Home exterior',
   },
 ];
 
 export function InspirationSection() {
   const { files, updateFiles, setCurrentSection } = useDesignBrief();
+  const [loadingImages, setLoadingImages] = React.useState<{ [key: string]: boolean }>({});
   
   const toggleImageSelection = (imageId: string) => {
     const updatedSelections = files.inspirationSelections.includes(imageId)
@@ -127,6 +129,21 @@ export function InspirationSection() {
   
   const handleNext = () => {
     setCurrentSection('uploads');
+  };
+
+  const handleImageLoad = (imageId: string) => {
+    setLoadingImages(prev => ({ ...prev, [imageId]: false }));
+  };
+
+  const handleImageError = (imageId: string, src: string) => {
+    setLoadingImages(prev => ({ ...prev, [imageId]: true }));
+    // Try to reload the image after a delay
+    setTimeout(() => {
+      const img = document.getElementById(`img-${imageId}`) as HTMLImageElement;
+      if (img) {
+        img.src = src;
+      }
+    }, 2000);
   };
   
   return (
@@ -151,20 +168,16 @@ export function InspirationSection() {
               onClick={() => toggleImageSelection(image.id)}
             >
               <div className="relative aspect-video">
+                {loadingImages[image.id] && (
+                  <Skeleton className="absolute inset-0 w-full h-full" />
+                )}
                 <img
+                  id={`img-${image.id}`}
                   src={image.src}
                   alt={image.alt}
                   className="w-full h-full object-cover"
-                  onError={(e) => {
-                    const target = e.currentTarget;
-                    // Fallback for broken images
-                    target.src = "/placeholder.svg";
-                    target.alt = "Image unavailable";
-                    // Add a retry mechanism
-                    setTimeout(() => {
-                      target.src = image.src;
-                    }, 1500);
-                  }}
+                  onLoad={() => handleImageLoad(image.id)}
+                  onError={() => handleImageError(image.id, image.src)}
                   loading="lazy"
                 />
                 {files.inspirationSelections.includes(image.id) && (
