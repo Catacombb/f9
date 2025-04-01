@@ -2,14 +2,15 @@
 import React from 'react';
 import { useTheme } from '@/components/ThemeProvider';
 
-export const AppLogo = ({ size = 'default' }: { size?: 'small' | 'default' | 'large' }) => {
+export const AppLogo = ({ size = 'default' }: { size?: 'small' | 'default' | 'large' | 'xlarge' }) => {
   const { theme } = useTheme();
   const isDarkMode = theme === 'dark';
   
   const sizeClasses = {
     small: 'h-6 md:h-7',
     default: 'h-8 md:h-9',
-    large: 'h-10 md:h-12'
+    large: 'h-10 md:h-12',
+    xlarge: 'h-14 md:h-16'
   };
   
   return (

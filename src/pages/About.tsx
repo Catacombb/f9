@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -28,9 +29,9 @@ const About = () => {
           <div className="space-y-8">
             <div className="text-center mb-12">
               <div className="flex justify-center mb-4">
-                <AppLogo size="large" />
+                <AppLogo size="xlarge" />
               </div>
-              <p className="text-xl text-muted-foreground">Guiding your design journey home</p>
+              <p className="text-xl text-muted-foreground">Illuminating your architectural vision</p>
             </div>
 
             <div className="space-y-6">
