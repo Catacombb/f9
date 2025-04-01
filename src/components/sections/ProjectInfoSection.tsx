@@ -55,15 +55,11 @@ export function ProjectInfoSection() {
   return (
     <div className="design-brief-section-wrapper">
       <div className="design-brief-section-container">
-        <div className="flex justify-between items-center mb-4">
-          <SectionHeader 
-            title="Project Information" 
-            description="Tell us about yourself and your project. This information helps us understand the basics of what you're looking to achieve."
-          />
-          <div className="text-sm font-medium">
-            {completionPercentage}% Complete
-          </div>
-        </div>
+        <SectionHeader 
+          title="Project Information" 
+          description="Tell us about yourself and your project. This information helps us understand the basics of what you're looking to achieve."
+          progress={completionPercentage}
+        />
         
         <div className="design-brief-form-group">
           <div className="mb-6">
@@ -153,7 +149,8 @@ export function ProjectInfoSection() {
           </div>
         </div>
         
-        <div className="flex justify-end mt-6">
+        <div className="flex justify-between mt-6">
+          <div></div> {/* Empty div for spacing */}
           <Button onClick={handleNext} className="group">
             <span>Next: Project Team</span>
             <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />

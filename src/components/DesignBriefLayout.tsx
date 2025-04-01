@@ -99,7 +99,7 @@ export function DesignBriefLayout({ children }: DesignBriefLayoutProps) {
             </Button>
           </SheetTrigger>
           <SheetContent side="left" className="p-0 w-[80%] max-w-[280px]">
-            <DesignBriefSidebar showLastSaved={isMobile} lastSavedFormatted={lastSavedFormatted} />
+            <DesignBriefSidebar showLastSaved={true} lastSavedFormatted={lastSavedFormatted} />
           </SheetContent>
         </Sheet>
       )}
@@ -135,7 +135,12 @@ export function DesignBriefLayout({ children }: DesignBriefLayoutProps) {
         <footer className="h-16 border-t flex flex-col justify-between px-4 py-2 text-xs text-muted-foreground w-full">
           <div className="flex flex-col gap-2 w-full items-center">
             <div className="flex justify-between items-center w-full max-w-full mx-auto px-2">
-              <span>Overall Progress: {overallProgress}%</span>
+              <span className="truncate">Overall Progress: {overallProgress}%</span>
+              {isMobile && (
+                <span className="text-xs truncate max-w-[50%]">
+                  Last saved {lastSavedFormatted}
+                </span>
+              )}
             </div>
             <Progress value={overallProgress} className="h-2 w-full" />
             <div className="text-center mt-1 pb-2 truncate w-full">

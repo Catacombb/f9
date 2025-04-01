@@ -152,6 +152,7 @@ export function SpacesSection() {
   };
   
   const handleRoomQuantityChange = (type: string, quantity: number) => {
+    // Update the local state for display
     setRoomsWithQuantities(prev => 
       prev.map(room => 
         room.type === type ? { ...room, quantity } : room
@@ -195,6 +196,19 @@ export function SpacesSection() {
     return roomMatch ? roomMatch.quantity : 0;
   };
   
+  // Handle increment and decrement with explicit bounds checking
+  const incrementRoomQuantity = (type: string) => {
+    const currentQuantity = getRoomQuantity(type);
+    handleRoomQuantityChange(type, currentQuantity + 1);
+  };
+  
+  const decrementRoomQuantity = (type: string) => {
+    const currentQuantity = getRoomQuantity(type);
+    if (currentQuantity > 0) {
+      handleRoomQuantityChange(type, currentQuantity - 1);
+    }
+  };
+  
   return (
     <div className="design-brief-section-wrapper">
       <div className="design-brief-section-container">
@@ -230,9 +244,10 @@ export function SpacesSection() {
                       <Button 
                         variant="outline" 
                         size="icon" 
-                        onClick={() => handleRoomQuantityChange(roomType.value, Math.max(0, getRoomQuantity(roomType.value) - 1))}
+                        onClick={() => decrementRoomQuantity(roomType.value)}
                         disabled={getRoomQuantity(roomType.value) <= 0}
                         className="h-8 w-8 flex items-center justify-center"
+                        aria-label={`Decrease ${roomType.label} quantity`}
                       >
                         -
                       </Button>
@@ -242,12 +257,14 @@ export function SpacesSection() {
                         value={getRoomQuantity(roomType.value)} 
                         onChange={(e) => handleRoomQuantityChange(roomType.value, parseInt(e.target.value) || 0)}
                         className="w-14 text-center h-8"
+                        aria-label={`${roomType.label} quantity`}
                       />
                       <Button 
                         variant="outline" 
                         size="icon" 
-                        onClick={() => handleRoomQuantityChange(roomType.value, getRoomQuantity(roomType.value) + 1)}
+                        onClick={() => incrementRoomQuantity(roomType.value)}
                         className="h-8 w-8 flex items-center justify-center"
+                        aria-label={`Increase ${roomType.label} quantity`}
                       >
                         +
                       </Button>

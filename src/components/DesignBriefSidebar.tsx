@@ -76,10 +76,10 @@ export function DesignBriefSidebar({ showLastSaved = false, lastSavedFormatted =
       <div className="h-full flex flex-col">
         <div className="py-6 px-4 flex flex-col items-center">
           <AppLogo size="large" />
-          <span className="text-xs text-muted-foreground mt-2">Guiding Your Vision</span>
+          <span className="text-xs text-muted-foreground mt-2 mb-3">Guiding Your Vision</span>
           
           {showLastSaved && lastSavedFormatted && (
-            <div className="mt-3 text-xs text-muted-foreground text-center pb-2 border-b border-sidebar-border w-full">
+            <div className="mt-1 text-xs text-muted-foreground text-center pb-2 border-b border-sidebar-border w-full">
               Last saved {lastSavedFormatted}
             </div>
           )}
@@ -105,7 +105,7 @@ export function DesignBriefSidebar({ showLastSaved = false, lastSavedFormatted =
                   <span className="truncate">{section.title}</span>
                   
                   {section.id !== 'intro' && section.id !== 'summary' && (
-                    <div className="ml-auto flex items-center space-x-1">
+                    <div className="ml-auto">
                       {getSectionProgress(section.id as SectionKey) > 0 && (
                         <span className="text-xs text-sidebar-foreground/70">
                           {getSectionProgress(section.id as SectionKey)}%
