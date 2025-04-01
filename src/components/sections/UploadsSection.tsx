@@ -56,7 +56,7 @@ export function UploadsSection() {
       <div className="design-brief-section-container">
         <h1 className="design-brief-section-title">Upload Files</h1>
         <p className="design-brief-section-description">
-          Upload any relevant files for your project, such as site plans, sketches, or reference images. You can upload up to 20 files.
+          Upload any relevant files for your project, such as site plans, sketches, or your own inspiration images. You can upload up to 20 files.
         </p>
         
         <div className="design-brief-card p-8">

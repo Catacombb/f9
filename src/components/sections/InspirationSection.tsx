@@ -6,73 +6,42 @@ import { useDesignBrief } from '@/context/DesignBriefContext';
 import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-// New Zealand architectural homes for inspiration gallery
+// New Zealand architectural homes from archipro.co.nz for inspiration gallery
 const inspirationImages = [
   {
     id: 'img1',
-    src: 'https://images.unsplash.com/photo-1571055107559-3e67626fa8be?w=800&auto=format&fit=crop',
+    src: 'https://archipro.co.nz/assets/Uploads/_resampled/x2medium-1-Architect-Designed-Home-Waiheke-Island-2.jpg',
     alt: 'Modern New Zealand house with glass facade',
-    category: 'Exterior',
   },
   {
     id: 'img2',
-    src: 'https://images.unsplash.com/photo-1600607688969-a5bfcd646154?w=800&auto=format&fit=crop',
+    src: 'https://archipro.co.nz/assets/Uploads/the-pavilion-house-cove-construction-1.jpg',
     alt: 'Contemporary coastal New Zealand home',
-    category: 'Exterior',
   },
   {
     id: 'img3',
-    src: 'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=800&auto=format&fit=crop',
-    alt: 'Minimalist New Zealand living space with mountain views',
-    category: 'Interior',
+    src: 'https://archipro.co.nz/assets/Uploads/_resampled/x2medium-Queenstown-luxury-architects-2.jpg',
+    alt: 'Queenstown luxury home with mountain views',
   },
   {
     id: 'img4',
-    src: 'https://images.unsplash.com/photo-1600566752355-09c79c71a7b0?w=800&auto=format&fit=crop',
-    alt: 'Open plan New Zealand kitchen and dining',
-    category: 'Interior',
+    src: 'https://archipro.co.nz/assets/Uploads/rjqyuOr.jpg',
+    alt: 'Auckland modern house with clean lines',
   },
   {
     id: 'img5',
-    src: 'https://images.unsplash.com/photo-1600210492493-0946911123ea?w=800&auto=format&fit=crop',
-    alt: 'Auckland modern house with outdoor deck',
-    category: 'Exterior',
+    src: 'https://archipro.co.nz/assets/Uploads/_resampled/x2medium-Pakiri-Beach-House-1.jpg',
+    alt: 'Beachfront home with outdoor deck',
   },
   {
     id: 'img6',
-    src: 'https://images.unsplash.com/photo-1575403071235-5dcd06cbf169?w=800&auto=format&fit=crop',
-    alt: 'Queenstown cabin with lake views',
-    category: 'Exterior',
-  },
-  {
-    id: 'img7',
-    src: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800&auto=format&fit=crop',
-    alt: 'Sustainable timber New Zealand home',
-    category: 'Exterior',
-  },
-  {
-    id: 'img8',
-    src: 'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?w=800&auto=format&fit=crop',
-    alt: 'Modern New Zealand bathroom with freestanding bath',
-    category: 'Interior',
-  },
-  {
-    id: 'img9',
-    src: 'https://images.unsplash.com/photo-1600607687644-c7f34a94d0b0?w=800&auto=format&fit=crop',
-    alt: 'New Zealand beachfront home with indoor-outdoor flow',
-    category: 'Interior',
-  },
-  {
-    id: 'img10',
-    src: 'https://images.unsplash.com/photo-1623625434462-e5e42318ae49?w=800&auto=format&fit=crop',
-    alt: 'Wellington eco-home with native garden',
-    category: 'Exterior',
+    src: 'https://archipro.co.nz/assets/Uploads/_resampled/x2medium-lake-hayes-2.jpg',
+    alt: 'Lake Hayes residence with panoramic views',
   },
 ];
 
 export function InspirationSection() {
   const { files, updateFiles, setCurrentSection } = useDesignBrief();
-  const [filter, setFilter] = useState<string | null>(null);
   
   const toggleImageSelection = (imageId: string) => {
     const updatedSelections = files.inspirationSelections.includes(imageId)
@@ -81,10 +50,6 @@ export function InspirationSection() {
     
     updateFiles({ inspirationSelections: updatedSelections });
   };
-  
-  const filteredImages = filter 
-    ? inspirationImages.filter(img => img.category === filter)
-    : inspirationImages;
   
   const handlePrevious = () => {
     setCurrentSection('architecture');
@@ -99,35 +64,12 @@ export function InspirationSection() {
       <div className="design-brief-section-container">
         <h1 className="design-brief-section-title">Inspiration Gallery</h1>
         <p className="design-brief-section-description">
-          Select images of New Zealand architectural homes that inspire you or reflect your design preferences. Your selections will help us understand your aesthetic tastes.
+          Select images of New Zealand architectural homes that inspire you or reflect your design preferences. 
+          Your selections will help us understand your aesthetic tastes.
         </p>
         
-        <div className="mb-6 flex flex-wrap gap-2">
-          <Button
-            variant={filter === null ? "default" : "outline"}
-            onClick={() => setFilter(null)}
-            size="sm"
-          >
-            All
-          </Button>
-          <Button
-            variant={filter === 'Interior' ? "default" : "outline"}
-            onClick={() => setFilter('Interior')}
-            size="sm"
-          >
-            Interiors
-          </Button>
-          <Button
-            variant={filter === 'Exterior' ? "default" : "outline"}
-            onClick={() => setFilter('Exterior')}
-            size="sm"
-          >
-            Exteriors
-          </Button>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredImages.map((image) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+          {inspirationImages.map((image) => (
             <Card 
               key={image.id} 
               className={cn(
@@ -150,10 +92,6 @@ export function InspirationSection() {
                   </div>
                 )}
               </div>
-              <CardContent className="p-3">
-                <p className="text-sm">{image.alt}</p>
-                <p className="text-xs text-muted-foreground">{image.category}</p>
-              </CardContent>
             </Card>
           ))}
         </div>
@@ -161,6 +99,9 @@ export function InspirationSection() {
         <div className="mt-6 text-center">
           <p className="text-muted-foreground">
             Selected {files.inspirationSelections.length} of {inspirationImages.length} images
+          </p>
+          <p className="text-muted-foreground mt-2">
+            You can also upload your own inspiration images in the next section
           </p>
         </div>
         
