@@ -35,7 +35,7 @@ export function SiteSection() {
         
         <div className="design-brief-form-group">
           <div className="mb-6">
-            <Label htmlFor="existingConditions" className="design-brief-question-title">
+            <Label htmlFor="existingConditions" className="design-brief-question-title font-bold">
               Site Description
               <span className="text-muted-foreground text-sm ml-2">(optional)</span>
             </Label>
@@ -53,7 +53,7 @@ export function SiteSection() {
           </div>
           
           <div className="mb-6">
-            <Label htmlFor="siteFeatures" className="design-brief-question-title">
+            <Label htmlFor="siteFeatures" className="design-brief-question-title font-bold">
               Topography
               <span className="text-muted-foreground text-sm ml-2">(optional)</span>
             </Label>
@@ -71,7 +71,7 @@ export function SiteSection() {
           </div>
           
           <div className="mb-6">
-            <Label htmlFor="neighboringProperties" className="design-brief-question-title">
+            <Label htmlFor="neighboringProperties" className="design-brief-question-title font-bold">
               Vegetation
               <span className="text-muted-foreground text-sm ml-2">(optional)</span>
             </Label>
@@ -89,7 +89,7 @@ export function SiteSection() {
           </div>
           
           <div>
-            <Label htmlFor="viewsOrientations" className="design-brief-question-title">
+            <Label htmlFor="viewsOrientations" className="design-brief-question-title font-bold">
               Views
               <span className="text-muted-foreground text-sm ml-2">(optional)</span>
             </Label>

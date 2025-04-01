@@ -89,22 +89,12 @@ export function DesignBriefLayout({ children }: DesignBriefLayoutProps) {
         <header className="h-16 border-b flex items-center justify-between px-4 bg-background z-10">
           <div className="flex items-center space-x-2">
             <AppLogo size="small" />
-            {showHeader && (
-              <div className="flex flex-col">
-                <span className="text-sm font-medium">Design Brief</span>
-                <span className="text-xs text-muted-foreground">
-                  Create your project brief
-                </span>
-              </div>
-            )}
-          </div>
-          
-          {/* Center content with last saved timestamp */}
-          <div className="absolute left-1/2 transform -translate-x-1/2 text-sm text-muted-foreground">
-            Last saved {lastSavedFormatted}
           </div>
           
           <div className="flex items-center space-x-2">
+            <span className="text-xs text-muted-foreground">
+              Last saved {lastSavedFormatted}
+            </span>
             <ThemeToggle />
           </div>
         </header>

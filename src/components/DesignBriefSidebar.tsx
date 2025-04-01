@@ -17,8 +17,8 @@ const sections = [
   { id: 'contractors', title: 'Project Team', icon: <Users className="h-5 w-5" /> },
   { id: 'budget', title: 'Budget', icon: <PiggyBank className="h-5 w-5" /> },
   { id: 'lifestyle', title: 'Lifestyle', icon: <Users className="h-5 w-5" /> },
-  { id: 'spaces', title: 'Spaces', icon: <Layout className="h-5 w-5" /> },
   { id: 'site', title: 'Site', icon: <MapPin className="h-5 w-5" /> },
+  { id: 'spaces', title: 'Spaces', icon: <Layout className="h-5 w-5" /> },
   { id: 'architecture', title: 'Architecture', icon: <Building className="h-5 w-5" /> },
   { id: 'inspiration', title: 'Inspiration', icon: <Image className="h-5 w-5" /> },
   { id: 'uploads', title: 'Uploads', icon: <Upload className="h-5 w-5" /> },
@@ -82,14 +82,6 @@ export function DesignBriefSidebar() {
     return Math.round((completed / fields.length) * 100);
   };
 
-  // Get client name and address from the project info
-  const clientName = projectData?.formData?.projectInfo?.clientName || '';
-  const clientAddress = projectData?.formData?.projectInfo?.projectAddress || '';
-
-  // Create dynamic title and subtitle
-  const briefTitle = clientName ? `${clientName} Brief` : 'Design Brief';
-  const briefSubtitle = clientAddress ? `Create your project brief for ${clientAddress}` : 'Create your project brief';
-
   return (
     <div 
       className={cn(
@@ -112,8 +104,7 @@ export function DesignBriefSidebar() {
 
       <div className={cn("h-full flex flex-col", isCollapsed ? "hidden" : "block")}>
         <div className="py-6 px-4">
-          <h2 className="text-xl font-semibold text-sidebar-foreground truncate">{briefTitle}</h2>
-          <p className="text-sm text-sidebar-foreground/70 truncate">{briefSubtitle}</p>
+          <AppLogo size="small" />
         </div>
         
         <Separator className="mb-2 bg-sidebar-border" />
@@ -150,7 +141,7 @@ export function DesignBriefSidebar() {
           </div>
         </ScrollArea>
         
-        <div className="p-4 border-t bg-sidebar border-sidebar-border">
+        <div className="p-4 border-t bg-sidebar border-sidebar-border mt-auto">
           <div className="space-y-2">
             <Button variant="ghost" className="w-full justify-start" asChild>
               <Link to="/about" className="flex items-center">
