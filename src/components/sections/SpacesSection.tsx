@@ -9,7 +9,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { SortableContext, arrayMove, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { PlusCircle, X, Trash2, GripVertical, MoveHorizontal, ArrowRightLeft } from 'lucide-react';
+import { PlusCircle, X, Trash2, GripVertical, ArrowRightLeft } from 'lucide-react';
 import { SpaceRoom, ProximityPair } from '@/types';
 import { Label } from '@/components/ui/label';
 import { toast } from '@/hooks/use-toast';
