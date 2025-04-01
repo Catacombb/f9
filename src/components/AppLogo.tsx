@@ -17,7 +17,7 @@ export const AppLogo = ({ size = 'default' }: { size?: 'small' | 'default' | 'la
     <div className="flex items-center gap-2">
       <img 
         src={isDarkMode 
-          ? "/lovable-uploads/70d2354a-6971-4612-ada4-f1277078f209.png" // Black logo for dark mode
+          ? "/lovable-uploads/3e4d3eb9-8d76-44ba-8a4a-15faf8837c49.png" // New dark mode logo
           : "/lovable-uploads/679db516-7bcb-4615-b61d-df2ce461c388.png" // Yellow logo for light mode
         } 
         alt="Northstar Logo" 
