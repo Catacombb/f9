@@ -1,344 +1,217 @@
 
 import React from 'react';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import * as z from 'zod';
-import { useDesignBrief } from '@/context/DesignBriefContext';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useDesignBrief } from '@/context/DesignBriefContext';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { SectionHeader } from './SectionHeader';
-
-const formSchema = z.object({
-  preferredMethod: z.string().min(1, { message: 'Please select a preferred contact method' }),
-  bestTimes: z.array(z.string()).min(1, { message: 'Please select at least one best time' }),
-  availableDays: z.array(z.string()).min(1, { message: 'Please select at least one available day' }),
-  frequency: z.string().min(1, { message: 'Please select a communication frequency' }),
-  urgentContact: z.string().min(1, { message: 'Please specify urgent contact method' }),
-  responseTime: z.string().min(1, { message: 'Please select a preferred response time' }),
-  additionalNotes: z.string().optional(),
-});
+import { MultiSelectButtons } from '@/components/MultiSelectButtons';
 
 export function CommunicationSection() {
-  const { formData, updateFormData } = useDesignBrief();
+  const { formData, updateFormData, setCurrentSection } = useDesignBrief();
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      preferredMethod: formData.communication?.preferredMethod || '',
-      bestTimes: formData.communication?.bestTimes || [],
-      availableDays: formData.communication?.availableDays || [],
-      frequency: formData.communication?.frequency || '',
-      urgentContact: formData.communication?.urgentContact || '',
-      responseTime: formData.communication?.responseTime || '',
-      additionalNotes: formData.communication?.additionalNotes || '',
-    },
-  });
-
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    updateFormData('communication', values);
-  }
-
-  // Handle individual field changes
-  const handleFieldChange = () => {
-    const values = form.getValues();
-    updateFormData('communication', values);
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    updateFormData('communication', { [name]: value });
   };
 
-  const bestTimeOptions = [
-    { id: 'morning', label: 'Morning (8am-12pm)' },
-    { id: 'afternoon', label: 'Afternoon (12pm-5pm)' },
-    { id: 'evening', label: 'Evening (5pm-9pm)' },
+  const handleSelectChange = (name: string, value: string) => {
+    updateFormData('communication', { [name]: value });
+  };
+
+  const handleBestTimesChange = (values: string[]) => {
+    updateFormData('communication', { 'bestTimes': values });
+  };
+
+  const handleAvailableDaysChange = (values: string[]) => {
+    updateFormData('communication', { 'availableDays': values });
+  };
+
+  const handlePrevious = () => {
+    setCurrentSection('inspiration');
+  };
+
+  const handleNext = () => {
+    setCurrentSection('uploads');
+  };
+
+  // Options for multi-select buttons
+  const timeOptions = [
+    { value: 'early_morning', label: 'Early Morning (6-9am)' },
+    { value: 'morning', label: 'Morning (9am-12pm)' },
+    { value: 'afternoon', label: 'Afternoon (12-5pm)' },
+    { value: 'evening', label: 'Evening (5-8pm)' },
+    { value: 'night', label: 'Night (8pm+)' }
   ];
 
-  const availableDaysOptions = [
-    { id: 'monday', label: 'Monday' },
-    { id: 'tuesday', label: 'Tuesday' },
-    { id: 'wednesday', label: 'Wednesday' },
-    { id: 'thursday', label: 'Thursday' },
-    { id: 'friday', label: 'Friday' },
-    { id: 'saturday', label: 'Saturday' },
-    { id: 'sunday', label: 'Sunday' },
+  const dayOptions = [
+    { value: 'monday', label: 'Monday' },
+    { value: 'tuesday', label: 'Tuesday' },
+    { value: 'wednesday', label: 'Wednesday' },
+    { value: 'thursday', label: 'Thursday' },
+    { value: 'friday', label: 'Friday' },
+    { value: 'saturday', label: 'Saturday' },
+    { value: 'sunday', label: 'Sunday' }
   ];
 
   return (
-    <div className="container max-w-3xl py-6">
-      <SectionHeader
-        title="Communication Preferences"
-        description="Specify how you'd prefer to communicate during your project."
-      />
+    <div className="design-brief-section-wrapper">
+      <div className="design-brief-section-container">
+        <SectionHeader
+          title="Communication Preferences"
+          description="Help us understand how you prefer to communicate during the design process."
+        />
 
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <FormField
-            control={form.control}
-            name="preferredMethod"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Preferred Contact Method</FormLabel>
-                <Select
-                  onValueChange={(value) => {
-                    field.onChange(value);
-                    handleFieldChange();
-                  }}
-                  defaultValue={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select your preferred contact method" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="email">Email</SelectItem>
-                    <SelectItem value="phone">Phone Call</SelectItem>
-                    <SelectItem value="sms">Text Message (SMS)</SelectItem>
-                    <SelectItem value="video">Video Call (Zoom, Skype, etc.)</SelectItem>
-                    <SelectItem value="in-person">In-Person Meetings</SelectItem>
-                    <SelectItem value="pm-software">Project Management Software</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormDescription>
-                  How would you like us to contact you primarily?
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+        <div className="design-brief-form-group">
+          <div className="mb-6">
+            <Label htmlFor="preferredMethod" className="design-brief-question-title">
+              Preferred Method of Communication
+            </Label>
+            <p className="design-brief-question-description">
+              How would you prefer we contact you for day-to-day updates and questions?
+            </p>
+            <Select
+              value={formData.communication.preferredMethod}
+              onValueChange={(value) => handleSelectChange('preferredMethod', value)}
+            >
+              <SelectTrigger id="preferredMethod" className="mt-1">
+                <SelectValue placeholder="Select preferred method" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="email">Email</SelectItem>
+                <SelectItem value="phone">Phone Call</SelectItem>
+                <SelectItem value="text">Text Message</SelectItem>
+                <SelectItem value="video">Video Call</SelectItem>
+                <SelectItem value="in_person">In-Person Meeting</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <FormField
-              control={form.control}
-              name="bestTimes"
-              render={() => (
-                <FormItem>
-                  <div className="mb-4">
-                    <FormLabel>Best Times for Contact</FormLabel>
-                    <FormDescription>
-                      When are you generally available?
-                    </FormDescription>
-                  </div>
-                  {bestTimeOptions.map((item) => (
-                    <FormField
-                      key={item.id}
-                      control={form.control}
-                      name="bestTimes"
-                      render={({ field }) => {
-                        return (
-                          <FormItem
-                            key={item.id}
-                            className="flex flex-row items-start space-x-3 space-y-0 mb-2"
-                          >
-                            <FormControl>
-                              <Checkbox
-                                checked={field.value?.includes(item.id)}
-                                onCheckedChange={(checked) => {
-                                  const newValue = checked
-                                    ? [...field.value, item.id]
-                                    : field.value?.filter((value) => value !== item.id);
-                                  field.onChange(newValue);
-                                  handleFieldChange();
-                                }}
-                              />
-                            </FormControl>
-                            <FormLabel className="font-normal">
-                              {item.label}
-                            </FormLabel>
-                          </FormItem>
-                        );
-                      }}
-                    />
-                  ))}
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="availableDays"
-              render={() => (
-                <FormItem>
-                  <div className="mb-4">
-                    <FormLabel>Available Days</FormLabel>
-                    <FormDescription>
-                      Which days are you available for communication?
-                    </FormDescription>
-                  </div>
-                  {availableDaysOptions.map((item) => (
-                    <FormField
-                      key={item.id}
-                      control={form.control}
-                      name="availableDays"
-                      render={({ field }) => {
-                        return (
-                          <FormItem
-                            key={item.id}
-                            className="flex flex-row items-start space-x-3 space-y-0 mb-2"
-                          >
-                            <FormControl>
-                              <Checkbox
-                                checked={field.value?.includes(item.id)}
-                                onCheckedChange={(checked) => {
-                                  const newValue = checked
-                                    ? [...field.value, item.id]
-                                    : field.value?.filter((value) => value !== item.id);
-                                  field.onChange(newValue);
-                                  handleFieldChange();
-                                }}
-                              />
-                            </FormControl>
-                            <FormLabel className="font-normal">
-                              {item.label}
-                            </FormLabel>
-                          </FormItem>
-                        );
-                      }}
-                    />
-                  ))}
-                  <FormMessage />
-                </FormItem>
-              )}
+          <div className="mb-6">
+            <MultiSelectButtons
+              label="Best Times to Contact You"
+              description="When are the best times for us to reach you? Select all that apply."
+              options={timeOptions}
+              selectedValues={formData.communication.bestTimes || []}
+              onChange={handleBestTimesChange}
             />
           </div>
 
-          <FormField
-            control={form.control}
-            name="frequency"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Frequency of Communication</FormLabel>
-                <Select
-                  onValueChange={(value) => {
-                    field.onChange(value);
-                    handleFieldChange();
-                  }}
-                  defaultValue={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select communication frequency" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="weekly">Weekly Updates</SelectItem>
-                    <SelectItem value="biweekly">Bi-Weekly Updates</SelectItem>
-                    <SelectItem value="as-needed">As Needed</SelectItem>
-                    <SelectItem value="major-decisions">Only for Major Decisions</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormDescription>
-                  How often would you like to be updated during the project?
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="mb-6">
+            <MultiSelectButtons
+              label="Available Days"
+              description="Which days of the week are you typically available? Select all that apply."
+              options={dayOptions}
+              selectedValues={formData.communication.availableDays || []}
+              onChange={handleAvailableDaysChange}
+            />
+          </div>
 
-          <FormField
-            control={form.control}
-            name="urgentContact"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Emergency or Urgent Contact</FormLabel>
-                <Select
-                  onValueChange={(value) => {
-                    field.onChange(value);
-                    handleFieldChange();
-                  }}
-                  defaultValue={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select urgent contact method" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="phone-first">Phone Call First, Then Email</SelectItem>
-                    <SelectItem value="email-first">Email First, Then Phone</SelectItem>
-                    <SelectItem value="phone-only">Phone Call Only</SelectItem>
-                    <SelectItem value="sms-only">Text Message Only</SelectItem>
-                    <SelectItem value="any">Any Available Method</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormDescription>
-                  How should we contact you for urgent matters?
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="mb-6">
+            <Label htmlFor="frequency" className="design-brief-question-title">
+              Communication Frequency
+            </Label>
+            <p className="design-brief-question-description">
+              How often would you like to receive project updates?
+            </p>
+            <RadioGroup
+              value={formData.communication.frequency}
+              onValueChange={(value) => handleSelectChange('frequency', value)}
+              className="mt-2 space-y-2"
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="daily" id="frequency_daily" />
+                <Label htmlFor="frequency_daily" className="font-normal">Daily</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="weekly" id="frequency_weekly" />
+                <Label htmlFor="frequency_weekly" className="font-normal">Weekly</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="biweekly" id="frequency_biweekly" />
+                <Label htmlFor="frequency_biweekly" className="font-normal">Every Two Weeks</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="monthly" id="frequency_monthly" />
+                <Label htmlFor="frequency_monthly" className="font-normal">Monthly</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="milestones" id="frequency_milestones" />
+                <Label htmlFor="frequency_milestones" className="font-normal">Only at Key Milestones</Label>
+              </div>
+            </RadioGroup>
+          </div>
 
-          <FormField
-            control={form.control}
-            name="responseTime"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Preferred Response Time</FormLabel>
-                <Select
-                  onValueChange={(value) => {
-                    field.onChange(value);
-                    handleFieldChange();
-                  }}
-                  defaultValue={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select preferred response time" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="same-day">Same Day</SelectItem>
-                    <SelectItem value="1-2-days">1-2 Business Days</SelectItem>
-                    <SelectItem value="flexible">Flexible/No Urgency</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormDescription>
-                  How quickly do you expect responses to your communications?
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="mb-6">
+            <Label htmlFor="urgentContact" className="design-brief-question-title">
+              How to Contact for Urgent Matters
+              <span className="text-muted-foreground text-sm ml-2">(optional)</span>
+            </Label>
+            <Textarea
+              id="urgentContact"
+              name="urgentContact"
+              placeholder="For urgent matters, please contact me via..."
+              value={formData.communication.urgentContact}
+              onChange={handleChange}
+              className="mt-1"
+            />
+          </div>
 
-          <FormField
-            control={form.control}
-            name="additionalNotes"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Additional Notes</FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder="Any additional communication preferences, time zones, or specific instructions..."
-                    className="min-h-[100px]"
-                    {...field}
-                    onChange={(e) => {
-                      field.onChange(e);
-                      handleFieldChange();
-                    }}
-                  />
-                </FormControl>
-                <FormDescription>
-                  Add any other specific communication preferences here.
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="mb-6">
+            <Label htmlFor="responseTime" className="design-brief-question-title">
+              Expected Response Time
+              <span className="text-muted-foreground text-sm ml-2">(optional)</span>
+            </Label>
+            <p className="design-brief-question-description">
+              How quickly would you like to receive responses to your questions or inquiries?
+            </p>
+            <Select
+              value={formData.communication.responseTime}
+              onValueChange={(value) => handleSelectChange('responseTime', value)}
+            >
+              <SelectTrigger id="responseTime" className="mt-1">
+                <SelectValue placeholder="Select expected response time" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="same_day">Same Day</SelectItem>
+                <SelectItem value="24_hours">Within 24 Hours</SelectItem>
+                <SelectItem value="48_hours">Within 48 Hours</SelectItem>
+                <SelectItem value="week">Within a Week</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
-          <Button type="submit" className="w-full md:w-auto">Save Communication Preferences</Button>
-        </form>
-      </Form>
+          <div>
+            <Label htmlFor="additionalNotes" className="design-brief-question-title">
+              Additional Communication Notes
+              <span className="text-muted-foreground text-sm ml-2">(optional)</span>
+            </Label>
+            <Textarea
+              id="additionalNotes"
+              name="additionalNotes"
+              placeholder="Any additional notes about communication..."
+              value={formData.communication.additionalNotes}
+              onChange={handleChange}
+              className="mt-1"
+            />
+          </div>
+        </div>
+
+        <div className="flex justify-between mt-6">
+          <Button variant="outline" onClick={handlePrevious} className="group">
+            <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
+            <span>Previous: Inspiration</span>
+          </Button>
+
+          <Button onClick={handleNext} className="group">
+            <span>Next: Uploads</span>
+            <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }

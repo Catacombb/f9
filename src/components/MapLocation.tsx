@@ -44,7 +44,8 @@ export function MapLocation({ address, onAddressChange, onCoordinatesChange }: M
       container: mapContainer.current,
       style: 'mapbox://styles/mapbox/streets-v12',
       center: [174.7787, -41.2924], // Default to New Zealand
-      zoom: 5
+      zoom: 5, // Start with a view of all of New Zealand
+      minZoom: 3, // Limit how far users can zoom out
     });
 
     // Add navigation controls
@@ -121,27 +122,29 @@ export function MapLocation({ address, onAddressChange, onCoordinatesChange }: M
     };
   }, []);
 
-  // Function to fetch address suggestions
+  // Function to fetch address suggestions - improved with better debouncing and NZ-focused search
   const fetchAddressSuggestions = async (query: string) => {
-    if (query.length < 3) {
+    if (query.length < 2) { // Reduced threshold for faster response
       setAddressSuggestions([]);
       return;
     }
     
     try {
       const response = await fetch(
-        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${mapboxgl.accessToken}&country=nz&types=address,place,locality,neighborhood,postcode`
+        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${mapboxgl.accessToken}&country=nz&types=address,place,locality,neighborhood,postcode&limit=5`
       );
       const data = await response.json();
       
       if (data.features) {
-        setAddressSuggestions(data.features.map((feature: any) => ({
+        const suggestions = data.features.map((feature: any) => ({
           id: feature.id,
           place_name: feature.place_name,
           center: feature.center
-        })));
+        }));
         
-        if (data.features.length > 0) {
+        setAddressSuggestions(suggestions);
+        
+        if (suggestions.length > 0) {
           setIsPopoverOpen(true);
         }
       }
@@ -150,7 +153,7 @@ export function MapLocation({ address, onAddressChange, onCoordinatesChange }: M
     }
   };
 
-  // Function to search for an address
+  // Function to search for an address - improved with better zoom and notifications
   const searchAddress = async (searchAddress: string) => {
     if (!map.current || !marker.current) return;
     
@@ -165,9 +168,18 @@ export function MapLocation({ address, onAddressChange, onCoordinatesChange }: M
         
         // Update marker and map
         marker.current.setLngLat([lng, lat]).addTo(map.current);
+        
+        // Determine appropriate zoom level based on feature type
+        let zoomLevel = 15;
+        if (data.features[0].place_type.includes('region')) zoomLevel = 10;
+        if (data.features[0].place_type.includes('place')) zoomLevel = 12;
+        if (data.features[0].place_type.includes('address')) zoomLevel = 17;
+        
         map.current.flyTo({
           center: [lng, lat],
-          zoom: 15
+          zoom: zoomLevel,
+          duration: 1500, // Smooth animation
+          essential: true
         });
         
         // Update coordinates
@@ -177,6 +189,12 @@ export function MapLocation({ address, onAddressChange, onCoordinatesChange }: M
         const formattedAddress = data.features[0].place_name;
         setSearchInput(formattedAddress);
         onAddressChange(formattedAddress);
+        
+        toast({
+          title: "Location found",
+          description: "Map has been centered on the selected address.",
+          duration: 3000,
+        });
       } else {
         toast({
           title: "Address not found",
@@ -217,15 +235,22 @@ export function MapLocation({ address, onAddressChange, onCoordinatesChange }: M
     onAddressChange(suggestion.place_name);
     
     if (map.current && marker.current) {
-      // Update marker and map
+      // Update marker and map with proper zooming
       marker.current.setLngLat(suggestion.center).addTo(map.current);
       map.current.flyTo({
         center: suggestion.center,
-        zoom: 15
+        zoom: 17, // Closer zoom for selected addresses
+        duration: 1500
       });
       
       // Update coordinates
       onCoordinatesChange(suggestion.center);
+      
+      toast({
+        title: "Location selected",
+        description: "Map has been centered on your selected address.",
+        duration: 3000,
+      });
     }
     
     setIsPopoverOpen(false);
@@ -241,9 +266,10 @@ export function MapLocation({ address, onAddressChange, onCoordinatesChange }: M
                 type="text"
                 value={searchInput}
                 onChange={handleInputChange}
-                placeholder="Enter address to search"
+                placeholder="Start typing your address to search"
                 onKeyDown={handleKeyDown}
                 className="flex-1 pr-8"
+                autoComplete="off"
               />
               {searchInput && addressSuggestions.length > 0 && (
                 <ArrowDown className="absolute right-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -260,7 +286,7 @@ export function MapLocation({ address, onAddressChange, onCoordinatesChange }: M
           <PopoverContent className="p-0 w-[320px] lg:w-[400px]" align="start">
             <Command>
               <CommandList>
-                <CommandGroup>
+                <CommandGroup heading="Address suggestions">
                   {addressSuggestions.map((suggestion) => (
                     <CommandItem 
                       key={suggestion.id}

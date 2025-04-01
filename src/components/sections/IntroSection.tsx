@@ -3,7 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useDesignBrief } from '@/context/DesignBriefContext';
-import { ArrowRight, Clipboard, Clock, PenLine, Share } from 'lucide-react';
+import { ArrowRight, Clipboard, PenLine, Share } from 'lucide-react';
 
 export function IntroSection() {
   const { setCurrentSection } = useDesignBrief();
@@ -33,7 +33,7 @@ export function IntroSection() {
               </p>
             </div>
             
-            <div className="grid gap-6 md:grid-cols-4">
+            <div className="grid gap-6 md:grid-cols-3">
               <div className="text-center p-4">
                 <div className="mb-4 mx-auto bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center">
                   <Clipboard className="h-8 w-8 text-primary" />
@@ -51,16 +51,6 @@ export function IntroSection() {
                 <h3 className="font-medium mb-2">Review the Summary</h3>
                 <p className="text-sm text-muted-foreground">
                   We'll generate an AI-written summary of your brief, which you can review and edit.
-                </p>
-              </div>
-              
-              <div className="text-center p-4">
-                <div className="mb-4 mx-auto bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center">
-                  <Clock className="h-8 w-8 text-primary" />
-                </div>
-                <h3 className="font-medium mb-2">Save Your Progress</h3>
-                <p className="text-sm text-muted-foreground">
-                  Your data is saved locally in your browser, so you can come back anytime to continue.
                 </p>
               </div>
               

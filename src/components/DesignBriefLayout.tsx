@@ -14,7 +14,7 @@ interface DesignBriefLayoutProps {
 }
 
 export function DesignBriefLayout({ children }: DesignBriefLayoutProps) {
-  const { lastSaved, formData } = useDesignBrief();
+  const { lastSaved, formData, currentSection } = useDesignBrief();
   
   // Create a form instance to provide FormContext
   const formMethods = useForm();
@@ -23,9 +23,16 @@ export function DesignBriefLayout({ children }: DesignBriefLayoutProps) {
     ? formatDistanceToNow(new Date(lastSaved), { addSuffix: true })
     : 'Not saved yet';
   
-  // Create dynamic title based on client name
+  // Create dynamic title based on client name and address
   const clientName = formData?.projectInfo?.clientName || '';
+  const projectAddress = formData?.projectInfo?.projectAddress || '';
+  
   const headerTitle = clientName ? `${clientName} Brief` : 'Design Brief';
+  const headerSubtitle = projectAddress 
+    ? `Create your project brief for ${projectAddress}`
+    : currentSection === 'intro' 
+      ? 'Create your project brief'
+      : 'Create your project brief';
   
   return (
     <div className="flex h-screen overflow-hidden bg-background">
