@@ -1,6 +1,6 @@
-
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import { ProjectData, SectionKey } from '@/types';
+import { generatePDF } from '@/utils/pdfGenerator';
 
 const initialProjectData: ProjectData = {
   formData: {
@@ -20,7 +20,7 @@ const initialProjectData: ProjectData = {
     },
     lifestyle: {
       occupants: '',
-      projectTimeframe: '', // Added this field to match the type
+      projectTimeframe: '',
       occupationDetails: '',
       dailyRoutine: '',
       entertainmentStyle: '',
@@ -129,7 +129,6 @@ export const DesignBriefProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const [projectData, setProjectData] = useState<ProjectData>(initialProjectData);
   const [currentSection, setCurrentSection] = useState<SectionKey>('intro');
 
-  // Generic update function for any section in formData
   const updateFormData: UpdateFormData = useCallback((section, updates) => {
     setProjectData(draft => {
       const updatedDraft = { ...draft };
@@ -142,7 +141,6 @@ export const DesignBriefProvider: React.FC<{ children: React.ReactNode }> = ({ c
     });
   }, []);
 
-  // Add updateFiles function
   const updateFiles = useCallback((updates: Partial<ProjectData['files']>) => {
     setProjectData(draft => {
       const updatedDraft = { ...draft };
@@ -155,7 +153,6 @@ export const DesignBriefProvider: React.FC<{ children: React.ReactNode }> = ({ c
     });
   }, []);
 
-  // Add updateSummary function
   const updateSummary = useCallback((updates: Partial<ProjectData['summary']>) => {
     setProjectData(draft => {
       const updatedDraft = { ...draft };
@@ -236,10 +233,7 @@ export const DesignBriefProvider: React.FC<{ children: React.ReactNode }> = ({ c
     localStorage.setItem('projectData', JSON.stringify(projectData));
   }, [projectData]);
 
-  // Fix the Promise<void> type for generateSummary
   const generateSummary = useCallback(async (): Promise<void> => {
-    // In a real app, this would call an API to generate the summary
-    // For now, we'll just set a mock summary after a delay
     return new Promise<void>((resolve) => {
       setTimeout(() => {
         updateSummary({
@@ -252,7 +246,6 @@ export const DesignBriefProvider: React.FC<{ children: React.ReactNode }> = ({ c
   }, [projectData.formData.projectInfo, updateSummary]);
 
   const sendByEmail = useCallback(async (email: string): Promise<boolean> => {
-    // Mock implementation - in a real app, this would send the email
     console.log(`Sending email to ${email}`);
     return new Promise<boolean>((resolve) => {
       setTimeout(() => {
@@ -261,16 +254,15 @@ export const DesignBriefProvider: React.FC<{ children: React.ReactNode }> = ({ c
     });
   }, []);
 
-  // Fix the Promise<void> type for exportAsPDF
   const exportAsPDF = useCallback(async (): Promise<void> => {
-    // Mock implementation - in a real app, this would export to PDF
-    console.log('Exporting as PDF');
-    return new Promise<void>((resolve) => {
-      setTimeout(() => {
-        resolve();
-      }, 1500);
-    });
-  }, []);
+    try {
+      await generatePDF(projectData);
+      return Promise.resolve();
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      return Promise.reject(error);
+    }
+  }, [projectData]);
 
   const value: DesignBriefContextType = {
     projectData,

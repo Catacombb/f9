@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -7,11 +6,10 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useDesignBrief } from '@/context/DesignBriefContext';
-import { ArrowLeft, FileText, Mail, Pencil, RefreshCw, Save } from 'lucide-react';
+import { ArrowLeft, FileText, Mail, Pencil, RefreshCw, Save, Download } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { SectionHeader } from './SectionHeader';
 
-// Define New Zealand architecture inspiration images
 const inspirationImages = [
   { id: '1', src: 'https://images.unsplash.com/photo-1571055107559-3e67626fa8be?w=800&auto=format&fit=crop', alt: 'Modern New Zealand house with glass facade' },
   { id: '2', src: 'https://images.unsplash.com/photo-1600607688969-a5bfcd646154?w=800&auto=format&fit=crop', alt: 'Contemporary coastal New Zealand home' },
@@ -29,7 +27,6 @@ export function SummarySection() {
   const [recipientEmail, setRecipientEmail] = useState(formData.projectInfo.contactEmail || '');
   const { toast } = useToast();
   
-  // Generate summary on initial load if none exists
   useEffect(() => {
     if (!summary.generatedSummary && !isGenerating) {
       handleGenerateSummary();
@@ -105,6 +102,7 @@ export function SummarySection() {
         description: "There was a problem exporting your PDF. Please try again.",
         variant: "destructive",
       });
+      console.error("PDF export error:", error);
     } finally {
       setIsExporting(false);
     }
@@ -114,26 +112,20 @@ export function SummarySection() {
     setCurrentSection('communication');
   };
   
-  // Function to generate a better summary text based on actual user inputs
   const generateBetterSummary = () => {
-    // Project Info
     const clientName = formData.projectInfo.clientName || '[Client Name]';
     const projectAddress = formData.projectInfo.projectAddress || '[Project Address]';
     const projectType = formData.projectInfo.projectType 
       ? formData.projectInfo.projectType.replace('_', ' ') 
       : 'not specified';
     
-    // Budget
     const budget = formData.budget.budgetRange || 'not specified';
     const timeframe = formData.budget.timeframe || 'not specified';
     
-    // Occupants
     const occupants = formData.lifestyle.occupants || 'not specified';
     
-    // Architecture
     const style = formData.architecture.stylePrefences || 'not specified';
     
-    // Spaces
     const roomCount = formData.spaces.rooms.length;
     const roomList = roomCount > 0 
       ? formData.spaces.rooms.map(r => `${r.quantity} ${r.type}`).join(', ')
@@ -151,7 +143,6 @@ ${formData.lifestyle.specialRequirements ? `Special requirements: ${formData.lif
 `;
   };
   
-  // Update the summary when needed
   useEffect(() => {
     if (!summary.generatedSummary && !isGenerating) {
       const betterSummary = generateBetterSummary();
@@ -238,13 +229,13 @@ ${formData.lifestyle.specialRequirements ? `Special requirements: ${formData.lif
                         disabled={isExporting}
                         className="min-w-[140px]"
                       >
-                        <FileText className={`h-4 w-4 mr-2 ${isExporting ? 'animate-spin' : ''}`} />
+                        <Download className={`h-4 w-4 mr-2 ${isExporting ? 'animate-spin' : ''}`} />
                         <span>Export PDF</span>
                       </Button>
                       <p className="text-sm text-muted-foreground">
                         Download your complete design brief as a PDF document with the title: 
                         <span className="font-semibold block">
-                          "New Home Brief – {formData.projectInfo.clientName || "[Client Name]"} – {formData.projectInfo.projectAddress || "[Site Address]"}"
+                          "Northstar_Brief_{formData.projectInfo.clientName || "[Client Name]"}_{new Date().toISOString().split('T')[0]}"
                         </span>
                       </p>
                     </div>
@@ -292,7 +283,6 @@ ${formData.lifestyle.specialRequirements ? `Special requirements: ${formData.lif
                 <h3 className="text-xl font-bold mb-4">Complete Design Brief Preview</h3>
                 
                 <div className="border rounded-lg p-6 space-y-8">
-                  {/* AI Summary Section */}
                   <div className="pb-6 border-b">
                     <h4 className="text-lg font-bold mb-4">Executive Summary</h4>
                     <div className="whitespace-pre-wrap text-sm">
@@ -304,7 +294,6 @@ ${formData.lifestyle.specialRequirements ? `Special requirements: ${formData.lif
                     </div>
                   </div>
                   
-                  {/* Project Info Section */}
                   <div className="pb-6 border-b">
                     <h4 className="text-lg font-bold mb-4">Project Information</h4>
                     <div className="grid md:grid-cols-2 gap-4">
@@ -340,7 +329,6 @@ ${formData.lifestyle.specialRequirements ? `Special requirements: ${formData.lif
                     )}
                   </div>
                   
-                  {/* Budget Section */}
                   <div className="pb-6 border-b">
                     <h4 className="text-lg font-bold mb-4">Budget Information</h4>
                     <div className="space-y-4">
@@ -369,7 +357,6 @@ ${formData.lifestyle.specialRequirements ? `Special requirements: ${formData.lif
                     </div>
                   </div>
                   
-                  {/* Lifestyle Section */}
                   <div className="pb-6 border-b">
                     <h4 className="text-lg font-bold mb-4">Lifestyle</h4>
                     <div className="space-y-4">
@@ -406,7 +393,6 @@ ${formData.lifestyle.specialRequirements ? `Special requirements: ${formData.lif
                     </div>
                   </div>
                   
-                  {/* Site Section */}
                   <div className="pb-6 border-b">
                     <h4 className="text-lg font-bold mb-4">Site Information</h4>
                     <div className="space-y-4">
@@ -443,7 +429,6 @@ ${formData.lifestyle.specialRequirements ? `Special requirements: ${formData.lif
                     </div>
                   </div>
                   
-                  {/* Architecture Section */}
                   <div className="pb-6 border-b">
                     <h4 className="text-lg font-bold mb-4">Architectural Preferences</h4>
                     <div className="space-y-4">
@@ -480,7 +465,6 @@ ${formData.lifestyle.specialRequirements ? `Special requirements: ${formData.lif
                     </div>
                   </div>
                   
-                  {/* Uploads Section */}
                   {files.uploadedFiles.length > 0 && (
                     <div className="pb-6 border-b">
                       <h4 className="text-lg font-bold mb-4">Uploaded Files</h4>
@@ -494,7 +478,6 @@ ${formData.lifestyle.specialRequirements ? `Special requirements: ${formData.lif
                     </div>
                   )}
                   
-                  {/* Inspiration Section */}
                   {files.inspirationSelections.length > 0 && (
                     <div>
                       <h4 className="text-lg font-bold mb-4">Inspiration Selections</h4>
@@ -516,7 +499,6 @@ ${formData.lifestyle.specialRequirements ? `Special requirements: ${formData.lif
                     </div>
                   )}
 
-                  {/* Communication Section */}
                   {(formData.communication.preferredMethods?.length > 0 || 
                     formData.communication.bestTimes?.length > 0 ||
                     formData.communication.availableDays?.length > 0 ||
