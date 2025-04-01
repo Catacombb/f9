@@ -41,6 +41,23 @@ function MapUpdater({ center, zoom }: { center: [number, number]; zoom: number }
   return null;
 }
 
+// Component to handle map clicks
+function MapClickHandler({ onMapClick }: { onMapClick: (e: L.LeafletMouseEvent) => void }) {
+  const map = useMap();
+  
+  useEffect(() => {
+    if (!map) return;
+    
+    map.on('click', onMapClick);
+    
+    return () => {
+      map.off('click', onMapClick);
+    };
+  }, [map, onMapClick]);
+  
+  return null;
+}
+
 export function LeafletMapLocation({ address, onAddressChange, onCoordinatesChange }: LeafletMapLocationProps) {
   // New Zealand coordinates for initial view
   const defaultCenter: [number, number] = [-41.2924, 174.7787];
@@ -240,34 +257,35 @@ export function LeafletMapLocation({ address, onAddressChange, onCoordinatesChan
     }
   };
 
-  // Handle marker drag end
-  const handleMarkerDragEnd = async (e: L.LeafletMouseEvent) => {
-    const { lat, lng } = e.target.getLatLng();
-    const newPosition: [number, number] = [lat, lng];
-    
-    setMarkerPosition(newPosition);
-    onCoordinatesChange(newPosition);
-    
-    // Reverse geocode to get address
-    try {
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`,
+  // Handle marker drag end - using the correct event type
+  const handleMarkerDragEnd = () => {
+    if (markerRef.current) {
+      const marker = markerRef.current;
+      const position = marker.getLatLng();
+      const newPosition: [number, number] = [position.lat, position.lng];
+      
+      setMarkerPosition(newPosition);
+      onCoordinatesChange(newPosition);
+      
+      // Reverse geocode to get address
+      fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${position.lat}&lon=${position.lng}`,
         { headers: { 'Accept-Language': 'en' } }
-      );
-      
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-
-      const data = await response.json();
-      
-      if (data && data.display_name) {
-        const newAddress = data.display_name;
-        setSearchInput(newAddress);
-        onAddressChange(newAddress);
-      }
-    } catch (error) {
-      console.error('Error reverse geocoding:', error);
+      )
+        .then(response => {
+          if (!response.ok) throw new Error('Network response was not ok');
+          return response.json();
+        })
+        .then(data => {
+          if (data && data.display_name) {
+            const newAddress = data.display_name;
+            setSearchInput(newAddress);
+            onAddressChange(newAddress);
+          }
+        })
+        .catch(error => {
+          console.error('Error reverse geocoding:', error);
+        });
     }
   };
 
@@ -326,22 +344,20 @@ export function LeafletMapLocation({ address, onAddressChange, onCoordinatesChan
             zoom={defaultZoom} 
             style={{ height: '100%', width: '100%' }}
             attributionControl={true}
-            whenCreated={(map) => {
-              map.on('click', handleMapClick);
-            }}
           >
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
             <MapUpdater center={currentPosition} zoom={currentZoom} />
+            <MapClickHandler onMapClick={handleMapClick} />
             
             {markerPosition && (
               <Marker 
                 position={markerPosition}
                 draggable={true}
                 eventHandlers={{
-                  dragend: handleMarkerDragEnd,
+                  dragend: handleMarkerDragEnd
                 }}
                 ref={markerRef}
               />
