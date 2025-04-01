@@ -16,9 +16,11 @@ export function IntroSection() {
     <div className="design-brief-section-wrapper">
       <div className="design-brief-section-container">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4">Create Your Design Brief</h1>
+          <h1 className="text-4xl font-bold mb-4">Start Your Design Journey with Northstar</h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Welcome to your home design journey. Let's create a comprehensive brief that will help turn your vision into reality.
+            Welcome to Northstar! Let's create a design brief that will bring your vision to life. 
+            With our step-by-step guide, you'll have a comprehensive plan for your dream home — 
+            all tailored to your unique needs and preferences.
           </p>
         </div>
         
@@ -71,7 +73,7 @@ export function IntroSection() {
             onClick={handleStart}
             className="group"
           >
-            <span>Start Your Brief</span>
+            <span>Start Your Design Brief</span>
             <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
           </Button>
         </div>
