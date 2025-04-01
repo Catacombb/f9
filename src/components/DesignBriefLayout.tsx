@@ -110,18 +110,13 @@ export function DesignBriefLayout({ children }: DesignBriefLayoutProps) {
         </main>
         
         <footer className="h-16 border-t flex flex-col justify-between px-4 py-2 text-xs text-muted-foreground">
-          <div className="flex flex-col gap-2 w-full">
-            <div className="flex justify-between items-center w-full">
+          <div className="flex flex-col gap-2 w-full items-center">
+            <div className="flex justify-between items-center w-full max-w-md mx-auto">
               <span>Overall Progress: {overallProgress}%</span>
-              <span className="text-right">© 2025 Northstar by www.nickharrison.co</span>
             </div>
-            <Progress value={overallProgress} className="h-2" />
-          </div>
-          <div className="flex justify-between items-center w-full">
-            <div>
-              {!showHeader && clientName && (
-                <span className="text-sm font-medium">{clientName} Brief</span>
-              )}
+            <Progress value={overallProgress} className="h-2 max-w-md w-full" />
+            <div className="text-center mt-1">
+              © 2025 Northstar by www.nickharrison.co
             </div>
           </div>
         </footer>

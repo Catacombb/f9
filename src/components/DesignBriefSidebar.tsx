@@ -136,16 +136,16 @@ export function DesignBriefSidebar() {
         <div className="p-4 border-t bg-sidebar border-sidebar-border mt-auto">
           <div className="space-y-2">
             <Button variant="ghost" className="w-full justify-start" asChild>
-              <Link to="/about" className="flex items-center">
-                <ExternalLink className="mr-2 h-4 w-4" />
-                <span>About Us</span>
-              </Link>
-            </Button>
-            <Button variant="ghost" className="w-full justify-start" asChild>
               <a href="#help" className="flex items-center">
                 <HelpCircle className="mr-2 h-4 w-4" />
                 <span>Need help?</span>
               </a>
+            </Button>
+            <Button variant="ghost" className="w-full justify-start" asChild>
+              <Link to="/about" className="flex items-center">
+                <ExternalLink className="mr-2 h-4 w-4" />
+                <span>About Northstar</span>
+              </Link>
             </Button>
           </div>
         </div>
