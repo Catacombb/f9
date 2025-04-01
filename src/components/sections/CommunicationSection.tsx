@@ -22,6 +22,10 @@ export function CommunicationSection() {
     updateFormData('communication', { [name]: value });
   };
 
+  const handleContactMethodsChange = (values: string[]) => {
+    updateFormData('communication', { 'preferredMethods': values });
+  };
+
   const handleBestTimesChange = (values: string[]) => {
     updateFormData('communication', { 'bestTimes': values });
   };
@@ -39,6 +43,14 @@ export function CommunicationSection() {
   };
 
   // Options for multi-select buttons
+  const contactMethodOptions = [
+    { value: 'email', label: 'Email' },
+    { value: 'phone', label: 'Phone Call' },
+    { value: 'text', label: 'Text Message' },
+    { value: 'video', label: 'Video Call' },
+    { value: 'in_person', label: 'In-Person Meeting' }
+  ];
+
   const timeOptions = [
     { value: 'early_morning', label: 'Early Morning (6-9am)' },
     { value: 'morning', label: 'Morning (9am-12pm)' },
@@ -67,27 +79,13 @@ export function CommunicationSection() {
 
         <div className="design-brief-form-group">
           <div className="mb-6">
-            <Label htmlFor="preferredMethod" className="design-brief-question-title">
-              Preferred Method of Communication
-            </Label>
-            <p className="design-brief-question-description">
-              How would you prefer we contact you for day-to-day updates and questions?
-            </p>
-            <Select
-              value={formData.communication.preferredMethod}
-              onValueChange={(value) => handleSelectChange('preferredMethod', value)}
-            >
-              <SelectTrigger id="preferredMethod" className="mt-1">
-                <SelectValue placeholder="Select preferred method" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="email">Email</SelectItem>
-                <SelectItem value="phone">Phone Call</SelectItem>
-                <SelectItem value="text">Text Message</SelectItem>
-                <SelectItem value="video">Video Call</SelectItem>
-                <SelectItem value="in_person">In-Person Meeting</SelectItem>
-              </SelectContent>
-            </Select>
+            <MultiSelectButtons
+              label="Preferred Methods of Communication"
+              description="How would you prefer we contact you for day-to-day updates and questions? Select all that apply."
+              options={contactMethodOptions}
+              selectedValues={formData.communication.preferredMethods || []}
+              onChange={handleContactMethodsChange}
+            />
           </div>
 
           <div className="mb-6">

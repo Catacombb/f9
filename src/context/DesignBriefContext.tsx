@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { FormData, ProjectFiles, BriefSummary, ProjectData, SectionKey, SpaceRoom, Professional } from '@/types';
 
@@ -55,7 +56,7 @@ const defaultFormData: FormData = {
     additionalNotes: '',
   },
   communication: {
-    preferredMethod: '',
+    preferredMethods: [], // Changed from a single value to an array
     bestTimes: [],
     availableDays: [],
     frequency: '',

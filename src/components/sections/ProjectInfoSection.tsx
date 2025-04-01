@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { ArrowRight } from 'lucide-react';
 import { SectionHeader } from './SectionHeader';
-import { LeafletMapLocation } from '@/components/LeafletMapLocation';
+import { PredictiveAddressFinder } from '@/components/PredictiveAddressFinder';
 
 export function ProjectInfoSection() {
   const { formData, updateFormData, setCurrentSection } = useDesignBrief();
@@ -62,7 +62,7 @@ export function ProjectInfoSection() {
           <div className="mb-6">
             <Label htmlFor="projectAddress">Project Address</Label>
             <div className="mt-1 space-y-4">
-              <LeafletMapLocation 
+              <PredictiveAddressFinder 
                 address={formData.projectInfo.projectAddress} 
                 onAddressChange={handleAddressChange}
                 onCoordinatesChange={handleCoordinatesChange}

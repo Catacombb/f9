@@ -1,4 +1,3 @@
-
 export interface FormData {
   // Project Info
   projectInfo: {
@@ -67,7 +66,7 @@ export interface FormData {
 
   // Communication Preferences
   communication: {
-    preferredMethod: string;
+    preferredMethods: string[]; // Changed from preferredMethod (string) to preferredMethods (string[])
     bestTimes: string[];
     availableDays: string[];
     frequency: string;
