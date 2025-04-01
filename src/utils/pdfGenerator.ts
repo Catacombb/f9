@@ -1,3 +1,4 @@
+
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 import { ProjectData } from '@/types';
@@ -115,7 +116,7 @@ export const generatePDF = async (projectData: ProjectData): Promise<void> => {
     );
   };
   
-  // Helper function to add a section title (without icons)
+  // Helper function to add a section title
   const addSectionTitle = (title: string) => {
     // Check if we need a new page
     if (yPosition > pageHeight - 40) {
@@ -195,6 +196,73 @@ export const generatePDF = async (projectData: ProjectData): Promise<void> => {
     yPosition += (textLines.length * 6) + 4;
   };
   
+  // Helper function to add bullet points
+  const addBulletPoints = (items: string[]) => {
+    if (!items || items.length === 0) return;
+    
+    items.forEach(item => {
+      // Check if we need a new page
+      if (yPosition > pageHeight - 20) {
+        addNewPage();
+      }
+      
+      pdf.setFont('helvetica', 'normal');
+      pdf.setTextColor(COLORS.secondary);
+      pdf.setFontSize(11);
+      
+      // Add bullet point
+      pdf.text('•', margin, yPosition);
+      
+      // Add item text, indented after bullet
+      const bulletWidth = pdf.getTextWidth('• ');
+      const textLines = pdf.splitTextToSize(item, contentWidth - bulletWidth);
+      pdf.text(textLines, margin + 4, yPosition);
+      
+      yPosition += (textLines.length * 6) + 2;
+    });
+  };
+  
+  // Helper function to format occupants data from JSON string to readable text
+  const formatOccupants = (occupantsJson: string): string => {
+    if (!occupantsJson) return 'Not specified';
+    
+    try {
+      // Try to parse as JSON first
+      const data = JSON.parse(occupantsJson);
+      let parts = [];
+      
+      // Format adults
+      if (data.adults && data.adults > 0) {
+        parts.push(`${data.adults} adult${data.adults > 1 ? 's' : ''}`);
+      }
+      
+      // Format children
+      if (data.children && data.children > 0) {
+        parts.push(`${data.children} child${data.children > 1 ? 'ren' : ''}`);
+      }
+      
+      // Format pets (dogs)
+      if (data.dogs && data.dogs > 0) {
+        parts.push(`${data.dogs} dog${data.dogs > 1 ? 's' : ''}`);
+      }
+      
+      // Format pets (cats)
+      if (data.cats && data.cats > 0) {
+        parts.push(`${data.cats} cat${data.cats > 1 ? 's' : ''}`);
+      }
+      
+      // Format other pets
+      if (data.otherPets) {
+        parts.push(data.otherPets);
+      }
+      
+      return parts.length > 0 ? parts.join(', ') : 'Not specified';
+    } catch (e) {
+      // If not valid JSON, just return as is
+      return occupantsJson;
+    }
+  };
+  
   // Add space after content
   const addSpace = (space = 4) => {
     yPosition += space;
@@ -238,9 +306,14 @@ export const generatePDF = async (projectData: ProjectData): Promise<void> => {
   addText('Contact Email', projectData.formData.projectInfo.contactEmail || 'Not specified');
   addText('Contact Phone', projectData.formData.projectInfo.contactPhone || 'Not specified');
   
-  const projectType = projectData.formData.projectInfo.projectType 
-    ? projectData.formData.projectInfo.projectType.replace('_', ' ') 
-    : 'Not specified';
+  let projectType = 'Not specified';
+  if (projectData.formData.projectInfo.projectType) {
+    // Format project type (convert new_build to "New Build")
+    projectType = projectData.formData.projectInfo.projectType
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  }
   addText('Project Type', projectType);
   
   if (projectData.formData.projectInfo.projectDescription) {
@@ -316,7 +389,8 @@ export const generatePDF = async (projectData: ProjectData): Promise<void> => {
   addSectionTitle('Lifestyle Information');
   
   if (projectData.formData.lifestyle.occupants) {
-    addText('Occupants', projectData.formData.lifestyle.occupants);
+    const formattedOccupants = formatOccupants(projectData.formData.lifestyle.occupants);
+    addText('Occupants', formattedOccupants);
   }
   
   if (projectData.formData.lifestyle.occupationDetails) {
@@ -346,8 +420,32 @@ export const generatePDF = async (projectData: ProjectData): Promise<void> => {
   
   if (projectData.formData.spaces.rooms.length > 0) {
     // Create a table-like structure for rooms
-    projectData.formData.spaces.rooms.forEach((room, index) => {
-      addText(`${room.type} (${room.quantity})`, room.description || 'No details provided', true);
+    addSpace(2);
+    
+    // Group rooms by type and sum quantities
+    const roomsByType = new Map();
+    projectData.formData.spaces.rooms.forEach(room => {
+      const { type, quantity } = room;
+      roomsByType.set(type, (roomsByType.get(type) || 0) + quantity);
+    });
+    
+    // Format as a bullet list
+    const roomList: string[] = [];
+    roomsByType.forEach((quantity, type) => {
+      roomList.push(`${quantity} ${type}${quantity > 1 ? 's' : ''}`);
+    });
+    
+    addBulletPoints(roomList);
+    
+    // Add detailed descriptions for each room
+    addSpace(4);
+    addText('Room Descriptions', '');
+    addSpace(2);
+    
+    projectData.formData.spaces.rooms.forEach(room => {
+      if (room.description) {
+        addText(`${room.type} (${room.quantity})`, room.description, true);
+      }
     });
   } else {
     addText('Rooms', 'No rooms specified');
@@ -432,10 +530,27 @@ export const generatePDF = async (projectData: ProjectData): Promise<void> => {
     addText('Professionals', '');
     addSpace(2);
     
-    projectData.formData.contractors.professionals.forEach((professional, index) => {
-      const profInfo = `${professional.type}: ${professional.name}${professional.contact ? `, ${professional.contact}` : ''}`;
-      addText(profInfo, professional.notes || '', true);
+    // Group professionals by type
+    const professionalsByType = new Map();
+    projectData.formData.contractors.professionals.forEach(professional => {
+      if (!professionalsByType.has(professional.type)) {
+        professionalsByType.set(professional.type, []);
+      }
+      professionalsByType.get(professional.type).push(professional);
     });
+    
+    // Format as a bullet list
+    const professionalsList: string[] = [];
+    professionalsByType.forEach((professionals, type) => {
+      professionals.forEach(professional => {
+        let profInfo = `${type}: ${professional.name}`;
+        if (professional.contact) profInfo += `, ${professional.contact}`;
+        if (professional.notes) profInfo += ` - ${professional.notes}`;
+        professionalsList.push(profInfo);
+      });
+    });
+    
+    addBulletPoints(professionalsList);
   }
   
   if (projectData.formData.contractors.additionalNotes) {
@@ -446,7 +561,7 @@ export const generatePDF = async (projectData: ProjectData): Promise<void> => {
   
   addSpace(8);
   
-  // 10. Communication Preferences Section
+  // 8. Communication Preferences Section
   addSectionTitle('Communication Preferences');
   
   if (projectData.formData.communication.preferredMethods && projectData.formData.communication.preferredMethods.length > 0) {
@@ -496,7 +611,15 @@ export const generatePDF = async (projectData: ProjectData): Promise<void> => {
   
   addSpace(8);
   
-  // 11. Summary Section
+  // 9. Inspiration Images
+  if (projectData.files.inspirationSelections && projectData.files.inspirationSelections.length > 0) {
+    addSectionTitle('Inspiration Gallery');
+    addText('Selected Inspiration Images', `${projectData.files.inspirationSelections.length} images selected`);
+    // Note: actual images would be included in a real implementation
+    // but that requires different handling outside of this PDF generation
+  }
+  
+  // 10. Summary Section
   if (projectData.summary.editedSummary) {
     addSectionTitle('Project Summary');
     addMultiLineText(projectData.summary.editedSummary);
