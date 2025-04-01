@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -6,7 +5,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { SectionKey } from '@/types';
-import { ChevronRight, Info, Home, PiggyBank, Users, MapPin, Layout, Building, Image, Upload, FileText, HelpCircle, MessageSquare, ExternalLink } from 'lucide-react';
+import { ChevronRight, Info, Home, PiggyBank, Users, MapPin, Layout, Building, Image, Upload, FileText, ExternalLink } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Link } from 'react-router-dom';
 import { AppLogo } from '@/components/AppLogo';
@@ -121,16 +120,6 @@ export function DesignBriefSidebar({ showLastSaved = false, lastSavedFormatted =
         
         <div className="p-4 border-t bg-sidebar-accent/10 border-sidebar-border mt-auto">
           <div className="space-y-2">
-            <Button 
-              variant="ghost" 
-              className="w-full justify-start truncate bg-sidebar-accent/20 hover:bg-sidebar-accent/30 text-sidebar-foreground font-medium text-sm" 
-              asChild
-            >
-              <a href="#help" className="flex items-center">
-                <HelpCircle className="mr-2 h-5 w-5 shrink-0 text-accent" />
-                <span className="truncate">Need Help?</span>
-              </a>
-            </Button>
             <Button 
               variant="ghost" 
               className="w-full justify-start truncate bg-sidebar-accent/20 hover:bg-sidebar-accent/30 text-sidebar-foreground font-medium text-sm" 
