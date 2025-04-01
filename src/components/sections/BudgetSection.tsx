@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -46,24 +45,24 @@ export function BudgetSection() {
               className="mt-3 space-y-3"
             >
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="25k_100k" id="25k_100k" />
-                <Label htmlFor="25k_100k" className="font-normal">$25,000 - $100,000</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="100k_250k" id="100k_250k" />
-                <Label htmlFor="100k_250k" className="font-normal">$100,000 - $250,000</Label>
-              </div>
-              <div className="flex items-center space-x-2">
                 <RadioGroupItem value="250k_500k" id="250k_500k" />
                 <Label htmlFor="250k_500k" className="font-normal">$250,000 - $500,000</Label>
               </div>
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="500k_1m" id="500k_1m" />
-                <Label htmlFor="500k_1m" className="font-normal">$500,000 - $1,000,000</Label>
+                <RadioGroupItem value="500k_750k" id="500k_750k" />
+                <Label htmlFor="500k_750k" className="font-normal">$500,000 - $750,000</Label>
               </div>
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="1m_2m" id="1m_2m" />
-                <Label htmlFor="1m_2m" className="font-normal">$1,000,000 - $2,000,000</Label>
+                <RadioGroupItem value="750k_1m" id="750k_1m" />
+                <Label htmlFor="750k_1m" className="font-normal">$750,000 - $1,000,000</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="1m_1.5m" id="1m_1.5m" />
+                <Label htmlFor="1m_1.5m" className="font-normal">$1,000,000 - $1,500,000</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="1.5m_2m" id="1.5m_2m" />
+                <Label htmlFor="1.5m_2m" className="font-normal">$1,500,000 - $2,000,000</Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="above_2m" id="above_2m" />
