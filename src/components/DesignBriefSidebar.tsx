@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -9,8 +8,8 @@ import { SectionKey } from '@/types';
 import { ChevronRight, Info, Home, PiggyBank, Users, MapPin, Layout, Building, Image, Upload, FileText, ChevronLeft, HelpCircle, MessageSquare, ExternalLink } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Link } from 'react-router-dom';
+import { AppLogo } from '@/components/AppLogo';
 
-// Define all sections with their icons and titles
 const sections = [
   { id: 'intro', title: 'Introduction', icon: <Info className="h-5 w-5" /> },
   { id: 'projectInfo', title: 'Project Info', icon: <Home className="h-5 w-5" /> },
@@ -31,7 +30,6 @@ export function DesignBriefSidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const isMobile = useIsMobile();
   
-  // Initially collapse sidebar on mobile
   useEffect(() => {
     if (isMobile) {
       setIsCollapsed(true);
@@ -45,15 +43,11 @@ export function DesignBriefSidebar() {
     }
   };
   
-  // Calculate progress for each section - only count required fields
   const getSectionProgress = (sectionId: SectionKey): number => {
-    // Skip progress for intro and summary sections
     if (sectionId === 'intro' || sectionId === 'summary') return 0;
     
-    // Make sure projectData is defined before accessing properties
     if (!projectData || !projectData.formData) return 0;
     
-    // Define required fields for each section
     const requiredFields = {
       projectInfo: ['clientName', 'projectAddress', 'contactEmail', 'contactPhone', 'projectType'],
       contractors: [],
@@ -65,7 +59,6 @@ export function DesignBriefSidebar() {
       communication: []
     };
     
-    // Calculate based on filled required fields for each section
     const section = projectData.formData[sectionId];
     if (!section) return 0;
     
@@ -89,7 +82,6 @@ export function DesignBriefSidebar() {
         isCollapsed ? "w-2 md:w-12" : "w-64"
       )}
     >
-      {/* Toggle button */}
       <Button
         variant="ghost"
         size="icon"
@@ -125,7 +117,6 @@ export function DesignBriefSidebar() {
                   <span className="mr-2">{section.icon}</span>
                   <span>{section.title}</span>
                   
-                  {/* Progress indicator (only show for sections that can have progress) */}
                   {section.id !== 'intro' && section.id !== 'summary' && (
                     <div className="ml-auto flex items-center space-x-1">
                       {getSectionProgress(section.id as SectionKey) > 0 && (
