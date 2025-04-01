@@ -6,7 +6,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { SectionKey } from '@/types';
-import { ChevronRight, Info, Home, PiggyBank, Users, MapPin, Layout, Building, Image, Upload, FileText, ChevronLeft, HelpCircle, Briefcase } from 'lucide-react';
+import { ChevronRight, Info, Home, PiggyBank, Users, MapPin, Layout, Building, Image, Upload, FileText, ChevronLeft, HelpCircle, Briefcase, People } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 // Define all sections with their icons and titles
@@ -18,7 +18,7 @@ const sections = [
   { id: 'site', title: 'Site', icon: <MapPin className="h-5 w-5" /> },
   { id: 'spaces', title: 'Spaces', icon: <Layout className="h-5 w-5" /> },
   { id: 'architecture', title: 'Architecture', icon: <Building className="h-5 w-5" /> },
-  { id: 'contractors', title: 'Contractors', icon: <Briefcase className="h-5 w-5" /> },
+  { id: 'contractors', title: 'Project Team', icon: <People className="h-5 w-5" /> },
   { id: 'inspiration', title: 'Inspiration', icon: <Image className="h-5 w-5" /> },
   { id: 'uploads', title: 'Uploads', icon: <Upload className="h-5 w-5" /> },
   { id: 'summary', title: 'Summary', icon: <FileText className="h-5 w-5" /> },
