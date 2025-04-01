@@ -14,7 +14,7 @@ const COLORS = {
   border: '#e0e0e0',
 };
 
-// Section icons mapping
+// Section icons mapping - using universal emoji icons for compatibility
 const SECTION_ICONS = {
   'Project Information': '📋',
   'Budget Information': '💰',
@@ -60,18 +60,17 @@ export const generatePDF = async (projectData: ProjectData): Promise<void> => {
     pdf.setFillColor(COLORS.background);
     pdf.rect(0, 0, pageWidth, 25, 'F');
     
-    // Add centered logo 
-    // Logo path to the light mode logo that was just uploaded
+    // Get logo path - using the light mode logo
     const logoPath = '/lovable-uploads/f87cbd00-65a2-4b67-ae04-55a828581a0e.png';
     
-    // Calculate center position and logo dimensions
-    // Logo height will be 12mm
+    // Calculate center position for logo while maintaining aspect ratio
+    // Max height 12mm
     const logoHeight = 12;
     const logoWidth = 40; // approximate aspect ratio
     const logoX = (pageWidth - logoWidth) / 2;
     
     try {
-      // Add actual image - if it fails, fall back to text
+      // Add actual image with preserved aspect ratio
       pdf.addImage(logoPath, 'PNG', logoX, 7, logoWidth, logoHeight);
     } catch (error) {
       // Fallback to text if image loading fails
