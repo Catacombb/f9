@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { formatDistanceToNow } from 'date-fns';
 import { Save } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { Link } from 'react-router-dom';
 
 interface DesignBriefLayoutProps {
   children: React.ReactNode;
@@ -35,6 +36,7 @@ export function DesignBriefLayout({ children }: DesignBriefLayoutProps) {
       <div className="flex-1 flex flex-col overflow-hidden">
         <header className="h-16 border-b flex items-center justify-between px-4 bg-background z-10">
           <div className="flex items-center space-x-2">
+            <h1 className="text-xl font-semibold text-primary hidden md:block">Northstar</h1>
             <Button 
               variant="ghost" 
               className="flex items-center text-muted-foreground" 
@@ -55,8 +57,9 @@ export function DesignBriefLayout({ children }: DesignBriefLayoutProps) {
         </main>
         
         <footer className="h-12 border-t flex items-center justify-between px-4 text-xs text-muted-foreground">
-          <div>© 2023 Home Dream Design</div>
-          <div>
+          <div>© 2023 Northstar</div>
+          <div className="flex space-x-4">
+            <Link to="/about" className="hover:underline">About Northstar</Link>
             <a href="#help" className="hover:underline">Need help?</a>
           </div>
         </footer>
