@@ -87,7 +87,7 @@ export function DesignBriefLayout({ children }: DesignBriefLayoutProps) {
   const showHeader = !clientName || !projectAddress;
   
   return (
-    <div className="flex h-screen overflow-hidden bg-background">
+    <div className="flex h-screen overflow-hidden bg-background max-w-full">
       {!isMobile ? (
         <DesignBriefSidebar />
       ) : (
@@ -105,7 +105,7 @@ export function DesignBriefLayout({ children }: DesignBriefLayoutProps) {
       )}
       
       <div className="flex-1 flex flex-col overflow-hidden">
-        <header className={`h-16 border-b flex items-center justify-center px-4 bg-background z-10 ${isMobile ? 'sticky top-0' : ''}`}>
+        <header className={`h-16 border-b flex items-center justify-center px-4 bg-background z-10 w-full ${isMobile ? 'sticky top-0' : ''}`}>
           <div className={`flex-1 flex justify-start items-center ${isMobile ? 'ml-8' : ''}`}>
             {/* Empty div to balance the layout */}
           </div>
@@ -115,28 +115,28 @@ export function DesignBriefLayout({ children }: DesignBriefLayoutProps) {
           </div>
           
           <div className="flex-1 flex justify-end items-center">
-            <span className="text-xs text-muted-foreground mr-2">
+            <span className="text-xs text-muted-foreground mr-2 truncate max-w-[150px]">
               Last saved {lastSavedFormatted}
             </span>
             <ThemeToggle />
           </div>
         </header>
         
-        <main className="flex-1 overflow-auto">
+        <main className="flex-1 overflow-auto w-full">
           <Form {...formMethods}>
-            <div className={`${isMobile ? 'px-4' : ''}`}>
+            <div className="responsive-container">
               {children}
             </div>
           </Form>
         </main>
         
-        <footer className="h-16 border-t flex flex-col justify-between px-4 py-2 text-xs text-muted-foreground">
+        <footer className="h-16 border-t flex flex-col justify-between px-4 py-2 text-xs text-muted-foreground w-full">
           <div className="flex flex-col gap-2 w-full items-center">
             <div className="flex justify-between items-center w-full max-w-full mx-auto px-2">
               <span>Overall Progress: {overallProgress}%</span>
             </div>
             <Progress value={overallProgress} className="h-2 w-full" />
-            <div className="text-center mt-1 pb-2">
+            <div className="text-center mt-1 pb-2 truncate w-full">
               © 2025 Northstar by www.nickharrison.co
             </div>
           </div>

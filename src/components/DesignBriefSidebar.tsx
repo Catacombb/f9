@@ -91,7 +91,7 @@ export function DesignBriefSidebar() {
               >
                 <div className="flex items-center w-full">
                   <span className="mr-2">{section.icon}</span>
-                  <span>{section.title}</span>
+                  <span className="truncate">{section.title}</span>
                   
                   {section.id !== 'intro' && section.id !== 'summary' && (
                     <div className="ml-auto flex items-center space-x-1">
@@ -110,16 +110,16 @@ export function DesignBriefSidebar() {
         
         <div className="p-4 border-t bg-sidebar border-sidebar-border mt-auto">
           <div className="space-y-2">
-            <Button variant="ghost" className="w-full justify-start" asChild>
+            <Button variant="ghost" className="w-full justify-start truncate" asChild>
               <a href="#help" className="flex items-center">
-                <HelpCircle className="mr-2 h-4 w-4" />
-                <span>Need help?</span>
+                <HelpCircle className="mr-2 h-4 w-4 shrink-0" />
+                <span className="truncate">Need help?</span>
               </a>
             </Button>
-            <Button variant="ghost" className="w-full justify-start" asChild>
+            <Button variant="ghost" className="w-full justify-start truncate" asChild>
               <Link to="/about" className="flex items-center">
-                <ExternalLink className="mr-2 h-4 w-4" />
-                <span>About Northstar</span>
+                <ExternalLink className="mr-2 h-4 w-4 shrink-0" />
+                <span className="truncate">About Northstar</span>
               </Link>
             </Button>
           </div>

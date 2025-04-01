@@ -79,20 +79,24 @@
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
     font-family: 'Inter', sans-serif;
+    overflow-x: hidden; /* Prevent horizontal scrolling at the body level */
   }
 }
 
 /* Design Brief Application Styles */
 .design-brief-section-wrapper {
   @apply flex-1 overflow-auto py-8 px-4 bg-background;
+  max-width: 100vw; /* Ensure content doesn't exceed screen width */
 }
 
 .design-brief-section-container {
-  @apply max-w-4xl mx-auto space-y-8;
+  @apply max-w-4xl mx-auto space-y-8 w-full;
+  padding: 0 1rem; /* Add consistent padding */
 }
 
 .design-brief-form-group {
-  @apply p-6 bg-card rounded-lg border shadow-sm mb-8;
+  @apply p-6 bg-card rounded-lg border shadow-sm mb-8 w-full;
+  max-width: 100%; /* Ensure container respects parent width */
 }
 
 .design-brief-question-title {
@@ -111,6 +115,7 @@
 
   .design-brief-form-group {
     @apply p-4;
+    width: 100%; /* Full width on mobile */
   }
 
   .design-brief-question-title {
@@ -128,4 +133,26 @@
 }
 .leaflet-default-shadow-path {
   background-image: url(https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png);
+}
+
+/* Additional responsive fixes */
+.responsive-container {
+  @apply w-full max-w-full overflow-x-hidden;
+}
+
+/* Ensure buttons don't overflow */
+button, a {
+  @apply max-w-full;
+  text-overflow: ellipsis;
+  white-space: normal;
+}
+
+/* Ensure all form elements are responsive */
+input, select, textarea {
+  @apply max-w-full;
+}
+
+/* Make sure toggle buttons don't cause horizontal scrolling */
+.flex-wrap {
+  flex-wrap: wrap !important;
 }

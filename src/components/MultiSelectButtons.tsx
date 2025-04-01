@@ -31,7 +31,7 @@ export function MultiSelectButtons({
   };
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3 w-full">
       <Label className="design-brief-question-title">
         {label}
         {optional && <span className="text-muted-foreground text-sm ml-2">(optional)</span>}
@@ -46,7 +46,7 @@ export function MultiSelectButtons({
       <ToggleGroup 
         type="multiple" 
         variant="outline"
-        className="flex flex-wrap gap-2"
+        className="flex flex-wrap gap-2 w-full"
         value={selectedValues}
         onValueChange={handleValueChange}
       >
@@ -54,7 +54,7 @@ export function MultiSelectButtons({
           <ToggleGroupItem 
             key={option.value} 
             value={option.value}
-            className="px-4 py-2 rounded-md border border-input data-[state=on]:bg-primary data-[state=on]:text-primary-foreground data-[state=on]:border-primary"
+            className="px-4 py-2 rounded-md border border-input data-[state=on]:bg-primary data-[state=on]:text-primary-foreground data-[state=on]:border-primary break-words"
           >
             {option.label}
           </ToggleGroupItem>
