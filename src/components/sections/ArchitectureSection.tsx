@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -33,7 +34,7 @@ export function ArchitectureSection() {
         
         <div className="design-brief-form-group">
           <div className="mb-6">
-            <Label htmlFor="architecturalStyle" className="design-brief-question-title">
+            <Label htmlFor="stylePrefences" className="design-brief-question-title">
               Preferred Architectural Style
               <span className="text-muted-foreground text-sm ml-2">(optional)</span>
             </Label>
@@ -41,17 +42,17 @@ export function ArchitectureSection() {
               Describe the architectural style you envision for your project.
             </p>
             <Textarea
-              id="architecturalStyle"
-              name="architecturalStyle"
+              id="stylePrefences"
+              name="stylePrefences"
               placeholder="Describe your preferred architectural style..."
-              value={formData.architecture.architecturalStyle}
+              value={formData.architecture.stylePrefences}
               onChange={handleChange}
               className="mt-1"
             />
           </div>
           
           <div className="mb-6">
-            <Label htmlFor="materialsPreferences" className="design-brief-question-title">
+            <Label htmlFor="externalMaterials" className="design-brief-question-title">
               Materials Preferences
               <span className="text-muted-foreground text-sm ml-2">(optional)</span>
             </Label>
@@ -59,17 +60,17 @@ export function ArchitectureSection() {
               Are there specific materials you'd like to incorporate into the design?
             </p>
             <Textarea
-              id="materialsPreferences"
-              name="materialsPreferences"
+              id="externalMaterials"
+              name="externalMaterials"
               placeholder="List any preferred building materials..."
-              value={formData.architecture.materialsPreferences}
+              value={formData.architecture.externalMaterials}
               onChange={handleChange}
               className="mt-1"
             />
           </div>
           
           <div>
-            <Label htmlFor="designElements" className="design-brief-question-title">
+            <Label htmlFor="specialFeatures" className="design-brief-question-title">
               Key Design Elements
               <span className="text-muted-foreground text-sm ml-2">(optional)</span>
             </Label>
@@ -77,10 +78,10 @@ export function ArchitectureSection() {
               Any specific design elements or features you'd like to include?
             </p>
             <Textarea
-              id="designElements"
-              name="designElements"
+              id="specialFeatures"
+              name="specialFeatures"
               placeholder="Describe any key design elements you want in your project..."
-              value={formData.architecture.designElements}
+              value={formData.architecture.specialFeatures}
               onChange={handleChange}
               className="mt-1"
             />

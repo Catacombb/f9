@@ -9,7 +9,7 @@ import { PlusCircle, Trash2 } from 'lucide-react';
 import { SpaceRoom } from '@/types';
 import { Label } from '@/components/ui/label';
 import { toast } from '@/hooks/use-toast';
-import { SectionHeader } from '@/components/ui/section-header';
+import { SectionHeader } from '@/components/sections/SectionHeader';
 
 // Predefined room types
 const predefinedRoomTypes = [
