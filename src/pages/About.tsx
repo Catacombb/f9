@@ -1,9 +1,9 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { ChevronLeft, Home } from 'lucide-react';
+import { AppLogo } from '@/components/AppLogo';
 
 const About = () => {
   return (
@@ -27,7 +27,9 @@ const About = () => {
 
           <div className="space-y-8">
             <div className="text-center mb-12">
-              <h1 className="text-4xl font-bold text-primary mb-2">Northstar</h1>
+              <div className="flex justify-center mb-4">
+                <AppLogo size="large" />
+              </div>
               <p className="text-xl text-muted-foreground">Guiding your design journey home</p>
             </div>
 

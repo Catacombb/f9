@@ -1,30 +1,27 @@
 
 import React from 'react';
-import { Compass } from 'lucide-react';
 
 export const AppLogo = ({ size = 'default' }: { size?: 'small' | 'default' | 'large' }) => {
   const sizeClasses = {
+    small: 'h-6 md:h-7',
+    default: 'h-8 md:h-9',
+    large: 'h-10 md:h-12'
+  };
+  
+  const textSizeClasses = {
     small: 'text-xl md:text-2xl',
     default: 'text-3xl md:text-4xl',
     large: 'text-4xl md:text-5xl'
   };
   
-  const iconSizes = {
-    small: { width: 20, height: 20 },
-    default: { width: 28, height: 28 },
-    large: { width: 36, height: 36 }
-  };
-  
   return (
     <div className="flex items-center gap-2">
-      <Compass 
-        className="text-primary" 
-        width={iconSizes[size].width} 
-        height={iconSizes[size].height} 
+      <img 
+        src="/lovable-uploads/70d2354a-6971-4612-ada4-f1277078f209.png" 
+        alt="Northstar Logo" 
+        className={`${sizeClasses[size]}`}
       />
-      <span className={`font-bold ${sizeClasses[size]}`}>
-        Northstar
-      </span>
+      {/* Remove the text span since it's included in the logo */}
     </div>
   );
 };

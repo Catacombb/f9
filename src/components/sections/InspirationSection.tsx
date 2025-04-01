@@ -6,67 +6,67 @@ import { useDesignBrief } from '@/context/DesignBriefContext';
 import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-// Mock inspiration gallery images
+// New Zealand architectural homes for inspiration gallery
 const inspirationImages = [
   {
     id: 'img1',
-    src: 'https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=800&auto=format&fit=crop',
-    alt: 'Modern living room with large windows',
-    category: 'Interior',
+    src: 'https://images.unsplash.com/photo-1571055107559-3e67626fa8be?w=800&auto=format&fit=crop',
+    alt: 'Modern New Zealand house with glass facade',
+    category: 'Exterior',
   },
   {
     id: 'img2',
-    src: 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=800&auto=format&fit=crop',
-    alt: 'Contemporary kitchen with island',
-    category: 'Interior',
+    src: 'https://images.unsplash.com/photo-1600607688969-a5bfcd646154?w=800&auto=format&fit=crop',
+    alt: 'Contemporary coastal New Zealand home',
+    category: 'Exterior',
   },
   {
     id: 'img3',
-    src: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&auto=format&fit=crop',
-    alt: 'Minimalist bedroom design',
+    src: 'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=800&auto=format&fit=crop',
+    alt: 'Minimalist New Zealand living space with mountain views',
     category: 'Interior',
   },
   {
     id: 'img4',
-    src: 'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=800&auto=format&fit=crop',
-    alt: 'Industrial style home office',
+    src: 'https://images.unsplash.com/photo-1600566752355-09c79c71a7b0?w=800&auto=format&fit=crop',
+    alt: 'Open plan New Zealand kitchen and dining',
     category: 'Interior',
   },
   {
     id: 'img5',
-    src: 'https://images.unsplash.com/photo-1721322800607-8c38375eef04?w=800&auto=format&fit=crop',
-    alt: 'Modern house exterior with garden',
+    src: 'https://images.unsplash.com/photo-1600210492493-0946911123ea?w=800&auto=format&fit=crop',
+    alt: 'Auckland modern house with outdoor deck',
     category: 'Exterior',
   },
   {
     id: 'img6',
-    src: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&auto=format&fit=crop',
-    alt: 'Minimalist facade with large windows',
+    src: 'https://images.unsplash.com/photo-1575403071235-5dcd06cbf169?w=800&auto=format&fit=crop',
+    alt: 'Queenstown cabin with lake views',
     category: 'Exterior',
   },
   {
     id: 'img7',
-    src: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&auto=format&fit=crop',
-    alt: 'Wooden deck with outdoor furniture',
+    src: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800&auto=format&fit=crop',
+    alt: 'Sustainable timber New Zealand home',
     category: 'Exterior',
   },
   {
     id: 'img8',
-    src: 'https://images.unsplash.com/photo-1433086966358-54859d0ed716?w=800&auto=format&fit=crop',
-    alt: 'Contemporary bathroom with freestanding bath',
+    src: 'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?w=800&auto=format&fit=crop',
+    alt: 'Modern New Zealand bathroom with freestanding bath',
     category: 'Interior',
   },
   {
     id: 'img9',
-    src: 'https://images.unsplash.com/photo-1487958449943-2429e8be8625?w=800&auto=format&fit=crop',
-    alt: 'Open plan kitchen and dining area',
+    src: 'https://images.unsplash.com/photo-1600607687644-c7f34a94d0b0?w=800&auto=format&fit=crop',
+    alt: 'New Zealand beachfront home with indoor-outdoor flow',
     category: 'Interior',
   },
   {
     id: 'img10',
-    src: 'https://images.unsplash.com/photo-1551038247-3d9af20df552?w=800&auto=format&fit=crop',
-    alt: 'Scandinavian style living room',
-    category: 'Interior',
+    src: 'https://images.unsplash.com/photo-1623625434462-e5e42318ae49?w=800&auto=format&fit=crop',
+    alt: 'Wellington eco-home with native garden',
+    category: 'Exterior',
   },
 ];
 
@@ -99,7 +99,7 @@ export function InspirationSection() {
       <div className="design-brief-section-container">
         <h1 className="design-brief-section-title">Inspiration Gallery</h1>
         <p className="design-brief-section-description">
-          Select images that inspire you or reflect your design preferences. Your selections will help us understand your aesthetic tastes.
+          Select images of New Zealand architectural homes that inspire you or reflect your design preferences. Your selections will help us understand your aesthetic tastes.
         </p>
         
         <div className="mb-6 flex flex-wrap gap-2">

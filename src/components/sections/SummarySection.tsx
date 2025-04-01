@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -9,14 +10,14 @@ import { useDesignBrief } from '@/context/DesignBriefContext';
 import { ArrowLeft, FileText, Mail, Pencil, RefreshCw, Save } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
-// Define placeholder inspiration images
+// Define New Zealand architecture inspiration images
 const inspirationImages = [
-  { id: '1', src: '/placeholder.svg', alt: 'Modern Kitchen' },
-  { id: '2', src: '/placeholder.svg', alt: 'Minimal Living Room' },
-  { id: '3', src: '/placeholder.svg', alt: 'Open Plan Layout' },
-  { id: '4', src: '/placeholder.svg', alt: 'Outdoor Living Space' },
-  { id: '5', src: '/placeholder.svg', alt: 'Master Bedroom' },
-  { id: '6', src: '/placeholder.svg', alt: 'Contemporary Bathroom' },
+  { id: '1', src: 'https://images.unsplash.com/photo-1571055107559-3e67626fa8be?w=800&auto=format&fit=crop', alt: 'Modern New Zealand house with glass facade' },
+  { id: '2', src: 'https://images.unsplash.com/photo-1600607688969-a5bfcd646154?w=800&auto=format&fit=crop', alt: 'Contemporary coastal New Zealand home' },
+  { id: '3', src: 'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=800&auto=format&fit=crop', alt: 'Minimalist New Zealand living space with mountain views' },
+  { id: '4', src: 'https://images.unsplash.com/photo-1600566752355-09c79c71a7b0?w=800&auto=format&fit=crop', alt: 'Open plan New Zealand kitchen and dining' },
+  { id: '5', src: 'https://images.unsplash.com/photo-1600210492493-0946911123ea?w=800&auto=format&fit=crop', alt: 'Auckland modern house with outdoor deck' },
+  { id: '6', src: 'https://images.unsplash.com/photo-1575403071235-5dcd06cbf169?w=800&auto=format&fit=crop', alt: 'Queenstown cabin with lake views' },
 ];
 
 export function SummarySection() {
