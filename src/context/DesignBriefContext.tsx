@@ -97,9 +97,11 @@ interface DesignBriefContextType {
   currentSection: SectionKey;
   setCurrentSection: (section: SectionKey) => void;
   saveProjectData: () => void;
-  generateSummary?: () => void;
-  sendByEmail?: () => void;
-  exportAsPDF?: () => void;
+  updateFiles: (updates: Partial<ProjectData['files']>) => void;
+  updateSummary: (updates: Partial<ProjectData['summary']>) => void;
+  generateSummary: () => Promise<void>;
+  sendByEmail: (email: string) => Promise<boolean>;
+  exportAsPDF: () => Promise<void>;
 }
 
 const updateCommunicationPreferences = (
@@ -133,6 +135,32 @@ export const DesignBriefProvider: React.FC<{ children: React.ReactNode }> = ({ c
       updatedDraft.formData[section] = { 
         ...updatedDraft.formData[section], 
         ...updates 
+      };
+      updatedDraft.lastSaved = new Date().toISOString();
+      return updatedDraft;
+    });
+  }, []);
+
+  // Add updateFiles function
+  const updateFiles = useCallback((updates: Partial<ProjectData['files']>) => {
+    setProjectData(draft => {
+      const updatedDraft = { ...draft };
+      updatedDraft.files = {
+        ...updatedDraft.files,
+        ...updates
+      };
+      updatedDraft.lastSaved = new Date().toISOString();
+      return updatedDraft;
+    });
+  }, []);
+
+  // Add updateSummary function
+  const updateSummary = useCallback((updates: Partial<ProjectData['summary']>) => {
+    setProjectData(draft => {
+      const updatedDraft = { ...draft };
+      updatedDraft.summary = {
+        ...updatedDraft.summary,
+        ...updates
       };
       updatedDraft.lastSaved = new Date().toISOString();
       return updatedDraft;
@@ -207,12 +235,49 @@ export const DesignBriefProvider: React.FC<{ children: React.ReactNode }> = ({ c
     localStorage.setItem('projectData', JSON.stringify(projectData));
   }, [projectData]);
 
+  // Mock implementations for the required async functions
+  const generateSummary = useCallback(async () => {
+    // In a real app, this would call an API to generate the summary
+    // For now, we'll just set a mock summary after a delay
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        updateSummary({
+          generatedSummary: `This is a mock generated summary for ${projectData.formData.projectInfo.clientName || 'your'} project at ${projectData.formData.projectInfo.projectAddress || 'the specified address'}.`,
+          editedSummary: `This is a mock generated summary for ${projectData.formData.projectInfo.clientName || 'your'} project at ${projectData.formData.projectInfo.projectAddress || 'the specified address'}.`
+        });
+        resolve();
+      }, 1500);
+    });
+  }, [projectData.formData.projectInfo, updateSummary]);
+
+  const sendByEmail = useCallback(async (email: string): Promise<boolean> => {
+    // Mock implementation - in a real app, this would send the email
+    console.log(`Sending email to ${email}`);
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(true);
+      }, 1500);
+    });
+  }, []);
+
+  const exportAsPDF = useCallback(async () => {
+    // Mock implementation - in a real app, this would export to PDF
+    console.log('Exporting as PDF');
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve();
+      }, 1500);
+    });
+  }, []);
+
   const value: DesignBriefContextType = {
     projectData,
     formData: projectData.formData,
     files: projectData.files,
     summary: projectData.summary,
     updateFormData,
+    updateFiles,
+    updateSummary,
     addRoom,
     updateRoom,
     removeRoom,
@@ -222,6 +287,9 @@ export const DesignBriefProvider: React.FC<{ children: React.ReactNode }> = ({ c
     currentSection,
     setCurrentSection,
     saveProjectData,
+    generateSummary,
+    sendByEmail,
+    exportAsPDF,
   };
 
   return (

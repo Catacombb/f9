@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -166,7 +165,7 @@ export function SummarySection() {
                       <span className="text-sm text-muted-foreground">You can edit this summary below</span>
                     </div>
                     <Textarea
-                      value={summary.editedSummary}
+                      value={summary.editedSummary || ""}
                       onChange={handleSummaryChange}
                       placeholder="Your AI-generated summary will appear here..."
                       className="min-h-[300px] font-mono text-sm"
