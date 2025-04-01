@@ -6,7 +6,7 @@ import { ThemeProvider } from '@/components/ThemeProvider';
 
 const Index = () => {
   return (
-    <ThemeProvider defaultTheme="light" storageKey="ui-theme">
+    <ThemeProvider>
       <DesignBriefProvider>
         <DesignBrief />
       </DesignBriefProvider>
