@@ -156,10 +156,16 @@ export function InspirationSection() {
                   alt={image.alt}
                   className="w-full h-full object-cover"
                   onError={(e) => {
+                    const target = e.currentTarget;
                     // Fallback for broken images
-                    e.currentTarget.src = "/placeholder.svg";
-                    e.currentTarget.alt = "Image unavailable";
+                    target.src = "/placeholder.svg";
+                    target.alt = "Image unavailable";
+                    // Add a retry mechanism
+                    setTimeout(() => {
+                      target.src = image.src;
+                    }, 1500);
                   }}
+                  loading="lazy"
                 />
                 {files.inspirationSelections.includes(image.id) && (
                   <div className="absolute top-2 right-2 bg-primary rounded-full p-1">

@@ -58,7 +58,7 @@ export function DesignBriefLayout({ children }: DesignBriefLayoutProps) {
         </main>
         
         <footer className="h-12 border-t flex items-center justify-between px-4 text-xs text-muted-foreground">
-          <div>© 2023 Northstar - www.nickharrison.co</div>
+          <div>© 2025 Northstar by www.nickharrison.co</div>
           <div className="flex space-x-4">
             <Link to="/about" className="hover:underline">About Northstar</Link>
             <a href="#help" className="hover:underline">Need help?</a>

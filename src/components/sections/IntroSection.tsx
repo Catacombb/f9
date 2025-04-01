@@ -16,7 +16,7 @@ export function IntroSection() {
     <div className="design-brief-section-wrapper">
       <div className="design-brief-section-container">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4">Start Your Design Journey with Northstar</h1>
+          <h1 className="text-4xl font-bold mb-4">Start Your New Home Journey with Northstar</h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Welcome to Northstar! Let's create a design brief that will bring your vision to life. 
             With our step-by-step guide, you'll have a comprehensive plan for your dream home — 
