@@ -1,4 +1,3 @@
-
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 import { ProjectData } from '@/types';
@@ -42,31 +41,37 @@ export const generatePDF = async (projectData: ProjectData): Promise<void> => {
     addFooter();
   };
   
-  // Helper function to add header
+  // Helper function to add header with centered logo
   const addHeader = () => {
     pdf.setFillColor(COLORS.background);
     pdf.rect(0, 0, pageWidth, 25, 'F');
     
-    // Add logo text (in a real app, you'd use an image logo)
+    // Add centered logo 
+    // Use light mode logo
+    const logoPath = '/lovable-uploads/c36ffe10-cbba-49ee-9805-4661cfbb83a3.png';
+    
+    // Calculate center position and logo dimensions
+    // Logo height will be 10mm
+    const logoHeight = 10;
+    const logoWidth = 35; // approximate aspect ratio
+    const logoX = (pageWidth - logoWidth) / 2;
+    
+    // Add image (if in production, we would use an actual image)
+    // For now, we'll use text as a placeholder
     pdf.setFont('helvetica', 'bold');
     pdf.setTextColor(COLORS.primary);
     pdf.setFontSize(18);
-    pdf.text('NORTHSTAR', margin, 10);
-    
-    pdf.setFont('helvetica', 'normal');
-    pdf.setFontSize(10);
-    pdf.setTextColor(COLORS.secondary);
-    pdf.text('Design Brief', margin, 16);
+    pdf.text('NORTHSTAR', pageWidth / 2, 12, { align: 'center' });
     
     // Add horizontal line
     pdf.setDrawColor(COLORS.accent);
     pdf.setLineWidth(0.5);
     pdf.line(margin, 20, pageWidth - margin, 20);
     
-    yPosition = 25;
+    yPosition = 30; // Increased to accommodate centered logo
   };
   
-  // Helper function to add footer
+  // Helper function to add footer with clickable link
   const addFooter = () => {
     const footerY = pageHeight - 10;
     
@@ -81,11 +86,28 @@ export const generatePDF = async (projectData: ProjectData): Promise<void> => {
     const dateText = `Generated ${formatDistanceToNow(new Date(), { addSuffix: true })}`;
     pdf.text(dateText, margin, footerY);
     
-    // Add website
-    pdf.text('www.northstar.co', pageWidth / 2, footerY, { align: 'center' });
+    // Add website with link
+    const website = 'northstar.nickharrison.co';
+    const websiteX = pageWidth / 2;
+    
+    // Calculate text width for link positioning
+    const textWidth = pdf.getTextWidth(website);
+    
+    // Add clickable link
+    pdf.setTextColor(COLORS.accent); // Make it look like a link
+    pdf.text(website, websiteX, footerY, { align: 'center' });
+    
+    // Add link annotation
+    pdf.link(
+      websiteX - textWidth / 2, // x position
+      footerY - 5, // y position (adjust for text height)
+      textWidth, // width
+      5, // height
+      { url: 'http://northstar.nickharrison.co' }
+    );
   };
   
-  // Helper function to add a section title
+  // Helper function to add a section title (now bold without underline)
   const addSectionTitle = (title: string) => {
     // Check if we need a new page
     if (yPosition > pageHeight - 40) {
@@ -93,18 +115,11 @@ export const generatePDF = async (projectData: ProjectData): Promise<void> => {
     }
     
     pdf.setFont('helvetica', 'bold');
-    pdf.setTextColor(COLORS.accent);
-    pdf.setFontSize(14);
+    pdf.setTextColor(COLORS.primary);
+    pdf.setFontSize(16); // Increased font size for better hierarchy
     pdf.text(title, margin, yPosition);
     
-    yPosition += 2;
-    
-    // Add small line under the title
-    pdf.setDrawColor(COLORS.accent);
-    pdf.setLineWidth(0.5);
-    pdf.line(margin, yPosition, margin + 30, yPosition);
-    
-    yPosition += 8;
+    yPosition += 8; // Space after title
   };
   
   // Helper function to add text
