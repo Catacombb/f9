@@ -1,3 +1,4 @@
+
 export interface FormData {
   // Project Info
   projectInfo: {
@@ -20,7 +21,8 @@ export interface FormData {
   
   // Lifestyle
   lifestyle: {
-    occupants: string;
+    occupants: string; // JSON string containing family members and pets
+    projectTimeframe: string; // JSON string containing timeframe details
     occupationDetails: string;
     dailyRoutine: string;
     entertainmentStyle: string;

@@ -10,6 +10,20 @@ import { SectionHeader } from './SectionHeader';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { ArrowLeft, ArrowRight, Plus, Trash2 } from 'lucide-react';
 import { Professional } from '@/types';
+import { MultiSelectButtons } from '@/components/MultiSelectButtons';
+
+// Predefined professionals
+const predefinedProfessionals = [
+  { value: 'architect', label: 'Architect' },
+  { value: 'structural_engineer', label: 'Structural Engineer' },
+  { value: 'interior_designer', label: 'Interior Designer' },
+  { value: 'landscape_architect', label: 'Landscape Architect' },
+  { value: 'surveyor', label: 'Surveyor' },
+  { value: 'electrical_engineer', label: 'Electrical Engineer' },
+  { value: 'plumbing_engineer', label: 'Plumbing Engineer' },
+  { value: 'project_manager', label: 'Project Manager' },
+  { value: 'quantity_surveyor', label: 'Quantity Surveyor' },
+];
 
 export function ContractorsSection() {
   const { formData, updateFormData, addProfessional, updateProfessional, removeProfessional, setCurrentSection } = useDesignBrief();
@@ -19,6 +33,7 @@ export function ContractorsSection() {
     contact: '',
     notes: '',
   });
+  const [selectedProfessionals, setSelectedProfessionals] = useState<string[]>([]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -64,6 +79,41 @@ export function ContractorsSection() {
       });
     }
   };
+  
+  const handleProfessionalSelection = (selectedValues: string[]) => {
+    setSelectedProfessionals(selectedValues);
+    
+    // Add any newly selected professionals
+    selectedValues.forEach(value => {
+      const professional = predefinedProfessionals.find(p => p.value === value);
+      if (professional && !formData.contractors.professionals.some(p => p.type === professional.label)) {
+        addProfessional({
+          id: crypto.randomUUID(),
+          type: professional.label,
+          name: '',
+          contact: '',
+          notes: '',
+        });
+      }
+    });
+    
+    // Remove any unselected professionals
+    formData.contractors.professionals.forEach(prof => {
+      const matchingPredefined = predefinedProfessionals.find(p => p.label === prof.type);
+      if (matchingPredefined && !selectedValues.includes(matchingPredefined.value)) {
+        removeProfessional(prof.id);
+      }
+    });
+  };
+  
+  // Initialize selected professionals based on existing data
+  React.useEffect(() => {
+    const initialSelected = formData.contractors.professionals
+      .map(prof => predefinedProfessionals.find(p => p.label === prof.type)?.value)
+      .filter(Boolean) as string[];
+    
+    setSelectedProfessionals(initialSelected);
+  }, []);
   
   const handlePrevious = () => {
     setCurrentSection('projectInfo');
@@ -120,10 +170,20 @@ export function ContractorsSection() {
             />
             <Label htmlFor="goToTender">I would like to go to tender for a builder</Label>
           </div>
+          
+          <div className="mb-8">
+            <MultiSelectButtons
+              label="Select Project Professionals"
+              description="Choose the professionals you need for your project"
+              options={predefinedProfessionals}
+              selectedValues={selectedProfessionals}
+              onChange={handleProfessionalSelection}
+            />
+          </div>
         </div>
         
         <div className="design-brief-form-group">
-          <h3 className="text-lg font-semibold mb-4">Other Professionals</h3>
+          <h3 className="text-lg font-semibold mb-4">Professional Details</h3>
           
           {formData.contractors.professionals.map((professional) => (
             <Card key={professional.id} className="mb-4">
@@ -178,7 +238,7 @@ export function ContractorsSection() {
           
           <Card className="mb-4 border-dashed">
             <CardContent className="p-4">
-              <h4 className="text-md font-medium mb-4">Add New Professional</h4>
+              <h4 className="text-md font-medium mb-4">Add Custom Professional</h4>
               
               <div className="grid gap-4 mb-4">
                 <div>
@@ -189,7 +249,7 @@ export function ContractorsSection() {
                     value={newProfessional.type}
                     onChange={handleInputChange}
                     className="mt-1"
-                    placeholder="e.g., Structural Engineer, Interior Designer"
+                    placeholder="e.g., Civil Engineer, Sustainability Consultant"
                   />
                 </div>
                 

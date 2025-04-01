@@ -1,33 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { PlusCircle, Trash2 } from 'lucide-react';
+import { PlusCircle, Trash2, Bed, Bath, Kitchen, Sofa, BookOpen, ShoppingBag, Car } from 'lucide-react';
 import { SpaceRoom } from '@/types';
 import { Label } from '@/components/ui/label';
 import { toast } from '@/hooks/use-toast';
 import { SectionHeader } from '@/components/sections/SectionHeader';
 
-// Predefined room types
+// Predefined room types with icons
 const predefinedRoomTypes = [
-  'Bedroom',
-  'Bathroom',
-  'Living Room',
-  'Kitchen',
-  'Dining Area',
-  'Office/Study',
-  'Laundry',
-  'Garage',
-  'Utility Room',
-  'Playroom',
-  'Media Room',
-  'Other'
+  { value: 'Bedroom', label: 'Bedroom', icon: <Bed className="h-4 w-4 mr-2" /> },
+  { value: 'Bathroom', label: 'Bathroom', icon: <Bath className="h-4 w-4 mr-2" /> },
+  { value: 'Living Room', label: 'Living Room', icon: <Sofa className="h-4 w-4 mr-2" /> },
+  { value: 'Kitchen', label: 'Kitchen', icon: <Kitchen className="h-4 w-4 mr-2" /> },
+  { value: 'Dining Area', label: 'Dining Area', icon: <ShoppingBag className="h-4 w-4 mr-2" /> },
+  { value: 'Office/Study', label: 'Office/Study', icon: <BookOpen className="h-4 w-4 mr-2" /> },
+  { value: 'Garage', label: 'Garage', icon: <Car className="h-4 w-4 mr-2" /> },
 ];
 
-// RoomItem component
+// RoomItem component for the detailed view
 const RoomItem = ({ 
   room, 
   onEdit, 
@@ -100,8 +95,22 @@ export function SpacesSection() {
   const [newRoomType, setNewRoomType] = useState('');
   const [customRoomType, setCustomRoomType] = useState('');
   const [showCustomInput, setShowCustomInput] = useState(false);
+  const [roomsWithQuantities, setRoomsWithQuantities] = useState<{ type: string; quantity: number }[]>([]);
   
   const rooms = formData.spaces.rooms;
+  
+  // Initialize roomsWithQuantities from existing rooms
+  useEffect(() => {
+    const uniqueRoomTypes = Array.from(new Set(rooms.map(room => room.type)));
+    
+    const initialRoomsWithQuantities = uniqueRoomTypes.map(type => {
+      const roomsOfType = rooms.filter(room => room.type === type);
+      const totalQuantity = roomsOfType.reduce((sum, room) => sum + room.quantity, 0);
+      return { type, quantity: totalQuantity };
+    });
+    
+    setRoomsWithQuantities(initialRoomsWithQuantities);
+  }, [rooms]);
   
   const handleAddRoom = () => {
     if ((showCustomInput && customRoomType.trim() !== '') || 
@@ -143,6 +152,60 @@ export function SpacesSection() {
     setShowCustomInput(value === 'Other');
   };
   
+  const handleRoomQuantityChange = (type: string, quantity: number) => {
+    // Update the roomsWithQuantities state
+    setRoomsWithQuantities(prev => 
+      prev.map(room => 
+        room.type === type ? { ...room, quantity } : room
+      )
+    );
+    
+    // Find existing rooms of this type
+    const existingRooms = rooms.filter(room => room.type === type);
+    
+    if (existingRooms.length === 0 && quantity > 0) {
+      // Add a new room if none exists
+      addRoom({
+        type,
+        quantity,
+        description: '',
+        isCustom: !predefinedRoomTypes.some(rt => rt.value === type)
+      });
+    } else if (existingRooms.length === 1) {
+      // Update the quantity of the existing room
+      if (quantity > 0) {
+        updateRoom({
+          ...existingRooms[0],
+          quantity
+        });
+      } else {
+        // Remove the room if quantity is 0
+        removeRoom(existingRooms[0].id);
+      }
+    } else if (existingRooms.length > 1) {
+      // If multiple rooms of this type exist, handle them appropriately
+      // This is a simplification - you might want a more sophisticated approach
+      if (quantity > 0) {
+        // Keep the first one and update its quantity, remove the rest
+        updateRoom({
+          ...existingRooms[0],
+          quantity
+        });
+        
+        // Remove additional rooms of this type
+        existingRooms.slice(1).forEach(room => removeRoom(room.id));
+      } else {
+        // Remove all rooms of this type
+        existingRooms.forEach(room => removeRoom(room.id));
+      }
+    }
+  };
+  
+  const getRoomQuantity = (type: string): number => {
+    const roomMatch = roomsWithQuantities.find(r => r.type === type);
+    return roomMatch ? roomMatch.quantity : 0;
+  };
+  
   return (
     <div className="design-brief-section-wrapper">
       <div className="design-brief-section-container">
@@ -153,36 +216,57 @@ export function SpacesSection() {
         />
         
         <div className="space-y-8">
-          {/* Room List Section */}
+          {/* Quick Room Selection with Buttons */}
           <Card>
             <CardHeader>
-              <CardTitle>Your Spaces</CardTitle>
+              <CardTitle>Room Selection</CardTitle>
             </CardHeader>
             <CardContent>
-              {rooms.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  <p>You haven't added any spaces yet.</p>
-                  <p className="text-sm mt-2">Start by adding bedrooms, bathrooms, and other spaces below.</p>
-                </div>
-              ) : (
-                <div>
-                  {rooms.map(room => (
-                    <RoomItem 
-                      key={room.id} 
-                      room={room} 
-                      onEdit={updateRoom} 
-                      onRemove={handleRemoveRoom} 
-                    />
-                  ))}
-                </div>
-              )}
+              <p className="text-sm text-muted-foreground mb-4">
+                Select the types of rooms you need and specify how many of each.
+              </p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {predefinedRoomTypes.map(roomType => (
+                  <div key={roomType.value} className="flex items-center space-x-2 p-3 border rounded-md">
+                    <div className="flex items-center flex-1">
+                      {roomType.icon}
+                      <span>{roomType.label}</span>
+                    </div>
+                    <div className="flex items-center">
+                      <Button 
+                        variant="outline" 
+                        size="icon" 
+                        onClick={() => handleRoomQuantityChange(roomType.value, Math.max(0, getRoomQuantity(roomType.value) - 1))}
+                        disabled={getRoomQuantity(roomType.value) <= 0}
+                      >
+                        -
+                      </Button>
+                      <Input 
+                        type="number" 
+                        min="0" 
+                        value={getRoomQuantity(roomType.value)} 
+                        onChange={(e) => handleRoomQuantityChange(roomType.value, parseInt(e.target.value) || 0)}
+                        className="w-16 mx-2 text-center"
+                      />
+                      <Button 
+                        variant="outline" 
+                        size="icon" 
+                        onClick={() => handleRoomQuantityChange(roomType.value, getRoomQuantity(roomType.value) + 1)}
+                      >
+                        +
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </CardContent>
           </Card>
           
-          {/* Add Room Section */}
+          {/* Custom Room Addition */}
           <Card>
             <CardHeader>
-              <CardTitle>Add a Space</CardTitle>
+              <CardTitle>Add a Custom Space</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex flex-col space-y-4">
@@ -195,10 +279,14 @@ export function SpacesSection() {
                       </SelectTrigger>
                       <SelectContent>
                         {predefinedRoomTypes.map(type => (
-                          <SelectItem key={type} value={type}>
-                            {type}
+                          <SelectItem key={type.value} value={type.value}>
+                            <div className="flex items-center">
+                              {type.icon}
+                              <span>{type.label}</span>
+                            </div>
                           </SelectItem>
                         ))}
+                        <SelectItem value="Other">Custom Space Type</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -227,9 +315,35 @@ export function SpacesSection() {
             <CardFooter>
               <Button onClick={handleAddRoom} disabled={(showCustomInput && customRoomType.trim() === '') || (!showCustomInput && !newRoomType)}>
                 <PlusCircle className="h-4 w-4 mr-2" />
-                Add Space
+                Add Custom Space
               </Button>
             </CardFooter>
+          </Card>
+          
+          {/* Room Details */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Room Details</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {rooms.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <p>You haven't added any spaces yet.</p>
+                  <p className="text-sm mt-2">Use the buttons above to add rooms to your project.</p>
+                </div>
+              ) : (
+                <div>
+                  {rooms.map(room => (
+                    <RoomItem 
+                      key={room.id} 
+                      room={room} 
+                      onEdit={updateRoom} 
+                      onRemove={handleRemoveRoom} 
+                    />
+                  ))}
+                </div>
+              )}
+            </CardContent>
           </Card>
           
           {/* Additional Notes */}

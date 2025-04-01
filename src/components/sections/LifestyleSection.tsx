@@ -1,17 +1,125 @@
-import React from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useDesignBrief } from '@/context/DesignBriefContext';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Users, Cat, Dog } from 'lucide-react';
 import { SectionHeader } from './SectionHeader';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
+
+// Custom icon for adult (since it's not in lucide-react by default)
+const AdultIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <circle cx="12" cy="5" r="3" />
+    <path d="M12 8v14" />
+    <path d="M8 16h8" />
+  </svg>
+);
+
+// Custom icon for child (since it's not in lucide-react by default)
+const ChildIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <circle cx="12" cy="5" r="2.5" />
+    <path d="M12 8v6" />
+    <path d="M10 14h4" />
+    <path d="M9 22v-6.5" />
+    <path d="M15 22v-6.5" />
+  </svg>
+);
 
 export function LifestyleSection() {
   const { formData, updateFormData, setCurrentSection } = useDesignBrief();
   
-  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  // States for family members and pets
+  const [adults, setAdults] = useState<number>(0);
+  const [children, setChildren] = useState<number>(0);
+  const [dogs, setDogs] = useState<number>(0);
+  const [cats, setCats] = useState<number>(0);
+  
+  // States for project timeframe
+  const [startDate, setStartDate] = useState<Date | undefined>(undefined);
+  const [endDate, setEndDate] = useState<Date | undefined>(undefined);
+  const [timeConstraints, setTimeConstraints] = useState<string>('');
+  
+  // Initialize values from formData
+  useEffect(() => {
+    if (formData.lifestyle.occupants) {
+      try {
+        const occupantsData = JSON.parse(formData.lifestyle.occupants);
+        if (occupantsData) {
+          setAdults(occupantsData.adults || 0);
+          setChildren(occupantsData.children || 0);
+          setDogs(occupantsData.dogs || 0);
+          setCats(occupantsData.cats || 0);
+        }
+      } catch (e) {
+        // If not valid JSON, initialize with zeros
+      }
+    }
+    
+    if (formData.lifestyle.projectTimeframe) {
+      try {
+        const timeframeData = JSON.parse(formData.lifestyle.projectTimeframe);
+        if (timeframeData) {
+          if (timeframeData.startDate) setStartDate(new Date(timeframeData.startDate));
+          if (timeframeData.endDate) setEndDate(new Date(timeframeData.endDate));
+          setTimeConstraints(timeframeData.timeConstraints || '');
+        }
+      } catch (e) {
+        // If not valid JSON, initialize with defaults
+      }
+    }
+  }, [formData.lifestyle]);
+  
+  // Update formData when values change
+  useEffect(() => {
+    const occupantsData = JSON.stringify({ adults, children, dogs, cats });
+    updateFormData('lifestyle', { occupants: occupantsData });
+  }, [adults, children, dogs, cats, updateFormData]);
+  
+  // Update formData when timeframe values change
+  useEffect(() => {
+    const timeframeData = JSON.stringify({
+      startDate: startDate?.toISOString(),
+      endDate: endDate?.toISOString(),
+      timeConstraints
+    });
+    updateFormData('lifestyle', { projectTimeframe: timeframeData });
+  }, [startDate, endDate, timeConstraints, updateFormData]);
+  
+  const handleTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     updateFormData('lifestyle', { [name]: value });
+  };
+  
+  const handleTimeConstraintsChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setTimeConstraints(e.target.value);
   };
   
   const handlePrevious = () => {
@@ -32,22 +140,215 @@ export function LifestyleSection() {
         />
         
         <div className="design-brief-form-group">
-          <div className="mb-6">
-            <Label htmlFor="occupants" className="design-brief-question-title">
-              Who will be living in this home?
-            </Label>
-            <p className="design-brief-question-description">
-              Include details about family members, pets, and any regular visitors or staff.
-            </p>
-            <Textarea
-              id="occupants"
-              name="occupants"
-              placeholder="Describe who will be living in or regularly using this home..."
-              value={formData.lifestyle.occupants}
-              onChange={handleChange}
-              className="mt-1"
-            />
-          </div>
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle>Who will be living in this home?</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground mb-4">
+                Select the number of people and pets who will be living in or regularly using this home.
+              </p>
+              
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="flex flex-col items-center">
+                  <div className="mb-2 p-3 rounded-full bg-primary/10 text-primary">
+                    <AdultIcon />
+                  </div>
+                  <Label className="mb-1">Adults</Label>
+                  <div className="flex items-center">
+                    <Button 
+                      variant="outline" 
+                      size="icon" 
+                      onClick={() => setAdults(Math.max(0, adults - 1))}
+                      disabled={adults <= 0}
+                    >
+                      -
+                    </Button>
+                    <Input 
+                      type="number" 
+                      min="0" 
+                      value={adults} 
+                      onChange={(e) => setAdults(parseInt(e.target.value) || 0)}
+                      className="w-16 mx-2 text-center"
+                    />
+                    <Button 
+                      variant="outline" 
+                      size="icon" 
+                      onClick={() => setAdults(adults + 1)}
+                    >
+                      +
+                    </Button>
+                  </div>
+                </div>
+                
+                <div className="flex flex-col items-center">
+                  <div className="mb-2 p-3 rounded-full bg-primary/10 text-primary">
+                    <ChildIcon />
+                  </div>
+                  <Label className="mb-1">Children</Label>
+                  <div className="flex items-center">
+                    <Button 
+                      variant="outline" 
+                      size="icon" 
+                      onClick={() => setChildren(Math.max(0, children - 1))}
+                      disabled={children <= 0}
+                    >
+                      -
+                    </Button>
+                    <Input 
+                      type="number" 
+                      min="0" 
+                      value={children} 
+                      onChange={(e) => setChildren(parseInt(e.target.value) || 0)}
+                      className="w-16 mx-2 text-center"
+                    />
+                    <Button 
+                      variant="outline" 
+                      size="icon" 
+                      onClick={() => setChildren(children + 1)}
+                    >
+                      +
+                    </Button>
+                  </div>
+                </div>
+                
+                <div className="flex flex-col items-center">
+                  <div className="mb-2 p-3 rounded-full bg-primary/10 text-primary">
+                    <Dog />
+                  </div>
+                  <Label className="mb-1">Dogs</Label>
+                  <div className="flex items-center">
+                    <Button 
+                      variant="outline" 
+                      size="icon" 
+                      onClick={() => setDogs(Math.max(0, dogs - 1))}
+                      disabled={dogs <= 0}
+                    >
+                      -
+                    </Button>
+                    <Input 
+                      type="number" 
+                      min="0" 
+                      value={dogs} 
+                      onChange={(e) => setDogs(parseInt(e.target.value) || 0)}
+                      className="w-16 mx-2 text-center"
+                    />
+                    <Button 
+                      variant="outline" 
+                      size="icon" 
+                      onClick={() => setDogs(dogs + 1)}
+                    >
+                      +
+                    </Button>
+                  </div>
+                </div>
+                
+                <div className="flex flex-col items-center">
+                  <div className="mb-2 p-3 rounded-full bg-primary/10 text-primary">
+                    <Cat />
+                  </div>
+                  <Label className="mb-1">Cats</Label>
+                  <div className="flex items-center">
+                    <Button 
+                      variant="outline" 
+                      size="icon" 
+                      onClick={() => setCats(Math.max(0, cats - 1))}
+                      disabled={cats <= 0}
+                    >
+                      -
+                    </Button>
+                    <Input 
+                      type="number" 
+                      min="0" 
+                      value={cats} 
+                      onChange={(e) => setCats(parseInt(e.target.value) || 0)}
+                      className="w-16 mx-2 text-center"
+                    />
+                    <Button 
+                      variant="outline" 
+                      size="icon" 
+                      onClick={() => setCats(cats + 1)}
+                    >
+                      +
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle>Project Timeframe</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="startDate" className="block mb-2">Expected Start Date</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full justify-start text-left font-normal",
+                          !startDate && "text-muted-foreground"
+                        )}
+                      >
+                        {startDate ? format(startDate, "PPP") : <span>Pick a start date</span>}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={startDate}
+                        onSelect={setStartDate}
+                        initialFocus
+                        className="p-3 pointer-events-auto"
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+                
+                <div>
+                  <Label htmlFor="endDate" className="block mb-2">Expected Finish Date</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full justify-start text-left font-normal",
+                          !endDate && "text-muted-foreground"
+                        )}
+                      >
+                        {endDate ? format(endDate, "PPP") : <span>Pick a finish date</span>}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={endDate}
+                        onSelect={setEndDate}
+                        disabled={(date) => startDate ? date < startDate : false}
+                        initialFocus
+                        className="p-3 pointer-events-auto"
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              </div>
+              
+              <div>
+                <Label htmlFor="timeConstraints" className="block mb-2">Time Constraints or Preferences</Label>
+                <Textarea
+                  id="timeConstraints"
+                  placeholder="Describe any specific timing requirements, seasonal considerations, or deadline constraints..."
+                  value={timeConstraints}
+                  onChange={handleTimeConstraintsChange}
+                  rows={3}
+                />
+              </div>
+            </CardContent>
+          </Card>
           
           <div className="mb-6">
             <Label htmlFor="occupationDetails" className="design-brief-question-title">
@@ -62,7 +363,7 @@ export function LifestyleSection() {
               name="occupationDetails"
               placeholder="Describe your work situation and any home workspace needs..."
               value={formData.lifestyle.occupationDetails}
-              onChange={handleChange}
+              onChange={handleTextAreaChange}
               className="mt-1"
             />
           </div>
@@ -80,7 +381,7 @@ export function LifestyleSection() {
               name="dailyRoutine"
               placeholder="Outline how you typically move through your day at home..."
               value={formData.lifestyle.dailyRoutine}
-              onChange={handleChange}
+              onChange={handleTextAreaChange}
               className="mt-1"
             />
           </div>
@@ -98,7 +399,7 @@ export function LifestyleSection() {
               name="entertainmentStyle"
               placeholder="Describe how you like to entertain guests and use social spaces..."
               value={formData.lifestyle.entertainmentStyle}
-              onChange={handleChange}
+              onChange={handleTextAreaChange}
               className="mt-1"
             />
           </div>
@@ -116,7 +417,7 @@ export function LifestyleSection() {
               name="specialRequirements"
               placeholder="Note any special needs or future considerations for your home..."
               value={formData.lifestyle.specialRequirements}
-              onChange={handleChange}
+              onChange={handleTextAreaChange}
               className="mt-1"
             />
           </div>
