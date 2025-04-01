@@ -27,7 +27,7 @@ export function DesignBriefLayout({ children }: DesignBriefLayoutProps) {
   // Create dynamic title based on client name
   const clientName = projectData?.formData?.projectInfo?.clientName || '';
   
-  // Calculate overall completion percentage - counting only required fields
+  // Calculate overall progress percentage - counting only required fields
   const calculateOverallProgress = () => {
     // Skip intro and summary sections
     const sections = ['projectInfo', 'contractors', 'budget', 'lifestyle', 'site', 'spaces', 'architecture', 'communication'];
@@ -86,13 +86,17 @@ export function DesignBriefLayout({ children }: DesignBriefLayoutProps) {
       <DesignBriefSidebar />
       
       <div className="flex-1 flex flex-col overflow-hidden">
-        <header className="h-16 border-b flex items-center justify-between px-4 bg-background z-10">
-          <div className="flex items-center space-x-2">
+        <header className="h-16 border-b flex items-center justify-center px-4 bg-background z-10">
+          <div className="flex-1 flex justify-start items-center">
+            {/* Empty div to balance the layout */}
+          </div>
+          
+          <div className="flex-1 flex justify-center items-center">
             <AppLogo size="small" />
           </div>
           
-          <div className="flex items-center space-x-2">
-            <span className="text-xs text-muted-foreground">
+          <div className="flex-1 flex justify-end items-center">
+            <span className="text-xs text-muted-foreground mr-2">
               Last saved {lastSavedFormatted}
             </span>
             <ThemeToggle />

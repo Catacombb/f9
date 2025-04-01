@@ -1,15 +1,19 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { useDesignBrief } from '@/context/DesignBriefContext';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Upload, Image, X } from 'lucide-react';
 import { SectionHeader } from './SectionHeader';
+import { Card, CardContent } from '@/components/ui/card';
 
 export function SiteSection() {
-  const { formData, updateFormData, setCurrentSection } = useDesignBrief();
+  const { formData, updateFormData, setCurrentSection, projectData, updateFiles } = useDesignBrief();
+  const [uploadedPhotos, setUploadedPhotos] = useState<File[]>(
+    projectData.files.uploadedFiles || []
+  );
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -22,6 +26,32 @@ export function SiteSection() {
   
   const handleNext = () => {
     setCurrentSection('spaces');
+  };
+  
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const newFiles = Array.from(e.target.files);
+      const updatedFiles = [...uploadedPhotos, ...newFiles];
+      setUploadedPhotos(updatedFiles);
+      
+      // Update the global state with the new files
+      updateFiles({
+        ...projectData.files,
+        uploadedFiles: updatedFiles
+      });
+    }
+  };
+  
+  const handleRemovePhoto = (index: number) => {
+    const updatedFiles = [...uploadedPhotos];
+    updatedFiles.splice(index, 1);
+    setUploadedPhotos(updatedFiles);
+    
+    // Update the global state with the updated files
+    updateFiles({
+      ...projectData.files,
+      uploadedFiles: updatedFiles
+    });
   };
   
   return (
@@ -88,7 +118,7 @@ export function SiteSection() {
             />
           </div>
           
-          <div>
+          <div className="mb-6">
             <Label htmlFor="viewsOrientations" className="design-brief-question-title font-bold">
               Views
               <span className="text-muted-foreground text-sm ml-2">(optional)</span>
@@ -104,6 +134,78 @@ export function SiteSection() {
               onChange={handleChange}
               className="mt-1"
             />
+          </div>
+          
+          {/* Site Photos Upload Section */}
+          <div className="mt-8">
+            <Label className="design-brief-question-title font-bold">
+              Site Photos
+              <span className="text-muted-foreground text-sm ml-2">(optional)</span>
+            </Label>
+            <p className="design-brief-question-description">
+              Upload photos of your site to help us better understand the location and its features.
+            </p>
+            
+            <div className="mt-4">
+              <Label 
+                htmlFor="site-photos" 
+                className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-md border-primary/50 cursor-pointer bg-background hover:bg-accent/10 transition-colors"
+              >
+                <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                  <Upload className="w-8 h-8 mb-2 text-primary" />
+                  <p className="mb-2 text-sm text-center">
+                    <span className="font-medium text-primary">Click to upload</span> or drag and drop
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    JPG, PNG, GIF (MAX. 10MB each)
+                  </p>
+                </div>
+                <Input 
+                  id="site-photos" 
+                  type="file" 
+                  accept="image/*" 
+                  multiple 
+                  className="hidden" 
+                  onChange={handleFileUpload}
+                />
+              </Label>
+            </div>
+            
+            {/* Display uploaded photos */}
+            {uploadedPhotos.length > 0 && (
+              <div className="mt-6">
+                <h3 className="font-medium mb-3">Uploaded Photos ({uploadedPhotos.length})</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {uploadedPhotos.map((file, index) => (
+                    <Card key={index} className="overflow-hidden">
+                      <CardContent className="p-2">
+                        <div className="relative h-40 bg-muted rounded-md overflow-hidden">
+                          <img 
+                            src={URL.createObjectURL(file)} 
+                            alt={`Uploaded Photo ${index + 1}`}
+                            className="w-full h-full object-cover"
+                          />
+                          <Button 
+                            variant="destructive" 
+                            size="icon" 
+                            className="absolute top-2 right-2 h-6 w-6 rounded-full" 
+                            onClick={() => handleRemovePhoto(index)}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                        <p className="text-sm font-medium mt-2 truncate">
+                          Uploaded Photo {index + 1}
+                        </p>
+                        <p className="text-xs text-muted-foreground truncate">
+                          {file.name}
+                        </p>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
         
