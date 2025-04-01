@@ -44,7 +44,6 @@ export interface FormData {
   // Spaces
   spaces: {
     rooms: SpaceRoom[];
-    proximitySettings: ProximityPair[];
     additionalNotes: string;
   };
   
@@ -64,13 +63,6 @@ export interface SpaceRoom {
   quantity: number;
   description: string;
   isCustom?: boolean;
-}
-
-export interface ProximityPair {
-  id: string;
-  space1Id: string;
-  space2Id: string;
-  relation: 'close' | 'far';
 }
 
 export interface ProjectFiles {

@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { FormData, ProjectFiles, BriefSummary, ProjectData, SectionKey, SpaceRoom, ProximityPair } from '@/types';
+import { FormData, ProjectFiles, BriefSummary, ProjectData, SectionKey, SpaceRoom } from '@/types';
 
 // Default values for the form
 const defaultFormData: FormData = {
@@ -39,7 +39,6 @@ const defaultFormData: FormData = {
   },
   spaces: {
     rooms: [],
-    proximitySettings: [],
     additionalNotes: '',
   },
   architecture: {
@@ -79,9 +78,6 @@ interface DesignBriefContextType {
   addRoom: (room: Omit<SpaceRoom, 'id'>) => string;
   updateRoom: (room: SpaceRoom) => void;
   removeRoom: (roomId: string) => void;
-  addProximityPair: (pair: Omit<ProximityPair, 'id'>) => string;
-  updateProximityPair: (pair: ProximityPair) => void;
-  removeProximityPair: (pairId: string) => void;
 }
 
 // Create the context
@@ -210,49 +206,6 @@ export const DesignBriefProvider: React.FC<{ children: React.ReactNode }> = ({ c
       spaces: {
         ...prevData.spaces,
         rooms: prevData.spaces.rooms.filter(r => r.id !== roomId),
-        // Also remove any proximity settings that include this room
-        proximitySettings: prevData.spaces.proximitySettings.filter(
-          p => p.space1Id !== roomId && p.space2Id !== roomId
-        ),
-      },
-    }));
-  };
-  
-  const addProximityPair = (pair: Omit<ProximityPair, 'id'>) => {
-    const id = crypto.randomUUID();
-    const newPair: ProximityPair = { ...pair, id };
-    
-    setFormData(prevData => ({
-      ...prevData,
-      spaces: {
-        ...prevData.spaces,
-        proximitySettings: [...prevData.spaces.proximitySettings, newPair],
-      },
-    }));
-    
-    return id;
-  };
-  
-  const updateProximityPair = (pair: ProximityPair) => {
-    setFormData(prevData => ({
-      ...prevData,
-      spaces: {
-        ...prevData.spaces,
-        proximitySettings: prevData.spaces.proximitySettings.map(p => 
-          p.id === pair.id ? pair : p
-        ),
-      },
-    }));
-  };
-  
-  const removeProximityPair = (pairId: string) => {
-    setFormData(prevData => ({
-      ...prevData,
-      spaces: {
-        ...prevData.spaces,
-        proximitySettings: prevData.spaces.proximitySettings.filter(
-          p => p.id !== pairId
-        ),
       },
     }));
   };
@@ -290,15 +243,6 @@ ${formData.spaces.rooms.length > 0
       `• ${room.quantity} ${room.type}${room.quantity > 1 ? 's' : ''}: ${room.description || 'No specific requirements'}`
     ).join('\n')
   : '• No spaces defined yet'}
-
-${formData.spaces.proximitySettings.length > 0 
-  ? `\nSpace Proximity Requirements:\n` + 
-    formData.spaces.proximitySettings.map(pair => {
-      const room1 = formData.spaces.rooms.find(r => r.id === pair.space1Id)?.type || 'Unknown';
-      const room2 = formData.spaces.rooms.find(r => r.id === pair.space2Id)?.type || 'Unknown';
-      return `• ${room1} should be ${pair.relation === 'close' ? 'close to' : 'far from'} ${room2}`;
-    }).join('\n')
-  : ''}
 
 ${formData.spaces.additionalNotes ? `\nAdditional Space Notes: ${formData.spaces.additionalNotes}` : ''}
 
@@ -393,10 +337,7 @@ This project summary reflects the client's input to date. Further consultation m
     exportAsPDF,
     addRoom,
     updateRoom,
-    removeRoom,
-    addProximityPair,
-    updateProximityPair,
-    removeProximityPair
+    removeRoom
   };
 
   return (
