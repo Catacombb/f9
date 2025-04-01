@@ -5,7 +5,7 @@ import { ThemeToggle } from './ThemeProvider';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { formatDistanceToNow } from 'date-fns';
 import { Link } from 'react-router-dom';
-import { AppLogo } from './AppLogo';
+import { AppLogo } from '@/components/AppLogo';
 import { Form } from '@/components/ui/form';
 import { useForm } from 'react-hook-form';
 import { Progress } from '@/components/ui/progress';
