@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -6,7 +5,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { SectionKey } from '@/types';
-import { ChevronRight, Info, Home, PiggyBank, Users, MapPin, Layout, Building, Image, Upload, FileText, ExternalLink, MessageSquare } from 'lucide-react';
+import { ChevronRight, Info, Home, PiggyBank, Users, MapPin, Layout, Building, Image, Upload, FileText, ExternalLink } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Link } from 'react-router-dom';
 import { AppLogo } from '@/components/AppLogo';
@@ -27,7 +26,6 @@ const sections = [
   { id: 'architecture', title: 'Architecture', icon: <Building className="h-5 w-5" /> },
   { id: 'inspiration', title: 'Inspiration', icon: <Image className="h-5 w-5" /> },
   { id: 'uploads', title: 'Uploads', icon: <Upload className="h-5 w-5" /> },
-  { id: 'communication', title: 'Communication', icon: <MessageSquare className="h-5 w-5" /> },
   { id: 'summary', title: 'Summary', icon: <FileText className="h-5 w-5" /> },
 ];
 
