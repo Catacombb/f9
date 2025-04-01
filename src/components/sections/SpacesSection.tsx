@@ -1,18 +1,16 @@
-
 import React, { useState, useEffect } from 'react';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { PlusCircle, Trash2, Bed, Bath, Sofa, BookOpen, ShoppingBag, Car, Utensils } from 'lucide-react';
 import { SpaceRoom } from '@/types';
 import { Label } from '@/components/ui/label';
 import { toast } from '@/hooks/use-toast';
 import { SectionHeader } from '@/components/sections/SectionHeader';
 
-// Predefined room types with icons
 const predefinedRoomTypes = [
   { value: 'Bedroom', label: 'Bedroom', icon: <Bed className="h-4 w-4 mr-2" /> },
   { value: 'Bathroom', label: 'Bathroom', icon: <Bath className="h-4 w-4 mr-2" /> },
@@ -23,7 +21,6 @@ const predefinedRoomTypes = [
   { value: 'Garage', label: 'Garage', icon: <Car className="h-4 w-4 mr-2" /> },
 ];
 
-// RoomItem component for the detailed view
 const RoomItem = ({ 
   room, 
   onEdit, 
@@ -100,7 +97,6 @@ export function SpacesSection() {
   
   const rooms = formData.spaces.rooms;
   
-  // Initialize roomsWithQuantities from existing rooms
   useEffect(() => {
     const uniqueRoomTypes = Array.from(new Set(rooms.map(room => room.type)));
     
@@ -154,18 +150,15 @@ export function SpacesSection() {
   };
   
   const handleRoomQuantityChange = (type: string, quantity: number) => {
-    // Update the roomsWithQuantities state
     setRoomsWithQuantities(prev => 
       prev.map(room => 
         room.type === type ? { ...room, quantity } : room
       )
     );
     
-    // Find existing rooms of this type
     const existingRooms = rooms.filter(room => room.type === type);
     
     if (existingRooms.length === 0 && quantity > 0) {
-      // Add a new room if none exists
       addRoom({
         type,
         quantity,
@@ -173,30 +166,23 @@ export function SpacesSection() {
         isCustom: !predefinedRoomTypes.some(rt => rt.value === type)
       });
     } else if (existingRooms.length === 1) {
-      // Update the quantity of the existing room
       if (quantity > 0) {
         updateRoom({
           ...existingRooms[0],
           quantity
         });
       } else {
-        // Remove the room if quantity is 0
         removeRoom(existingRooms[0].id);
       }
     } else if (existingRooms.length > 1) {
-      // If multiple rooms of this type exist, handle them appropriately
-      // This is a simplification - you might want a more sophisticated approach
       if (quantity > 0) {
-        // Keep the first one and update its quantity, remove the rest
         updateRoom({
           ...existingRooms[0],
           quantity
         });
         
-        // Remove additional rooms of this type
         existingRooms.slice(1).forEach(room => removeRoom(room.id));
       } else {
-        // Remove all rooms of this type
         existingRooms.forEach(room => removeRoom(room.id));
       }
     }
@@ -217,7 +203,6 @@ export function SpacesSection() {
         />
         
         <div className="space-y-8">
-          {/* Quick Room Selection with Buttons */}
           <Card>
             <CardHeader>
               <CardTitle>Room Selection</CardTitle>
@@ -227,19 +212,21 @@ export function SpacesSection() {
                 Select the types of rooms you need and specify how many of each.
               </p>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-3 gap-4">
                 {predefinedRoomTypes.map(roomType => (
-                  <div key={roomType.value} className="flex items-center space-x-2 p-3 border rounded-md">
-                    <div className="flex items-center flex-1">
-                      {roomType.icon}
-                      <span>{roomType.label}</span>
-                    </div>
-                    <div className="flex items-center">
+                  <div 
+                    key={roomType.value} 
+                    className="flex items-center border rounded-md p-3 space-x-2"
+                  >
+                    {roomType.icon}
+                    <span className="flex-grow">{roomType.label}</span>
+                    <div className="flex items-center space-x-2">
                       <Button 
                         variant="outline" 
                         size="icon" 
                         onClick={() => handleRoomQuantityChange(roomType.value, Math.max(0, getRoomQuantity(roomType.value) - 1))}
                         disabled={getRoomQuantity(roomType.value) <= 0}
+                        className="h-8 w-8"
                       >
                         -
                       </Button>
@@ -248,12 +235,13 @@ export function SpacesSection() {
                         min="0" 
                         value={getRoomQuantity(roomType.value)} 
                         onChange={(e) => handleRoomQuantityChange(roomType.value, parseInt(e.target.value) || 0)}
-                        className="w-16 mx-2 text-center"
+                        className="w-16 text-center h-8"
                       />
                       <Button 
                         variant="outline" 
                         size="icon" 
                         onClick={() => handleRoomQuantityChange(roomType.value, getRoomQuantity(roomType.value) + 1)}
+                        className="h-8 w-8"
                       >
                         +
                       </Button>
@@ -264,7 +252,6 @@ export function SpacesSection() {
             </CardContent>
           </Card>
           
-          {/* Custom Room Addition */}
           <Card>
             <CardHeader>
               <CardTitle>Add a Custom Space</CardTitle>
@@ -321,7 +308,6 @@ export function SpacesSection() {
             </CardFooter>
           </Card>
           
-          {/* Room Details */}
           <Card>
             <CardHeader>
               <CardTitle>Room Details</CardTitle>
@@ -347,7 +333,6 @@ export function SpacesSection() {
             </CardContent>
           </Card>
           
-          {/* Additional Notes */}
           <Card>
             <CardHeader>
               <CardTitle>Additional Space Notes</CardTitle>
@@ -362,7 +347,6 @@ export function SpacesSection() {
             </CardContent>
           </Card>
           
-          {/* Navigation Buttons */}
           <div className="flex justify-between pt-4">
             <Button
               variant="outline"
