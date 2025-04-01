@@ -46,7 +46,9 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>
-      {children}
+      <div className="font-inter"> {/* Ensure Inter font is applied consistently */}
+        {children}
+      </div>
     </ThemeContext.Provider>
   );
 };

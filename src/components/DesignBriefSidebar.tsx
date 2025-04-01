@@ -6,7 +6,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { SectionKey } from '@/types';
-import { ChevronRight, Info, Home, PiggyBank, Users, MapPin, Layout, Building, Image, Upload, FileText, ChevronLeft, HelpCircle, MessageSquare, ExternalLink } from 'lucide-react';
+import { ChevronRight, Info, Home, PiggyBank, Users, MapPin, Layout, Building, Image, Upload, FileText, HelpCircle, MessageSquare, ExternalLink } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Link } from 'react-router-dom';
 import { AppLogo } from '@/components/AppLogo';
@@ -28,20 +28,11 @@ const sections = [
 
 export function DesignBriefSidebar() {
   const { currentSection, setCurrentSection, projectData } = useDesignBrief();
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  // Removed isCollapsed state and related functions since sidebar should always be visible
   const isMobile = useIsMobile();
-  
-  useEffect(() => {
-    if (isMobile) {
-      setIsCollapsed(true);
-    }
-  }, [isMobile]);
 
   const navigateToSection = (sectionId: SectionKey) => {
     setCurrentSection(sectionId);
-    if (isMobile) {
-      setIsCollapsed(true);
-    }
   };
   
   const getSectionProgress = (sectionId: SectionKey): number => {
@@ -77,27 +68,11 @@ export function DesignBriefSidebar() {
   };
 
   return (
-    <div 
-      className={cn(
-        "h-screen border-r bg-sidebar transition-all duration-300 relative",
-        isCollapsed ? "w-2 md:w-12" : "w-64"
-      )}
-    >
-      <Button
-        variant="ghost"
-        size="icon"
-        className={cn(
-          "absolute top-4 transition-all duration-300 z-10",
-          isCollapsed ? "right-0 -mr-10" : "right-2"
-        )}
-        onClick={() => setIsCollapsed(!isCollapsed)}
-      >
-        {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
-      </Button>
-
-      <div className={cn("h-full flex flex-col", isCollapsed ? "hidden" : "block")}>
-        <div className="py-6 px-4 flex justify-center">
+    <div className="h-screen border-r bg-sidebar transition-all duration-300 relative w-64">
+      <div className="h-full flex flex-col">
+        <div className="py-6 px-4 flex flex-col items-center">
           <AppLogo size="large" />
+          <span className="text-xs text-muted-foreground mt-2">Guiding Your Vision</span>
         </div>
         
         <Separator className="mb-2 bg-sidebar-border" />

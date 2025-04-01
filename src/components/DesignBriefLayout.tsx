@@ -93,7 +93,7 @@ export function DesignBriefLayout({ children }: DesignBriefLayoutProps) {
           
           <div className="flex-1 flex flex-col justify-center items-center">
             <AppLogo size="small" />
-            <span className="text-xs text-muted-foreground mt-1">Guiding Your Vision</span>
+            {/* Removed tagline from here */}
           </div>
           
           <div className="flex-1 flex justify-end items-center">
@@ -116,7 +116,7 @@ export function DesignBriefLayout({ children }: DesignBriefLayoutProps) {
               <span>Overall Progress: {overallProgress}%</span>
             </div>
             <Progress value={overallProgress} className="h-2 w-full" />
-            <div className="text-center mt-1 pb-1">
+            <div className="text-center mt-1 pb-2">
               © 2025 Northstar by www.nickharrison.co
             </div>
           </div>
