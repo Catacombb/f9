@@ -85,16 +85,16 @@ export const generateTestData = (): Partial<ProjectData['formData']> => {
         {
           id: crypto.randomUUID(),
           name: "Test Architect",
-          type: "architect", // Changed 'role' to 'type'
+          type: "architect",
           contact: "architect@test.com",
-          company: "Test Architecture Ltd"
+          notes: "From Test Architecture Ltd"
         },
         {
           id: crypto.randomUUID(),
           name: "Test Engineer",
-          type: "structural_engineer", // Changed 'role' to 'type'
+          type: "structural_engineer",
           contact: "engineer@test.com",
-          company: "Test Engineering Ltd"
+          notes: "From Test Engineering Ltd"
         }
       ],
       additionalNotes: "Would like to involve landscape designer at later stage"
