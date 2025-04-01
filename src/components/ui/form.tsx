@@ -51,12 +51,15 @@ const useFormField = () => {
   }
 
   if (!formContext) {
+    // Include error property with default value of undefined
     return {
       id: itemContext?.id || "",
       name: fieldContext.name,
       formItemId: `${itemContext?.id || "form"}-form-item`,
       formDescriptionId: `${itemContext?.id || "form"}-form-item-description`,
       formMessageId: `${itemContext?.id || "form"}-form-item-message`,
+      // Add error property to fix TypeScript errors
+      error: undefined,
     };
   }
 
