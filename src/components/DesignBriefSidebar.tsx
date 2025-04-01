@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -29,7 +29,7 @@ export function DesignBriefSidebar() {
   const isMobile = useIsMobile();
   
   // Initially collapse sidebar on mobile
-  React.useEffect(() => {
+  useEffect(() => {
     if (isMobile) {
       setIsCollapsed(true);
     }
@@ -47,6 +47,9 @@ export function DesignBriefSidebar() {
     // Skip progress for intro and summary sections
     if (sectionId === 'intro' || sectionId === 'summary') return 0;
     
+    // Make sure formData is defined before accessing properties
+    if (!formData) return 0;
+    
     // Calculate based on filled fields for each section
     switch (sectionId) {
       case 'projectInfo':
@@ -58,7 +61,7 @@ export function DesignBriefSidebar() {
       case 'site':
         return calculateProgress(formData.site);
       case 'spaces':
-        return formData.spaces.rooms.length > 0 ? 
+        return formData.spaces && formData.spaces.rooms && formData.spaces.rooms.length > 0 ? 
           Math.min(100, Math.round((formData.spaces.rooms.length / 4) * 100)) : 0;
       case 'architecture':
         return calculateProgress(formData.architecture);
@@ -71,7 +74,8 @@ export function DesignBriefSidebar() {
   };
   
   // Helper to calculate progress based on filled fields
-  const calculateProgress = (sectionData: Record<string, any>): number => {
+  const calculateProgress = (sectionData: Record<string, any> | undefined): number => {
+    if (!sectionData) return 0;
     const totalFields = Object.keys(sectionData).length;
     if (totalFields === 0) return 0;
     
