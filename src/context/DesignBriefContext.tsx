@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { FormData, ProjectFiles, BriefSummary, ProjectData, SectionKey } from '@/types';
+import { FormData, ProjectFiles, BriefSummary, ProjectData, SectionKey, SpaceRoom, ProximityPair } from '@/types';
 
 // Default values for the form
 const defaultFormData: FormData = {
@@ -37,6 +37,11 @@ const defaultFormData: FormData = {
     certificateOfTitle: '',
     covenants: '',
   },
+  spaces: {
+    rooms: [],
+    proximitySettings: [],
+    additionalNotes: '',
+  },
   architecture: {
     stylePrefences: '',
     externalMaterials: '',
@@ -71,6 +76,12 @@ interface DesignBriefContextType {
   generateSummary: () => Promise<string>;
   sendByEmail: (recipientEmail: string) => Promise<boolean>;
   exportAsPDF: () => Promise<void>;
+  addRoom: (room: Omit<SpaceRoom, 'id'>) => string;
+  updateRoom: (room: SpaceRoom) => void;
+  removeRoom: (roomId: string) => void;
+  addProximityPair: (pair: Omit<ProximityPair, 'id'>) => string;
+  updateProximityPair: (pair: ProximityPair) => void;
+  removeProximityPair: (pairId: string) => void;
 }
 
 // Create the context
@@ -165,6 +176,87 @@ export const DesignBriefProvider: React.FC<{ children: React.ReactNode }> = ({ c
     localStorage.removeItem('designBriefData');
   };
 
+  // Spaces section methods
+  const addRoom = (room: Omit<SpaceRoom, 'id'>) => {
+    const id = crypto.randomUUID();
+    const newRoom: SpaceRoom = { ...room, id };
+    
+    setFormData(prevData => ({
+      ...prevData,
+      spaces: {
+        ...prevData.spaces,
+        rooms: [...prevData.spaces.rooms, newRoom],
+      },
+    }));
+    
+    return id;
+  };
+  
+  const updateRoom = (room: SpaceRoom) => {
+    setFormData(prevData => ({
+      ...prevData,
+      spaces: {
+        ...prevData.spaces,
+        rooms: prevData.spaces.rooms.map(r => 
+          r.id === room.id ? room : r
+        ),
+      },
+    }));
+  };
+  
+  const removeRoom = (roomId: string) => {
+    setFormData(prevData => ({
+      ...prevData,
+      spaces: {
+        ...prevData.spaces,
+        rooms: prevData.spaces.rooms.filter(r => r.id !== roomId),
+        // Also remove any proximity settings that include this room
+        proximitySettings: prevData.spaces.proximitySettings.filter(
+          p => p.space1Id !== roomId && p.space2Id !== roomId
+        ),
+      },
+    }));
+  };
+  
+  const addProximityPair = (pair: Omit<ProximityPair, 'id'>) => {
+    const id = crypto.randomUUID();
+    const newPair: ProximityPair = { ...pair, id };
+    
+    setFormData(prevData => ({
+      ...prevData,
+      spaces: {
+        ...prevData.spaces,
+        proximitySettings: [...prevData.spaces.proximitySettings, newPair],
+      },
+    }));
+    
+    return id;
+  };
+  
+  const updateProximityPair = (pair: ProximityPair) => {
+    setFormData(prevData => ({
+      ...prevData,
+      spaces: {
+        ...prevData.spaces,
+        proximitySettings: prevData.spaces.proximitySettings.map(p => 
+          p.id === pair.id ? pair : p
+        ),
+      },
+    }));
+  };
+  
+  const removeProximityPair = (pairId: string) => {
+    setFormData(prevData => ({
+      ...prevData,
+      spaces: {
+        ...prevData.spaces,
+        proximitySettings: prevData.spaces.proximitySettings.filter(
+          p => p.id !== pairId
+        ),
+      },
+    }));
+  };
+
   // Generate an AI summary based on the form data
   const generateSummary = async (): Promise<string> => {
     // For MVP, we'll create a simple summary from the form data
@@ -191,6 +283,24 @@ ${formData.lifestyle.occupationDetails ? `• Occupations: ${formData.lifestyle.
 ${formData.lifestyle.dailyRoutine ? `• Daily Routines: ${formData.lifestyle.dailyRoutine}` : ''}
 ${formData.lifestyle.entertainmentStyle ? `• Entertainment Style: ${formData.lifestyle.entertainmentStyle}` : ''}
 ${formData.lifestyle.specialRequirements ? `• Special Requirements: ${formData.lifestyle.specialRequirements}` : ''}
+
+Spaces Required:
+${formData.spaces.rooms.length > 0 
+  ? formData.spaces.rooms.map(room => 
+      `• ${room.quantity} ${room.type}${room.quantity > 1 ? 's' : ''}: ${room.description || 'No specific requirements'}`
+    ).join('\n')
+  : '• No spaces defined yet'}
+
+${formData.spaces.proximitySettings.length > 0 
+  ? `\nSpace Proximity Requirements:\n` + 
+    formData.spaces.proximitySettings.map(pair => {
+      const room1 = formData.spaces.rooms.find(r => r.id === pair.space1Id)?.type || 'Unknown';
+      const room2 = formData.spaces.rooms.find(r => r.id === pair.space2Id)?.type || 'Unknown';
+      return `• ${room1} should be ${pair.relation === 'close' ? 'close to' : 'far from'} ${room2}`;
+    }).join('\n')
+  : ''}
+
+${formData.spaces.additionalNotes ? `\nAdditional Space Notes: ${formData.spaces.additionalNotes}` : ''}
 
 Site Analysis:
 ${formData.site.existingConditions ? `• Existing Conditions: ${formData.site.existingConditions}` : ''}
@@ -281,6 +391,12 @@ This project summary reflects the client's input to date. Further consultation m
     generateSummary,
     sendByEmail,
     exportAsPDF,
+    addRoom,
+    updateRoom,
+    removeRoom,
+    addProximityPair,
+    updateProximityPair,
+    removeProximityPair
   };
 
   return (

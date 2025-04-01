@@ -6,7 +6,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { SectionKey } from '@/types';
-import { ChevronRight, Info, Home, PiggyBank, Users, MapPin, Building, Image, Upload, FileText, ChevronLeft, HelpCircle } from 'lucide-react';
+import { ChevronRight, Info, Home, PiggyBank, Users, MapPin, Layout, Building, Image, Upload, FileText, ChevronLeft, HelpCircle } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 // Define all sections with their icons and titles
@@ -16,6 +16,7 @@ const sections = [
   { id: 'budget', title: 'Budget', icon: <PiggyBank className="h-5 w-5" /> },
   { id: 'lifestyle', title: 'Lifestyle', icon: <Users className="h-5 w-5" /> },
   { id: 'site', title: 'Site', icon: <MapPin className="h-5 w-5" /> },
+  { id: 'spaces', title: 'Spaces', icon: <Layout className="h-5 w-5" /> },
   { id: 'architecture', title: 'Architecture', icon: <Building className="h-5 w-5" /> },
   { id: 'inspiration', title: 'Inspiration', icon: <Image className="h-5 w-5" /> },
   { id: 'uploads', title: 'Uploads', icon: <Upload className="h-5 w-5" /> },
@@ -56,6 +57,9 @@ export function DesignBriefSidebar() {
         return calculateProgress(formData.lifestyle);
       case 'site':
         return calculateProgress(formData.site);
+      case 'spaces':
+        return formData.spaces.rooms.length > 0 ? 
+          Math.min(100, Math.round((formData.spaces.rooms.length / 4) * 100)) : 0;
       case 'architecture':
         return calculateProgress(formData.architecture);
       case 'inspiration':

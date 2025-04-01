@@ -41,6 +41,13 @@ export interface FormData {
     covenants: string;
   };
   
+  // Spaces
+  spaces: {
+    rooms: SpaceRoom[];
+    proximitySettings: ProximityPair[];
+    additionalNotes: string;
+  };
+  
   // Architecture
   architecture: {
     stylePrefences: string;
@@ -49,6 +56,21 @@ export interface FormData {
     sustainabilityGoals: string;
     specialFeatures: string;
   };
+}
+
+export interface SpaceRoom {
+  id: string;
+  type: string;
+  quantity: number;
+  description: string;
+  isCustom?: boolean;
+}
+
+export interface ProximityPair {
+  id: string;
+  space1Id: string;
+  space2Id: string;
+  relation: 'close' | 'far';
 }
 
 export interface ProjectFiles {
@@ -69,7 +91,7 @@ export interface ProjectData {
   currentSection?: string;
 }
 
-export type SectionKey = 'intro' | 'projectInfo' | 'budget' | 'lifestyle' | 'site' | 'architecture' | 'inspiration' | 'uploads' | 'summary';
+export type SectionKey = 'intro' | 'projectInfo' | 'budget' | 'lifestyle' | 'site' | 'spaces' | 'architecture' | 'inspiration' | 'uploads' | 'summary';
 
 export interface Section {
   id: SectionKey;
