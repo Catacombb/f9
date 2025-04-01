@@ -235,11 +235,11 @@ export const DesignBriefProvider: React.FC<{ children: React.ReactNode }> = ({ c
     localStorage.setItem('projectData', JSON.stringify(projectData));
   }, [projectData]);
 
-  // Mock implementations for the required async functions
-  const generateSummary = useCallback(async () => {
+  // Fix the Promise<void> type for generateSummary
+  const generateSummary = useCallback(async (): Promise<void> => {
     // In a real app, this would call an API to generate the summary
     // For now, we'll just set a mock summary after a delay
-    return new Promise((resolve) => {
+    return new Promise<void>((resolve) => {
       setTimeout(() => {
         updateSummary({
           generatedSummary: `This is a mock generated summary for ${projectData.formData.projectInfo.clientName || 'your'} project at ${projectData.formData.projectInfo.projectAddress || 'the specified address'}.`,
@@ -253,17 +253,18 @@ export const DesignBriefProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const sendByEmail = useCallback(async (email: string): Promise<boolean> => {
     // Mock implementation - in a real app, this would send the email
     console.log(`Sending email to ${email}`);
-    return new Promise((resolve) => {
+    return new Promise<boolean>((resolve) => {
       setTimeout(() => {
         resolve(true);
       }, 1500);
     });
   }, []);
 
-  const exportAsPDF = useCallback(async () => {
+  // Fix the Promise<void> type for exportAsPDF
+  const exportAsPDF = useCallback(async (): Promise<void> => {
     // Mock implementation - in a real app, this would export to PDF
     console.log('Exporting as PDF');
-    return new Promise((resolve) => {
+    return new Promise<void>((resolve) => {
       setTimeout(() => {
         resolve();
       }, 1500);
