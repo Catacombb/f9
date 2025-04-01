@@ -11,6 +11,11 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { Link } from 'react-router-dom';
 import { AppLogo } from '@/components/AppLogo';
 
+interface DesignBriefSidebarProps {
+  showLastSaved?: boolean;
+  lastSavedFormatted?: string;
+}
+
 const sections = [
   { id: 'intro', title: 'Introduction', icon: <Info className="h-5 w-5" /> },
   { id: 'projectInfo', title: 'Project Info', icon: <Home className="h-5 w-5" /> },
@@ -26,7 +31,7 @@ const sections = [
   { id: 'summary', title: 'Summary', icon: <FileText className="h-5 w-5" /> },
 ];
 
-export function DesignBriefSidebar() {
+export function DesignBriefSidebar({ showLastSaved = false, lastSavedFormatted = '' }: DesignBriefSidebarProps) {
   const { currentSection, setCurrentSection, projectData } = useDesignBrief();
   const isMobile = useIsMobile();
 
@@ -67,14 +72,20 @@ export function DesignBriefSidebar() {
   };
 
   return (
-    <div className={`h-full border-r bg-sidebar transition-all duration-300 relative ${isMobile ? 'w-full' : 'w-64'}`}>
+    <div className={`h-full border-r bg-sidebar transition-all duration-300 relative ${isMobile ? 'w-full' : 'w-64'} overflow-hidden`}>
       <div className="h-full flex flex-col">
         <div className="py-6 px-4 flex flex-col items-center">
           <AppLogo size="large" />
           <span className="text-xs text-muted-foreground mt-2">Guiding Your Vision</span>
+          
+          {showLastSaved && lastSavedFormatted && (
+            <div className="mt-3 text-xs text-muted-foreground text-center pb-2 border-b border-sidebar-border w-full">
+              Last saved {lastSavedFormatted}
+            </div>
+          )}
         </div>
         
-        <Separator className="mb-2 bg-sidebar-border" />
+        {!showLastSaved && <Separator className="mb-2 bg-sidebar-border" />}
         
         <ScrollArea className="flex-1">
           <div className="px-2 py-2">

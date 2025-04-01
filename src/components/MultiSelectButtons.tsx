@@ -46,7 +46,7 @@ export function MultiSelectButtons({
       <ToggleGroup 
         type="multiple" 
         variant="outline"
-        className="flex flex-wrap gap-2 w-full"
+        className="flex flex-wrap gap-2 w-full max-w-full"
         value={selectedValues}
         onValueChange={handleValueChange}
       >
@@ -54,7 +54,7 @@ export function MultiSelectButtons({
           <ToggleGroupItem 
             key={option.value} 
             value={option.value}
-            className="px-4 py-2 rounded-md border border-input data-[state=on]:bg-primary data-[state=on]:text-primary-foreground data-[state=on]:border-primary break-words"
+            className="px-4 py-2 rounded-md border border-input data-[state=on]:bg-primary data-[state=on]:text-primary-foreground data-[state=on]:border-primary break-words max-w-full"
           >
             {option.label}
           </ToggleGroupItem>

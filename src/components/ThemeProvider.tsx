@@ -46,7 +46,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>
-      <div className="font-inter h-full w-full overflow-x-hidden"> {/* Added overflow-x-hidden to prevent horizontal scroll */}
+      <div className="font-inter h-full w-full overflow-hidden"> {/* Added overflow-hidden to prevent horizontal scroll */}
         {children}
       </div>
     </ThemeContext.Provider>

@@ -99,7 +99,7 @@ export function DesignBriefLayout({ children }: DesignBriefLayoutProps) {
             </Button>
           </SheetTrigger>
           <SheetContent side="left" className="p-0 w-[80%] max-w-[280px]">
-            <DesignBriefSidebar />
+            <DesignBriefSidebar showLastSaved={isMobile} lastSavedFormatted={lastSavedFormatted} />
           </SheetContent>
         </Sheet>
       )}
@@ -115,9 +115,11 @@ export function DesignBriefLayout({ children }: DesignBriefLayoutProps) {
           </div>
           
           <div className="flex-1 flex justify-end items-center">
-            <span className="text-xs text-muted-foreground mr-2 truncate max-w-[150px]">
-              Last saved {lastSavedFormatted}
-            </span>
+            {!isMobile && (
+              <span className="text-xs text-muted-foreground mr-2 truncate max-w-[150px]">
+                Last saved {lastSavedFormatted}
+              </span>
+            )}
             <ThemeToggle />
           </div>
         </header>
