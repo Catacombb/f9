@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -34,7 +35,7 @@ export function SiteSection() {
         
         <div className="design-brief-form-group">
           <div className="mb-6">
-            <Label htmlFor="siteDescription" className="design-brief-question-title">
+            <Label htmlFor="existingConditions" className="design-brief-question-title">
               Site Description
               <span className="text-muted-foreground text-sm ml-2">(optional)</span>
             </Label>
@@ -42,17 +43,17 @@ export function SiteSection() {
               Describe the general characteristics of the site (e.g., urban, suburban, rural, coastal).
             </p>
             <Textarea
-              id="siteDescription"
-              name="siteDescription"
+              id="existingConditions"
+              name="existingConditions"
               placeholder="Describe the site's general environment and setting..."
-              value={formData.site.siteDescription}
+              value={formData.site.existingConditions}
               onChange={handleChange}
               className="mt-1"
             />
           </div>
           
           <div className="mb-6">
-            <Label htmlFor="topography" className="design-brief-question-title">
+            <Label htmlFor="siteFeatures" className="design-brief-question-title">
               Topography
               <span className="text-muted-foreground text-sm ml-2">(optional)</span>
             </Label>
@@ -60,17 +61,17 @@ export function SiteSection() {
               Describe the site's topography (e.g., flat, sloping, steep).
             </p>
             <Textarea
-              id="topography"
-              name="topography"
+              id="siteFeatures"
+              name="siteFeatures"
               placeholder="Describe the site's topography and any significant elevation changes..."
-              value={formData.site.topography}
+              value={formData.site.siteFeatures}
               onChange={handleChange}
               className="mt-1"
             />
           </div>
           
           <div className="mb-6">
-            <Label htmlFor="vegetation" className="design-brief-question-title">
+            <Label htmlFor="neighboringProperties" className="design-brief-question-title">
               Vegetation
               <span className="text-muted-foreground text-sm ml-2">(optional)</span>
             </Label>
@@ -78,17 +79,17 @@ export function SiteSection() {
               Describe the existing vegetation on the site (e.g., trees, shrubs, grass).
             </p>
             <Textarea
-              id="vegetation"
-              name="vegetation"
+              id="neighboringProperties"
+              name="neighboringProperties"
               placeholder="Describe the site's vegetation and any significant trees or plants..."
-              value={formData.site.vegetation}
+              value={formData.site.neighboringProperties}
               onChange={handleChange}
               className="mt-1"
             />
           </div>
           
           <div>
-            <Label htmlFor="views" className="design-brief-question-title">
+            <Label htmlFor="viewsOrientations" className="design-brief-question-title">
               Views
               <span className="text-muted-foreground text-sm ml-2">(optional)</span>
             </Label>
@@ -96,10 +97,10 @@ export function SiteSection() {
               Describe the views from the site (e.g., ocean, mountains, city skyline).
             </p>
             <Textarea
-              id="views"
-              name="views"
+              id="viewsOrientations"
+              name="viewsOrientations"
               placeholder="Describe the views from the site and any significant landmarks..."
-              value={formData.site.views}
+              value={formData.site.viewsOrientations}
               onChange={handleChange}
               className="mt-1"
             />
