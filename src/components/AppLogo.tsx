@@ -8,20 +8,13 @@ export const AppLogo = ({ size = 'default' }: { size?: 'small' | 'default' | 'la
     large: 'h-10 md:h-12'
   };
   
-  const textSizeClasses = {
-    small: 'text-xl md:text-2xl',
-    default: 'text-3xl md:text-4xl',
-    large: 'text-4xl md:text-5xl'
-  };
-  
   return (
     <div className="flex items-center gap-2">
       <img 
-        src="/lovable-uploads/70d2354a-6971-4612-ada4-f1277078f209.png" 
+        src="/lovable-uploads/679db516-7bcb-4615-b61d-df2ce461c388.png" 
         alt="Northstar Logo" 
         className={`${sizeClasses[size]}`}
       />
-      {/* Remove the text span since it's included in the logo */}
     </div>
   );
 };
