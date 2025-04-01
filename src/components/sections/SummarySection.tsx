@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -9,6 +8,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { ArrowLeft, FileText, Mail, Pencil, RefreshCw, Save } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+
+// Define placeholder inspiration images
+const inspirationImages = [
+  { id: '1', src: '/placeholder.svg', alt: 'Modern Kitchen' },
+  { id: '2', src: '/placeholder.svg', alt: 'Minimal Living Room' },
+  { id: '3', src: '/placeholder.svg', alt: 'Open Plan Layout' },
+  { id: '4', src: '/placeholder.svg', alt: 'Outdoor Living Space' },
+  { id: '5', src: '/placeholder.svg', alt: 'Master Bedroom' },
+  { id: '6', src: '/placeholder.svg', alt: 'Contemporary Bathroom' },
+];
 
 export function SummarySection() {
   const { formData, files, summary, updateSummary, setCurrentSection, generateSummary, sendByEmail, exportAsPDF } = useDesignBrief();
