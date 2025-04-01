@@ -95,6 +95,14 @@ export function DesignBriefSidebar() {
     return Math.round((filledFields / totalFields) * 100);
   };
 
+  // Get client name and address from the project info
+  const clientName = formData?.projectInfo?.clientName || '';
+  const clientAddress = formData?.projectInfo?.projectAddress || '';
+
+  // Create dynamic title and subtitle
+  const briefTitle = clientName ? `Design Brief - ${clientName}` : 'Design Brief';
+  const briefSubtitle = clientAddress ? `Create your project brief for ${clientAddress}` : 'Create your project brief';
+
   return (
     <div 
       className={cn(
@@ -117,8 +125,8 @@ export function DesignBriefSidebar() {
 
       <div className={cn("h-full", isCollapsed ? "hidden" : "block")}>
         <div className="py-6 px-4">
-          <h2 className="text-xl font-semibold text-sidebar-foreground">Design Brief</h2>
-          <p className="text-sm text-sidebar-foreground/70">Create your project brief</p>
+          <h2 className="text-xl font-semibold text-sidebar-foreground truncate">{briefTitle}</h2>
+          <p className="text-sm text-sidebar-foreground/70 truncate">{briefSubtitle}</p>
         </div>
         
         <Separator className="mb-2 bg-sidebar-border" />
