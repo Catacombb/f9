@@ -6,20 +6,21 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import { PlusCircle, Trash2, Bed, Bath, Sofa, BookOpen, ShoppingBag, Car, Utensils } from 'lucide-react';
+import { PlusCircle, Trash2, Bed, Bath, Sofa, BookOpen, ShoppingBag, Car, Utensils, Toilet } from 'lucide-react';
 import { SpaceRoom } from '@/types';
 import { Label } from '@/components/ui/label';
 import { toast } from '@/hooks/use-toast';
 import { SectionHeader } from '@/components/sections/SectionHeader';
 
 const predefinedRoomTypes = [
-  { value: 'Bedroom', label: 'Bedroom', icon: <Bed className="h-4 w-4 mr-2" /> },
-  { value: 'Bathroom', label: 'Bathroom', icon: <Bath className="h-4 w-4 mr-2" /> },
-  { value: 'Living Room', label: 'Living Room', icon: <Sofa className="h-4 w-4 mr-2" /> },
-  { value: 'Kitchen', label: 'Kitchen', icon: <Utensils className="h-4 w-4 mr-2" /> },
-  { value: 'Dining Area', label: 'Dining Area', icon: <ShoppingBag className="h-4 w-4 mr-2" /> },
-  { value: 'Office/Study', label: 'Office/Study', icon: <BookOpen className="h-4 w-4 mr-2" /> },
-  { value: 'Garage', label: 'Garage', icon: <Car className="h-4 w-4 mr-2" /> },
+  { value: 'Bedroom', label: 'Bedroom', icon: <Bed className="h-5 w-5" /> },
+  { value: 'Bathroom', label: 'Bathroom', icon: <Bath className="h-5 w-5" /> },
+  { value: 'Powder', label: 'Powder', icon: <Toilet className="h-5 w-5" /> },
+  { value: 'Living', label: 'Living', icon: <Sofa className="h-5 w-5" /> },
+  { value: 'Kitchen', label: 'Kitchen', icon: <Utensils className="h-5 w-5" /> },
+  { value: 'Dining', label: 'Dining', icon: <ShoppingBag className="h-5 w-5" /> },
+  { value: 'Office', label: 'Office', icon: <BookOpen className="h-5 w-5" /> },
+  { value: 'Garage', label: 'Garage', icon: <Car className="h-5 w-5" /> },
 ];
 
 const RoomItem = ({ 
@@ -213,21 +214,25 @@ export function SpacesSection() {
                 Select the types of rooms you need and specify how many of each.
               </p>
               
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {predefinedRoomTypes.map(roomType => (
                   <div 
                     key={roomType.value} 
-                    className="flex items-center border rounded-md p-3 space-x-2"
+                    className="flex flex-col items-center border rounded-md p-4"
                   >
-                    {roomType.icon}
-                    <span className="flex-grow">{roomType.label}</span>
-                    <div className="flex items-center space-x-2">
+                    <div className="flex flex-col items-center mb-3">
+                      <div className="w-10 h-10 flex items-center justify-center">
+                        {roomType.icon}
+                      </div>
+                      <span className="mt-2 text-center font-medium">{roomType.label}</span>
+                    </div>
+                    <div className="flex items-center space-x-2 mt-2">
                       <Button 
                         variant="outline" 
                         size="icon" 
                         onClick={() => handleRoomQuantityChange(roomType.value, Math.max(0, getRoomQuantity(roomType.value) - 1))}
                         disabled={getRoomQuantity(roomType.value) <= 0}
-                        className="h-8 w-8"
+                        className="h-8 w-8 flex items-center justify-center"
                       >
                         -
                       </Button>
@@ -236,13 +241,13 @@ export function SpacesSection() {
                         min="0" 
                         value={getRoomQuantity(roomType.value)} 
                         onChange={(e) => handleRoomQuantityChange(roomType.value, parseInt(e.target.value) || 0)}
-                        className="w-16 text-center h-8"
+                        className="w-14 text-center h-8"
                       />
                       <Button 
                         variant="outline" 
                         size="icon" 
                         onClick={() => handleRoomQuantityChange(roomType.value, getRoomQuantity(roomType.value) + 1)}
-                        className="h-8 w-8"
+                        className="h-8 w-8 flex items-center justify-center"
                       >
                         +
                       </Button>
@@ -271,7 +276,7 @@ export function SpacesSection() {
                           <SelectItem key={type.value} value={type.value}>
                             <div className="flex items-center">
                               {type.icon}
-                              <span>{type.label}</span>
+                              <span className="ml-2">{type.label}</span>
                             </div>
                           </SelectItem>
                         ))}
