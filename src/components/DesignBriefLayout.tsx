@@ -6,6 +6,8 @@ import { useDesignBrief } from '@/context/DesignBriefContext';
 import { formatDistanceToNow } from 'date-fns';
 import { Link } from 'react-router-dom';
 import { AppLogo } from './AppLogo';
+import { Form } from '@/components/ui/form';
+import { useForm } from 'react-hook-form';
 
 interface DesignBriefLayoutProps {
   children: React.ReactNode;
@@ -13,6 +15,9 @@ interface DesignBriefLayoutProps {
 
 export function DesignBriefLayout({ children }: DesignBriefLayoutProps) {
   const { lastSaved, formData } = useDesignBrief();
+  
+  // Create a form instance to provide FormContext
+  const formMethods = useForm();
   
   const lastSavedFormatted = lastSaved 
     ? formatDistanceToNow(new Date(lastSaved), { addSuffix: true })
@@ -44,7 +49,9 @@ export function DesignBriefLayout({ children }: DesignBriefLayoutProps) {
         </header>
         
         <main className="flex-1 overflow-auto">
-          {children}
+          <Form {...formMethods}>
+            {children}
+          </Form>
         </main>
         
         <footer className="h-12 border-t flex items-center justify-between px-4 text-xs text-muted-foreground">
