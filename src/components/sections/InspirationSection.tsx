@@ -1,12 +1,12 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-// New Zealand architectural homes from archipro.co.nz for inspiration gallery
+// 20 New Zealand exterior architectural homes from archipro.co.nz for inspiration gallery
 const inspirationImages = [
   {
     id: 'img1',
@@ -38,6 +38,76 @@ const inspirationImages = [
     src: 'https://archipro.co.nz/assets/Uploads/_resampled/x2medium-lake-hayes-2.jpg',
     alt: 'Lake Hayes residence with panoramic views',
   },
+  {
+    id: 'img7',
+    src: 'https://archipro.co.nz/assets/Uploads/_resampled/x2medium-Mt-Maunganui-House-01.jpg',
+    alt: 'Mt Maunganui modern home',
+  },
+  {
+    id: 'img8',
+    src: 'https://archipro.co.nz/assets/Uploads/_resampled/x2medium-Omaha-Beach-House-exterior.jpg',
+    alt: 'Omaha Beach House exterior',
+  },
+  {
+    id: 'img9',
+    src: 'https://archipro.co.nz/assets/Uploads/_resampled/x2medium-Te-Arai-Luxury-Holiday-Home-1.jpg',
+    alt: 'Te Arai Luxury Holiday Home',
+  },
+  {
+    id: 'img10',
+    src: 'https://archipro.co.nz/assets/Uploads/_resampled/x2medium-Piha-House-1.jpg',
+    alt: 'Piha House with ocean view',
+  },
+  {
+    id: 'img11',
+    src: 'https://archipro.co.nz/assets/Uploads/_resampled/x2medium-DJI-0322.jpg',
+    alt: 'Aerial view of modern beachfront home',
+  },
+  {
+    id: 'img12',
+    src: 'https://archipro.co.nz/assets/Uploads/_resampled/x2medium-DYP-Photography-4.jpg',
+    alt: 'Luxury home with infinity pool',
+  },
+  {
+    id: 'img13',
+    src: 'https://archipro.co.nz/assets/Uploads/_resampled/x2medium-Coastal-House-1.jpg',
+    alt: 'Modern coastal residence',
+  },
+  {
+    id: 'img14',
+    src: 'https://archipro.co.nz/assets/Uploads/_resampled/x2medium-Kapiti-Beach-house-1.jpg',
+    alt: 'Kapiti Beach house',
+  },
+  {
+    id: 'img15',
+    src: 'https://archipro.co.nz/assets/Uploads/_resampled/x2medium-Marlborough-Sounds-Bach-1.jpg',
+    alt: 'Marlborough Sounds Bach',
+  },
+  {
+    id: 'img16',
+    src: 'https://archipro.co.nz/assets/Uploads/_resampled/x2medium-Waimarama-Beach-House-exterior.jpg',
+    alt: 'Waimarama Beach House exterior',
+  },
+  {
+    id: 'img17',
+    src: 'https://archipro.co.nz/assets/Uploads/_resampled/x2medium-Kaipara-Harbour-House-exterior.jpg',
+    alt: 'Kaipara Harbour House exterior',
+  },
+  {
+    id: 'img18',
+    src: 'https://archipro.co.nz/assets/Uploads/_resampled/x2medium-Wanaka-Lakehouse-1.jpg',
+    alt: 'Wanaka Lakehouse',
+  },
+  {
+    id: 'img19',
+    src: 'https://archipro.co.nz/assets/Uploads/_resampled/x2medium-Matakana-House-exterior.jpg',
+    alt: 'Matakana House exterior',
+  },
+  {
+    id: 'img20',
+    src: 'https://archipro.co.nz/assets/Uploads/_resampled/x2medium-Bay-of-Islands-Holiday-Home-exterior.jpg',
+    alt: 'Bay of Islands Holiday Home exterior',
+  },
 ];
 
 export function InspirationSection() {
@@ -64,7 +134,7 @@ export function InspirationSection() {
       <div className="design-brief-section-container">
         <h1 className="design-brief-section-title">Inspiration Gallery</h1>
         <p className="design-brief-section-description">
-          Select images of New Zealand architectural homes that inspire you or reflect your design preferences. 
+          Select exterior images of New Zealand architectural homes that inspire you or reflect your design preferences. 
           Your selections will help us understand your aesthetic tastes.
         </p>
         
@@ -80,11 +150,16 @@ export function InspirationSection() {
               )}
               onClick={() => toggleImageSelection(image.id)}
             >
-              <div className="relative aspect-w-4 aspect-h-3 h-48">
+              <div className="relative aspect-video">
                 <img
                   src={image.src}
                   alt={image.alt}
                   className="w-full h-full object-cover"
+                  onError={(e) => {
+                    // Fallback for broken images
+                    e.currentTarget.src = "/placeholder.svg";
+                    e.currentTarget.alt = "Image unavailable";
+                  }}
                 />
                 {files.inspirationSelections.includes(image.id) && (
                   <div className="absolute top-2 right-2 bg-primary rounded-full p-1">
@@ -101,7 +176,7 @@ export function InspirationSection() {
             Selected {files.inspirationSelections.length} of {inspirationImages.length} images
           </p>
           <p className="text-muted-foreground mt-2">
-            You can also upload your own inspiration images in the next section
+            You can upload your own inspiration images in the next section
           </p>
         </div>
         
