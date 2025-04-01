@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { Button } from '@/components/ui/button';
@@ -152,7 +151,6 @@ export function SpacesSection() {
   };
   
   const handleRoomQuantityChange = (type: string, quantity: number) => {
-    // Update the local state for display
     setRoomsWithQuantities(prev => 
       prev.map(room => 
         room.type === type ? { ...room, quantity } : room
@@ -196,7 +194,6 @@ export function SpacesSection() {
     return roomMatch ? roomMatch.quantity : 0;
   };
   
-  // Handle increment and decrement with explicit bounds checking
   const incrementRoomQuantity = (type: string) => {
     const currentQuantity = getRoomQuantity(type);
     handleRoomQuantityChange(type, currentQuantity + 1);
