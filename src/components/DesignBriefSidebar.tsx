@@ -119,17 +119,25 @@ export function DesignBriefSidebar({ showLastSaved = false, lastSavedFormatted =
           </div>
         </ScrollArea>
         
-        <div className="p-4 border-t bg-sidebar border-sidebar-border mt-auto">
+        <div className="p-4 border-t bg-sidebar-accent/10 border-sidebar-border mt-auto">
           <div className="space-y-2">
-            <Button variant="ghost" className="w-full justify-start truncate" asChild>
+            <Button 
+              variant="ghost" 
+              className="w-full justify-start truncate bg-sidebar-accent/20 hover:bg-sidebar-accent/30 text-sidebar-foreground font-medium text-sm" 
+              asChild
+            >
               <a href="#help" className="flex items-center">
-                <HelpCircle className="mr-2 h-4 w-4 shrink-0" />
-                <span className="truncate">Need help?</span>
+                <HelpCircle className="mr-2 h-5 w-5 shrink-0 text-accent" />
+                <span className="truncate">Need Help?</span>
               </a>
             </Button>
-            <Button variant="ghost" className="w-full justify-start truncate" asChild>
+            <Button 
+              variant="ghost" 
+              className="w-full justify-start truncate bg-sidebar-accent/20 hover:bg-sidebar-accent/30 text-sidebar-foreground font-medium text-sm" 
+              asChild
+            >
               <Link to="/about" className="flex items-center">
-                <ExternalLink className="mr-2 h-4 w-4 shrink-0" />
+                <ExternalLink className="mr-2 h-5 w-5 shrink-0 text-accent" />
                 <span className="truncate">About Northstar</span>
               </Link>
             </Button>

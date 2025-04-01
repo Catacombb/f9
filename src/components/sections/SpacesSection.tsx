@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { Button } from '@/components/ui/button';
@@ -98,13 +99,27 @@ export function SpacesSection() {
   
   const rooms = formData.spaces.rooms;
   
+  // Initialize room quantities from existing rooms data
   useEffect(() => {
-    const uniqueRoomTypes = Array.from(new Set(rooms.map(room => room.type)));
+    const uniqueRoomTypes = Array.from(new Set(predefinedRoomTypes.map(rt => rt.value)));
     
     const initialRoomsWithQuantities = uniqueRoomTypes.map(type => {
       const roomsOfType = rooms.filter(room => room.type === type);
-      const totalQuantity = roomsOfType.reduce((sum, room) => sum + room.quantity, 0);
+      const totalQuantity = roomsOfType.reduce((sum, room) => sum + (room.quantity || 0), 0);
       return { type, quantity: totalQuantity };
+    });
+    
+    // Add any custom room types that are already in the data
+    const customTypes = rooms
+      .filter(room => !predefinedRoomTypes.some(pt => pt.value === room.type))
+      .map(room => room.type);
+    
+    const uniqueCustomTypes = Array.from(new Set(customTypes));
+    
+    uniqueCustomTypes.forEach(type => {
+      const roomsOfType = rooms.filter(room => room.type === type);
+      const totalQuantity = roomsOfType.reduce((sum, room) => sum + (room.quantity || 0), 0);
+      initialRoomsWithQuantities.push({ type, quantity: totalQuantity });
     });
     
     setRoomsWithQuantities(initialRoomsWithQuantities);
@@ -151,6 +166,7 @@ export function SpacesSection() {
   };
   
   const handleRoomQuantityChange = (type: string, quantity: number) => {
+    // Update the roomsWithQuantities state for UI display
     setRoomsWithQuantities(prev => 
       prev.map(room => 
         room.type === type ? { ...room, quantity } : room
@@ -159,6 +175,7 @@ export function SpacesSection() {
     
     const existingRooms = rooms.filter(room => room.type === type);
     
+    // If there are no existing rooms of this type and quantity > 0, add a new room
     if (existingRooms.length === 0 && quantity > 0) {
       addRoom({
         type,
@@ -166,24 +183,32 @@ export function SpacesSection() {
         description: '',
         isCustom: !predefinedRoomTypes.some(rt => rt.value === type)
       });
-    } else if (existingRooms.length === 1) {
+    } 
+    // If there's exactly one room of this type, update its quantity
+    else if (existingRooms.length === 1) {
       if (quantity > 0) {
         updateRoom({
           ...existingRooms[0],
           quantity
         });
       } else {
+        // If quantity is 0, remove the room
         removeRoom(existingRooms[0].id);
       }
-    } else if (existingRooms.length > 1) {
+    } 
+    // If there are multiple rooms of this type, consolidate them
+    else if (existingRooms.length > 1) {
       if (quantity > 0) {
+        // Update the first room to have the total quantity
         updateRoom({
           ...existingRooms[0],
           quantity
         });
         
+        // Remove the other rooms of the same type
         existingRooms.slice(1).forEach(room => removeRoom(room.id));
       } else {
+        // If quantity is 0, remove all rooms of this type
         existingRooms.forEach(room => removeRoom(room.id));
       }
     }
