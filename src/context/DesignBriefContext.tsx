@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { FormData, ProjectFiles, BriefSummary, ProjectData, SectionKey, SpaceRoom } from '@/types';
+import { FormData, ProjectFiles, BriefSummary, ProjectData, SectionKey, SpaceRoom, Professional } from '@/types';
 
 // Default values for the form
 const defaultFormData: FormData = {
@@ -47,6 +47,12 @@ const defaultFormData: FormData = {
     internalFinishes: '',
     sustainabilityGoals: '',
     specialFeatures: '',
+  },
+  contractors: {
+    preferredBuilder: '',
+    goToTender: false,
+    professionals: [],
+    additionalNotes: '',
   }
 };
 
@@ -78,6 +84,9 @@ interface DesignBriefContextType {
   addRoom: (room: Omit<SpaceRoom, 'id'>) => string;
   updateRoom: (room: SpaceRoom) => void;
   removeRoom: (roomId: string) => void;
+  addProfessional: (professional: Omit<Professional, 'id'>) => string;
+  updateProfessional: (professional: Professional) => void;
+  removeProfessional: (professionalId: string) => void;
 }
 
 // Create the context
@@ -210,6 +219,44 @@ export const DesignBriefProvider: React.FC<{ children: React.ReactNode }> = ({ c
     }));
   };
 
+  // Contractors section methods
+  const addProfessional = (professional: Omit<Professional, 'id'>) => {
+    const id = crypto.randomUUID();
+    const newProfessional: Professional = { ...professional, id };
+    
+    setFormData(prevData => ({
+      ...prevData,
+      contractors: {
+        ...prevData.contractors,
+        professionals: [...prevData.contractors.professionals, newProfessional],
+      },
+    }));
+    
+    return id;
+  };
+  
+  const updateProfessional = (professional: Professional) => {
+    setFormData(prevData => ({
+      ...prevData,
+      contractors: {
+        ...prevData.contractors,
+        professionals: prevData.contractors.professionals.map(p => 
+          p.id === professional.id ? professional : p
+        ),
+      },
+    }));
+  };
+  
+  const removeProfessional = (professionalId: string) => {
+    setFormData(prevData => ({
+      ...prevData,
+      contractors: {
+        ...prevData.contractors,
+        professionals: prevData.contractors.professionals.filter(p => p.id !== professionalId),
+      },
+    }));
+  };
+
   // Generate an AI summary based on the form data
   const generateSummary = async (): Promise<string> => {
     // For MVP, we'll create a simple summary from the form data
@@ -260,6 +307,16 @@ ${formData.architecture.internalFinishes ? `• Internal Finishes: ${formData.ar
 ${formData.architecture.sustainabilityGoals ? `• Sustainability Goals: ${formData.architecture.sustainabilityGoals}` : ''}
 ${formData.architecture.specialFeatures ? `• Special Features: ${formData.architecture.specialFeatures}` : ''}
 
+Contractors & Professionals:
+${formData.contractors.preferredBuilder ? `• Preferred Builder: ${formData.contractors.preferredBuilder}` : ''}
+${formData.contractors.goToTender ? '• Client would like to go to tender for builder selection' : ''}
+${formData.contractors.professionals.length > 0 
+  ? '\nOther Professionals:\n' + formData.contractors.professionals.map(prof => 
+      `• ${prof.type}: ${prof.name}${prof.contact ? ` (${prof.contact})` : ''}${prof.notes ? `\n  Note: ${prof.notes}` : ''}`
+    ).join('\n')
+  : ''}
+${formData.contractors.additionalNotes ? `\nAdditional Contractor Notes: ${formData.contractors.additionalNotes}` : ''}
+
 This project summary reflects the client's input to date. Further consultation may reveal additional requirements or modifications to these initial preferences.
       `;
 
@@ -309,7 +366,7 @@ This project summary reflects the client's input to date. Further consultation m
           console.log('PDF generated successfully');
           
           // Create a title for the PDF using client name and address
-          const pdfTitle = `New Home Brief - ${formData.projectInfo.clientName} - ${formData.projectInfo.projectAddress}`;
+          const pdfTitle = `Northstar Brief - ${formData.projectInfo.clientName} - ${formData.projectInfo.projectAddress}`;
           console.log('PDF Title:', pdfTitle);
           
           resolve();
@@ -337,7 +394,10 @@ This project summary reflects the client's input to date. Further consultation m
     exportAsPDF,
     addRoom,
     updateRoom,
-    removeRoom
+    removeRoom,
+    addProfessional,
+    updateProfessional,
+    removeProfessional
   };
 
   return (

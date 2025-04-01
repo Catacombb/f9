@@ -6,7 +6,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { SectionKey } from '@/types';
-import { ChevronRight, Info, Home, PiggyBank, Users, MapPin, Layout, Building, Image, Upload, FileText, ChevronLeft, HelpCircle } from 'lucide-react';
+import { ChevronRight, Info, Home, PiggyBank, Users, MapPin, Layout, Building, Image, Upload, FileText, ChevronLeft, HelpCircle, Briefcase } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 // Define all sections with their icons and titles
@@ -18,6 +18,7 @@ const sections = [
   { id: 'site', title: 'Site', icon: <MapPin className="h-5 w-5" /> },
   { id: 'spaces', title: 'Spaces', icon: <Layout className="h-5 w-5" /> },
   { id: 'architecture', title: 'Architecture', icon: <Building className="h-5 w-5" /> },
+  { id: 'contractors', title: 'Contractors', icon: <Briefcase className="h-5 w-5" /> },
   { id: 'inspiration', title: 'Inspiration', icon: <Image className="h-5 w-5" /> },
   { id: 'uploads', title: 'Uploads', icon: <Upload className="h-5 w-5" /> },
   { id: 'summary', title: 'Summary', icon: <FileText className="h-5 w-5" /> },
@@ -65,6 +66,14 @@ export function DesignBriefSidebar() {
           Math.min(100, Math.round((formData.spaces.rooms.length / 4) * 100)) : 0;
       case 'architecture':
         return calculateProgress(formData.architecture);
+      case 'contractors':
+        return formData.contractors && 
+          (formData.contractors.preferredBuilder || 
+           formData.contractors.professionals && formData.contractors.professionals.length > 0) ? 
+          Math.min(100, formData.contractors.professionals ? 
+            Math.round((formData.contractors.professionals.length / 3) * 50) + 
+            (formData.contractors.preferredBuilder ? 50 : 0) : 
+            (formData.contractors.preferredBuilder ? 50 : 0)) : 0;
       case 'inspiration':
       case 'uploads':
         return 0; // Will implement when files are handled

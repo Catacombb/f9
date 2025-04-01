@@ -55,6 +55,14 @@ export interface FormData {
     sustainabilityGoals: string;
     specialFeatures: string;
   };
+
+  // Contractors
+  contractors: {
+    preferredBuilder: string;
+    goToTender: boolean;
+    professionals: Professional[];
+    additionalNotes: string;
+  };
 }
 
 export interface SpaceRoom {
@@ -62,6 +70,15 @@ export interface SpaceRoom {
   type: string;
   quantity: number;
   description: string;
+  isCustom?: boolean;
+}
+
+export interface Professional {
+  id: string;
+  type: string;
+  name: string;
+  contact?: string;
+  notes?: string;
   isCustom?: boolean;
 }
 
@@ -83,7 +100,7 @@ export interface ProjectData {
   currentSection?: string;
 }
 
-export type SectionKey = 'intro' | 'projectInfo' | 'budget' | 'lifestyle' | 'site' | 'spaces' | 'architecture' | 'inspiration' | 'uploads' | 'summary';
+export type SectionKey = 'intro' | 'projectInfo' | 'budget' | 'lifestyle' | 'site' | 'spaces' | 'architecture' | 'contractors' | 'inspiration' | 'uploads' | 'summary';
 
 export interface Section {
   id: SectionKey;

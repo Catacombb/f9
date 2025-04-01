@@ -8,6 +8,7 @@ import { LifestyleSection } from './sections/LifestyleSection';
 import { SiteSection } from './sections/SiteSection';
 import { SpacesSection } from './sections/SpacesSection';
 import { ArchitectureSection } from './sections/ArchitectureSection';
+import { ContractorsSection } from './sections/ContractorsSection';
 import { InspirationSection } from './sections/InspirationSection';
 import { UploadsSection } from './sections/UploadsSection';
 import { SummarySection } from './sections/SummarySection';
@@ -32,6 +33,8 @@ export function DesignBrief() {
         return <SpacesSection />;
       case 'architecture':
         return <ArchitectureSection />;
+      case 'contractors':
+        return <ContractorsSection />;
       case 'inspiration':
         return <InspirationSection />;
       case 'uploads':
