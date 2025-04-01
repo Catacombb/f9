@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -95,8 +96,8 @@ export function DesignBriefSidebar() {
       </Button>
 
       <div className={cn("h-full flex flex-col", isCollapsed ? "hidden" : "block")}>
-        <div className="py-6 px-4">
-          <AppLogo size="small" />
+        <div className="py-6 px-4 flex justify-center">
+          <AppLogo size="large" />
         </div>
         
         <Separator className="mb-2 bg-sidebar-border" />
