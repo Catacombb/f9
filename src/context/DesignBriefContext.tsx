@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import { ProjectData, SectionKey } from '@/types';
 
@@ -76,85 +77,29 @@ const initialProjectData: ProjectData = {
   currentSection: 'intro',
 };
 
-type UpdateProjectInfo = (
-  updates: Partial<ProjectData['formData']['projectInfo']>
+type UpdateFormData = <K extends keyof ProjectData['formData']>(
+  section: K,
+  updates: Partial<ProjectData['formData'][K]>
 ) => void;
-
-type UpdateBudget = (
-  updates: Partial<ProjectData['formData']['budget']>
-) => void;
-
-type UpdateLifestyle = (
-  updates: Partial<ProjectData['formData']['lifestyle']>
-) => void;
-
-type UpdateSite = (
-  updates: Partial<ProjectData['formData']['site']>
-) => void;
-
-type UpdateSpaces = (
-  updates: Partial<ProjectData['formData']['spaces']>
-) => void;
-
-type UpdateArchitecture = (
-  updates: Partial<ProjectData['formData']['architecture']>
-) => void;
-
-type UpdateContractors = (
-  updates: Partial<ProjectData['formData']['contractors']>
-) => void;
-
-type UpdateCommunication = (
-    updates: {
-        preferredMethods?: string[],
-        bestTimes?: string[],
-        availableDays?: string[],
-        frequency?: string,
-        urgentContact?: string,
-        responseTime?: string,
-        additionalNotes?: string
-    }
-) => void;
-
-type UpdateFiles = (
-  updates: Partial<ProjectData['files']>
-) => void;
-
-type UpdateSummary = (
-  updates: Partial<ProjectData['summary']>
-) => void;
-
-type AddRoom = (room: ProjectData['formData']['spaces']['rooms'][0]) => void;
-type UpdateRoom = (room: ProjectData['formData']['spaces']['rooms'][0]) => void;
-type DeleteRoom = (id: string) => void;
-
-type AddProfessional = (professional: ProjectData['formData']['contractors']['professionals'][0]) => void;
-type UpdateProfessional = (professional: ProjectData['formData']['contractors']['professionals'][0]) => void;
-type DeleteProfessional = (id: string) => void;
-
-type SetCurrentSection = (section: SectionKey) => void;
 
 interface DesignBriefContextType {
   projectData: ProjectData;
-  updateProjectInfo: UpdateProjectInfo;
-  updateBudget: UpdateBudget;
-  updateLifestyle: UpdateLifestyle;
-  updateSite: UpdateSite;
-  updateSpaces: UpdateSpaces;
-  updateArchitecture: UpdateArchitecture;
-  updateContractors: UpdateContractors;
-  updateCommunication: UpdateCommunication;
-  updateFiles: UpdateFiles;
-  updateSummary: UpdateSummary;
-  addRoom: AddRoom;
-  updateRoom: UpdateRoom;
-  deleteRoom: DeleteRoom;
-  addProfessional: AddProfessional;
-  updateProfessional: UpdateProfessional;
-  deleteProfessional: DeleteProfessional;
+  formData: ProjectData['formData'];
+  files: ProjectData['files'];
+  summary: ProjectData['summary'];
+  updateFormData: UpdateFormData;
+  addRoom: (room: { type: string; quantity: number; description: string; isCustom: boolean }) => void;
+  updateRoom: (room: ProjectData['formData']['spaces']['rooms'][0]) => void;
+  removeRoom: (id: string) => void;
+  addProfessional: (professional: ProjectData['formData']['contractors']['professionals'][0]) => void;
+  updateProfessional: (professional: ProjectData['formData']['contractors']['professionals'][0]) => void;
+  removeProfessional: (id: string) => void;
   currentSection: SectionKey;
-  setCurrentSection: SetCurrentSection;
+  setCurrentSection: (section: SectionKey) => void;
   saveProjectData: () => void;
+  generateSummary?: () => void;
+  sendByEmail?: () => void;
+  exportAsPDF?: () => void;
 }
 
 const updateCommunicationPreferences = (
@@ -181,145 +126,80 @@ export const DesignBriefProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const [projectData, setProjectData] = useState<ProjectData>(initialProjectData);
   const [currentSection, setCurrentSection] = useState<SectionKey>('intro');
 
-  const updateProjectInfo = useCallback((updates: Partial<ProjectData['formData']['projectInfo']>) => {
+  // Generic update function for any section in formData
+  const updateFormData: UpdateFormData = useCallback((section, updates) => {
     setProjectData(draft => {
-      draft.formData.projectInfo = { ...draft.formData.projectInfo, ...updates };
-      draft.lastSaved = new Date().toISOString();
-      return { ...draft };
+      const updatedDraft = { ...draft };
+      updatedDraft.formData[section] = { 
+        ...updatedDraft.formData[section], 
+        ...updates 
+      };
+      updatedDraft.lastSaved = new Date().toISOString();
+      return updatedDraft;
     });
   }, []);
 
-  const updateBudget = useCallback((updates: Partial<ProjectData['formData']['budget']>) => {
+  const addRoom = useCallback((room: { type: string; quantity: number; description: string; isCustom: boolean }) => {
     setProjectData(draft => {
-      draft.formData.budget = { ...draft.formData.budget, ...updates };
-      draft.lastSaved = new Date().toISOString();
-      return { ...draft };
-    });
-  }, []);
-
-  const updateLifestyle = useCallback((updates: Partial<ProjectData['formData']['lifestyle']>) => {
-    setProjectData(draft => {
-      draft.formData.lifestyle = { ...draft.formData.lifestyle, ...updates };
-      draft.lastSaved = new Date().toISOString();
-      return { ...draft };
-    });
-  }, []);
-
-  const updateSite = useCallback((updates: Partial<ProjectData['formData']['site']>) => {
-    setProjectData(draft => {
-      draft.formData.site = { ...draft.formData.site, ...updates };
-      draft.lastSaved = new Date().toISOString();
-      return { ...draft };
-    });
-  }, []);
-
-  const updateSpaces = useCallback((updates: Partial<ProjectData['formData']['spaces']>) => {
-    setProjectData(draft => {
-      draft.formData.spaces = { ...draft.formData.spaces, ...updates };
-      draft.lastSaved = new Date().toISOString();
-      return { ...draft };
-    });
-  }, []);
-
-  const updateArchitecture = useCallback((updates: Partial<ProjectData['formData']['architecture']>) => {
-    setProjectData(draft => {
-      draft.formData.architecture = { ...draft.formData.architecture, ...updates };
-      draft.lastSaved = new Date().toISOString();
-      return { ...draft };
-    });
-  }, []);
-
-  const updateContractors = useCallback((updates: Partial<ProjectData['formData']['contractors']>) => {
-    setProjectData(draft => {
-      draft.formData.contractors = { ...draft.formData.contractors, ...updates };
-      draft.lastSaved = new Date().toISOString();
-      return { ...draft };
-    });
-  }, []);
-
-  const updateCommunication = useCallback((updates: {
-        preferredMethods?: string[];
-        bestTimes?: string[];
-        availableDays?: string[];
-        frequency?: string;
-        urgentContact?: string;
-        responseTime?: string;
-        additionalNotes?: string;
-    }) => {
-    setProjectData(draft => {
-      updateCommunicationPreferences(draft, updates);
-      draft.lastSaved = new Date().toISOString();
-      return { ...draft };
-    });
-  }, []);
-
-  const updateFiles = useCallback((updates: Partial<ProjectData['files']>) => {
-    setProjectData(draft => {
-      draft.files = { ...draft.files, ...updates };
-      draft.lastSaved = new Date().toISOString();
-      return { ...draft };
-    });
-  }, []);
-
-  const updateSummary = useCallback((updates: Partial<ProjectData['summary']>) => {
-    setProjectData(draft => {
-      draft.summary = { ...draft.summary, ...updates };
-      draft.lastSaved = new Date().toISOString();
-      return { ...draft };
-    });
-  }, []);
-
-  const addRoom = useCallback((room: ProjectData['formData']['spaces']['rooms'][0]) => {
-    setProjectData(draft => {
-      draft.formData.spaces.rooms.push(room);
-      draft.lastSaved = new Date().toISOString();
-      return { ...draft };
+      const newRoom = {
+        ...room,
+        id: crypto.randomUUID(),
+      };
+      const updatedDraft = { ...draft };
+      updatedDraft.formData.spaces.rooms.push(newRoom);
+      updatedDraft.lastSaved = new Date().toISOString();
+      return updatedDraft;
     });
   }, []);
 
   const updateRoom = useCallback((room: ProjectData['formData']['spaces']['rooms'][0]) => {
     setProjectData(draft => {
-      const roomIndex = draft.formData.spaces.rooms.findIndex(r => r.id === room.id);
+      const updatedDraft = { ...draft };
+      const roomIndex = updatedDraft.formData.spaces.rooms.findIndex(r => r.id === room.id);
       if (roomIndex !== -1) {
-        draft.formData.spaces.rooms[roomIndex] = room;
+        updatedDraft.formData.spaces.rooms[roomIndex] = room;
       }
-      draft.lastSaved = new Date().toISOString();
-      return { ...draft };
+      updatedDraft.lastSaved = new Date().toISOString();
+      return updatedDraft;
     });
   }, []);
 
-  const deleteRoom = useCallback((id: string) => {
+  const removeRoom = useCallback((id: string) => {
     setProjectData(draft => {
-      draft.formData.spaces.rooms = draft.formData.spaces.rooms.filter(room => room.id !== id);
-      draft.lastSaved = new Date().toISOString();
-      return { ...draft };
+      const updatedDraft = { ...draft };
+      updatedDraft.formData.spaces.rooms = updatedDraft.formData.spaces.rooms.filter(room => room.id !== id);
+      updatedDraft.lastSaved = new Date().toISOString();
+      return updatedDraft;
     });
   }, []);
 
   const addProfessional = useCallback((professional: ProjectData['formData']['contractors']['professionals'][0]) => {
     setProjectData(draft => {
-      draft.formData.contractors.professionals.push(professional);
-      draft.lastSaved = new Date().toISOString();
-      return { ...draft };
+      const updatedDraft = { ...draft };
+      updatedDraft.formData.contractors.professionals.push(professional);
+      updatedDraft.lastSaved = new Date().toISOString();
+      return updatedDraft;
     });
   }, []);
 
   const updateProfessional = useCallback((professional: ProjectData['formData']['contractors']['professionals'][0]) => {
     setProjectData(draft => {
-      const professionalIndex = draft.formData.contractors.professionals.findIndex(p => p.id === professional.id);
+      const updatedDraft = { ...draft };
+      const professionalIndex = updatedDraft.formData.contractors.professionals.findIndex(p => p.id === professional.id);
       if (professionalIndex !== -1) {
-        draft.formData.contractors.professionals[professionalIndex] = professional;
+        updatedDraft.formData.contractors.professionals[professionalIndex] = professional;
       }
-      draft.lastSaved = new Date().toISOString();
-      return { ...draft };
+      updatedDraft.lastSaved = new Date().toISOString();
+      return updatedDraft;
     });
   }, []);
 
-  const deleteProfessional = useCallback((id: string) => {
+  const removeProfessional = useCallback((id: string) => {
     setProjectData(draft => {
-      draft.formData.contractors.professionals = draft.formData.contractors.professionals.filter(professional => professional.id !== id);
-      draft.lastSaved = new Date().toISOString();
-      return { ...draft };
+      const updatedDraft = { ...draft };
+      updatedDraft.formData.contractors.professionals = updatedDraft.formData.contractors.professionals.filter(p => p.id !== id);
+      updatedDraft.lastSaved = new Date().toISOString();
+      return updatedDraft;
     });
   }, []);
 
@@ -329,22 +209,16 @@ export const DesignBriefProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
   const value: DesignBriefContextType = {
     projectData,
-    updateProjectInfo,
-    updateBudget,
-    updateLifestyle,
-    updateSite,
-    updateSpaces,
-    updateArchitecture,
-    updateContractors,
-    updateCommunication,
-    updateFiles,
-    updateSummary,
+    formData: projectData.formData,
+    files: projectData.files,
+    summary: projectData.summary,
+    updateFormData,
     addRoom,
     updateRoom,
-    deleteRoom,
+    removeRoom,
     addProfessional,
     updateProfessional,
-    deleteProfessional,
+    removeProfessional,
     currentSection,
     setCurrentSection,
     saveProjectData,
