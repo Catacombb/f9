@@ -1,10 +1,10 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { SectionHeader } from './SectionHeader';
 
 export function LifestyleSection() {
   const { formData, updateFormData, setCurrentSection } = useDesignBrief();
@@ -25,10 +25,11 @@ export function LifestyleSection() {
   return (
     <div className="design-brief-section-wrapper">
       <div className="design-brief-section-container">
-        <h1 className="design-brief-section-title">Lifestyle</h1>
-        <p className="design-brief-section-description">
-          Your lifestyle shapes how you'll use your home. This information helps us design spaces that support your daily activities and long-term needs.
-        </p>
+        <SectionHeader 
+          title="Lifestyle" 
+          description="Your lifestyle shapes how you'll use your home. This information helps us design spaces that support your daily activities and long-term needs."
+          isBold={true}
+        />
         
         <div className="design-brief-form-group">
           <div className="mb-6">

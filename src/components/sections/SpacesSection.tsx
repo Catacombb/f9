@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { Button } from '@/components/ui/button';
@@ -10,6 +9,7 @@ import { PlusCircle, Trash2 } from 'lucide-react';
 import { SpaceRoom } from '@/types';
 import { Label } from '@/components/ui/label';
 import { toast } from '@/hooks/use-toast';
+import { SectionHeader } from '@/components/ui/section-header';
 
 // Predefined room types
 const predefinedRoomTypes = [
@@ -87,7 +87,7 @@ const RoomItem = ({
   );
 };
 
-export const SpacesSection = () => {
+export function SpacesSection() {
   const { 
     formData, 
     addRoom, 
@@ -146,10 +146,11 @@ export const SpacesSection = () => {
   return (
     <div className="design-brief-section-wrapper">
       <div className="design-brief-section-container">
-        <h1 className="design-brief-section-title">Spaces</h1>
-        <p className="design-brief-section-description">
-          Define the spaces you need in your home, including quantities and special requirements.
-        </p>
+        <SectionHeader 
+          title="Spaces" 
+          description="Tell us about the rooms and spaces you need in your home."
+          isBold={true}
+        />
         
         <div className="space-y-8">
           {/* Room List Section */}
@@ -264,4 +265,4 @@ export const SpacesSection = () => {
       </div>
     </div>
   );
-};
+}

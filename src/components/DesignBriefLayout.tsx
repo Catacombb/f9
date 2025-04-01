@@ -24,50 +24,61 @@ export function DesignBriefLayout({ children }: DesignBriefLayoutProps) {
     ? formatDistanceToNow(new Date(projectData.lastSaved), { addSuffix: true })
     : 'Not saved yet';
   
-  // Create dynamic title based on client name and address
+  // Create dynamic title based on client name
   const clientName = projectData?.formData?.projectInfo?.clientName || '';
-  const projectAddress = projectData?.formData?.projectInfo?.projectAddress || '';
   
-  const headerTitle = clientName ? `${clientName} Brief` : 'Design Brief';
-  const headerSubtitle = projectAddress 
-    ? `Create your project brief for ${projectAddress}`
-    : currentSection === 'intro' 
-      ? 'Create your project brief'
-      : 'Create your project brief';
-  
-  // Calculate overall completion percentage
+  // Calculate overall completion percentage - counting only required fields
   const calculateOverallProgress = () => {
     // Skip intro and summary sections
     const sections = ['projectInfo', 'contractors', 'budget', 'lifestyle', 'site', 'spaces', 'architecture', 'communication'];
     let totalProgress = 0;
+    let totalRequiredFields = 0;
+    let completedRequiredFields = 0;
     
-    // Use the calculated progress for each section from the context logic
-    sections.forEach(section => {
-      if (section === 'projectInfo' && projectData.formData.projectInfo) {
-        const filled = Object.values(projectData.formData.projectInfo).filter(val => 
-          val !== undefined && val !== null && val !== ''
-        ).length;
-        const required = ['clientName', 'projectAddress', 'contactEmail', 'contactPhone', 'projectType'].length;
-        totalProgress += filled >= required ? 100 : Math.round((filled / required) * 100);
-      } else if (section === 'contractors' && projectData.formData.contractors) {
-        const hasBuilder = projectData.formData.contractors.preferredBuilder ? 1 : 0;
-        const hasProfessionals = projectData.formData.contractors.professionals?.length > 0 ? 1 : 0;
-        totalProgress += (hasBuilder + hasProfessionals) > 0 ? 50 : 0;
-      } else if (projectData.formData[section]) {
-        // For other sections, count any filled field as progress
-        const filled = Object.values(projectData.formData[section]).filter(val => 
-          val !== undefined && val !== null && val !== '' && val !== false
-        ).length;
-        totalProgress += filled > 0 ? Math.min(100, Math.round((filled / 3) * 100)) : 0;
+    // Required fields for each section
+    const requiredFields = {
+      projectInfo: ['clientName', 'projectAddress', 'contactEmail', 'contactPhone', 'projectType'],
+      contractors: [],
+      budget: ['budgetRange'],
+      lifestyle: ['occupants'],
+      site: [],
+      spaces: [],
+      architecture: [],
+      communication: []
+    };
+    
+    // Calculate total required fields
+    for (const section in requiredFields) {
+      totalRequiredFields += requiredFields[section].length;
+    }
+    
+    // Count completed required fields
+    for (const section in requiredFields) {
+      if (projectData.formData[section]) {
+        requiredFields[section].forEach(field => {
+          if (projectData.formData[section][field] && 
+              projectData.formData[section][field] !== '' && 
+              projectData.formData[section][field] !== undefined) {
+            completedRequiredFields++;
+          }
+        });
       }
-    });
+    }
     
-    return Math.round(totalProgress / sections.length);
+    // Calculate progress percentage
+    if (totalRequiredFields > 0) {
+      totalProgress = Math.round((completedRequiredFields / totalRequiredFields) * 100);
+    } else {
+      totalProgress = 0;
+    }
+    
+    return totalProgress;
   };
   
   const overallProgress = calculateOverallProgress();
   
-  // Check if we should show header
+  // Check if we should show header - only show the logo after client info is entered
+  const projectAddress = projectData?.formData?.projectInfo?.projectAddress || '';
   const showHeader = !clientName || !projectAddress;
   
   return (
@@ -75,23 +86,28 @@ export function DesignBriefLayout({ children }: DesignBriefLayoutProps) {
       <DesignBriefSidebar />
       
       <div className="flex-1 flex flex-col overflow-hidden">
-        {showHeader && (
-          <header className="h-16 border-b flex items-center justify-between px-4 bg-background z-10">
-            <div className="flex items-center space-x-2">
-              <AppLogo size="small" />
+        <header className="h-16 border-b flex items-center justify-between px-4 bg-background z-10">
+          <div className="flex items-center space-x-2">
+            <AppLogo size="small" />
+            {showHeader && (
               <div className="flex flex-col">
-                <span className="text-sm font-medium">{headerTitle}</span>
+                <span className="text-sm font-medium">Design Brief</span>
                 <span className="text-xs text-muted-foreground">
-                  Last saved {lastSavedFormatted}
+                  Create your project brief
                 </span>
               </div>
-            </div>
-            
-            <div className="flex items-center space-x-2">
-              <ThemeToggle />
-            </div>
-          </header>
-        )}
+            )}
+          </div>
+          
+          {/* Center content with last saved timestamp */}
+          <div className="absolute left-1/2 transform -translate-x-1/2 text-sm text-muted-foreground">
+            Last saved {lastSavedFormatted}
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            <ThemeToggle />
+          </div>
+        </header>
         
         <main className="flex-1 overflow-auto">
           <Form {...formMethods}>
@@ -109,13 +125,9 @@ export function DesignBriefLayout({ children }: DesignBriefLayoutProps) {
           </div>
           <div className="flex justify-between items-center w-full">
             <div>
-              {!showHeader && (
-                <span className="text-sm font-medium">{headerTitle} • Last saved {lastSavedFormatted}</span>
+              {!showHeader && clientName && (
+                <span className="text-sm font-medium">{clientName} Brief</span>
               )}
-            </div>
-            <div className="flex space-x-4">
-              <Link to="/about" className="hover:underline">About Northstar</Link>
-              <a href="#help" className="hover:underline">Need help?</a>
             </div>
           </div>
         </footer>

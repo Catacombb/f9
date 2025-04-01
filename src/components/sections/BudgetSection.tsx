@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { SectionHeader } from './SectionHeader';
 
 export function BudgetSection() {
   const { formData, updateFormData, setCurrentSection } = useDesignBrief();
@@ -21,7 +22,7 @@ export function BudgetSection() {
   };
   
   const handlePrevious = () => {
-    setCurrentSection('projectInfo');
+    setCurrentSection('contractors');
   };
   
   const handleNext = () => {
@@ -31,10 +32,11 @@ export function BudgetSection() {
   return (
     <div className="design-brief-section-wrapper">
       <div className="design-brief-section-container">
-        <h1 className="design-brief-section-title">Budget Information</h1>
-        <p className="design-brief-section-description">
-          Understanding your budget helps us tailor solutions that meet your financial parameters while achieving your design goals.
-        </p>
+        <SectionHeader 
+          title="Budget Information" 
+          description="Understanding your budget helps us tailor solutions that meet your financial parameters while achieving your design goals."
+          isBold={true}
+        />
         
         <div className="design-brief-form-group">
           <div className="mb-6">
@@ -131,7 +133,7 @@ export function BudgetSection() {
         <div className="flex justify-between mt-6">
           <Button variant="outline" onClick={handlePrevious} className="group">
             <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-            <span>Previous: Project Info</span>
+            <span>Previous: Project Team</span>
           </Button>
           
           <Button onClick={handleNext} className="group">
