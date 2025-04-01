@@ -3,7 +3,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ThemeProvider } from '@/components/ThemeProvider';
-import { ChevronLeft, Home } from 'lucide-react';
+import { ChevronLeft, Home, Linkedin } from 'lucide-react';
 import { AppLogo } from '@/components/AppLogo';
 
 const About = () => {
@@ -31,7 +31,7 @@ const About = () => {
               <div className="flex justify-center mb-4">
                 <AppLogo size="xlarge" />
               </div>
-              <p className="text-xl text-muted-foreground">Illuminating your architectural vision</p>
+              <p className="text-xl text-muted-foreground">Guiding you through the home design process</p>
             </div>
 
             <div className="space-y-6">
@@ -42,6 +42,24 @@ const About = () => {
                 renovation, Northstar guides you through a structured process to capture your
                 vision, requirements, and preferences.
               </p>
+
+              <div className="bg-muted p-6 rounded-lg my-8">
+                <p className="italic text-muted-foreground">
+                  "After years of working with clients to obtain their new home brief, I needed a better way. 
+                  That's why Northstar exists. Enjoy!"
+                </p>
+                <div className="flex items-center mt-4 justify-between">
+                  <span className="font-medium">Nick Harrison, Creator</span>
+                  <a 
+                    href="https://www.linkedin.com/in/nick-harrison/" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-primary hover:text-primary/80 transition-colors"
+                  >
+                    <Linkedin className="h-5 w-5" />
+                  </a>
+                </div>
+              </div>
 
               <h3 className="text-xl font-medium mt-6">How It Works</h3>
               <ol className="list-decimal pl-6 space-y-3 mt-2">
