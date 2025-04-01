@@ -12,11 +12,15 @@ interface DesignBriefLayoutProps {
 }
 
 export function DesignBriefLayout({ children }: DesignBriefLayoutProps) {
-  const { lastSaved } = useDesignBrief();
+  const { lastSaved, formData } = useDesignBrief();
   
   const lastSavedFormatted = lastSaved 
     ? formatDistanceToNow(new Date(lastSaved), { addSuffix: true })
     : 'Not saved yet';
+  
+  // Create dynamic title based on client name
+  const clientName = formData?.projectInfo?.clientName || '';
+  const headerTitle = clientName ? `${clientName} Brief` : 'Design Brief';
   
   return (
     <div className="flex h-screen overflow-hidden bg-background">
@@ -26,9 +30,12 @@ export function DesignBriefLayout({ children }: DesignBriefLayoutProps) {
         <header className="h-16 border-b flex items-center justify-between px-4 bg-background z-10">
           <div className="flex items-center space-x-2">
             <AppLogo size="small" />
-            <span className="text-xs text-muted-foreground">
-              Last saved {lastSavedFormatted}
-            </span>
+            <div className="flex flex-col">
+              <span className="text-sm font-medium">{headerTitle}</span>
+              <span className="text-xs text-muted-foreground">
+                Last saved {lastSavedFormatted}
+              </span>
+            </div>
           </div>
           
           <div className="flex items-center space-x-2">

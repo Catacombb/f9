@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -101,7 +100,7 @@ export function DesignBriefSidebar() {
   const clientAddress = formData?.projectInfo?.projectAddress || '';
 
   // Create dynamic title and subtitle
-  const briefTitle = clientName ? `Design Brief - ${clientName}` : 'Design Brief';
+  const briefTitle = clientName ? `${clientName} Brief` : 'Design Brief';
   const briefSubtitle = clientAddress ? `Create your project brief for ${clientAddress}` : 'Create your project brief';
 
   return (

@@ -5,8 +5,10 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, MapPin } from 'lucide-react';
+import { Search, MapPin, ArrowDown } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 // Temporary public token - in production, this should be stored securely
 const MAPBOX_TOKEN = 'pk.eyJ1IjoibG92YWJsZSIsImEiOiJjbHdlamYwYTIwMHY0MmxtcmQzc3FicXc1In0.Ek9YFqHXnjpj2m1vJI8UcA';
@@ -17,11 +19,19 @@ interface MapLocationProps {
   onCoordinatesChange: (coordinates: [number, number]) => void;
 }
 
+interface AddressSuggestion {
+  id: string;
+  place_name: string;
+  center: [number, number];
+}
+
 export function MapLocation({ address, onAddressChange, onCoordinatesChange }: MapLocationProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const marker = useRef<mapboxgl.Marker | null>(null);
   const [searchInput, setSearchInput] = useState(address);
+  const [addressSuggestions, setAddressSuggestions] = useState<AddressSuggestion[]>([]);
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const { toast } = useToast();
 
   // Initialize map
@@ -111,6 +121,35 @@ export function MapLocation({ address, onAddressChange, onCoordinatesChange }: M
     };
   }, []);
 
+  // Function to fetch address suggestions
+  const fetchAddressSuggestions = async (query: string) => {
+    if (query.length < 3) {
+      setAddressSuggestions([]);
+      return;
+    }
+    
+    try {
+      const response = await fetch(
+        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${mapboxgl.accessToken}&country=nz&types=address,place,locality,neighborhood,postcode`
+      );
+      const data = await response.json();
+      
+      if (data.features) {
+        setAddressSuggestions(data.features.map((feature: any) => ({
+          id: feature.id,
+          place_name: feature.place_name,
+          center: feature.center
+        })));
+        
+        if (data.features.length > 0) {
+          setIsPopoverOpen(true);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching address suggestions:', error);
+    }
+  };
+
   // Function to search for an address
   const searchAddress = async (searchAddress: string) => {
     if (!map.current || !marker.current) return;
@@ -157,6 +196,7 @@ export function MapLocation({ address, onAddressChange, onCoordinatesChange }: M
 
   const handleSearch = () => {
     searchAddress(searchInput);
+    setIsPopoverOpen(false);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -166,22 +206,77 @@ export function MapLocation({ address, onAddressChange, onCoordinatesChange }: M
     }
   };
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchInput(value);
+    fetchAddressSuggestions(value);
+  };
+
+  const handleAddressSelect = (suggestion: AddressSuggestion) => {
+    setSearchInput(suggestion.place_name);
+    onAddressChange(suggestion.place_name);
+    
+    if (map.current && marker.current) {
+      // Update marker and map
+      marker.current.setLngLat(suggestion.center).addTo(map.current);
+      map.current.flyTo({
+        center: suggestion.center,
+        zoom: 15
+      });
+      
+      // Update coordinates
+      onCoordinatesChange(suggestion.center);
+    }
+    
+    setIsPopoverOpen(false);
+  };
+
   return (
     <div className="space-y-4">
-      <div className="flex gap-2">
-        <Input
-          type="text"
-          value={searchInput}
-          onChange={(e) => setSearchInput(e.target.value)}
-          placeholder="Enter address to search"
-          onKeyDown={handleKeyDown}
-          className="flex-1"
-        />
-        <Button onClick={handleSearch} type="button">
-          <Search className="h-4 w-4 mr-2" />
-          Search
-        </Button>
-      </div>
+      <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+        <div className="flex gap-2">
+          <PopoverTrigger asChild className="flex-1">
+            <div className="relative w-full">
+              <Input
+                type="text"
+                value={searchInput}
+                onChange={handleInputChange}
+                placeholder="Enter address to search"
+                onKeyDown={handleKeyDown}
+                className="flex-1 pr-8"
+              />
+              {searchInput && addressSuggestions.length > 0 && (
+                <ArrowDown className="absolute right-3 top-3 h-4 w-4 text-muted-foreground" />
+              )}
+            </div>
+          </PopoverTrigger>
+          <Button onClick={handleSearch} type="button">
+            <Search className="h-4 w-4 mr-2" />
+            Search
+          </Button>
+        </div>
+        
+        {addressSuggestions.length > 0 && (
+          <PopoverContent className="p-0 w-[320px] lg:w-[400px]" align="start">
+            <Command>
+              <CommandList>
+                <CommandGroup>
+                  {addressSuggestions.map((suggestion) => (
+                    <CommandItem 
+                      key={suggestion.id}
+                      onSelect={() => handleAddressSelect(suggestion)}
+                      className="cursor-pointer"
+                    >
+                      <MapPin className="h-4 w-4 mr-2 flex-shrink-0" />
+                      <span className="truncate">{suggestion.place_name}</span>
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        )}
+      </Popover>
       
       <Card className="overflow-hidden">
         <div
