@@ -18,7 +18,7 @@ export const AppLogo = ({ size = 'default' }: { size?: 'small' | 'default' | 'la
       <img 
         src={isDarkMode 
           ? "/lovable-uploads/3e4d3eb9-8d76-44ba-8a4a-15faf8837c49.png" // Dark mode logo
-          : "/lovable-uploads/c36ffe10-cbba-49ee-9805-4661cfbb83a3.png" // New light mode logo
+          : "/lovable-uploads/f87cbd00-65a2-4b67-ae04-55a828581a0e.png" // New light mode logo (the one just uploaded)
         } 
         alt="Northstar Logo" 
         className={`${sizeClasses[size]}`}

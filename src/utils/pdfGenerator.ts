@@ -1,3 +1,4 @@
+
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 import { ProjectData } from '@/types';
@@ -13,6 +14,19 @@ const COLORS = {
   border: '#e0e0e0',
 };
 
+// Section icons mapping
+const SECTION_ICONS = {
+  'Project Information': '📋',
+  'Budget Information': '💰',
+  'Lifestyle Information': '👪',
+  'Spaces Required': '🏠',
+  'Site Information': '🗺️',
+  'Architecture Preferences': '🏛️',
+  'Project Team': '👷',
+  'Communication Preferences': '📱',
+  'Project Summary': '📝',
+};
+
 // Function to create a PDF from the project data
 export const generatePDF = async (projectData: ProjectData): Promise<void> => {
   // Create a new PDF document in portrait mode, using mm units
@@ -25,7 +39,7 @@ export const generatePDF = async (projectData: ProjectData): Promise<void> => {
   let yPosition = margin;
   let pageNumber = 1;
   
-  // Set font
+  // Set font to Helvetica (closest to sans-serif web fonts)
   pdf.setFont('helvetica');
   
   // Helper function to add a new page
@@ -47,26 +61,36 @@ export const generatePDF = async (projectData: ProjectData): Promise<void> => {
     pdf.rect(0, 0, pageWidth, 25, 'F');
     
     // Add centered logo 
-    // Use light mode logo
-    const logoPath = '/lovable-uploads/c36ffe10-cbba-49ee-9805-4661cfbb83a3.png';
+    // Logo path to the light mode logo that was just uploaded
+    const logoPath = '/lovable-uploads/f87cbd00-65a2-4b67-ae04-55a828581a0e.png';
     
     // Calculate center position and logo dimensions
-    // Logo height will be 10mm
-    const logoHeight = 10;
-    const logoWidth = 35; // approximate aspect ratio
+    // Logo height will be 12mm
+    const logoHeight = 12;
+    const logoWidth = 40; // approximate aspect ratio
     const logoX = (pageWidth - logoWidth) / 2;
     
-    // Add image (if in production, we would use an actual image)
-    // For now, we'll use text as a placeholder
-    pdf.setFont('helvetica', 'bold');
-    pdf.setTextColor(COLORS.primary);
-    pdf.setFontSize(18);
-    pdf.text('NORTHSTAR', pageWidth / 2, 12, { align: 'center' });
+    try {
+      // Add actual image - if it fails, fall back to text
+      pdf.addImage(logoPath, 'PNG', logoX, 7, logoWidth, logoHeight);
+    } catch (error) {
+      // Fallback to text if image loading fails
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(COLORS.primary);
+      pdf.setFontSize(18);
+      pdf.text('NORTHSTAR', pageWidth / 2, 12, { align: 'center' });
+      
+      // Add the house icon in yellow
+      pdf.setTextColor(COLORS.accent);
+      pdf.setFontSize(14);
+      pdf.text('⌂★', pageWidth / 2 + 25, 12);
+      pdf.setTextColor(COLORS.primary);
+    }
     
     // Add horizontal line
     pdf.setDrawColor(COLORS.accent);
     pdf.setLineWidth(0.5);
-    pdf.line(margin, 20, pageWidth - margin, 20);
+    pdf.line(margin, 23, pageWidth - margin, 23);
     
     yPosition = 30; // Increased to accommodate centered logo
   };
@@ -107,19 +131,29 @@ export const generatePDF = async (projectData: ProjectData): Promise<void> => {
     );
   };
   
-  // Helper function to add a section title (now bold without underline)
+  // Helper function to add a section title with icon
   const addSectionTitle = (title: string) => {
     // Check if we need a new page
     if (yPosition > pageHeight - 40) {
       addNewPage();
     }
     
-    pdf.setFont('helvetica', 'bold');
-    pdf.setTextColor(COLORS.primary);
-    pdf.setFontSize(16); // Increased font size for better hierarchy
-    pdf.text(title, margin, yPosition);
+    // Add section icon if available
+    const icon = SECTION_ICONS[title] || '';
     
-    yPosition += 8; // Space after title
+    pdf.setFont('helvetica', 'bold');
+    pdf.setTextColor(COLORS.accent); // Use accent color for section titles
+    pdf.setFontSize(16); // Larger font size for better hierarchy
+    
+    // Add icon and title
+    pdf.text(`${icon} ${title}`, margin, yPosition);
+    
+    // Add a thin line below the title for visual separation
+    pdf.setDrawColor(COLORS.border);
+    pdf.setLineWidth(0.2);
+    pdf.line(margin, yPosition + 3, pageWidth - margin, yPosition + 3);
+    
+    yPosition += 10; // Increased space after title
   };
   
   // Helper function to add text
