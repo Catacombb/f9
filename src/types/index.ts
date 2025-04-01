@@ -1,3 +1,4 @@
+
 export interface FormData {
   // Project Info
   projectInfo: {
@@ -7,6 +8,7 @@ export interface FormData {
     contactPhone: string;
     projectType: string;
     projectDescription: string;
+    coordinates?: [number, number]; // Longitude, Latitude
   };
   
   // Budget
@@ -94,6 +96,7 @@ export interface Professional {
 
 export interface ProjectFiles {
   uploadedFiles: File[];
+  uploadedInspirationImages: File[];
   inspirationSelections: string[];
 }
 

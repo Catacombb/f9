@@ -24,24 +24,24 @@ export function DesignBrief() {
         return <IntroSection />;
       case 'projectInfo':
         return <ProjectInfoSection />;
+      case 'contractors':
+        return <ContractorsSection />;
       case 'budget':
         return <BudgetSection />;
       case 'lifestyle':
         return <LifestyleSection />;
-      case 'site':
-        return <SiteSection />;
       case 'spaces':
         return <SpacesSection />;
+      case 'site':
+        return <SiteSection />;
       case 'architecture':
         return <ArchitectureSection />;
-      case 'contractors':
-        return <ContractorsSection />;
-      case 'communication':
-        return <CommunicationSection />;
       case 'inspiration':
         return <InspirationSection />;
       case 'uploads':
         return <UploadsSection />;
+      case 'communication':
+        return <CommunicationSection />;
       case 'summary':
         return <SummarySection />;
       default:

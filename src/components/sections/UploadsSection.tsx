@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { ArrowLeft, ArrowRight, Upload, X, File, Image as ImageIcon } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { SectionHeader } from './SectionHeader';
 
 export function UploadsSection() {
   const { files, updateFiles, setCurrentSection } = useDesignBrief();
@@ -42,7 +43,7 @@ export function UploadsSection() {
   };
   
   const handleNext = () => {
-    setCurrentSection('summary');
+    setCurrentSection('communication');
   };
   
   // Helper function to determine file type icon
@@ -54,22 +55,22 @@ export function UploadsSection() {
   return (
     <div className="design-brief-section-wrapper">
       <div className="design-brief-section-container">
-        <h1 className="design-brief-section-title">Upload Files</h1>
-        <p className="design-brief-section-description">
-          Upload any relevant files for your project, such as site plans, sketches, or your own inspiration images. You can upload up to 20 files.
-        </p>
+        <SectionHeader 
+          title="Upload Files" 
+          description="Upload any relevant documents for your project, such as site plans, floor plans, or architectural drawings. These will help us understand the technical aspects of your project."
+        />
         
         <div className="design-brief-card p-8">
           <div className="mb-8 text-center">
             <div className="border-2 border-dashed border-muted rounded-lg p-8 mb-4">
               <div className="flex flex-col items-center">
                 <Upload className="h-10 w-10 text-muted-foreground mb-4" />
-                <h3 className="font-medium text-lg mb-2">Upload your files</h3>
+                <h3 className="font-medium text-lg mb-2">Upload your plans and documents</h3>
                 <p className="text-sm text-muted-foreground mb-4">
                   Drag and drop files here or click to browse
                 </p>
                 <p className="text-xs text-muted-foreground mb-6">
-                  Accepted file types: Images, PDFs, DWG, and other common files (Max 10MB per file)
+                  Accepted file types: PDFs, DWG, images of plans, and other technical documents (Max 10MB per file)
                 </p>
                 <label htmlFor="file-upload">
                   <Button asChild>
@@ -85,7 +86,7 @@ export function UploadsSection() {
                   multiple
                   className="hidden"
                   onChange={handleFileUpload}
-                  accept="image/*,.pdf,.dwg,.dxf,.skp,.doc,.docx,.xls,.xlsx"
+                  accept=".pdf,.dwg,.dxf,.skp,.doc,.docx,.xls,.xlsx,image/*"
                 />
               </div>
             </div>
@@ -97,7 +98,7 @@ export function UploadsSection() {
           
           {files.uploadedFiles.length > 0 && (
             <div>
-              <h3 className="font-medium mb-4">Uploaded Files</h3>
+              <h3 className="font-medium mb-4">Uploaded Plans & Documents</h3>
               <div className="space-y-3">
                 {files.uploadedFiles.map((file, index) => (
                   <div 
@@ -137,7 +138,7 @@ export function UploadsSection() {
           </Button>
           
           <Button onClick={handleNext} className="group">
-            <span>Next: Summary</span>
+            <span>Next: Communication</span>
             <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
           </Button>
         </div>

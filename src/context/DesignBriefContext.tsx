@@ -10,6 +10,7 @@ const defaultFormData: FormData = {
     contactPhone: '',
     projectType: '',
     projectDescription: '',
+    coordinates: undefined,
   },
   budget: {
     budgetRange: '',
@@ -66,6 +67,7 @@ const defaultFormData: FormData = {
 
 const defaultProjectFiles: ProjectFiles = {
   uploadedFiles: [],
+  uploadedInspirationImages: [],
   inspirationSelections: [],
 };
 
@@ -120,6 +122,7 @@ export const DesignBriefProvider: React.FC<{ children: React.ReactNode }> = ({ c
         // We can't store actual File objects in localStorage, so we only restore the inspirationSelections
         setFiles({
           uploadedFiles: [],
+          uploadedInspirationImages: [],
           inspirationSelections: parsedData.files?.inspirationSelections || [],
         });
         
@@ -143,6 +146,7 @@ export const DesignBriefProvider: React.FC<{ children: React.ReactNode }> = ({ c
       formData,
       files: {
         uploadedFiles: [], // We don't save File objects to localStorage
+        uploadedInspirationImages: [], // We don't save File objects to localStorage
         inspirationSelections: files.inspirationSelections,
       },
       summary,

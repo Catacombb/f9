@@ -13,15 +13,15 @@ import { useIsMobile } from '@/hooks/use-mobile';
 const sections = [
   { id: 'intro', title: 'Introduction', icon: <Info className="h-5 w-5" /> },
   { id: 'projectInfo', title: 'Project Info', icon: <Home className="h-5 w-5" /> },
+  { id: 'contractors', title: 'Project Team', icon: <Users className="h-5 w-5" /> },
   { id: 'budget', title: 'Budget', icon: <PiggyBank className="h-5 w-5" /> },
   { id: 'lifestyle', title: 'Lifestyle', icon: <Users className="h-5 w-5" /> },
-  { id: 'site', title: 'Site', icon: <MapPin className="h-5 w-5" /> },
   { id: 'spaces', title: 'Spaces', icon: <Layout className="h-5 w-5" /> },
+  { id: 'site', title: 'Site', icon: <MapPin className="h-5 w-5" /> },
   { id: 'architecture', title: 'Architecture', icon: <Building className="h-5 w-5" /> },
-  { id: 'contractors', title: 'Project Team', icon: <Users className="h-5 w-5" /> },
-  { id: 'communication', title: 'Communication', icon: <MessageSquare className="h-5 w-5" /> },
   { id: 'inspiration', title: 'Inspiration', icon: <Image className="h-5 w-5" /> },
   { id: 'uploads', title: 'Uploads', icon: <Upload className="h-5 w-5" /> },
+  { id: 'communication', title: 'Communication', icon: <MessageSquare className="h-5 w-5" /> },
   { id: 'summary', title: 'Summary', icon: <FileText className="h-5 w-5" /> },
 ];
 

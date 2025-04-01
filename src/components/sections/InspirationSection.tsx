@@ -1,10 +1,13 @@
-import React from 'react';
+
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useDesignBrief } from '@/context/DesignBriefContext';
-import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, Upload, X, Image as ImageIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
+import { SectionHeader } from './SectionHeader';
+import { useToast } from '@/hooks/use-toast';
 
 // Inspiration gallery with 30 unique reliable image sources
 const inspirationImages = [
@@ -162,7 +165,8 @@ const inspirationImages = [
 
 export function InspirationSection() {
   const { files, updateFiles, setCurrentSection } = useDesignBrief();
-  const [loadingImages, setLoadingImages] = React.useState<{ [key: string]: boolean }>({});
+  const [loadingImages, setLoadingImages] = useState<{ [key: string]: boolean }>({});
+  const { toast } = useToast();
   
   const toggleImageSelection = (imageId: string) => {
     const updatedSelections = files.inspirationSelections.includes(imageId)
@@ -194,57 +198,170 @@ export function InspirationSection() {
       }
     }, 2000);
   };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const fileList = e.target.files;
+    if (!fileList) return;
+    
+    // Check file types (only images)
+    const imageFiles = Array.from(fileList).filter(file => file.type.startsWith('image/'));
+    
+    if (imageFiles.length !== fileList.length) {
+      toast({
+        title: "Invalid files",
+        description: "Only image files are allowed in the Inspiration section.",
+        variant: "destructive",
+      });
+    }
+    
+    // Check if adding these files would exceed the 20-file limit
+    if (files.uploadedInspirationImages.length + imageFiles.length > 20) {
+      toast({
+        title: "Upload limit reached",
+        description: "You can upload a maximum of 20 inspiration images.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Add the new files to the uploaded files array
+    updateFiles({ 
+      uploadedInspirationImages: [...files.uploadedInspirationImages, ...imageFiles] 
+    });
+    
+    // Reset the input value to allow uploading the same file again
+    e.target.value = '';
+  };
+  
+  const handleRemoveInspirationImage = (index: number) => {
+    const updatedFiles = [...files.uploadedInspirationImages];
+    updatedFiles.splice(index, 1);
+    updateFiles({ uploadedInspirationImages: updatedFiles });
+  };
   
   return (
     <div className="design-brief-section-wrapper">
       <div className="design-brief-section-container">
-        <h1 className="design-brief-section-title">Inspiration Gallery</h1>
-        <p className="design-brief-section-description">
-          Select exterior images of New Zealand architectural homes that inspire you or reflect your design preferences. 
-          Your selections will help us understand your aesthetic tastes.
-        </p>
+        <SectionHeader 
+          title="Inspiration Gallery" 
+          description="Select exterior images that inspire you or reflect your design preferences. Your selections will help us understand your aesthetic tastes."
+        />
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-          {inspirationImages.map((image) => (
-            <Card 
-              key={image.id} 
-              className={cn(
-                "overflow-hidden cursor-pointer transition-all duration-200 hover:shadow-md",
-                files.inspirationSelections.includes(image.id) 
-                  ? "ring-2 ring-primary ring-offset-2" 
-                  : ""
-              )}
-              onClick={() => toggleImageSelection(image.id)}
-            >
-              <div className="relative aspect-video">
-                {loadingImages[image.id] && (
-                  <Skeleton className="absolute inset-0 w-full h-full" />
-                )}
-                <img
-                  id={`img-${image.id}`}
-                  src={image.src}
-                  alt={image.alt}
-                  className="w-full h-full object-cover"
-                  onLoad={() => handleImageLoad(image.id)}
-                  onError={() => handleImageError(image.id, image.src)}
-                  loading="lazy"
+        {/* Upload your own inspiration images */}
+        <div className="mb-8">
+          <h3 className="text-lg font-medium mb-3">Upload Your Own Inspiration</h3>
+          <Card className="p-6">
+            <div className="border-2 border-dashed border-muted rounded-lg p-6 mb-4 text-center">
+              <div className="flex flex-col items-center">
+                <ImageIcon className="h-10 w-10 text-muted-foreground mb-4" />
+                <h3 className="font-medium text-lg mb-2">Upload inspiration images</h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Drag and drop images here or click to browse
+                </p>
+                <p className="text-xs text-muted-foreground mb-6">
+                  Accepted file types: JPG, PNG, GIF (Max 5MB per file)
+                </p>
+                <label htmlFor="inspiration-upload">
+                  <Button asChild>
+                    <span>
+                      <Upload className="h-4 w-4 mr-2" />
+                      Browse Images
+                    </span>
+                  </Button>
+                </label>
+                <input
+                  id="inspiration-upload"
+                  type="file"
+                  multiple
+                  className="hidden"
+                  onChange={handleFileUpload}
+                  accept="image/*"
                 />
-                {files.inspirationSelections.includes(image.id) && (
-                  <div className="absolute top-2 right-2 bg-primary rounded-full p-1">
-                    <Check className="h-4 w-4 text-white" />
-                  </div>
-                )}
               </div>
-            </Card>
-          ))}
+            </div>
+            
+            <p className="text-sm text-muted-foreground text-center">
+              {files.uploadedInspirationImages.length} of 20 inspiration images uploaded
+            </p>
+
+            {files.uploadedInspirationImages.length > 0 && (
+              <div className="mt-4">
+                <h4 className="font-medium mb-3">Your Uploaded Inspiration</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                  {files.uploadedInspirationImages.map((file, index) => (
+                    <div 
+                      key={`${file.name}-${index}`}
+                      className="relative aspect-video group"
+                    >
+                      <img
+                        src={URL.createObjectURL(file)}
+                        alt={`Uploaded inspiration ${index + 1}`}
+                        className="w-full h-full object-cover rounded-md"
+                      />
+                      <Button 
+                        variant="destructive" 
+                        size="icon" 
+                        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                        onClick={() => handleRemoveInspirationImage(index)}
+                        aria-label={`Remove ${file.name}`}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </Card>
+        </div>
+        
+        {/* Gallery of pre-selected images */}
+        <div>
+          <h3 className="text-lg font-medium mb-3">Select from our gallery</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+            {inspirationImages.map((image) => (
+              <Card 
+                key={image.id} 
+                className={cn(
+                  "overflow-hidden cursor-pointer transition-all duration-200 hover:shadow-md",
+                  files.inspirationSelections.includes(image.id) 
+                    ? "ring-2 ring-primary ring-offset-2" 
+                    : ""
+                )}
+                onClick={() => toggleImageSelection(image.id)}
+              >
+                <div className="relative aspect-video">
+                  {loadingImages[image.id] && (
+                    <Skeleton className="absolute inset-0 w-full h-full" />
+                  )}
+                  <img
+                    id={`img-${image.id}`}
+                    src={image.src}
+                    alt={image.alt}
+                    className="w-full h-full object-cover"
+                    onLoad={() => handleImageLoad(image.id)}
+                    onError={() => handleImageError(image.id, image.src)}
+                    loading="lazy"
+                  />
+                  {files.inspirationSelections.includes(image.id) && (
+                    <div className="absolute top-2 right-2 bg-primary rounded-full p-1">
+                      <Check className="h-4 w-4 text-white" />
+                    </div>
+                  )}
+                </div>
+              </Card>
+            ))}
+          </div>
         </div>
         
         <div className="mt-6 text-center">
           <p className="text-muted-foreground">
-            Selected {files.inspirationSelections.length} of {inspirationImages.length} images
+            Selected {files.inspirationSelections.length} of {inspirationImages.length} gallery images
           </p>
           <p className="text-muted-foreground mt-2">
-            You can upload your own inspiration images in the next section
+            {files.uploadedInspirationImages.length > 0 
+              ? `You've uploaded ${files.uploadedInspirationImages.length} custom inspiration images`
+              : "Upload your own inspiration images using the form above"}
           </p>
         </div>
         

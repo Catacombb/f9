@@ -3,10 +3,7 @@ import React from 'react';
 import { DesignBriefSidebar } from './DesignBriefSidebar';
 import { ThemeToggle } from './ThemeProvider';
 import { useDesignBrief } from '@/context/DesignBriefContext';
-import { Button } from '@/components/ui/button';
 import { formatDistanceToNow } from 'date-fns';
-import { Save } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
 import { Link } from 'react-router-dom';
 import { AppLogo } from './AppLogo';
 
@@ -16,19 +13,10 @@ interface DesignBriefLayoutProps {
 
 export function DesignBriefLayout({ children }: DesignBriefLayoutProps) {
   const { lastSaved } = useDesignBrief();
-  const { toast } = useToast();
   
   const lastSavedFormatted = lastSaved 
     ? formatDistanceToNow(new Date(lastSaved), { addSuffix: true })
     : 'Not saved yet';
-  
-  const showSaveConfirmation = () => {
-    toast({
-      title: "Progress Saved",
-      description: "Your design brief is automatically saved in your browser.",
-      duration: 3000,
-    });
-  };
   
   return (
     <div className="flex h-screen overflow-hidden bg-background">
@@ -38,14 +26,9 @@ export function DesignBriefLayout({ children }: DesignBriefLayoutProps) {
         <header className="h-16 border-b flex items-center justify-between px-4 bg-background z-10">
           <div className="flex items-center space-x-2">
             <AppLogo size="small" />
-            <Button 
-              variant="ghost" 
-              className="flex items-center text-muted-foreground" 
-              onClick={showSaveConfirmation}
-            >
-              <Save className="h-4 w-4 mr-2" />
-              <span>Saved {lastSavedFormatted}</span>
-            </Button>
+            <span className="text-xs text-muted-foreground">
+              Last saved {lastSavedFormatted}
+            </span>
           </div>
           
           <div className="flex items-center space-x-2">
