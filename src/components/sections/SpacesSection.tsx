@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { Button } from '@/components/ui/button';
@@ -5,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { PlusCircle, Trash2, Bed, Bath, Kitchen, Sofa, BookOpen, ShoppingBag, Car } from 'lucide-react';
+import { PlusCircle, Trash2, Bed, Bath, Sofa, BookOpen, ShoppingBag, Car, Utensils } from 'lucide-react';
 import { SpaceRoom } from '@/types';
 import { Label } from '@/components/ui/label';
 import { toast } from '@/hooks/use-toast';
@@ -16,7 +17,7 @@ const predefinedRoomTypes = [
   { value: 'Bedroom', label: 'Bedroom', icon: <Bed className="h-4 w-4 mr-2" /> },
   { value: 'Bathroom', label: 'Bathroom', icon: <Bath className="h-4 w-4 mr-2" /> },
   { value: 'Living Room', label: 'Living Room', icon: <Sofa className="h-4 w-4 mr-2" /> },
-  { value: 'Kitchen', label: 'Kitchen', icon: <Kitchen className="h-4 w-4 mr-2" /> },
+  { value: 'Kitchen', label: 'Kitchen', icon: <Utensils className="h-4 w-4 mr-2" /> },
   { value: 'Dining Area', label: 'Dining Area', icon: <ShoppingBag className="h-4 w-4 mr-2" /> },
   { value: 'Office/Study', label: 'Office/Study', icon: <BookOpen className="h-4 w-4 mr-2" /> },
   { value: 'Garage', label: 'Garage', icon: <Car className="h-4 w-4 mr-2" /> },

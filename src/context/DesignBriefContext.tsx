@@ -20,6 +20,7 @@ const initialProjectData: ProjectData = {
     },
     lifestyle: {
       occupants: '',
+      projectTimeframe: '', // Added this field to match the type
       occupationDetails: '',
       dailyRoutine: '',
       entertainmentStyle: '',
