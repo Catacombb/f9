@@ -1,4 +1,3 @@
-
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 import { ProjectData } from '@/types';
@@ -12,19 +11,6 @@ const COLORS = {
   background: '#ffffff',
   muted: '#f5f5f5',
   border: '#e0e0e0',
-};
-
-// Section icons mapping - using universal emoji icons for compatibility
-const SECTION_ICONS = {
-  'Project Information': '📋',
-  'Budget Information': '💰',
-  'Lifestyle Information': '👪',
-  'Spaces Required': '🏠',
-  'Site Information': '🗺️',
-  'Architecture Preferences': '🏛️',
-  'Project Team': '👷',
-  'Communication Preferences': '📱',
-  'Project Summary': '📝',
 };
 
 // Function to create a PDF from the project data
@@ -63,15 +49,14 @@ export const generatePDF = async (projectData: ProjectData): Promise<void> => {
     // Get logo path - using the light mode logo
     const logoPath = '/lovable-uploads/f87cbd00-65a2-4b67-ae04-55a828581a0e.png';
     
-    // Calculate center position for logo while maintaining aspect ratio
-    // Max height 12mm
-    const logoHeight = 12;
-    const logoWidth = 40; // approximate aspect ratio
+    // Set max height and preserve aspect ratio
+    const maxLogoHeight = 12; // in mm
+    const logoWidth = 40; // approximate width at the proper aspect ratio
     const logoX = (pageWidth - logoWidth) / 2;
     
     try {
       // Add actual image with preserved aspect ratio
-      pdf.addImage(logoPath, 'PNG', logoX, 7, logoWidth, logoHeight);
+      pdf.addImage(logoPath, 'PNG', logoX, 7, logoWidth, maxLogoHeight);
     } catch (error) {
       // Fallback to text if image loading fails
       pdf.setFont('helvetica', 'bold');
@@ -130,22 +115,19 @@ export const generatePDF = async (projectData: ProjectData): Promise<void> => {
     );
   };
   
-  // Helper function to add a section title with icon
+  // Helper function to add a section title (without icons)
   const addSectionTitle = (title: string) => {
     // Check if we need a new page
     if (yPosition > pageHeight - 40) {
       addNewPage();
     }
     
-    // Add section icon if available
-    const icon = SECTION_ICONS[title] || '';
-    
     pdf.setFont('helvetica', 'bold');
     pdf.setTextColor(COLORS.accent); // Use accent color for section titles
     pdf.setFontSize(16); // Larger font size for better hierarchy
     
-    // Add icon and title
-    pdf.text(`${icon} ${title}`, margin, yPosition);
+    // Add title without icon
+    pdf.text(title, margin, yPosition);
     
     // Add a thin line below the title for visual separation
     pdf.setDrawColor(COLORS.border);
