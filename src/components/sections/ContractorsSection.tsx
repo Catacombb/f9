@@ -1,350 +1,271 @@
+
 import React, { useState } from 'react';
-import { useDesignBrief } from '@/context/DesignBriefContext';
-import { Professional } from '@/types';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
-import { useForm } from 'react-hook-form';
-import { Briefcase, User, X, Plus, Trash, Phone, Mail, FileText } from 'lucide-react';
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from '@/components/ui/separator';
-import { Toggle } from '@/components/ui/toggle';
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { Card, CardContent } from '@/components/ui/card';
+import { SectionHeader } from './SectionHeader';
+import { useDesignBrief } from '@/context/DesignBriefContext';
+import { ArrowLeft, ArrowRight, Plus, Trash2 } from 'lucide-react';
+import { Professional } from '@/types';
 
 export function ContractorsSection() {
-  const { formData, updateFormData, addProfessional, updateProfessional, removeProfessional } = useDesignBrief();
-  const [showAddProfessional, setShowAddProfessional] = useState(false);
-  const [editingProfessional, setEditingProfessional] = useState<Professional | null>(null);
-  
-  // Predefined professional types
-  const professionalTypes = [
-    'Structural Engineer',
-    'Surveyor',
-    'Architect',
-    'Landscape Designer',
-    'Interior Designer',
-    'Project Manager',
-    'Quantity Surveyor',
-    'Building Inspector',
-    'Other'
-  ];
-  
-  // Form for adding/editing professionals
-  const professionalForm = useForm({
-    defaultValues: {
-      type: '',
-      name: '',
-      contact: '',
-      notes: '',
-      isCustom: false
-    }
+  const { formData, updateFormData, addProfessional, updateProfessional, removeProfessional, setCurrentSection } = useDesignBrief();
+  const [newProfessional, setNewProfessional] = useState<Omit<Professional, 'id'>>({
+    type: '',
+    name: '',
+    contact: '',
+    notes: '',
   });
-  
-  // Handler for builder/contractor fields
-  const handleBuilderChange = (field: string, value: any) => {
-    updateFormData('contractors', { [field]: value });
-  };
-  
-  // Reset and show the add professional form
-  const handleAddProfessional = () => {
-    professionalForm.reset({
-      type: 'Structural Engineer',
-      name: '',
-      contact: '',
-      notes: '',
-      isCustom: false
-    });
-    setEditingProfessional(null);
-    setShowAddProfessional(true);
-  };
-  
-  // Edit an existing professional
-  const handleEditProfessional = (professional: Professional) => {
-    professionalForm.reset({
-      type: professional.type,
-      name: professional.name,
-      contact: professional.contact || '',
-      notes: professional.notes || '',
-      isCustom: professional.isCustom || false
-    });
-    setEditingProfessional(professional);
-    setShowAddProfessional(true);
-  };
-  
-  // Submit the professional form
-  const handleProfessionalSubmit = (values: any) => {
-    if (editingProfessional) {
-      // Update existing professional
-      updateProfessional({
-        ...values,
-        id: editingProfessional.id
-      });
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    if (name.startsWith('new_')) {
+      const field = name.replace('new_', '');
+      setNewProfessional(prev => ({ ...prev, [field]: value }));
     } else {
-      // Add new professional
-      addProfessional(values);
+      updateFormData('contractors', { [name]: value });
     }
-    setShowAddProfessional(false);
-    setEditingProfessional(null);
-    professionalForm.reset();
   };
-  
-  // Cancel adding/editing a professional
-  const handleCancelProfessional = () => {
-    setShowAddProfessional(false);
-    setEditingProfessional(null);
-    professionalForm.reset();
+
+  const handleSwitchChange = (checked: boolean) => {
+    updateFormData('contractors', { goToTender: checked });
   };
-  
-  // Remove a professional
+
+  const handleAddProfessional = () => {
+    if (newProfessional.type && newProfessional.name) {
+      addProfessional({
+        ...newProfessional,
+        id: crypto.randomUUID(),
+      });
+      
+      // Reset form
+      setNewProfessional({
+        type: '',
+        name: '',
+        contact: '',
+        notes: '',
+      });
+    }
+  };
+
   const handleRemoveProfessional = (id: string) => {
     removeProfessional(id);
   };
+
+  const handleProfessionalChange = (id: string, field: string, value: string) => {
+    const professional = formData.contractors.professionals.find(p => p.id === id);
+    if (professional) {
+      updateProfessional({
+        ...professional,
+        [field]: value,
+      });
+    }
+  };
   
+  const handlePrevious = () => {
+    setCurrentSection('projectInfo');
+  };
+  
+  const handleNext = () => {
+    setCurrentSection('budget');
+  };
+  
+  // Calculate completion percentage
+  const calculateCompletion = () => {
+    let completed = 0;
+    const requiredFields = 2; // preferredBuilder and at least one professional
+    
+    if (formData.contractors.preferredBuilder) completed++;
+    if (formData.contractors.professionals && formData.contractors.professionals.length > 0) completed++;
+    
+    return Math.round((completed / requiredFields) * 100);
+  };
+  
+  const completionPercentage = calculateCompletion();
+
   return (
-    <ScrollArea className="h-[calc(100vh-10rem)] px-4 py-6">
-      <div className="container max-w-3xl mx-auto">
-        <div className="space-y-6">
-          <div>
-            <h1 className="text-3xl font-bold">Contractors</h1>
-            <p className="text-muted-foreground">
-              Specify preferred contractors and other professionals for your project.
-            </p>
+    <div className="design-brief-section-wrapper">
+      <div className="design-brief-section-container">
+        <div className="flex justify-between items-center mb-4">
+          <SectionHeader 
+            title="Project Team" 
+            description="Tell us about the professionals you'd like to work with on your project." 
+          />
+          <div className="text-sm font-medium">
+            {completionPercentage}% Complete
+          </div>
+        </div>
+        
+        <div className="design-brief-form-group">
+          <div className="mb-6">
+            <Label htmlFor="preferredBuilder">Preferred Builder</Label>
+            <Input
+              id="preferredBuilder"
+              name="preferredBuilder"
+              placeholder="Enter the name of your preferred builder (if any)"
+              value={formData.contractors.preferredBuilder}
+              onChange={handleInputChange}
+              className="mt-1"
+            />
           </div>
           
-          {/* Builder/Contractor Section */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Briefcase className="mr-2 h-5 w-5" />
-                Preferred Builder
-              </CardTitle>
-              <CardDescription>
-                Specify your preferred builder or contractor for this project.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-4">
-                <FormItem>
-                  <FormLabel>Preferred Builder/Contractor</FormLabel>
-                  <FormControl>
-                    <Input 
-                      placeholder="Enter builder or contractor name" 
-                      value={formData.contractors.preferredBuilder || ''}
-                      onChange={(e) => handleBuilderChange('preferredBuilder', e.target.value)}
-                    />
-                  </FormControl>
-                </FormItem>
+          <div className="mb-6 flex items-center space-x-2">
+            <Switch
+              id="goToTender"
+              checked={formData.contractors.goToTender}
+              onCheckedChange={handleSwitchChange}
+            />
+            <Label htmlFor="goToTender">I would like to go to tender for a builder</Label>
+          </div>
+        </div>
+        
+        <div className="design-brief-form-group">
+          <h3 className="text-lg font-semibold mb-4">Other Professionals</h3>
+          
+          {formData.contractors.professionals.map((professional) => (
+            <Card key={professional.id} className="mb-4">
+              <CardContent className="p-4">
+                <div className="flex justify-between items-start mb-4">
+                  <h4 className="text-md font-medium">{professional.type || 'Professional'}</h4>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => handleRemoveProfessional(professional.id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
                 
-                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-                  <div className="space-y-0.5">
-                    <FormLabel>Go to Tender</FormLabel>
-                    <FormDescription>
-                      Would you like to go to tender for the builder selection?
-                    </FormDescription>
-                  </div>
-                  <FormControl>
-                    <Switch
-                      checked={formData.contractors.goToTender}
-                      onCheckedChange={(checked) => handleBuilderChange('goToTender', checked)}
+                <div className="grid gap-4 mb-2">
+                  <div>
+                    <Label htmlFor={`name_${professional.id}`}>Name</Label>
+                    <Input
+                      id={`name_${professional.id}`}
+                      value={professional.name}
+                      onChange={(e) => handleProfessionalChange(professional.id, 'name', e.target.value)}
+                      className="mt-1"
                     />
-                  </FormControl>
-                </FormItem>
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor={`contact_${professional.id}`}>Contact Info</Label>
+                    <Input
+                      id={`contact_${professional.id}`}
+                      value={professional.contact || ''}
+                      onChange={(e) => handleProfessionalChange(professional.id, 'contact', e.target.value)}
+                      className="mt-1"
+                      placeholder="Email or phone number"
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor={`notes_${professional.id}`}>Notes</Label>
+                    <Textarea
+                      id={`notes_${professional.id}`}
+                      value={professional.notes || ''}
+                      onChange={(e) => handleProfessionalChange(professional.id, 'notes', e.target.value)}
+                      className="mt-1"
+                      placeholder="Any additional information"
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+          
+          <Card className="mb-4 border-dashed">
+            <CardContent className="p-4">
+              <h4 className="text-md font-medium mb-4">Add New Professional</h4>
+              
+              <div className="grid gap-4 mb-4">
+                <div>
+                  <Label htmlFor="new_type">Type of Professional</Label>
+                  <Input
+                    id="new_type"
+                    name="new_type"
+                    value={newProfessional.type}
+                    onChange={handleInputChange}
+                    className="mt-1"
+                    placeholder="e.g., Structural Engineer, Interior Designer"
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="new_name">Name</Label>
+                  <Input
+                    id="new_name"
+                    name="new_name"
+                    value={newProfessional.name}
+                    onChange={handleInputChange}
+                    className="mt-1"
+                    placeholder="Professional's name"
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="new_contact">Contact Info</Label>
+                  <Input
+                    id="new_contact"
+                    name="new_contact"
+                    value={newProfessional.contact}
+                    onChange={handleInputChange}
+                    className="mt-1"
+                    placeholder="Email or phone number"
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="new_notes">Notes</Label>
+                  <Textarea
+                    id="new_notes"
+                    name="new_notes"
+                    value={newProfessional.notes}
+                    onChange={handleInputChange}
+                    className="mt-1"
+                    placeholder="Any additional information"
+                  />
+                </div>
               </div>
+              
+              <Button 
+                variant="outline"
+                onClick={handleAddProfessional}
+                disabled={!newProfessional.type || !newProfessional.name}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                <span>Add Professional</span>
+              </Button>
             </CardContent>
           </Card>
           
-          {/* Other Professionals Section */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <User className="mr-2 h-5 w-5" />
-                Other Professionals
-              </CardTitle>
-              <CardDescription>
-                Specify other professionals involved in your project.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {/* List of added professionals */}
-              {formData.contractors.professionals && formData.contractors.professionals.length > 0 ? (
-                <div className="space-y-3">
-                  {formData.contractors.professionals.map((professional) => (
-                    <div 
-                      key={professional.id}
-                      className="flex items-start justify-between p-3 border rounded-md"
-                    >
-                      <div className="space-y-1">
-                        <div className="font-medium">{professional.type}</div>
-                        <div>{professional.name}</div>
-                        {professional.contact && (
-                          <div className="text-sm text-muted-foreground flex items-center">
-                            <Phone className="h-3 w-3 mr-1" />
-                            <Mail className="h-3 w-3 mr-1" />
-                            {professional.contact}
-                          </div>
-                        )}
-                        {professional.notes && (
-                          <div className="text-sm text-muted-foreground flex items-start">
-                            <FileText className="h-3 w-3 mr-1 mt-1" />
-                            <span>{professional.notes}</span>
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex space-x-2">
-                        <Button 
-                          variant="ghost" 
-                          size="icon"
-                          onClick={() => handleEditProfessional(professional)}
-                        >
-                          <User className="h-4 w-4" />
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="icon"
-                          onClick={() => handleRemoveProfessional(professional.id)}
-                        >
-                          <Trash className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center p-4 border border-dashed rounded-md">
-                  <p className="text-muted-foreground">No professionals added yet.</p>
-                </div>
-              )}
-              
-              {/* Button to add a new professional */}
-              {!showAddProfessional && (
-                <Button 
-                  variant="outline" 
-                  className="w-full" 
-                  onClick={handleAddProfessional}
-                >
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add Professional
-                </Button>
-              )}
-              
-              {/* Form to add/edit a professional */}
-              {showAddProfessional && (
-                <Card className="border-2 border-primary">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-md">
-                      {editingProfessional ? 'Edit Professional' : 'Add Professional'}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <Form {...professionalForm}>
-                      <form onSubmit={professionalForm.handleSubmit(handleProfessionalSubmit)} className="space-y-4">
-                        {/* Professional type selection */}
-                        <FormItem>
-                          <FormLabel>Professional Type</FormLabel>
-                          <div className="space-y-2">
-                            <ToggleGroup 
-                              type="single" 
-                              variant="outline"
-                              className="flex flex-wrap justify-start"
-                              value={professionalForm.watch('type')}
-                              onValueChange={(value) => {
-                                if (value) professionalForm.setValue('type', value);
-                              }}
-                            >
-                              {professionalTypes.map((type) => (
-                                <ToggleGroupItem key={type} value={type} className="mb-1 mr-1">
-                                  {type}
-                                </ToggleGroupItem>
-                              ))}
-                            </ToggleGroup>
-                            
-                            {professionalForm.watch('type') === 'Other' && (
-                              <Input
-                                placeholder="Specify other professional type"
-                                value={professionalForm.watch('isCustom') ? professionalForm.watch('type') : ''}
-                                onChange={(e) => {
-                                  professionalForm.setValue('type', e.target.value);
-                                  professionalForm.setValue('isCustom', true);
-                                }}
-                              />
-                            )}
-                          </div>
-                        </FormItem>
-                        
-                        {/* Professional name */}
-                        <FormItem>
-                          <FormLabel>Name</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="Professional's name"
-                              {...professionalForm.register('name')}
-                            />
-                          </FormControl>
-                        </FormItem>
-                        
-                        {/* Contact information */}
-                        <FormItem>
-                          <FormLabel>Contact Information (Optional)</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="Phone number or email"
-                              {...professionalForm.register('contact')}
-                            />
-                          </FormControl>
-                        </FormItem>
-                        
-                        {/* Notes */}
-                        <FormItem>
-                          <FormLabel>Notes (Optional)</FormLabel>
-                          <FormControl>
-                            <Textarea
-                              placeholder="Any specific preferences or notes about this professional"
-                              {...professionalForm.register('notes')}
-                              rows={3}
-                            />
-                          </FormControl>
-                        </FormItem>
-                        
-                        {/* Form actions */}
-                        <div className="flex justify-end space-x-2">
-                          <Button 
-                            type="button" 
-                            variant="outline" 
-                            onClick={handleCancelProfessional}
-                          >
-                            Cancel
-                          </Button>
-                          <Button type="submit">
-                            {editingProfessional ? 'Update' : 'Add'} Professional
-                          </Button>
-                        </div>
-                      </form>
-                    </Form>
-                  </CardContent>
-                </Card>
-              )}
-              
-              {/* Additional notes about professionals */}
-              <div className="pt-4">
-                <FormItem>
-                  <FormLabel>Additional Notes</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Any additional notes about contractors or professionals..."
-                      value={formData.contractors.additionalNotes || ''}
-                      onChange={(e) => handleBuilderChange('additionalNotes', e.target.value)}
-                      rows={4}
-                    />
-                  </FormControl>
-                </FormItem>
-              </div>
-            </CardContent>
-          </Card>
+          <div>
+            <Label htmlFor="additionalNotes">Additional Notes</Label>
+            <Textarea
+              id="additionalNotes"
+              name="additionalNotes"
+              placeholder="Any other information about your project team..."
+              value={formData.contractors.additionalNotes || ''}
+              onChange={handleInputChange}
+              className="mt-1 h-32"
+            />
+          </div>
+        </div>
+        
+        <div className="flex justify-between mt-6">
+          <Button variant="outline" onClick={handlePrevious} className="group">
+            <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
+            <span>Previous: Project Info</span>
+          </Button>
+          
+          <Button onClick={handleNext} className="group">
+            <span>Next: Budget</span>
+            <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+          </Button>
         </div>
       </div>
-    </ScrollArea>
+    </div>
   );
 }

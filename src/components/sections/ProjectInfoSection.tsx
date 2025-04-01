@@ -38,13 +38,32 @@ export function ProjectInfoSection() {
     setCurrentSection('contractors');
   };
   
+  // Calculate completion percentage based on required fields
+  const calculateCompletion = () => {
+    const requiredFields = ['clientName', 'projectAddress', 'contactEmail', 'contactPhone', 'projectType'];
+    let filledCount = 0;
+    
+    requiredFields.forEach(field => {
+      if (formData.projectInfo[field]) filledCount++;
+    });
+    
+    return Math.round((filledCount / requiredFields.length) * 100);
+  };
+  
+  const completionPercentage = calculateCompletion();
+  
   return (
     <div className="design-brief-section-wrapper">
       <div className="design-brief-section-container">
-        <SectionHeader 
-          title="Project Information" 
-          description="Tell us about yourself and your project. This information helps us understand the basics of what you're looking to achieve."
-        />
+        <div className="flex justify-between items-center mb-4">
+          <SectionHeader 
+            title="Project Information" 
+            description="Tell us about yourself and your project. This information helps us understand the basics of what you're looking to achieve."
+          />
+          <div className="text-sm font-medium">
+            {completionPercentage}% Complete
+          </div>
+        </div>
         
         <div className="design-brief-form-group">
           <div className="mb-6">

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -8,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { ArrowLeft, FileText, Mail, Pencil, RefreshCw, Save } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { SectionHeader } from './SectionHeader';
 
 // Define New Zealand architecture inspiration images
 const inspirationImages = [
@@ -109,16 +111,64 @@ export function SummarySection() {
   };
   
   const handlePrevious = () => {
-    setCurrentSection('uploads');
+    setCurrentSection('communication');
   };
+  
+  // Function to generate a better summary text based on actual user inputs
+  const generateBetterSummary = () => {
+    // Project Info
+    const clientName = formData.projectInfo.clientName || '[Client Name]';
+    const projectAddress = formData.projectInfo.projectAddress || '[Project Address]';
+    const projectType = formData.projectInfo.projectType 
+      ? formData.projectInfo.projectType.replace('_', ' ') 
+      : 'not specified';
+    
+    // Budget
+    const budget = formData.budget.budgetRange || 'not specified';
+    const timeframe = formData.budget.timeframe || 'not specified';
+    
+    // Occupants
+    const occupants = formData.lifestyle.occupants || 'not specified';
+    
+    // Architecture
+    const style = formData.architecture.stylePrefences || 'not specified';
+    
+    // Spaces
+    const roomCount = formData.spaces.rooms.length;
+    const roomList = roomCount > 0 
+      ? formData.spaces.rooms.map(r => `${r.quantity} ${r.type}`).join(', ')
+      : 'not specified';
+    
+    return `Design Brief Summary for ${clientName} at ${projectAddress}
+
+This ${projectType} project has a budget of ${budget} with a timeframe of ${timeframe}. The home will be occupied by ${occupants} and is designed in a ${style} style.
+
+The project includes ${roomCount} defined spaces: ${roomList}.
+
+${formData.projectInfo.projectDescription ? `Additional project description: ${formData.projectInfo.projectDescription}` : ''}
+${formData.budget.priorityAreas ? `Priority areas include: ${formData.budget.priorityAreas}` : ''}
+${formData.lifestyle.specialRequirements ? `Special requirements: ${formData.lifestyle.specialRequirements}` : ''}
+`;
+  };
+  
+  // Update the summary when needed
+  useEffect(() => {
+    if (!summary.generatedSummary && !isGenerating) {
+      const betterSummary = generateBetterSummary();
+      updateSummary({
+        generatedSummary: betterSummary,
+        editedSummary: betterSummary
+      });
+    }
+  }, [formData]);
   
   return (
     <div className="design-brief-section-wrapper">
       <div className="design-brief-section-container">
-        <h1 className="design-brief-section-title">Design Brief Summary</h1>
-        <p className="design-brief-section-description">
-          Review your design brief summary and make any necessary edits before finalizing your brief.
-        </p>
+        <SectionHeader
+          title="Design Brief Summary"
+          description="Review your design brief summary and make any necessary edits before finalizing your brief."
+        />
         
         <Tabs defaultValue="summary">
           <TabsList className="grid grid-cols-2 mb-6">
@@ -130,7 +180,7 @@ export function SummarySection() {
             <Card>
               <CardContent className="p-6">
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-xl font-semibold">AI-Generated Summary</h3>
+                  <h3 className="text-xl font-bold">AI-Generated Summary</h3>
                   <div className="flex gap-2">
                     <Button 
                       variant="outline" 
@@ -176,7 +226,7 @@ export function SummarySection() {
             </Card>
             
             <div className="mt-8 space-y-6">
-              <h3 className="text-xl font-semibold">Finalize Your Brief</h3>
+              <h3 className="text-xl font-bold">Finalize Your Brief</h3>
               
               <Card>
                 <CardContent className="p-6 space-y-4">
@@ -239,12 +289,12 @@ export function SummarySection() {
           <TabsContent value="preview">
             <Card>
               <CardContent className="p-6">
-                <h3 className="text-xl font-semibold mb-4">Complete Design Brief Preview</h3>
+                <h3 className="text-xl font-bold mb-4">Complete Design Brief Preview</h3>
                 
                 <div className="border rounded-lg p-6 space-y-8">
                   {/* AI Summary Section */}
                   <div className="pb-6 border-b">
-                    <h4 className="text-lg font-medium mb-4">Executive Summary</h4>
+                    <h4 className="text-lg font-bold mb-4">Executive Summary</h4>
                     <div className="whitespace-pre-wrap text-sm">
                       {summary.editedSummary || (
                         <p className="text-muted-foreground italic">
@@ -256,7 +306,7 @@ export function SummarySection() {
                   
                   {/* Project Info Section */}
                   <div className="pb-6 border-b">
-                    <h4 className="text-lg font-medium mb-4">Project Information</h4>
+                    <h4 className="text-lg font-bold mb-4">Project Information</h4>
                     <div className="grid md:grid-cols-2 gap-4">
                       <div>
                         <p className="text-sm font-medium">Client Name:</p>
@@ -276,7 +326,9 @@ export function SummarySection() {
                       </div>
                       <div>
                         <p className="text-sm font-medium">Project Type:</p>
-                        <p className="text-sm">{formData.projectInfo.projectType || "Not provided"}</p>
+                        <p className="text-sm">
+                          {formData.projectInfo.projectType ? formData.projectInfo.projectType.replace('_', ' ') : "Not provided"}
+                        </p>
                       </div>
                     </div>
                     
@@ -290,7 +342,7 @@ export function SummarySection() {
                   
                   {/* Budget Section */}
                   <div className="pb-6 border-b">
-                    <h4 className="text-lg font-medium mb-4">Budget Information</h4>
+                    <h4 className="text-lg font-bold mb-4">Budget Information</h4>
                     <div className="space-y-4">
                       <div>
                         <p className="text-sm font-medium">Budget Range:</p>
@@ -319,7 +371,7 @@ export function SummarySection() {
                   
                   {/* Lifestyle Section */}
                   <div className="pb-6 border-b">
-                    <h4 className="text-lg font-medium mb-4">Lifestyle</h4>
+                    <h4 className="text-lg font-bold mb-4">Lifestyle</h4>
                     <div className="space-y-4">
                       {formData.lifestyle.occupants && (
                         <div>
@@ -356,7 +408,7 @@ export function SummarySection() {
                   
                   {/* Site Section */}
                   <div className="pb-6 border-b">
-                    <h4 className="text-lg font-medium mb-4">Site Information</h4>
+                    <h4 className="text-lg font-bold mb-4">Site Information</h4>
                     <div className="space-y-4">
                       {formData.site.existingConditions && (
                         <div>
@@ -393,7 +445,7 @@ export function SummarySection() {
                   
                   {/* Architecture Section */}
                   <div className="pb-6 border-b">
-                    <h4 className="text-lg font-medium mb-4">Architectural Preferences</h4>
+                    <h4 className="text-lg font-bold mb-4">Architectural Preferences</h4>
                     <div className="space-y-4">
                       {formData.architecture.stylePrefences && (
                         <div>
@@ -431,7 +483,7 @@ export function SummarySection() {
                   {/* Uploads Section */}
                   {files.uploadedFiles.length > 0 && (
                     <div className="pb-6 border-b">
-                      <h4 className="text-lg font-medium mb-4">Uploaded Files</h4>
+                      <h4 className="text-lg font-bold mb-4">Uploaded Files</h4>
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                         {files.uploadedFiles.map((file, index) => (
                           <div key={`upload-${index}`} className="text-sm">
@@ -445,7 +497,7 @@ export function SummarySection() {
                   {/* Inspiration Section */}
                   {files.inspirationSelections.length > 0 && (
                     <div>
-                      <h4 className="text-lg font-medium mb-4">Inspiration Selections</h4>
+                      <h4 className="text-lg font-bold mb-4">Inspiration Selections</h4>
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                         {files.inspirationSelections.map((id) => {
                           const image = inspirationImages.find(img => img.id === id);
@@ -463,6 +515,56 @@ export function SummarySection() {
                       </div>
                     </div>
                   )}
+
+                  {/* Communication Section */}
+                  {(formData.communication.preferredMethods?.length > 0 || 
+                    formData.communication.bestTimes?.length > 0 ||
+                    formData.communication.availableDays?.length > 0 ||
+                    formData.communication.frequency ||
+                    formData.communication.urgentContact ||
+                    formData.communication.responseTime) && (
+                    <div className="pb-6 border-b">
+                      <h4 className="text-lg font-bold mb-4">Communication Preferences</h4>
+                      <div className="space-y-4">
+                        {formData.communication.preferredMethods?.length > 0 && (
+                          <div>
+                            <p className="text-sm font-medium">Preferred Methods:</p>
+                            <p className="text-sm">{formData.communication.preferredMethods.join(', ')}</p>
+                          </div>
+                        )}
+                        {formData.communication.bestTimes?.length > 0 && (
+                          <div>
+                            <p className="text-sm font-medium">Best Times:</p>
+                            <p className="text-sm">{formData.communication.bestTimes.join(', ')}</p>
+                          </div>
+                        )}
+                        {formData.communication.availableDays?.length > 0 && (
+                          <div>
+                            <p className="text-sm font-medium">Available Days:</p>
+                            <p className="text-sm">{formData.communication.availableDays.join(', ')}</p>
+                          </div>
+                        )}
+                        {formData.communication.frequency && (
+                          <div>
+                            <p className="text-sm font-medium">Update Frequency:</p>
+                            <p className="text-sm">{formData.communication.frequency}</p>
+                          </div>
+                        )}
+                        {formData.communication.urgentContact && (
+                          <div>
+                            <p className="text-sm font-medium">Urgent Contact:</p>
+                            <p className="text-sm">{formData.communication.urgentContact}</p>
+                          </div>
+                        )}
+                        {formData.communication.responseTime && (
+                          <div>
+                            <p className="text-sm font-medium">Expected Response Time:</p>
+                            <p className="text-sm">{formData.communication.responseTime}</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -472,7 +574,7 @@ export function SummarySection() {
         <div className="flex justify-between mt-6">
           <Button variant="outline" onClick={handlePrevious} className="group">
             <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-            <span>Previous: Uploads</span>
+            <span>Previous: Communication</span>
           </Button>
         </div>
       </div>
