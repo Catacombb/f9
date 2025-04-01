@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { FormData, ProjectFiles, BriefSummary, ProjectData, SectionKey, SpaceRoom, Professional } from '@/types';
 
@@ -52,6 +51,15 @@ const defaultFormData: FormData = {
     preferredBuilder: '',
     goToTender: false,
     professionals: [],
+    additionalNotes: '',
+  },
+  communication: {
+    preferredMethod: '',
+    bestTimes: [],
+    availableDays: [],
+    frequency: '',
+    urgentContact: '',
+    responseTime: '',
     additionalNotes: '',
   }
 };
@@ -316,6 +324,17 @@ ${formData.contractors.professionals.length > 0
     ).join('\n')
   : ''}
 ${formData.contractors.additionalNotes ? `\nAdditional Contractor Notes: ${formData.contractors.additionalNotes}` : ''}
+
+Communication Preferences:
+${formData.communication.preferredMethod ? `• Preferred Contact Method: ${formData.communication.preferredMethod}` : ''}
+${formData.communication.bestTimes?.length > 0 
+  ? `• Best Times for Contact: ${formData.communication.bestTimes.join(', ')}` : ''}
+${formData.communication.availableDays?.length > 0 
+  ? `• Available Days: ${formData.communication.availableDays.join(', ')}` : ''}
+${formData.communication.frequency ? `• Communication Frequency: ${formData.communication.frequency}` : ''}
+${formData.communication.urgentContact ? `• Urgent Contact Method: ${formData.communication.urgentContact}` : ''}
+${formData.communication.responseTime ? `• Preferred Response Time: ${formData.communication.responseTime}` : ''}
+${formData.communication.additionalNotes ? `• Additional Notes: ${formData.communication.additionalNotes}` : ''}
 
 This project summary reflects the client's input to date. Further consultation may reveal additional requirements or modifications to these initial preferences.
       `;

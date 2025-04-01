@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -5,7 +6,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { SectionKey } from '@/types';
-import { ChevronRight, Info, Home, PiggyBank, Users, MapPin, Layout, Building, Image, Upload, FileText, ChevronLeft, HelpCircle, Briefcase } from 'lucide-react';
+import { ChevronRight, Info, Home, PiggyBank, Users, MapPin, Layout, Building, Image, Upload, FileText, ChevronLeft, HelpCircle, MessageSquare } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 // Define all sections with their icons and titles
@@ -18,6 +19,7 @@ const sections = [
   { id: 'spaces', title: 'Spaces', icon: <Layout className="h-5 w-5" /> },
   { id: 'architecture', title: 'Architecture', icon: <Building className="h-5 w-5" /> },
   { id: 'contractors', title: 'Project Team', icon: <Users className="h-5 w-5" /> },
+  { id: 'communication', title: 'Communication', icon: <MessageSquare className="h-5 w-5" /> },
   { id: 'inspiration', title: 'Inspiration', icon: <Image className="h-5 w-5" /> },
   { id: 'uploads', title: 'Uploads', icon: <Upload className="h-5 w-5" /> },
   { id: 'summary', title: 'Summary', icon: <FileText className="h-5 w-5" /> },

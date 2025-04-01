@@ -1,4 +1,3 @@
-
 export interface FormData {
   // Project Info
   projectInfo: {
@@ -63,6 +62,17 @@ export interface FormData {
     professionals: Professional[];
     additionalNotes: string;
   };
+
+  // Communication Preferences
+  communication: {
+    preferredMethod: string;
+    bestTimes: string[];
+    availableDays: string[];
+    frequency: string;
+    urgentContact: string;
+    responseTime: string;
+    additionalNotes: string;
+  };
 }
 
 export interface SpaceRoom {
@@ -100,7 +110,7 @@ export interface ProjectData {
   currentSection?: string;
 }
 
-export type SectionKey = 'intro' | 'projectInfo' | 'budget' | 'lifestyle' | 'site' | 'spaces' | 'architecture' | 'contractors' | 'inspiration' | 'uploads' | 'summary';
+export type SectionKey = 'intro' | 'projectInfo' | 'budget' | 'lifestyle' | 'site' | 'spaces' | 'architecture' | 'contractors' | 'communication' | 'inspiration' | 'uploads' | 'summary';
 
 export interface Section {
   id: SectionKey;
