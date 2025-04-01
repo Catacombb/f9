@@ -31,6 +31,11 @@ const defaultFormData: FormData = {
     viewsOrientations: '',
     accessConstraints: '',
     neighboringProperties: '',
+    topographicSurvey: '',
+    existingHouseDrawings: '',
+    septicDesign: '',
+    certificateOfTitle: '',
+    covenants: '',
   },
   architecture: {
     stylePrefences: '',
