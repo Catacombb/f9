@@ -44,9 +44,9 @@
   }
 
   .dark {
-    --background: 0 0% 12%; /* Changed to dark grey */
+    --background: 0 0% 12%; /* Dark grey background */
     --foreground: 0 0% 100%;
-    --sidebar: 0 0% 8%; /* Changed to darker grey */
+    --sidebar: 0 0% 8%; /* Darker grey for sidebar */
     --sidebar-foreground: 210 40% 98%;
     --sidebar-border: 0 0% 20%; /* Adjusted for grey theme */
     --sidebar-accent: 45 93% 47%;
@@ -101,6 +101,25 @@
 
 .design-brief-question-description {
   @apply text-sm text-muted-foreground mb-4;
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .design-brief-section-wrapper {
+    @apply py-6 px-3;
+  }
+
+  .design-brief-form-group {
+    @apply p-4;
+  }
+
+  .design-brief-question-title {
+    @apply text-sm;
+  }
+
+  .design-brief-question-description {
+    @apply text-xs;
+  }
 }
 
 /* Fix for leaflet marker icons */

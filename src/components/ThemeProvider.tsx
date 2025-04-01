@@ -46,7 +46,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>
-      <div className="font-inter"> {/* Ensure Inter font is applied consistently */}
+      <div className="font-inter h-full w-full"> {/* Added h-full w-full to ensure consistent sizing */}
         {children}
       </div>
     </ThemeContext.Provider>
@@ -63,18 +63,20 @@ export const useTheme = () => {
 
 export const ThemeToggle: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
+  const isMobile = window.innerWidth < 768;
   
   return (
     <Button
       variant="ghost"
-      size="icon"
+      size={isMobile ? "sm" : "icon"}
       onClick={toggleTheme}
       aria-label="Toggle theme"
+      className="h-8 w-8 p-0"
     >
       {theme === 'light' ? (
-        <Moon className="h-5 w-5" />
+        <Moon className="h-4 w-4" />
       ) : (
-        <Sun className="h-5 w-5" />
+        <Sun className="h-4 w-4" />
       )}
     </Button>
   );

@@ -28,7 +28,6 @@ const sections = [
 
 export function DesignBriefSidebar() {
   const { currentSection, setCurrentSection, projectData } = useDesignBrief();
-  // Removed isCollapsed state and related functions since sidebar should always be visible
   const isMobile = useIsMobile();
 
   const navigateToSection = (sectionId: SectionKey) => {
@@ -68,7 +67,7 @@ export function DesignBriefSidebar() {
   };
 
   return (
-    <div className="h-screen border-r bg-sidebar transition-all duration-300 relative w-64">
+    <div className={`h-full border-r bg-sidebar transition-all duration-300 relative ${isMobile ? 'w-full' : 'w-64'}`}>
       <div className="h-full flex flex-col">
         <div className="py-6 px-4 flex flex-col items-center">
           <AppLogo size="large" />
@@ -85,7 +84,8 @@ export function DesignBriefSidebar() {
                 variant={currentSection === section.id ? "secondary" : "ghost"}
                 className={cn(
                   "w-full justify-start mb-1 relative",
-                  currentSection === section.id ? "bg-sidebar-accent text-sidebar-accent-foreground" : ""
+                  currentSection === section.id ? "bg-sidebar-accent text-sidebar-accent-foreground" : "",
+                  isMobile ? "text-sm py-2" : ""
                 )}
                 onClick={() => navigateToSection(section.id as SectionKey)}
               >

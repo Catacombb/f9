@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { DesignBriefSidebar } from './DesignBriefSidebar';
 import { ThemeToggle } from './ThemeProvider';
 import { useDesignBrief } from '@/context/DesignBriefContext';
@@ -9,6 +9,10 @@ import { AppLogo } from '@/components/AppLogo';
 import { Form } from '@/components/ui/form';
 import { useForm } from 'react-hook-form';
 import { Progress } from '@/components/ui/progress';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { Menu } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
 interface DesignBriefLayoutProps {
   children: React.ReactNode;
@@ -16,6 +20,7 @@ interface DesignBriefLayoutProps {
 
 export function DesignBriefLayout({ children }: DesignBriefLayoutProps) {
   const { projectData, currentSection } = useDesignBrief();
+  const isMobile = useIsMobile();
   
   // Create a form instance to provide FormContext
   const formMethods = useForm();
@@ -83,17 +88,30 @@ export function DesignBriefLayout({ children }: DesignBriefLayoutProps) {
   
   return (
     <div className="flex h-screen overflow-hidden bg-background">
-      <DesignBriefSidebar />
+      {!isMobile ? (
+        <DesignBriefSidebar />
+      ) : (
+        <Sheet>
+          <SheetTrigger asChild>
+            <Button variant="ghost" size="icon" className="absolute top-4 left-4 z-50">
+              <Menu className="h-6 w-6" />
+              <span className="sr-only">Toggle menu</span>
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="left" className="p-0 w-[80%] max-w-[280px]">
+            <DesignBriefSidebar />
+          </SheetContent>
+        </Sheet>
+      )}
       
       <div className="flex-1 flex flex-col overflow-hidden">
-        <header className="h-16 border-b flex items-center justify-center px-4 bg-background z-10">
-          <div className="flex-1 flex justify-start items-center">
+        <header className={`h-16 border-b flex items-center justify-center px-4 bg-background z-10 ${isMobile ? 'sticky top-0' : ''}`}>
+          <div className={`flex-1 flex justify-start items-center ${isMobile ? 'ml-8' : ''}`}>
             {/* Empty div to balance the layout */}
           </div>
           
           <div className="flex-1 flex flex-col justify-center items-center">
             <AppLogo size="small" />
-            {/* Removed tagline from here */}
           </div>
           
           <div className="flex-1 flex justify-end items-center">
@@ -106,7 +124,9 @@ export function DesignBriefLayout({ children }: DesignBriefLayoutProps) {
         
         <main className="flex-1 overflow-auto">
           <Form {...formMethods}>
-            {children}
+            <div className={`${isMobile ? 'px-4' : ''}`}>
+              {children}
+            </div>
           </Form>
         </main>
         
