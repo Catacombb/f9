@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -7,7 +6,7 @@ import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
 
-// Inspiration gallery with reliable image sources
+// Inspiration gallery with 30 unique reliable image sources
 const inspirationImages = [
   {
     id: 'img1',
@@ -31,8 +30,8 @@ const inspirationImages = [
   },
   {
     id: 'img5',
-    src: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2070&auto=format&fit=crop',
-    alt: 'Beachfront home with outdoor deck',
+    src: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=2070&auto=format&fit=crop',
+    alt: 'House with ocean view',
   },
   {
     id: 'img6',
@@ -56,58 +55,108 @@ const inspirationImages = [
   },
   {
     id: 'img10',
-    src: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=2070&auto=format&fit=crop',
-    alt: 'House with ocean view',
-  },
-  {
-    id: 'img11',
     src: 'https://images.unsplash.com/photo-1501876725168-00c445821c9e?q=80&w=2070&auto=format&fit=crop',
     alt: 'Aerial view of modern beachfront home',
   },
   {
-    id: 'img12',
+    id: 'img11',
     src: 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?q=80&w=2070&auto=format&fit=crop',
     alt: 'Luxury home with infinity pool',
   },
   {
-    id: 'img13',
+    id: 'img12',
     src: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?q=80&w=2071&auto=format&fit=crop',
     alt: 'Modern coastal residence',
   },
   {
-    id: 'img14',
+    id: 'img13',
     src: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=2070&auto=format&fit=crop',
     alt: 'Beach house',
   },
   {
-    id: 'img15',
+    id: 'img14',
     src: 'https://images.unsplash.com/photo-1600607688969-a5bfcd646154?q=80&w=2070&auto=format&fit=crop',
     alt: 'Modern waterfront home',
   },
   {
-    id: 'img16',
+    id: 'img15',
     src: 'https://images.unsplash.com/photo-1600585154526-990dced4db0d?q=80&w=2070&auto=format&fit=crop',
     alt: 'Modern beach house exterior',
   },
   {
-    id: 'img17',
+    id: 'img16',
     src: 'https://images.unsplash.com/photo-1558036117-15d82a90b9b1?q=80&w=2070&auto=format&fit=crop',
     alt: 'Harbour view house exterior',
   },
   {
-    id: 'img18',
+    id: 'img17',
     src: 'https://images.unsplash.com/photo-1523217582562-09d0def993a6?q=80&w=2080&auto=format&fit=crop',
     alt: 'Lakehouse with mountain views',
   },
   {
-    id: 'img19',
+    id: 'img18',
     src: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=2070&auto=format&fit=crop',
     alt: 'Modern house exterior',
   },
   {
-    id: 'img20',
+    id: 'img19',
     src: 'https://images.unsplash.com/photo-1599427303058-f04cbcf4756f?q=80&w=2071&auto=format&fit=crop',
     alt: 'Holiday Home exterior',
+  },
+  {
+    id: 'img20',
+    src: 'https://images.unsplash.com/photo-1593604572578-3431a5f2f442?q=80&w=2070&auto=format&fit=crop',
+    alt: 'Modern minimalist home',
+  },
+  {
+    id: 'img21',
+    src: 'https://images.unsplash.com/photo-1502005229762-cf1b2da7c5d6?q=80&w=2187&auto=format&fit=crop',
+    alt: 'Luxury white villa with pool',
+  },
+  {
+    id: 'img22',
+    src: 'https://images.unsplash.com/photo-1577495508326-19a1b3cf65b9?q=80&w=2574&auto=format&fit=crop',
+    alt: 'Modern black box house in forest',
+  },
+  {
+    id: 'img23',
+    src: 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?q=80&w=2070&auto=format&fit=crop',
+    alt: 'Modern home with large windows',
+  },
+  {
+    id: 'img24',
+    src: 'https://images.unsplash.com/photo-1531971589569-0d9370cbe1e5?q=80&w=2081&auto=format&fit=crop',
+    alt: 'Contemporary house with courtyard',
+  },
+  {
+    id: 'img25',
+    src: 'https://images.unsplash.com/photo-1572120360610-d971b9d7767c?q=80&w=2070&auto=format&fit=crop',
+    alt: 'House with unique architecture',
+  },
+  {
+    id: 'img26',
+    src: 'https://images.unsplash.com/photo-1602075432748-82d264e2b463?q=80&w=2070&auto=format&fit=crop',
+    alt: 'Coastal house with modern design',
+  },
+  {
+    id: 'img27',
+    src: 'https://images.unsplash.com/photo-1602343168117-bb8ffe3e2e9f?q=80&w=2025&auto=format&fit=crop',
+    alt: 'Modern eco-friendly house',
+  },
+  {
+    id: 'img28',
+    src: 'https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?q=80&w=2070&auto=format&fit=crop',
+    alt: 'Contemporary hillside home',
+  },
+  {
+    id: 'img29',
+    src: 'https://images.unsplash.com/photo-1591474200742-8e512e6f98f8?q=80&w=2074&auto=format&fit=crop',
+    alt: 'Luxury glass house in nature',
+  },
+  {
+    id: 'img30',
+    src: 'https://images.unsplash.com/photo-1542889601-399c4f3a8402?q=80&w=2070&auto=format&fit=crop',
+    alt: 'Modern wooden cabin home',
   },
 ];
 

@@ -46,8 +46,8 @@ export function BudgetSection() {
               className="mt-3 space-y-3"
             >
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="under_100k" id="under_100k" />
-                <Label htmlFor="under_100k" className="font-normal">Under $100,000</Label>
+                <RadioGroupItem value="25k_100k" id="25k_100k" />
+                <Label htmlFor="25k_100k" className="font-normal">$25,000 - $100,000</Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="100k_250k" id="100k_250k" />
@@ -62,8 +62,12 @@ export function BudgetSection() {
                 <Label htmlFor="500k_1m" className="font-normal">$500,000 - $1,000,000</Label>
               </div>
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="above_1m" id="above_1m" />
-                <Label htmlFor="above_1m" className="font-normal">Above $1,000,000</Label>
+                <RadioGroupItem value="1m_2m" id="1m_2m" />
+                <Label htmlFor="1m_2m" className="font-normal">$1,000,000 - $2,000,000</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="above_2m" id="above_2m" />
+                <Label htmlFor="above_2m" className="font-normal">$2,000,000+</Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="tbd" id="tbd" />

@@ -34,6 +34,11 @@ export interface FormData {
     viewsOrientations: string;
     accessConstraints: string;
     neighboringProperties: string;
+    topographicSurvey: string;
+    existingHouseDrawings: string;
+    septicDesign: string;
+    certificateOfTitle: string;
+    covenants: string;
   };
   
   // Architecture
