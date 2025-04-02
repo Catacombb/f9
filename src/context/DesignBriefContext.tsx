@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import { ProjectData, SectionKey } from '@/types';
 import { generatePDF } from '@/utils/pdfGenerator';
@@ -102,7 +101,6 @@ interface DesignBriefContextType {
   saveProjectData: () => void;
   updateFiles: (updates: Partial<ProjectData['files']>) => void;
   updateSummary: (updates: Partial<ProjectData['summary']>) => void;
-  generateSummary: () => Promise<void>;
   sendByEmail: (email: string) => Promise<boolean>;
   exportAsPDF: () => Promise<void>;
 }
@@ -235,14 +233,6 @@ export const DesignBriefProvider: React.FC<{ children: React.ReactNode }> = ({ c
     localStorage.setItem('projectData', JSON.stringify(projectData));
   }, [projectData]);
 
-  // This is a placeholder for the real API-based summary generation
-  // In a real app, this would likely use an AI service to generate the summary
-  const generateSummary = useCallback(async (): Promise<void> => {
-    // We don't do anything here as the actual summary generation happens in the SummarySection component
-    // This is just kept for backward compatibility with existing code
-    return Promise.resolve();
-  }, []);
-
   const sendByEmail = useCallback(async (email: string): Promise<boolean> => {
     console.log(`Sending email to ${email}`);
     return new Promise<boolean>((resolve) => {
@@ -279,7 +269,6 @@ export const DesignBriefProvider: React.FC<{ children: React.ReactNode }> = ({ c
     currentSection,
     setCurrentSection,
     saveProjectData,
-    generateSummary,
     sendByEmail,
     exportAsPDF,
   };

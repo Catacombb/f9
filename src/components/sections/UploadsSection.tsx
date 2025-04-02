@@ -43,7 +43,8 @@ export function UploadsSection() {
   };
   
   const handleNext = () => {
-    setCurrentSection('communication');
+    // Updated to go directly to summary section instead of communication
+    setCurrentSection('summary');
   };
   
   // Helper function to determine file type icon

@@ -36,7 +36,8 @@ export function DesignBrief() {
       updateFiles({
         uploadedFiles: fileData.uploadedFiles,
         uploadedInspirationImages: fileData.inspirationImages,
-        inspirationSelections: fileData.inspirationSelections as string[]
+        inspirationSelections: fileData.inspirationSelections as string[],
+        siteDocuments: fileData.siteDocuments || [],
       });
       
       toast.success("Test data loaded successfully! All sections now 100% complete.");
@@ -71,7 +72,6 @@ export function DesignBrief() {
       case 'communication':
         return <CommunicationSection />;
       case 'summary':
-        // The summary section will auto-regenerate the summary when mounted
         return <SummarySection />;
       default:
         return <IntroSection />;

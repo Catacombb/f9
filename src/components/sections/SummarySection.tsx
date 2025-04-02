@@ -1,13 +1,12 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useDesignBrief } from '@/context/DesignBriefContext';
-import { ArrowLeft, FileText, Mail, Pencil, RefreshCw, Save, Download } from 'lucide-react';
+import { ArrowLeft, FileText, Mail, Download } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { SectionHeader } from './SectionHeader';
 
@@ -21,46 +20,11 @@ const inspirationImages = [
 ];
 
 export function SummarySection() {
-  const { formData, files, summary, updateSummary, setCurrentSection, generateSummary, sendByEmail, exportAsPDF } = useDesignBrief();
-  const [isGenerating, setIsGenerating] = useState(false);
+  const { formData, files, sendByEmail, exportAsPDF, setCurrentSection } = useDesignBrief();
   const [isEmailSending, setIsEmailSending] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [recipientEmail, setRecipientEmail] = useState(formData.projectInfo.contactEmail || '');
   const { toast } = useToast();
-  
-  useEffect(() => {
-    handleGenerateSummary();
-  }, []);
-  
-  const handleGenerateSummary = async () => {
-    setIsGenerating(true);
-    try {
-      const architecturalSummary = generateArchitecturalSummary(formData, files);
-      
-      updateSummary({
-        generatedSummary: architecturalSummary,
-        editedSummary: architecturalSummary
-      });
-      
-      toast({
-        title: "Summary Generated",
-        description: "We've created a comprehensive summary based on your design brief.",
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "There was a problem generating your summary. Please try again.",
-        variant: "destructive",
-      });
-      console.error("Summary generation error:", error);
-    } finally {
-      setIsGenerating(false);
-    }
-  };
-  
-  const handleSummaryChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    updateSummary({ editedSummary: e.target.value });
-  };
   
   const handleSendEmail = async () => {
     if (!recipientEmail) {
@@ -115,312 +79,7 @@ export function SummarySection() {
   };
   
   const handlePrevious = () => {
-    setCurrentSection('communication');
-  };
-  
-  const generateArchitecturalSummary = (data: typeof formData, fileData: typeof files) => {
-    const sections: string[] = [];
-    const date = new Date().toLocaleDateString('en-NZ', { day: 'numeric', month: 'long', year: 'numeric' });
-    
-    if (data.projectInfo.clientName || data.projectInfo.projectAddress || data.projectInfo.projectType) {
-      let intro = "# Design Brief\n\n";
-      intro += `_Design Brief prepared on ${date}_\n\n`;
-      
-      if (data.projectInfo.clientName) {
-        intro += `## Client: ${data.projectInfo.clientName}\n\n`;
-      }
-      
-      let projectTypeText = "";
-      if (data.projectInfo.projectType) {
-        projectTypeText = data.projectInfo.projectType
-          .split('_')
-          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-          .join(' ');
-      }
-      
-      if (data.projectInfo.projectAddress) {
-        intro += `This design brief outlines the architectural vision for a ${projectTypeText.toLowerCase()} project located at ${data.projectInfo.projectAddress}.`;
-      } else if (projectTypeText) {
-        intro += `This design brief outlines the architectural vision for a ${projectTypeText.toLowerCase()} project.`;
-      }
-      
-      if (data.projectInfo.projectDescription) {
-        intro += `\n\n${data.projectInfo.projectDescription}`;
-      }
-      
-      sections.push(intro);
-    }
-    
-    if (data.budget.budgetRange || data.budget.timeframe || data.budget.priorityAreas || data.budget.flexibilityNotes) {
-      let budgetSection = "## Project Parameters\n\n";
-      
-      if (data.budget.budgetRange) {
-        budgetSection += `The project has an allocated budget range of ${data.budget.budgetRange}.`;
-      }
-      
-      if (data.budget.timeframe) {
-        budgetSection += data.budget.budgetRange ? ` ` : ``;
-        budgetSection += `The projected timeline for completion is ${data.budget.timeframe}.`;
-      }
-      
-      if (data.budget.priorityAreas) {
-        budgetSection += `\n\nPriority areas for investment include: ${data.budget.priorityAreas}.`;
-      }
-      
-      if (data.budget.flexibilityNotes) {
-        budgetSection += `\n\nRegarding budget flexibility: ${data.budget.flexibilityNotes}`;
-      }
-      
-      sections.push(budgetSection);
-    }
-    
-    if (data.lifestyle.occupants || data.lifestyle.occupationDetails || data.lifestyle.dailyRoutine || 
-        data.lifestyle.entertainmentStyle || data.lifestyle.specialRequirements) {
-      let lifestyleSection = "## Client Lifestyle Considerations\n\n";
-      
-      if (data.lifestyle.occupants) {
-        lifestyleSection += `The residence will accommodate ${data.lifestyle.occupants}.`;
-      }
-      
-      if (data.lifestyle.occupationDetails) {
-        lifestyleSection += `\n\nOccupational considerations: ${data.lifestyle.occupationDetails}`;
-      }
-      
-      if (data.lifestyle.dailyRoutine) {
-        lifestyleSection += `\n\nThe daily routines of the occupants involve ${data.lifestyle.dailyRoutine.toLowerCase()}.`;
-      }
-      
-      if (data.lifestyle.entertainmentStyle) {
-        lifestyleSection += `\n\nThe entertainment style is characterized by ${data.lifestyle.entertainmentStyle.toLowerCase()}.`;
-      }
-      
-      if (data.lifestyle.specialRequirements) {
-        lifestyleSection += `\n\nSpecial requirements noted: ${data.lifestyle.specialRequirements}`;
-      }
-      
-      sections.push(lifestyleSection);
-    }
-    
-    if (data.site.existingConditions || data.site.siteFeatures || data.site.viewsOrientations || 
-        data.site.accessConstraints || data.site.neighboringProperties) {
-      let siteSection = "## Site Analysis\n\n";
-      
-      if (data.site.existingConditions) {
-        siteSection += `**Existing Conditions:** ${data.site.existingConditions}\n\n`;
-      }
-      
-      if (data.site.siteFeatures) {
-        siteSection += `**Site Features:** ${data.site.siteFeatures}\n\n`;
-      }
-      
-      if (data.site.viewsOrientations) {
-        siteSection += `**Views and Orientation:** ${data.site.viewsOrientations}\n\n`;
-      }
-      
-      if (data.site.accessConstraints) {
-        siteSection += `**Access and Constraints:** ${data.site.accessConstraints}\n\n`;
-      }
-      
-      if (data.site.neighboringProperties) {
-        siteSection += `**Neighboring Context:** ${data.site.neighboringProperties}`;
-      }
-      
-      const siteDocuments = [];
-      if (data.site.topographicSurvey) siteDocuments.push(`Topographic Survey: ${data.site.topographicSurvey}`);
-      if (data.site.existingHouseDrawings) siteDocuments.push(`Existing House Drawings: ${data.site.existingHouseDrawings}`);
-      if (data.site.septicDesign) siteDocuments.push(`Septic Design: ${data.site.septicDesign}`);
-      if (data.site.certificateOfTitle) siteDocuments.push(`Certificate of Title: ${data.site.certificateOfTitle}`);
-      if (data.site.covenants) siteDocuments.push(`Covenants: ${data.site.covenants}`);
-      
-      if (siteDocuments.length > 0) {
-        siteSection += `\n\n**Available Documentation:**\n- ${siteDocuments.join('\n- ')}`;
-      }
-      
-      sections.push(siteSection);
-    }
-    
-    if (data.spaces.rooms.length > 0 || data.spaces.additionalNotes) {
-      let spacesSection = "## Spatial Programme\n\n";
-      
-      if (data.spaces.rooms.length > 0) {
-        spacesSection += "The spatial programme includes:\n\n";
-        
-        const roomsByType: Record<string, {count: number, descriptions: string[]}> = {};
-        
-        data.spaces.rooms.forEach(room => {
-          const formattedType = room.isCustom 
-            ? room.type 
-            : room.type.charAt(0).toUpperCase() + room.type.slice(1);
-            
-          if (!roomsByType[formattedType]) {
-            roomsByType[formattedType] = {
-              count: 0,
-              descriptions: []
-            };
-          }
-          
-          roomsByType[formattedType].count += room.quantity;
-          if (room.description) {
-            roomsByType[formattedType].descriptions.push(room.description);
-          }
-        });
-        
-        Object.entries(roomsByType).forEach(([type, details]) => {
-          spacesSection += `- **${type}s (${details.count})**: `;
-          if (details.descriptions.length > 0) {
-            spacesSection += details.descriptions.join("; ");
-          }
-          spacesSection += "\n";
-        });
-      }
-      
-      if (data.spaces.additionalNotes) {
-        spacesSection += `\n**Additional Spatial Notes:**\n${data.spaces.additionalNotes}`;
-      }
-      
-      sections.push(spacesSection);
-    }
-    
-    if (data.architecture.stylePrefences || data.architecture.externalMaterials || data.architecture.internalFinishes || 
-        data.architecture.sustainabilityGoals || data.architecture.specialFeatures) {
-      let architectureSection = "## Design Vision\n\n";
-      
-      if (data.architecture.stylePrefences) {
-        architectureSection += `The architectural language for this project is envisioned as ${data.architecture.stylePrefences.toLowerCase()}.`;
-      }
-      
-      if (data.architecture.externalMaterials) {
-        architectureSection += `\n\n**External Materials:** ${data.architecture.externalMaterials}`;
-      }
-      
-      if (data.architecture.internalFinishes) {
-        architectureSection += `\n\n**Internal Finishes:** ${data.architecture.internalFinishes}`;
-      }
-      
-      if (data.architecture.sustainabilityGoals) {
-        architectureSection += `\n\n**Sustainability Goals:** ${data.architecture.sustainabilityGoals}`;
-      }
-      
-      if (data.architecture.specialFeatures) {
-        architectureSection += `\n\n**Special Features:** ${data.architecture.specialFeatures}`;
-      }
-      
-      sections.push(architectureSection);
-    }
-    
-    if (data.contractors.preferredBuilder || data.contractors.professionals.length > 0 || data.contractors.additionalNotes) {
-      let teamSection = "## Project Team\n\n";
-      
-      if (data.contractors.preferredBuilder) {
-        teamSection += `**Preferred Builder:** ${data.contractors.preferredBuilder}\n\n`;
-      }
-      
-      if (data.contractors.goToTender) {
-        teamSection += `This project will go to tender.\n\n`;
-      }
-      
-      if (data.contractors.professionals.length > 0) {
-        teamSection += "**Current Professional Team:**\n\n";
-        
-        data.contractors.professionals.forEach(professional => {
-          const professionalType = professional.type
-            .split('_')
-            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-            .join(' ');
-            
-          teamSection += `- **${professionalType}:** ${professional.name}`;
-          if (professional.contact) {
-            teamSection += ` (${professional.contact})`;
-          }
-          if (professional.notes) {
-            teamSection += ` — ${professional.notes}`;
-          }
-          teamSection += "\n";
-        });
-      }
-      
-      if (data.contractors.additionalNotes) {
-        teamSection += `\n**Additional Notes on Project Team:**\n${data.contractors.additionalNotes}`;
-      }
-      
-      sections.push(teamSection);
-    }
-    
-    if (data.communication.preferredMethods?.length || data.communication.bestTimes?.length || 
-        data.communication.availableDays?.length || data.communication.frequency || 
-        data.communication.urgentContact || data.communication.responseTime) {
-      
-      let commsSection = "## Communication Plan\n\n";
-      
-      if (data.communication.preferredMethods?.length) {
-        const methods = data.communication.preferredMethods.map(m => 
-          m.charAt(0).toUpperCase() + m.slice(1)
-        ).join(', ');
-        commsSection += `**Preferred Methods:** ${methods}\n\n`;
-      }
-      
-      if (data.communication.bestTimes?.length) {
-        const times = data.communication.bestTimes.map(t => 
-          t.charAt(0).toUpperCase() + t.slice(1)
-        ).join(', ');
-        commsSection += `**Best Contact Times:** ${times}\n\n`;
-      }
-      
-      if (data.communication.availableDays?.length) {
-        const days = data.communication.availableDays.map(d => 
-          d.charAt(0).toUpperCase() + d.slice(1)
-        ).join(', ');
-        commsSection += `**Available Days:** ${days}\n\n`;
-      }
-      
-      if (data.communication.frequency) {
-        commsSection += `**Update Frequency:** ${data.communication.frequency}\n\n`;
-      }
-      
-      if (data.communication.urgentContact) {
-        commsSection += `**For Urgent Matters:** ${data.communication.urgentContact}\n\n`;
-      }
-      
-      if (data.communication.responseTime) {
-        commsSection += `**Expected Response Time:** ${data.communication.responseTime}`;
-      }
-      
-      if (data.communication.additionalNotes) {
-        commsSection += `\n\n**Additional Communication Notes:**\n${data.communication.additionalNotes}`;
-      }
-      
-      sections.push(commsSection);
-    }
-    
-    if (fileData.inspirationSelections.length > 0) {
-      const inspirationSection = "## Design Inspiration\n\nThe client has selected specific design inspirations that should inform the architectural approach. These selections highlight preferences for:\n\n";
-      
-      const selectedImages = fileData.inspirationSelections.map(id => {
-        const image = inspirationImages.find(img => img.id === id);
-        return image ? image.alt : null;
-      }).filter(Boolean);
-      
-      const inspirationText = selectedImages.length > 0
-        ? inspirationSection + selectedImages.map(alt => `- ${alt}`).join('\n')
-        : '';
-        
-      if (inspirationText) {
-        sections.push(inspirationText);
-      }
-    }
-    
-    if (fileData.uploadedFiles.length > 0) {
-      let uploadsSection = "## Attachments\n\n";
-      uploadsSection += `The client has provided ${fileData.uploadedFiles.length} file(s) as supplementary documentation for this project:\n\n`;
-      
-      fileData.uploadedFiles.forEach(file => {
-        uploadsSection += `- ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)\n`;
-      });
-      
-      sections.push(uploadsSection);
-    }
-    
-    return sections.join("\n\n");
+    setCurrentSection('uploads');
   };
   
   return (
@@ -428,142 +87,20 @@ export function SummarySection() {
       <div className="design-brief-section-container">
         <SectionHeader
           title="Design Brief Summary"
-          description="Review your design brief summary and make any necessary edits before finalizing your brief."
+          description="Review your design brief information before finalizing."
         />
         
-        <Tabs defaultValue="summary">
-          <TabsList className="grid grid-cols-2 mb-6">
-            <TabsTrigger value="summary">Brief Summary</TabsTrigger>
-            <TabsTrigger value="preview">Full Brief Preview</TabsTrigger>
+        <Tabs defaultValue="preview">
+          <TabsList className="mb-6">
+            <TabsTrigger value="preview">Design Brief Overview</TabsTrigger>
           </TabsList>
-          
-          <TabsContent value="summary">
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-xl font-bold">AI-Generated Summary</h3>
-                  <div className="flex gap-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      onClick={handleGenerateSummary}
-                      disabled={isGenerating}
-                    >
-                      <RefreshCw className={`h-4 w-4 mr-2 ${isGenerating ? 'animate-spin' : ''}`} />
-                      <span>Regenerate</span>
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      disabled={!summary.editedSummary}
-                      onClick={() => updateSummary({ editedSummary: summary.generatedSummary })}
-                    >
-                      <RefreshCw className="h-4 w-4 mr-2" />
-                      <span>Reset</span>
-                    </Button>
-                  </div>
-                </div>
-                
-                {isGenerating ? (
-                  <div className="flex flex-col items-center justify-center py-12">
-                    <RefreshCw className="h-8 w-8 animate-spin text-primary mb-4" />
-                    <p>Generating your summary...</p>
-                  </div>
-                ) : (
-                  <div>
-                    <div className="flex items-center mb-2">
-                      <Pencil className="h-4 w-4 mr-2 text-muted-foreground" />
-                      <span className="text-sm text-muted-foreground">You can edit this summary below</span>
-                    </div>
-                    <Textarea
-                      value={summary.editedSummary || ""}
-                      onChange={handleSummaryChange}
-                      placeholder="Your AI-generated summary will appear here..."
-                      className="min-h-[300px] font-mono text-sm"
-                    />
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-            
-            <div className="mt-8 space-y-6">
-              <h3 className="text-xl font-bold">Finalize Your Brief</h3>
-              
-              <Card>
-                <CardContent className="p-6 space-y-4">
-                  <div>
-                    <h4 className="font-medium mb-2">Export as PDF</h4>
-                    <div className="flex items-start gap-4">
-                      <div className="flex-1">
-                        <p className="text-sm text-muted-foreground mb-2">
-                          Download your complete design brief as a PDF document with the title: 
-                          <span className="font-semibold block">
-                            "Northstar_Brief_{formData.projectInfo.clientName || "[Client Name]"}_{new Date().toISOString().split('T')[0]}"
-                          </span>
-                        </p>
-                      </div>
-                      <Button 
-                        onClick={handleExportPDF} 
-                        disabled={isExporting}
-                        className="min-w-[140px]"
-                      >
-                        <Download className={`h-4 w-4 mr-2 ${isExporting ? 'animate-spin' : ''}`} />
-                        <span>Export PDF</span>
-                      </Button>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <h4 className="font-medium mb-2">Send by Email</h4>
-                    <div className="flex items-start gap-4">
-                      <div className="flex-1">
-                        <Label htmlFor="recipientEmail">Email Address</Label>
-                        <Input
-                          id="recipientEmail"
-                          type="email"
-                          value={recipientEmail}
-                          onChange={(e) => setRecipientEmail(e.target.value)}
-                          placeholder="Enter email address"
-                          className="mt-1"
-                        />
-                      </div>
-                      <div className="pt-6">
-                        <Button 
-                          onClick={handleSendEmail} 
-                          disabled={isEmailSending}
-                          className="min-w-[140px]"
-                        >
-                          <Mail className={`h-4 w-4 mr-2 ${isEmailSending ? 'animate-spin' : ''}`} />
-                          <span>Send Email</span>
-                        </Button>
-                      </div>
-                    </div>
-                    <p className="text-sm text-muted-foreground mt-2">
-                      Receive a copy of your design brief by email. We'll also send a copy to our team for reference.
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
           
           <TabsContent value="preview">
             <Card>
               <CardContent className="p-6">
-                <h3 className="text-xl font-bold mb-4">Complete Design Brief Preview</h3>
+                <h3 className="text-xl font-bold mb-4">Design Brief Overview</h3>
                 
                 <div className="border rounded-lg p-6 space-y-8">
-                  <div className="pb-6 border-b">
-                    <h4 className="text-lg font-bold mb-4">Executive Summary</h4>
-                    <div className="whitespace-pre-wrap text-sm">
-                      {summary.editedSummary || (
-                        <p className="text-muted-foreground italic">
-                          No summary generated yet. Please go to the Summary tab to generate one.
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                  
                   <div className="pb-6 border-b">
                     <h4 className="text-lg font-bold mb-4">Project Information</h4>
                     <div className="grid md:grid-cols-2 gap-4">
@@ -675,7 +212,9 @@ export function SummarySection() {
                       {formData.site.siteFeatures && (
                         <div>
                           <p className="text-sm font-medium">Site Features:</p>
-                          <p className="text-sm">{formData.site.siteFeatures}</p>
+                          <p className="text-sm">{typeof formData.site.siteFeatures === 'string' 
+                              ? formData.site.siteFeatures 
+                              : formData.site.siteFeatures.join(', ')}</p>
                         </div>
                       )}
                       {formData.site.viewsOrientations && (
@@ -698,6 +237,29 @@ export function SummarySection() {
                       )}
                     </div>
                   </div>
+                  
+                  {formData.spaces.rooms.length > 0 && (
+                    <div className="pb-6 border-b">
+                      <h4 className="text-lg font-bold mb-4">Spaces</h4>
+                      <div className="space-y-4">
+                        {formData.spaces.rooms.map((room, index) => (
+                          <div key={room.id || index}>
+                            <p className="text-sm font-medium">
+                              {room.isCustom && room.customName ? room.customName : room.type} ({room.quantity}):
+                            </p>
+                            <p className="text-sm">{room.description}</p>
+                          </div>
+                        ))}
+                        
+                        {formData.spaces.additionalNotes && (
+                          <div>
+                            <p className="text-sm font-medium">Additional Notes:</p>
+                            <p className="text-sm">{formData.spaces.additionalNotes}</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
                   
                   <div className="pb-6 border-b">
                     <h4 className="text-lg font-bold mb-4">Architectural Preferences</h4>
@@ -735,12 +297,66 @@ export function SummarySection() {
                     </div>
                   </div>
                   
+                  {formData.contractors.professionals.length > 0 && (
+                    <div className="pb-6 border-b">
+                      <h4 className="text-lg font-bold mb-4">Project Team</h4>
+                      <div className="space-y-4">
+                        {formData.contractors.preferredBuilder && (
+                          <div>
+                            <p className="text-sm font-medium">Preferred Builder:</p>
+                            <p className="text-sm">{formData.contractors.preferredBuilder}</p>
+                          </div>
+                        )}
+                        
+                        <div>
+                          <p className="text-sm font-medium">Go to Tender:</p>
+                          <p className="text-sm">{formData.contractors.goToTender ? "Yes" : "No"}</p>
+                        </div>
+                        
+                        <div>
+                          <p className="text-sm font-medium">Professionals:</p>
+                          <div className="ml-4">
+                            {formData.contractors.professionals.map((professional, index) => (
+                              <div key={professional.id || index} className="mb-2">
+                                <p className="text-sm">
+                                  <span className="font-medium">{professional.type}:</span> {professional.name}
+                                  {professional.contact && ` (${professional.contact})`}
+                                  {professional.notes && ` - ${professional.notes}`}
+                                </p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                        
+                        {formData.contractors.additionalNotes && (
+                          <div>
+                            <p className="text-sm font-medium">Additional Notes:</p>
+                            <p className="text-sm">{formData.contractors.additionalNotes}</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                  
                   {files.uploadedFiles.length > 0 && (
                     <div className="pb-6 border-b">
                       <h4 className="text-lg font-bold mb-4">Uploaded Files</h4>
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                         {files.uploadedFiles.map((file, index) => (
                           <div key={`upload-${index}`} className="text-sm">
+                            {file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {files.siteDocuments && files.siteDocuments.length > 0 && (
+                    <div className="pb-6 border-b">
+                      <h4 className="text-lg font-bold mb-4">Site Documents</h4>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        {files.siteDocuments.map((file, index) => (
+                          <div key={`site-doc-${index}`} className="text-sm">
                             {file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)
                           </div>
                         ))}
@@ -820,13 +436,73 @@ export function SummarySection() {
                 </div>
               </CardContent>
             </Card>
+            
+            <div className="mt-8 space-y-6">
+              <h3 className="text-xl font-bold">Finalize Your Brief</h3>
+              
+              <Card>
+                <CardContent className="p-6 space-y-4">
+                  <div>
+                    <h4 className="font-medium mb-2">Export as PDF</h4>
+                    <div className="flex items-start gap-4">
+                      <div className="flex-1">
+                        <p className="text-sm text-muted-foreground mb-2">
+                          Download your complete design brief as a PDF document with the title: 
+                          <span className="font-semibold block">
+                            "Northstar_Brief_{formData.projectInfo.clientName || "[Client Name]"}_{new Date().toISOString().split('T')[0]}"
+                          </span>
+                        </p>
+                      </div>
+                      <Button 
+                        onClick={handleExportPDF} 
+                        disabled={isExporting}
+                        className="min-w-[140px]"
+                      >
+                        <Download className={`h-4 w-4 mr-2 ${isExporting ? 'animate-spin' : ''}`} />
+                        <span>Export PDF</span>
+                      </Button>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h4 className="font-medium mb-2">Send by Email</h4>
+                    <div className="flex items-start gap-4">
+                      <div className="flex-1">
+                        <Label htmlFor="recipientEmail">Email Address</Label>
+                        <Input
+                          id="recipientEmail"
+                          type="email"
+                          value={recipientEmail}
+                          onChange={(e) => setRecipientEmail(e.target.value)}
+                          placeholder="Enter email address"
+                          className="mt-1"
+                        />
+                      </div>
+                      <div className="pt-6">
+                        <Button 
+                          onClick={handleSendEmail} 
+                          disabled={isEmailSending}
+                          className="min-w-[140px]"
+                        >
+                          <Mail className={`h-4 w-4 mr-2 ${isEmailSending ? 'animate-spin' : ''}`} />
+                          <span>Send Email</span>
+                        </Button>
+                      </div>
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-2">
+                      Receive a copy of your design brief by email. We'll also send a copy to our team for reference.
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
         </Tabs>
         
         <div className="flex justify-between mt-6">
           <Button variant="outline" onClick={handlePrevious} className="group">
             <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-            <span>Previous: Communication</span>
+            <span>Previous: Uploads</span>
           </Button>
         </div>
       </div>
