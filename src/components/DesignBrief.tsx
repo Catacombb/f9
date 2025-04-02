@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { DesignBriefLayout } from './DesignBriefLayout';
 import { IntroSection } from './sections/IntroSection';
@@ -36,9 +35,8 @@ export function DesignBrief() {
       updateFiles({
         uploadedFiles: fileData.uploadedFiles,
         uploadedInspirationImages: fileData.inspirationImages,
-        inspirationSelections: fileData.inspirationSelections as string[],
-        // Make sure this property exists in the files object type
-        siteDocuments: fileData.siteDocuments || [],
+        inspirationSelections: fileData.inspirationSelections,
+        siteDocuments: fileData.siteDocuments,
       });
       
       toast.success("Test data loaded successfully! All sections now 100% complete.");

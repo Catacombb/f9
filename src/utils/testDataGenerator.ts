@@ -1,3 +1,4 @@
+
 import { FormData } from '@/types';
 
 // Function to generate a random string of a specified length
@@ -120,20 +121,20 @@ export function generateTestData(): Partial<FormData> {
 
 export function generateTestFiles(): {
   uploadedFiles: File[];
-  inspirationImages: File[];
+  uploadedInspirationImages: File[];
   inspirationSelections: string[];
-  siteDocuments: File[]; // Add this property to the return type
+  siteDocuments: File[];
 } {
   // Create dummy files for testing purposes
   const createDummyFile = (name: string, type: string) => {
     return new File(['dummy content'], name, { type });
   };
 
-  // Create an array of dummy uploaded files
+  // Create an array of dummy uploaded files (for site photos)
   const uploadedFiles = [
-    createDummyFile('floor-plan.pdf', 'application/pdf'),
     createDummyFile('site-photo-1.jpg', 'image/jpeg'),
     createDummyFile('site-photo-2.jpg', 'image/jpeg'),
+    createDummyFile('site-photo-3.jpg', 'image/jpeg'),
   ];
 
   // Create an array of dummy inspiration images
@@ -148,6 +149,7 @@ export function generateTestFiles(): {
     createDummyFile('certificate-of-title.pdf', 'application/pdf'),
     createDummyFile('site-survey.pdf', 'application/pdf'),
     createDummyFile('resource-consent.pdf', 'application/pdf'),
+    createDummyFile('floor-plan.pdf', 'application/pdf'),
   ];
 
   // Create an array of dummy inspiration selections
@@ -157,8 +159,8 @@ export function generateTestFiles(): {
 
   return {
     uploadedFiles,
-    inspirationImages,
+    uploadedInspirationImages: inspirationImages,
     inspirationSelections,
-    siteDocuments, // Include this in the returned object
+    siteDocuments,
   };
 }

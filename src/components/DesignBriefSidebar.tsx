@@ -89,21 +89,48 @@ export function DesignBriefSidebar({ showLastSaved = false, lastSavedFormatted =
     
     const fields = sectionFields[sectionId];
     if (!fields || fields.length === 0) {
-      // For sections like inspiration and uploads, handle specially
+      // For special sections like inspiration, uploads, and site
       if (sectionId === 'inspiration') {
-        // Check if there are any selected inspiration images
+        // Check if there are any selected inspiration images or uploads
         const hasInspiration = projectData.files?.inspirationSelections && 
-                             Object.keys(projectData.files.inspirationSelections).length > 0;
+                             projectData.files.inspirationSelections.length > 0;
+        const hasInspirationImages = projectData.files?.uploadedInspirationImages && 
+                             projectData.files.uploadedInspirationImages.length > 0;
         const hasNotes = section.inspirationNotes && section.inspirationNotes.trim() !== '';
         
-        if (hasInspiration && hasNotes) return 100;
-        if (hasInspiration || hasNotes) return 50;
+        if ((hasInspiration || hasInspirationImages) && hasNotes) return 100;
+        if (hasInspiration || hasInspirationImages || hasNotes) return 50;
         return 0;
       }
       
       if (sectionId === 'uploads') {
         // Check if there are any uploaded files
-        return projectData.files?.uploadedFiles && projectData.files.uploadedFiles.length > 0 ? 100 : 0;
+        const hasUploads = projectData.files?.uploadedFiles && projectData.files.uploadedFiles.length > 0;
+        return hasUploads ? 100 : 0;
+      }
+      
+      if (sectionId === 'site') {
+        // Calculate site section progress including form fields and uploads
+        let siteProgress = 0;
+        const formFields = Object.keys(section).filter(key => 
+          section[key] && 
+          section[key] !== '' && 
+          section[key] !== undefined
+        ).length;
+        
+        // Count form fields (up to 50%)
+        const totalFormFields = 10; // Approximate number of fields in the site section
+        const formProgress = Math.min(50, Math.round((formFields / totalFormFields) * 50));
+        siteProgress += formProgress;
+        
+        // Check for site photos and documents (up to 50%)
+        const hasSitePhotos = projectData.files?.uploadedFiles && projectData.files.uploadedFiles.length > 0;
+        const hasSiteDocuments = projectData.files?.siteDocuments && projectData.files.siteDocuments.length > 0;
+        
+        if (hasSitePhotos) siteProgress += 25;
+        if (hasSiteDocuments) siteProgress += 25;
+        
+        return siteProgress;
       }
       
       return 0;
