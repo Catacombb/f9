@@ -1,4 +1,3 @@
-
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 import { ProjectData } from '@/types';
@@ -44,40 +43,45 @@ export const generatePDF = async (projectData: ProjectData): Promise<void> => {
   
   // Helper function to add header with centered logo
   const addHeader = () => {
+    // Increased header height to accommodate logo properly
+    const headerHeight = 30; // Increased from 25
+    
     pdf.setFillColor(COLORS.background);
-    pdf.rect(0, 0, pageWidth, 25, 'F');
+    pdf.rect(0, 0, pageWidth, headerHeight, 'F');
     
     // Get logo path - using the light mode logo
     const logoPath = '/lovable-uploads/f87cbd00-65a2-4b67-ae04-55a828581a0e.png';
     
-    // Set max height and preserve aspect ratio
-    const maxLogoHeight = 12; // in mm
-    const logoWidth = 40; // approximate width at the proper aspect ratio
+    // Adjusted logo dimensions to preserve aspect ratio
+    // Original logo aspect ratio is approximately 3.33:1 (width:height)
+    const logoHeight = 15; // Increased from 12
+    const logoWidth = logoHeight * 3.33; // Preserve aspect ratio
     const logoX = (pageWidth - logoWidth) / 2;
+    const logoY = 5; // Properly centered in the taller header
     
     try {
       // Add actual image with preserved aspect ratio
-      pdf.addImage(logoPath, 'PNG', logoX, 7, logoWidth, maxLogoHeight);
+      pdf.addImage(logoPath, 'PNG', logoX, logoY, logoWidth, logoHeight);
     } catch (error) {
       // Fallback to text if image loading fails
       pdf.setFont('helvetica', 'bold');
       pdf.setTextColor(COLORS.primary);
       pdf.setFontSize(18);
-      pdf.text('NORTHSTAR', pageWidth / 2, 12, { align: 'center' });
+      pdf.text('NORTHSTAR', pageWidth / 2, 15, { align: 'center' });
       
       // Add the house icon in yellow
       pdf.setTextColor(COLORS.accent);
       pdf.setFontSize(14);
-      pdf.text('⌂★', pageWidth / 2 + 25, 12);
+      pdf.text('⌂★', pageWidth / 2 + 25, 15);
       pdf.setTextColor(COLORS.primary);
     }
     
-    // Add horizontal line
+    // Add horizontal line - moved down to match new header height
     pdf.setDrawColor(COLORS.accent);
     pdf.setLineWidth(0.5);
-    pdf.line(margin, 23, pageWidth - margin, 23);
+    pdf.line(margin, headerHeight - 2, pageWidth - margin, headerHeight - 2);
     
-    yPosition = 30; // Increased to accommodate centered logo
+    yPosition = headerHeight + 5; // Adjusted starting position after header
   };
   
   // Helper function to add footer with clickable link
@@ -118,8 +122,8 @@ export const generatePDF = async (projectData: ProjectData): Promise<void> => {
   
   // Helper function to add a section title
   const addSectionTitle = (title: string) => {
-    // Check if we need a new page
-    if (yPosition > pageHeight - 40) {
+    // Check if we need a new page - increased threshold to ensure enough space
+    if (yPosition > pageHeight - 50) {
       addNewPage();
     }
     
@@ -140,8 +144,8 @@ export const generatePDF = async (projectData: ProjectData): Promise<void> => {
   
   // Helper function to add text
   const addText = (label: string, value: string, isSmall = false) => {
-    // Check if we need a new page
-    if (yPosition > pageHeight - 30) {
+    // Check if we need a new page - increased threshold to ensure enough space
+    if (yPosition > pageHeight - 40) {
       addNewPage();
     }
     
@@ -177,14 +181,9 @@ export const generatePDF = async (projectData: ProjectData): Promise<void> => {
     }
   };
   
-  // Helper function to add multiline text
+  // Helper function to add multiline text - improved to handle page breaks
   const addMultiLineText = (text: string) => {
     if (!text || text.trim() === '') return;
-    
-    // Check if we need a new page
-    if (yPosition > pageHeight - 30) {
-      addNewPage();
-    }
     
     pdf.setFont('helvetica', 'normal');
     pdf.setTextColor(COLORS.secondary);
@@ -192,17 +191,51 @@ export const generatePDF = async (projectData: ProjectData): Promise<void> => {
     
     // Split text to handle wrapping
     const textLines = pdf.splitTextToSize(text, contentWidth);
-    pdf.text(textLines, margin, yPosition);
-    yPosition += (textLines.length * 6) + 4;
+    
+    // Calculate if we need multiple pages
+    const lineHeight = 6;
+    const textHeight = textLines.length * lineHeight;
+    
+    // Enhanced page break handling for long text blocks
+    if (yPosition + textHeight > pageHeight - 20) {
+      // If text doesn't fit on current page
+      const linesPerPage = Math.floor((pageHeight - yPosition - 20) / lineHeight);
+      
+      if (linesPerPage > 0) {
+        // Add as many lines as we can fit on this page
+        const currentPageLines = textLines.slice(0, linesPerPage);
+        pdf.text(currentPageLines, margin, yPosition);
+        
+        // Move to next page
+        addNewPage();
+        
+        // Add remaining lines to next page
+        const remainingLines = textLines.slice(linesPerPage);
+        
+        if (remainingLines.length > 0) {
+          // Recursively handle remaining text to support multiple page breaks if needed
+          pdf.text(remainingLines, margin, yPosition);
+          yPosition += (remainingLines.length * lineHeight) + 4;
+        }
+      } else {
+        // Not enough space for even one line, just go to next page
+        addNewPage();
+        addMultiLineText(text); // Recursively call with same text on new page
+      }
+    } else {
+      // Text fits on current page
+      pdf.text(textLines, margin, yPosition);
+      yPosition += textHeight + 4;
+    }
   };
   
-  // Helper function to add bullet points
+  // Helper function to add bullet points - improved for page breaks
   const addBulletPoints = (items: string[]) => {
     if (!items || items.length === 0) return;
     
     items.forEach(item => {
-      // Check if we need a new page
-      if (yPosition > pageHeight - 20) {
+      // Check if we need a new page - increased threshold
+      if (yPosition > pageHeight - 30) {
         addNewPage();
       }
       
@@ -216,7 +249,17 @@ export const generatePDF = async (projectData: ProjectData): Promise<void> => {
       // Add item text, indented after bullet
       const bulletWidth = pdf.getTextWidth('• ');
       const textLines = pdf.splitTextToSize(item, contentWidth - bulletWidth);
-      pdf.text(textLines, margin + 4, yPosition);
+      
+      // Check if bullet point text will fit on current page
+      if (yPosition + (textLines.length * 6) > pageHeight - 20) {
+        addNewPage();
+        
+        // Re-add the bullet and text on the new page
+        pdf.text('•', margin, yPosition);
+        pdf.text(textLines, margin + 4, yPosition);
+      } else {
+        pdf.text(textLines, margin + 4, yPosition);
+      }
       
       yPosition += (textLines.length * 6) + 2;
     });
@@ -619,7 +662,7 @@ export const generatePDF = async (projectData: ProjectData): Promise<void> => {
     // but that requires different handling outside of this PDF generation
   }
   
-  // 10. Summary Section
+  // 10. Summary Section - Enhanced to handle page breaks and long text
   if (projectData.summary.editedSummary) {
     addSectionTitle('Project Summary');
     addMultiLineText(projectData.summary.editedSummary);
