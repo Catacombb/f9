@@ -15,11 +15,11 @@ import { UploadsSection } from './sections/UploadsSection';
 import { SummarySection } from './sections/SummarySection';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { Button } from './ui/button';
-import { generateTestData } from '@/utils/testDataGenerator';
+import { generateTestData, generateTestFiles } from '@/utils/testDataGenerator';
 import { toast } from 'sonner';
 
 export function DesignBrief() {
-  const { currentSection, updateFormData, projectData } = useDesignBrief();
+  const { currentSection, updateFormData, updateFiles, projectData } = useDesignBrief();
   
   const loadTestData = () => {
     const testData = generateTestData();
@@ -29,7 +29,20 @@ export function DesignBrief() {
       updateFormData(section as any, data as any);
     });
     
-    toast.success("Test data loaded successfully!");
+    // Generate and update test files
+    try {
+      const fileData = generateTestFiles();
+      updateFiles({
+        uploadedFiles: fileData.uploadedFiles,
+        uploadedInspirationImages: fileData.inspirationImages,
+        inspirationSelections: fileData.inspirationSelections
+      });
+      
+      toast.success("Test data loaded successfully!");
+    } catch (error) {
+      console.error("Error generating test files:", error);
+      toast.error("Test data loaded partially. Error with file generation.");
+    }
   };
   
   const renderSection = () => {
