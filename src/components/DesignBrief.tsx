@@ -36,7 +36,7 @@ export function DesignBrief() {
       updateFiles({
         uploadedFiles: fileData.uploadedFiles,
         uploadedInspirationImages: fileData.inspirationImages,
-        inspirationSelections: fileData.inspirationSelections
+        inspirationSelections: fileData.inspirationSelections as string[]
       });
       
       toast.success("Test data loaded successfully! All sections now 100% complete.");
@@ -58,10 +58,10 @@ export function DesignBrief() {
         return <BudgetSection />;
       case 'lifestyle':
         return <LifestyleSection />;
-      case 'spaces':
-        return <SpacesSection />;
       case 'site':
         return <SiteSection />;
+      case 'spaces':
+        return <SpacesSection />;
       case 'architecture':
         return <ArchitectureSection />;
       case 'inspiration':

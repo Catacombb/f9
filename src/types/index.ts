@@ -8,6 +8,7 @@ export interface FormData {
     contactPhone: string;
     projectType: string;
     projectDescription: string;
+    projectGoals?: string;
     coordinates?: [number, number]; // Longitude, Latitude
   };
   
@@ -17,6 +18,9 @@ export interface FormData {
     flexibilityNotes: string;
     priorityAreas: string;
     timeframe: string;
+    budgetFlexibility?: string;
+    budgetPriorities?: string[];
+    budgetNotes?: string;
   };
   
   // Lifestyle
@@ -27,12 +31,18 @@ export interface FormData {
     dailyRoutine: string;
     entertainmentStyle: string;
     specialRequirements: string;
+    pets?: string;
+    specialNeeds?: string;
+    hobbies?: string[];
+    entertaining?: string;
+    workFromHome?: string;
+    lifestyleNotes?: string;
   };
   
   // Site
   site: {
     existingConditions: string;
-    siteFeatures: string;
+    siteFeatures: string | string[];
     viewsOrientations: string;
     accessConstraints: string;
     neighboringProperties: string;
@@ -41,12 +51,23 @@ export interface FormData {
     septicDesign: string;
     certificateOfTitle: string;
     covenants: string;
+    siteConstraints?: string[];
+    siteAccess?: string;
+    siteViews?: string;
+    outdoorSpaces?: string[];
+    siteNotes?: string;
   };
   
   // Spaces
   spaces: {
     rooms: SpaceRoom[];
     additionalNotes: string;
+    roomTypes?: string[];
+    specialSpaces?: string[];
+    storageNeeds?: string;
+    spatialRelationships?: string;
+    accessibilityNeeds?: string;
+    spacesNotes?: string;
   };
   
   // Architecture
@@ -56,6 +77,11 @@ export interface FormData {
     internalFinishes: string;
     sustainabilityGoals: string;
     specialFeatures: string;
+    preferredStyles?: string[];
+    materialPreferences?: string[];
+    sustainabilityFeatures?: string[];
+    technologyRequirements?: string[];
+    architectureNotes?: string;
   };
 
   // Contractors
@@ -68,13 +94,19 @@ export interface FormData {
 
   // Communication Preferences
   communication: {
-    preferredMethods: string[]; // Changed from preferredMethod (string) to preferredMethods (string[])
+    preferredMethods: string[]; 
     bestTimes: string[];
     availableDays: string[];
     frequency: string;
     urgentContact: string;
     responseTime: string;
     additionalNotes: string;
+    communicationNotes?: string;
+  };
+  
+  // Inspiration
+  inspiration?: {
+    inspirationNotes?: string;
   };
 }
 
@@ -84,6 +116,7 @@ export interface SpaceRoom {
   quantity: number;
   description: string;
   isCustom?: boolean;
+  customName?: string;
 }
 
 export interface Professional {

@@ -318,45 +318,32 @@ export const generateTestFiles = () => {
     createImageFile('inspiration_lighting', '#ffebee')
   ];
   
-  // Generate comprehensive inspiration selections
-  const inspirationSelections = {
-    // Kitchen inspirations
-    'modern_kitchen_01': true,
-    'contemporary_kitchen_02': true,
-    'minimalist_kitchen_03': true,
-    
-    // Bathroom inspirations
-    'contemporary_bathroom_03': true,
-    'spa_bathroom_04': true,
-    'minimalist_bathroom_02': true,
-    
-    // Living room inspirations
-    'scandinavian_living_02': true,
-    'contemporary_living_04': true,
-    'open_plan_living_01': true,
-    
-    // Exterior inspirations
-    'modern_exterior_02': true,
-    'contemporary_facade_03': true,
-    'minimalist_exterior_01': true,
-    
-    // Garden/outdoor inspirations
-    'japanese_garden_04': true,
-    'modern_landscape_02': true,
-    'sustainable_garden_03': true,
-    
-    // Material inspirations
-    'sustainable_materials_01': true,
-    'natural_materials_03': true,
-    'warm_materials_02': true,
-    
-    // Additional categories
-    'bedroom_02': true,
-    'home_office_03': true,
-    'media_room_01': true,
-    'indoor_outdoor_flow_04': true,
-    'lighting_design_02': true
-  };
+  // Generate comprehensive inspiration selections - as an array of strings now
+  const inspirationSelections = [
+    'modern_kitchen_01',
+    'contemporary_kitchen_02',
+    'minimalist_kitchen_03',
+    'contemporary_bathroom_03',
+    'spa_bathroom_04',
+    'minimalist_bathroom_02',
+    'scandinavian_living_02',
+    'contemporary_living_04',
+    'open_plan_living_01',
+    'modern_exterior_02',
+    'contemporary_facade_03',
+    'minimalist_exterior_01',
+    'japanese_garden_04',
+    'modern_landscape_02',
+    'sustainable_garden_03',
+    'sustainable_materials_01',
+    'natural_materials_03',
+    'warm_materials_02',
+    'bedroom_02',
+    'home_office_03',
+    'media_room_01',
+    'indoor_outdoor_flow_04',
+    'lighting_design_02'
+  ];
   
   return {
     uploadedFiles,
