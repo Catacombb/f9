@@ -39,31 +39,81 @@ export function DesignBriefSidebar({ showLastSaved = false, lastSavedFormatted =
   };
   
   const getSectionProgress = (sectionId: SectionKey): number => {
-    if (sectionId === 'intro' || sectionId === 'summary' || sectionId === 'inspiration' || sectionId === 'uploads') return 0;
+    // For intro and summary sections, always return 0 as they don't have inputs to track
+    if (sectionId === 'intro' || sectionId === 'summary') return 0;
     
     if (!projectData || !projectData.formData) return 0;
     
-    // Define required fields for each section - only these count toward completion
-    const requiredFields = {
-      projectInfo: ['clientName', 'projectAddress', 'contactEmail', 'contactPhone', 'projectType'],
-      contractors: ['preferredBuilder', 'goToTender'],
-      budget: ['budgetRange', 'timeframe'],
-      lifestyle: ['occupants'],
-      site: [],
-      spaces: [],
-      architecture: [],
-      communication: ['preferredMethods', 'responseTime']
+    // Define fields for each section that should be tracked for progress
+    const sectionFields = {
+      projectInfo: [
+        'clientName', 'projectAddress', 'contactEmail', 'contactPhone', 
+        'projectType', 'projectDescription', 'projectGoals'
+      ],
+      contractors: [
+        'preferredBuilder', 'goToTender', 'architectName', 'builderName', 
+        'interiorDesignerName', 'otherConsultants'
+      ],
+      budget: [
+        'budgetRange', 'timeframe', 'budgetPriorities', 'budgetFlexibility',
+        'budgetNotes'
+      ],
+      lifestyle: [
+        'occupants', 'pets', 'specialNeeds', 'hobbies', 'entertaining',
+        'workFromHome', 'lifestyleNotes'
+      ],
+      site: [
+        'siteFeatures', 'siteConstraints', 'siteAccess', 'siteViews',
+        'outdoorSpaces', 'siteNotes'
+      ],
+      spaces: [
+        'roomTypes', 'specialSpaces', 'storageNeeds', 'spatialRelationships',
+        'accessibilityNeeds', 'spacesNotes'
+      ],
+      architecture: [
+        'preferredStyles', 'materialPreferences', 'sustainabilityFeatures',
+        'technologyRequirements', 'architectureNotes'
+      ],
+      inspiration: [
+        'inspirationNotes'
+      ],
+      uploads: [],
+      communication: [
+        'preferredMethods', 'responseTime', 'availableDays', 'bestTimes',
+        'communicationNotes'
+      ]
     };
     
     const section = projectData.formData[sectionId];
     if (!section) return 0;
     
-    const fields = requiredFields[sectionId];
-    if (!fields || fields.length === 0) return 0;
+    const fields = sectionFields[sectionId];
+    if (!fields || fields.length === 0) {
+      // For sections like inspiration and uploads, handle specially
+      if (sectionId === 'inspiration') {
+        // Check if there are any selected inspiration images
+        const hasInspiration = projectData.files?.inspirationSelections && 
+                             Object.keys(projectData.files.inspirationSelections).length > 0;
+        const hasNotes = section.inspirationNotes && section.inspirationNotes.trim() !== '';
+        
+        if (hasInspiration && hasNotes) return 100;
+        if (hasInspiration || hasNotes) return 50;
+        return 0;
+      }
+      
+      if (sectionId === 'uploads') {
+        // Check if there are any uploaded files
+        return projectData.files?.uploadedFiles && projectData.files.uploadedFiles.length > 0 ? 100 : 0;
+      }
+      
+      return 0;
+    }
     
     let completed = 0;
     fields.forEach(field => {
-      if (field === 'preferredMethods' || field === 'availableDays' || field === 'bestTimes') {
+      if (field === 'preferredMethods' || field === 'availableDays' || field === 'bestTimes' || 
+          field === 'roomTypes' || field === 'specialSpaces' || field === 'siteFeatures' ||
+          field === 'preferredStyles' || field === 'materialPreferences' || field === 'sustainabilityFeatures') {
         // For array fields, check if there's at least one item
         if (section[field] && Array.isArray(section[field]) && section[field].length > 0) {
           completed++;
@@ -119,13 +169,11 @@ export function DesignBriefSidebar({ showLastSaved = false, lastSavedFormatted =
                     <span className="mr-2">{section.icon}</span>
                     <span className="truncate">{section.title}</span>
                     
-                    {!(section.id === 'intro' || section.id === 'summary' || section.id === 'inspiration' || section.id === 'uploads') && (
+                    {!(section.id === 'intro' || section.id === 'summary') && (
                       <div className="ml-auto">
-                        {progress > 0 && (
-                          <span className="text-xs text-sidebar-foreground/70">
-                            {progress}%
-                          </span>
-                        )}
+                        <span className="text-xs text-sidebar-foreground/70">
+                          {progress}%
+                        </span>
                       </div>
                     )}
                   </div>

@@ -1,8 +1,9 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useDesignBrief } from '@/context/DesignBriefContext';
-import { ArrowRight, Clipboard, PenLine, Share } from 'lucide-react';
+import { ArrowRight, Clipboard, PenLine, Share, AlertTriangle } from 'lucide-react';
 
 export function IntroSection() {
   const { setCurrentSection } = useDesignBrief();
@@ -32,6 +33,15 @@ export function IntroSection() {
               <p className="text-muted-foreground">
                 The more detail you provide, the better your brief will be. All fields are optional, but we encourage you to share as much as you can.
               </p>
+            </div>
+            
+            <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-md p-4 mb-6">
+              <div className="flex">
+                <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-500 mt-0.5 mr-2 shrink-0" />
+                <p className="text-amber-800 dark:text-amber-300 text-sm">
+                  Your new home is a major investment. Taking time to complete this brief properly will help you avoid unnecessary costs, delays, and regret later. A well-thought-out brief now saves time, money, and frustration during the design and build.
+                </p>
+              </div>
             </div>
             
             <div className="grid gap-6 md:grid-cols-3">
