@@ -51,8 +51,7 @@ export function DesignBriefSidebar({ showLastSaved = false, lastSavedFormatted =
         'projectType', 'projectDescription', 'projectGoals'
       ],
       contractors: [
-        'preferredBuilder', 'goToTender', 'architectName', 'builderName', 
-        'interiorDesignerName', 'otherConsultants'
+        'preferredBuilder', 'goToTender', 'professionals'
       ],
       budget: [
         'budgetRange', 'timeframe', 'budgetPriorities', 'budgetFlexibility',
@@ -110,7 +109,30 @@ export function DesignBriefSidebar({ showLastSaved = false, lastSavedFormatted =
     }
     
     let completed = 0;
+    let total = 0;
+    
     fields.forEach(field => {
+      // Skip fields that shouldn't count toward progress calculation
+      if (field === 'professionals') {
+        // Handle professionals array specially
+        if (section[field] && Array.isArray(section[field])) {
+          // Only count actively added professionals
+          const activeProfessionals = section[field].filter(p => 
+            p.name && p.name.trim() !== '' && 
+            // Don't count professionals with default "no" selection
+            !(p.defaultSelection === false || p.defaultSelection === 'no')
+          );
+          
+          if (activeProfessionals.length > 0) {
+            total++;
+            completed++;
+          }
+        }
+        return;
+      }
+      
+      total++;
+      
       if (field === 'preferredMethods' || field === 'availableDays' || field === 'bestTimes' || 
           field === 'roomTypes' || field === 'specialSpaces' || field === 'siteFeatures' ||
           field === 'preferredStyles' || field === 'materialPreferences' || field === 'sustainabilityFeatures') {
@@ -131,7 +153,7 @@ export function DesignBriefSidebar({ showLastSaved = false, lastSavedFormatted =
       }
     });
     
-    return Math.round((completed / fields.length) * 100);
+    return total > 0 ? Math.round((completed / total) * 100) : 0;
   };
 
   return (

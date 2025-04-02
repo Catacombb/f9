@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -192,12 +191,71 @@ export function ContractorsSection() {
   // Calculate completion percentage
   const calculateCompletion = () => {
     let completed = 0;
-    const requiredFields = 2; // preferredBuilder and at least one professional
+    let total = 0;
     
-    if (formData.contractors.preferredBuilder) completed++;
-    if (formData.contractors.professionals && formData.contractors.professionals.length > 0) completed++;
+    // Check preferredBuilder field
+    total++;
+    if (formData.contractors.preferredBuilder && formData.contractors.preferredBuilder.trim() !== '') {
+      completed++;
+    }
     
-    return Math.round((completed / requiredFields) * 100);
+    // Check goToTender field - only count if explicitly set by user
+    total++;
+    if (formData.contractors.goToTender !== undefined) {
+      completed++;
+    }
+    
+    // Check professionals
+    // Count fields that have been actively filled (only for professionals where user selected "Yes")
+    predefinedProfessionals.forEach(prof => {
+      // First check if user has made a selection (yes/no) for this professional
+      const prefKey = prof.value;
+      const hasPreference = professionalPreferences[prefKey]?.hasPreferred;
+      
+      // Only count the selection itself if user has explicitly made a choice
+      if (hasPreference && hasPreference !== '') {
+        // The selection itself counts as a completed field
+        total++;
+        completed++;
+        
+        // If user selected "Yes", check if they provided name and contact info
+        if (hasPreference === 'yes') {
+          // Name field
+          total++;
+          if (professionalPreferences[prefKey]?.name && professionalPreferences[prefKey].name.trim() !== '') {
+            completed++;
+          }
+          
+          // Contact field
+          total++;
+          if (professionalPreferences[prefKey]?.contact && professionalPreferences[prefKey].contact.trim() !== '') {
+            completed++;
+          }
+        }
+      }
+    });
+    
+    // Custom professionals
+    if (formData.contractors.professionals) {
+      const customProfessionals = formData.contractors.professionals.filter(
+        p => !predefinedProfessionals.some(pre => pre.label === p.type)
+      );
+      
+      if (customProfessionals.length > 0) {
+        // Each custom professional counts as a completed item
+        total += customProfessionals.length;
+        completed += customProfessionals.length;
+      }
+    }
+    
+    // Additional notes
+    total++;
+    if (formData.contractors.additionalNotes && formData.contractors.additionalNotes.trim() !== '') {
+      completed++;
+    }
+    
+    // Calculate percentage
+    return total > 0 ? Math.round((completed / total) * 100) : 0;
   };
   
   const completionPercentage = calculateCompletion();
