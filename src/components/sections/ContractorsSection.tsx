@@ -13,17 +13,12 @@ import { Professional } from '@/types';
 import { MultiSelectButtons } from '@/components/MultiSelectButtons';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
-// Predefined professionals
+// Simplified list of professionals
 const predefinedProfessionals = [
+  { value: 'builder', label: 'Builder' },
   { value: 'architect', label: 'Architect' },
-  { value: 'structural_engineer', label: 'Structural Engineer' },
   { value: 'interior_designer', label: 'Interior Designer' },
   { value: 'landscape_architect', label: 'Landscape Architect' },
-  { value: 'surveyor', label: 'Surveyor' },
-  { value: 'electrical_engineer', label: 'Electrical Engineer' },
-  { value: 'plumbing_engineer', label: 'Plumbing Engineer' },
-  { value: 'project_manager', label: 'Project Manager' },
-  { value: 'quantity_surveyor', label: 'Quantity Surveyor' },
 ];
 
 export function ContractorsSection() {
@@ -34,17 +29,17 @@ export function ContractorsSection() {
     contact: '',
     notes: '',
   });
-  const [selectedProfessionals, setSelectedProfessionals] = useState<string[]>([]);
-  const [professionalPreferences, setProfessionalPreferences] = useState<Record<string, { hasPreferred: string, name: string, contact: string }>>({});
+  const [professionalPreferences, setProfessionalPreferences] = useState<Record<string, { hasPreferred: string | null, name: string, contact: string }>>({});
 
-  // Initialize professional preferences
+  // Initialize professional preferences without default selections
   useEffect(() => {
-    const initialPreferences: Record<string, { hasPreferred: string, name: string, contact: string }> = {};
+    const initialPreferences: Record<string, { hasPreferred: string | null, name: string, contact: string }> = {};
     
     predefinedProfessionals.forEach(prof => {
       const existing = formData.contractors.professionals.find(p => p.type === prof.label);
       initialPreferences[prof.value] = {
-        hasPreferred: existing ? 'yes' : 'no',
+        // Start with null (unselected) unless there's existing data
+        hasPreferred: existing ? 'yes' : null,
         name: existing?.name || '',
         contact: existing?.contact || ''
       };
@@ -117,8 +112,8 @@ export function ContractorsSection() {
       }
     }
     
-    // If changing from no to yes, add placeholder
-    if (value === 'yes' && professionalPreferences[professional]?.hasPreferred === 'no') {
+    // If changing from null/no to yes, add placeholder
+    if (value === 'yes' && professionalPreferences[professional]?.hasPreferred !== 'yes') {
       const profLabel = predefinedProfessionals.find(p => p.value === professional)?.label;
       if (profLabel) {
         addProfessional({
@@ -162,25 +157,6 @@ export function ContractorsSection() {
     }
   };
   
-  const handleSelectProfessionals = (selectedValues: string[]) => {
-    setSelectedProfessionals(selectedValues);
-    
-    // For each newly selected professional
-    selectedValues.forEach(value => {
-      if (!professionalPreferences[value] || professionalPreferences[value].hasPreferred === 'no') {
-        // Set default preference
-        setProfessionalPreferences(prev => ({
-          ...prev,
-          [value]: {
-            hasPreferred: 'no',
-            name: '',
-            contact: ''
-          }
-        }));
-      }
-    });
-  };
-  
   const handlePrevious = () => {
     setCurrentSection('projectInfo');
   };
@@ -189,7 +165,7 @@ export function ContractorsSection() {
     setCurrentSection('budget');
   };
   
-  // Calculate completion percentage
+  // Calculate completion percentage - revised to only count explicit user selections
   const calculateCompletion = () => {
     let completed = 0;
     let total = 0;
@@ -213,7 +189,7 @@ export function ContractorsSection() {
       const prefKey = prof.value;
       const hasPreference = professionalPreferences[prefKey]?.hasPreferred;
       
-      // Only count the selection itself if user has explicitly made a choice
+      // Only count if user has made an explicit choice (not null)
       if (hasPreference === 'yes' || hasPreference === 'no') {
         // The selection itself counts as a completed field
         total++;
@@ -233,6 +209,9 @@ export function ContractorsSection() {
             completed++;
           }
         }
+      } else {
+        // If user hasn't made a selection, still count the field in total but not completed
+        total++;
       }
     });
     
@@ -298,7 +277,8 @@ export function ContractorsSection() {
         </div>
         
         <div className="design-brief-form-group">
-          <h3 className="text-lg font-semibold mb-4">Project Professionals</h3>
+          <h3 className="text-lg font-semibold mb-2">Project Professionals</h3>
+          <p className="text-sm text-muted-foreground mb-4">Do you have any preferred professionals for the roles below?</p>
           
           <div className="space-y-6">
             {predefinedProfessionals.map((professional) => (
@@ -306,12 +286,9 @@ export function ContractorsSection() {
                 <CardContent className="p-4">
                   <div className="mb-4">
                     <h4 className="text-md font-medium mb-2">{professional.label}</h4>
-                    <div className="text-sm mb-4">
-                      Do you have a preferred {professional.label}?
-                    </div>
                     
                     <RadioGroup 
-                      value={professionalPreferences[professional.value]?.hasPreferred || 'no'}
+                      value={professionalPreferences[professional.value]?.hasPreferred || ''}
                       onValueChange={(value) => handlePreferenceChange(professional.value, value)}
                       className="flex space-x-4"
                     >
