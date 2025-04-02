@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -182,15 +181,14 @@ export function ContractorsSection() {
       completed++;
     }
     
-    // Check professionals
-    // Count fields that have been actively filled (only for professionals where user selected "Yes")
+    // Check professionals - Only count fields where user made explicit selection
     predefinedProfessionals.forEach(prof => {
       // First check if user has made a selection (yes/no) for this professional
       const prefKey = prof.value;
       const hasPreference = professionalPreferences[prefKey]?.hasPreferred;
       
-      // Only count if user has made an explicit choice (not null)
-      if (hasPreference === 'yes' || hasPreference === 'no') {
+      // Only count if user has made an explicit choice (yes or no)
+      if (hasPreference) {
         // The selection itself counts as a completed field
         total++;
         completed++;
@@ -216,16 +214,14 @@ export function ContractorsSection() {
     });
     
     // Custom professionals
-    if (formData.contractors.professionals) {
-      const customProfessionals = formData.contractors.professionals.filter(
-        p => !predefinedProfessionals.some(pre => pre.label === p.type)
-      );
-      
-      if (customProfessionals.length > 0) {
-        // Each custom professional counts as a completed item
-        total += customProfessionals.length;
-        completed += customProfessionals.length;
-      }
+    const customProfessionals = formData.contractors.professionals.filter(
+      p => !predefinedProfessionals.some(pre => pre.label === p.type)
+    );
+    
+    if (customProfessionals.length > 0) {
+      // Each custom professional counts as a completed item
+      total += customProfessionals.length;
+      completed += customProfessionals.length;
     }
     
     // Additional notes

@@ -138,7 +138,7 @@ export function generateTestFiles(): {
   ];
 
   // Create an array of dummy inspiration images
-  const inspirationImages = [
+  const uploadedInspirationImages = [
     createDummyFile('inspiration-1.jpg', 'image/jpeg'),
     createDummyFile('inspiration-2.jpg', 'image/jpeg'),
     createDummyFile('inspiration-3.jpg', 'image/jpeg'),
@@ -159,7 +159,7 @@ export function generateTestFiles(): {
 
   return {
     uploadedFiles,
-    uploadedInspirationImages: inspirationImages,
+    uploadedInspirationImages,
     inspirationSelections,
     siteDocuments,
   };

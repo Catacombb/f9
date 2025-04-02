@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { DesignBriefLayout } from './DesignBriefLayout';
 import { IntroSection } from './sections/IntroSection';
@@ -34,7 +35,7 @@ export function DesignBrief() {
       const fileData = generateTestFiles();
       updateFiles({
         uploadedFiles: fileData.uploadedFiles,
-        uploadedInspirationImages: fileData.inspirationImages,
+        uploadedInspirationImages: fileData.uploadedInspirationImages,
         inspirationSelections: fileData.inspirationSelections,
         siteDocuments: fileData.siteDocuments,
       });

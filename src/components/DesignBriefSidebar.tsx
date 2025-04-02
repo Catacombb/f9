@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -86,6 +85,46 @@ export function DesignBriefSidebar({ showLastSaved = false, lastSavedFormatted =
     
     const section = projectData.formData[sectionId];
     if (!section) return 0;
+    
+    // Special handling for contractors section
+    if (sectionId === 'contractors') {
+      // Professionals array should only count if they have explicit values
+      const professionals = section.professionals || [];
+      let completedCount = 0;
+      let totalCount = 1; // Start with 1 for preferredBuilder field
+      
+      // Count preferredBuilder field
+      if (section.preferredBuilder && section.preferredBuilder.trim() !== '') {
+        completedCount++;
+      }
+      
+      // Count goToTender field only if explicitly set (not using default value)
+      totalCount++;
+      if (section.goToTender === true || section.goToTender === false) {
+        completedCount++;
+      }
+      
+      // Count professional preferences - only if they have explicit values
+      // Each predefined professional adds to total count
+      const predefinedProfsCount = 4; // From the predefined list in ContractorsSection
+      totalCount += predefinedProfsCount;
+      
+      // Calculate how many professionals have been explicitly set
+      const explicitProfessionals = professionals.filter(p => 
+        p.name && p.name.trim() !== ''
+      );
+      
+      completedCount += Math.min(explicitProfessionals.length, predefinedProfsCount);
+      
+      // Count additional notes
+      totalCount++;
+      if (section.additionalNotes && section.additionalNotes.trim() !== '') {
+        completedCount++;
+      }
+      
+      return Math.round((completedCount / totalCount) * 100);
+    }
+    
     
     const fields = sectionFields[sectionId];
     if (!fields || fields.length === 0) {
