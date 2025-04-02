@@ -43,7 +43,7 @@ export function UploadsSection() {
   };
   
   const handleNext = () => {
-    // Updated to go directly to summary section instead of communication
+    // Update to go directly to summary section
     setCurrentSection('summary');
   };
   
@@ -139,7 +139,7 @@ export function UploadsSection() {
           </Button>
           
           <Button onClick={handleNext} className="group">
-            <span>Next: Communication</span>
+            <span>Next: Summary</span>
             <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
           </Button>
         </div>

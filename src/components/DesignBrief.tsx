@@ -37,6 +37,7 @@ export function DesignBrief() {
         uploadedFiles: fileData.uploadedFiles,
         uploadedInspirationImages: fileData.inspirationImages,
         inspirationSelections: fileData.inspirationSelections as string[],
+        // Make sure this property exists in the files object type
         siteDocuments: fileData.siteDocuments || [],
       });
       
