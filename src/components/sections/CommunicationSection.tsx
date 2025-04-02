@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -35,14 +34,13 @@ export function CommunicationSection() {
   };
 
   const handlePrevious = () => {
-    setCurrentSection('inspiration');
-  };
-
-  const handleNext = () => {
     setCurrentSection('uploads');
   };
 
-  // Options for multi-select buttons
+  const handleNext = () => {
+    setCurrentSection('summary');
+  };
+
   const contactMethodOptions = [
     { value: 'email', label: 'Email' },
     { value: 'phone', label: 'Phone Call' },
@@ -201,11 +199,11 @@ export function CommunicationSection() {
         <div className="flex justify-between mt-6">
           <Button variant="outline" onClick={handlePrevious} className="group">
             <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-            <span>Previous: Inspiration</span>
+            <span>Previous: Uploads</span>
           </Button>
 
           <Button onClick={handleNext} className="group">
-            <span>Next: Uploads</span>
+            <span>Next: Summary</span>
             <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
           </Button>
         </div>
