@@ -1,4 +1,3 @@
-
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 import { ProjectData } from '@/types';
@@ -551,9 +550,19 @@ export const generatePDF = async (projectData: ProjectData): Promise<void> => {
     addMultiLineText(projectData.formData.site.existingConditions);
   }
   
+  // Fix for the TypeScript error - handle both string and string[] types for siteFeatures
   if (projectData.formData.site.siteFeatures) {
     addText('Site Features', '');
-    addMultiLineText(projectData.formData.site.siteFeatures);
+    
+    // If siteFeatures is an array, convert to string first
+    if (Array.isArray(projectData.formData.site.siteFeatures)) {
+      // Format the array into a readable string
+      const featuresString = projectData.formData.site.siteFeatures.join(', ');
+      addMultiLineText(featuresString);
+    } else {
+      // It's already a string, pass directly
+      addMultiLineText(projectData.formData.site.siteFeatures);
+    }
   }
   
   if (projectData.formData.site.viewsOrientations) {
