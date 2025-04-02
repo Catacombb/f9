@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -493,6 +494,14 @@ export function SummarySection() {
                   <div>
                     <h4 className="font-medium mb-2">Export as PDF</h4>
                     <div className="flex items-start gap-4">
+                      <div className="flex-1">
+                        <p className="text-sm text-muted-foreground mb-2">
+                          Download your complete design brief as a PDF document with the title: 
+                          <span className="font-semibold block">
+                            "Northstar_Brief_{formData.projectInfo.clientName || "[Client Name]"}_{new Date().toISOString().split('T')[0]}"
+                          </span>
+                        </p>
+                      </div>
                       <Button 
                         onClick={handleExportPDF} 
                         disabled={isExporting}
@@ -501,45 +510,37 @@ export function SummarySection() {
                         <Download className={`h-4 w-4 mr-2 ${isExporting ? 'animate-spin' : ''}`} />
                         <span>Export PDF</span>
                       </Button>
-                      <p className="text-sm text-muted-foreground">
-                        Download your complete design brief as a PDF document with the title: 
-                        <span className="font-semibold block">
-                          "Northstar_Brief_{formData.projectInfo.clientName || "[Client Name]"}_{new Date().toISOString().split('T')[0]}"
-                        </span>
-                      </p>
                     </div>
                   </div>
                   
                   <div>
                     <h4 className="font-medium mb-2">Send by Email</h4>
-                    <div className="flex flex-col gap-4">
-                      <div className="flex items-start gap-4">
-                        <div className="flex-1">
-                          <Label htmlFor="recipientEmail">Email Address</Label>
-                          <Input
-                            id="recipientEmail"
-                            type="email"
-                            value={recipientEmail}
-                            onChange={(e) => setRecipientEmail(e.target.value)}
-                            placeholder="Enter email address"
-                            className="mt-1"
-                          />
-                        </div>
-                        <div className="pt-6">
-                          <Button 
-                            onClick={handleSendEmail} 
-                            disabled={isEmailSending}
-                            className="min-w-[140px]"
-                          >
-                            <Mail className={`h-4 w-4 mr-2 ${isEmailSending ? 'animate-spin' : ''}`} />
-                            <span>Send Email</span>
-                          </Button>
-                        </div>
+                    <div className="flex items-start gap-4">
+                      <div className="flex-1">
+                        <Label htmlFor="recipientEmail">Email Address</Label>
+                        <Input
+                          id="recipientEmail"
+                          type="email"
+                          value={recipientEmail}
+                          onChange={(e) => setRecipientEmail(e.target.value)}
+                          placeholder="Enter email address"
+                          className="mt-1"
+                        />
                       </div>
-                      <p className="text-sm text-muted-foreground">
-                        Receive a copy of your design brief by email. We'll also send a copy to our team for reference.
-                      </p>
+                      <div className="pt-6">
+                        <Button 
+                          onClick={handleSendEmail} 
+                          disabled={isEmailSending}
+                          className="min-w-[140px]"
+                        >
+                          <Mail className={`h-4 w-4 mr-2 ${isEmailSending ? 'animate-spin' : ''}`} />
+                          <span>Send Email</span>
+                        </Button>
+                      </div>
                     </div>
+                    <p className="text-sm text-muted-foreground mt-2">
+                      Receive a copy of your design brief by email. We'll also send a copy to our team for reference.
+                    </p>
                   </div>
                 </CardContent>
               </Card>

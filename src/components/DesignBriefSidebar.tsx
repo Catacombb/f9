@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -38,19 +39,20 @@ export function DesignBriefSidebar({ showLastSaved = false, lastSavedFormatted =
   };
   
   const getSectionProgress = (sectionId: SectionKey): number => {
-    if (sectionId === 'intro' || sectionId === 'summary') return 0;
+    if (sectionId === 'intro' || sectionId === 'summary' || sectionId === 'inspiration' || sectionId === 'uploads') return 0;
     
     if (!projectData || !projectData.formData) return 0;
     
+    // Define required fields for each section - only these count toward completion
     const requiredFields = {
       projectInfo: ['clientName', 'projectAddress', 'contactEmail', 'contactPhone', 'projectType'],
-      contractors: [],
-      budget: ['budgetRange'],
+      contractors: ['preferredBuilder', 'goToTender'],
+      budget: ['budgetRange', 'timeframe'],
       lifestyle: ['occupants'],
       site: [],
       spaces: [],
       architecture: [],
-      communication: []
+      communication: ['preferredMethods', 'responseTime']
     };
     
     const section = projectData.formData[sectionId];
@@ -61,8 +63,21 @@ export function DesignBriefSidebar({ showLastSaved = false, lastSavedFormatted =
     
     let completed = 0;
     fields.forEach(field => {
-      if (section[field] && section[field] !== '' && section[field] !== undefined) {
-        completed++;
+      if (field === 'preferredMethods' || field === 'availableDays' || field === 'bestTimes') {
+        // For array fields, check if there's at least one item
+        if (section[field] && Array.isArray(section[field]) && section[field].length > 0) {
+          completed++;
+        }
+      } else if (field === 'goToTender') {
+        // For boolean fields, it's considered filled if it's explicitly true or false
+        if (section[field] !== undefined) {
+          completed++;
+        }
+      } else {
+        // For regular fields, check if not empty
+        if (section[field] && section[field] !== '' && section[field] !== undefined) {
+          completed++;
+        }
       }
     });
     
@@ -87,33 +102,36 @@ export function DesignBriefSidebar({ showLastSaved = false, lastSavedFormatted =
         
         <ScrollArea className="flex-1">
           <div className="px-2 py-2">
-            {sections.map((section) => (
-              <Button
-                key={section.id}
-                variant={currentSection === section.id ? "secondary" : "ghost"}
-                className={cn(
-                  "w-full justify-start mb-1 relative",
-                  currentSection === section.id ? "bg-sidebar-accent text-sidebar-accent-foreground" : "",
-                  isMobile ? "text-sm py-2" : ""
-                )}
-                onClick={() => navigateToSection(section.id as SectionKey)}
-              >
-                <div className="flex items-center w-full">
-                  <span className="mr-2">{section.icon}</span>
-                  <span className="truncate">{section.title}</span>
-                  
-                  {section.id !== 'intro' && section.id !== 'summary' && (
-                    <div className="ml-auto">
-                      {getSectionProgress(section.id as SectionKey) > 0 && (
-                        <span className="text-xs text-sidebar-foreground/70">
-                          {getSectionProgress(section.id as SectionKey)}%
-                        </span>
-                      )}
-                    </div>
+            {sections.map((section) => {
+              const progress = getSectionProgress(section.id as SectionKey);
+              return (
+                <Button
+                  key={section.id}
+                  variant={currentSection === section.id ? "secondary" : "ghost"}
+                  className={cn(
+                    "w-full justify-start mb-1 relative",
+                    currentSection === section.id ? "bg-sidebar-accent text-sidebar-accent-foreground" : "",
+                    isMobile ? "text-sm py-2" : ""
                   )}
-                </div>
-              </Button>
-            ))}
+                  onClick={() => navigateToSection(section.id as SectionKey)}
+                >
+                  <div className="flex items-center w-full">
+                    <span className="mr-2">{section.icon}</span>
+                    <span className="truncate">{section.title}</span>
+                    
+                    {!(section.id === 'intro' || section.id === 'summary' || section.id === 'inspiration' || section.id === 'uploads') && (
+                      <div className="ml-auto">
+                        {progress > 0 && (
+                          <span className="text-xs text-sidebar-foreground/70">
+                            {progress}%
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </Button>
+              );
+            })}
           </div>
         </ScrollArea>
         

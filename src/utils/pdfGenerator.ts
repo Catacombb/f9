@@ -1,3 +1,4 @@
+
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 import { ProjectData } from '@/types';
@@ -11,6 +12,44 @@ const COLORS = {
   background: '#ffffff',
   muted: '#f5f5f5',
   border: '#e0e0e0',
+};
+
+// Helper function to remove markdown formatting
+const removeMarkdown = (text: string): string => {
+  if (!text) return '';
+  
+  // Replace headings (# Heading) with just the text
+  let cleanText = text.replace(/^#+\s+(.+)$/gm, '$1');
+  
+  // Remove bold/italic markers
+  cleanText = cleanText.replace(/\*\*(.+?)\*\*/g, '$1');
+  cleanText = cleanText.replace(/\*(.+?)\*/g, '$1');
+  cleanText = cleanText.replace(/__(.+?)__/g, '$1');
+  cleanText = cleanText.replace(/_(.+?)_/g, '$1');
+  
+  // Remove link syntax
+  cleanText = cleanText.replace(/\[(.+?)\]\(.+?\)/g, '$1');
+  
+  // Remove bullet points
+  cleanText = cleanText.replace(/^\s*[-*+]\s+(.+)$/gm, '$1');
+  
+  // Remove numbered lists
+  cleanText = cleanText.replace(/^\s*\d+\.\s+(.+)$/gm, '$1');
+  
+  // Remove horizontal rules
+  cleanText = cleanText.replace(/^\s*[-*_]{3,}\s*$/gm, '');
+  
+  // Remove code blocks and inline code
+  cleanText = cleanText.replace(/```[\s\S]*?```/g, '');
+  cleanText = cleanText.replace(/`(.+?)`/g, '$1');
+  
+  // Remove blockquotes
+  cleanText = cleanText.replace(/^\s*>\s+(.+)$/gm, '$1');
+  
+  // Ensure sentences start with capital letter
+  cleanText = cleanText.replace(/(\.\s+|^)([a-z])/gm, (match, p1, p2) => p1 + p2.toUpperCase());
+  
+  return cleanText;
 };
 
 // Function to create a PDF from the project data
@@ -44,7 +83,7 @@ export const generatePDF = async (projectData: ProjectData): Promise<void> => {
   // Helper function to add header with centered logo
   const addHeader = () => {
     // Increased header height to accommodate logo properly
-    const headerHeight = 30; // Increased from 25
+    const headerHeight = 35; // Further increased height for better logo appearance
     
     pdf.setFillColor(COLORS.background);
     pdf.rect(0, 0, pageWidth, headerHeight, 'F');
@@ -52,12 +91,11 @@ export const generatePDF = async (projectData: ProjectData): Promise<void> => {
     // Get logo path - using the light mode logo
     const logoPath = '/lovable-uploads/f87cbd00-65a2-4b67-ae04-55a828581a0e.png';
     
-    // Adjusted logo dimensions to preserve aspect ratio
-    // Original logo aspect ratio is approximately 3.33:1 (width:height)
-    const logoHeight = 15; // Increased from 12
-    const logoWidth = logoHeight * 3.33; // Preserve aspect ratio
-    const logoX = (pageWidth - logoWidth) / 2;
-    const logoY = 5; // Properly centered in the taller header
+    // Properly preserve aspect ratio - original logo is approximately 3.33:1 (width:height)
+    const logoHeight = 18; // Increased from 15 for better visibility
+    const logoWidth = logoHeight * 3.33; // Preserve exact aspect ratio
+    const logoX = (pageWidth - logoWidth) / 2; // Center horizontally
+    const logoY = 8; // Properly centered in the taller header
     
     try {
       // Add actual image with preserved aspect ratio
@@ -188,6 +226,9 @@ export const generatePDF = async (projectData: ProjectData): Promise<void> => {
     pdf.setFont('helvetica', 'normal');
     pdf.setTextColor(COLORS.secondary);
     pdf.setFontSize(11);
+    
+    // Process text to remove markdown if needed
+    text = removeMarkdown(text);
     
     // Split text to handle wrapping
     const textLines = pdf.splitTextToSize(text, contentWidth);
@@ -665,6 +706,7 @@ export const generatePDF = async (projectData: ProjectData): Promise<void> => {
   // 10. Summary Section - Enhanced to handle page breaks and long text
   if (projectData.summary.editedSummary) {
     addSectionTitle('Project Summary');
+    // Apply removeMarkdown to the summary text
     addMultiLineText(projectData.summary.editedSummary);
   }
   

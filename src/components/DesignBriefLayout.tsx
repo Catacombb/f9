@@ -34,23 +34,20 @@ export function DesignBriefLayout({ children }: DesignBriefLayoutProps) {
   
   // Calculate overall progress percentage - counting only required fields
   const calculateOverallProgress = () => {
-    // Skip intro and summary sections
-    const sections = ['projectInfo', 'contractors', 'budget', 'lifestyle', 'site', 'spaces', 'architecture', 'communication'];
-    let totalProgress = 0;
-    let totalRequiredFields = 0;
-    let completedRequiredFields = 0;
-    
-    // Required fields for each section
+    // Define required fields for each section
     const requiredFields = {
       projectInfo: ['clientName', 'projectAddress', 'contactEmail', 'contactPhone', 'projectType'],
-      contractors: [],
-      budget: ['budgetRange'],
+      contractors: ['preferredBuilder', 'goToTender'],
+      budget: ['budgetRange', 'timeframe'],
       lifestyle: ['occupants'],
       site: [],
       spaces: [],
       architecture: [],
-      communication: []
+      communication: ['preferredMethods', 'responseTime']
     };
+    
+    let totalRequiredFields = 0;
+    let completedRequiredFields = 0;
     
     // Calculate total required fields
     for (const section in requiredFields) {
@@ -61,10 +58,25 @@ export function DesignBriefLayout({ children }: DesignBriefLayoutProps) {
     for (const section in requiredFields) {
       if (projectData.formData[section]) {
         requiredFields[section].forEach(field => {
-          if (projectData.formData[section][field] && 
-              projectData.formData[section][field] !== '' && 
-              projectData.formData[section][field] !== undefined) {
-            completedRequiredFields++;
+          if (field === 'preferredMethods' || field === 'availableDays' || field === 'bestTimes') {
+            // For array fields, check if there's at least one item
+            if (projectData.formData[section][field] && 
+                Array.isArray(projectData.formData[section][field]) && 
+                projectData.formData[section][field].length > 0) {
+              completedRequiredFields++;
+            }
+          } else if (field === 'goToTender') {
+            // For boolean fields, it's considered filled if it's explicitly true or false
+            if (projectData.formData[section][field] !== undefined) {
+              completedRequiredFields++;
+            }
+          } else {
+            // For regular fields, check if not empty
+            if (projectData.formData[section][field] && 
+                projectData.formData[section][field] !== '' && 
+                projectData.formData[section][field] !== undefined) {
+              completedRequiredFields++;
+            }
           }
         });
       }
@@ -72,12 +84,10 @@ export function DesignBriefLayout({ children }: DesignBriefLayoutProps) {
     
     // Calculate progress percentage
     if (totalRequiredFields > 0) {
-      totalProgress = Math.round((completedRequiredFields / totalRequiredFields) * 100);
+      return Math.round((completedRequiredFields / totalRequiredFields) * 100);
     } else {
-      totalProgress = 0;
+      return 0;
     }
-    
-    return totalProgress;
   };
   
   const overallProgress = calculateOverallProgress();
