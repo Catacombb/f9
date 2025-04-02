@@ -16,7 +16,7 @@ export function IntroSection() {
     <div className="design-brief-section-wrapper">
       <div className="design-brief-section-container">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4">
+          <h1 className="text-4xl font-bold mb-4 font-heading">
             <strong>Welcome to Northstar!</strong>
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -30,9 +30,6 @@ export function IntroSection() {
           <CardContent className="p-6">
             <div className="text-center mb-6">
               <h2 className="text-2xl font-semibold mb-2">How It Works</h2>
-              <p className="text-muted-foreground">
-                The more detail you provide, the better your brief will be. All fields are optional, but we encourage you to share as much as you can.
-              </p>
             </div>
             
             <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-md p-4 mb-6">

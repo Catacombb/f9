@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -201,7 +202,7 @@ export function ContractorsSection() {
     
     // Check goToTender field - only count if explicitly set by user
     total++;
-    if (formData.contractors.goToTender !== undefined) {
+    if (formData.contractors.goToTender === true || formData.contractors.goToTender === false) {
       completed++;
     }
     
@@ -213,7 +214,7 @@ export function ContractorsSection() {
       const hasPreference = professionalPreferences[prefKey]?.hasPreferred;
       
       // Only count the selection itself if user has explicitly made a choice
-      if (hasPreference && hasPreference !== '') {
+      if (hasPreference === 'yes' || hasPreference === 'no') {
         // The selection itself counts as a completed field
         total++;
         completed++;

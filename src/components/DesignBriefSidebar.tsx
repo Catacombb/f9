@@ -116,10 +116,10 @@ export function DesignBriefSidebar({ showLastSaved = false, lastSavedFormatted =
       if (field === 'professionals') {
         // Handle professionals array specially
         if (section[field] && Array.isArray(section[field])) {
-          // Only count actively added professionals
+          // Only count actively added professionals with explicit user input
           const activeProfessionals = section[field].filter(p => 
             p.name && p.name.trim() !== '' && 
-            // Don't count professionals with default "no" selection
+            // Don't count professionals with default selection
             !(p.defaultSelection === false || p.defaultSelection === 'no')
           );
           
@@ -141,8 +141,8 @@ export function DesignBriefSidebar({ showLastSaved = false, lastSavedFormatted =
           completed++;
         }
       } else if (field === 'goToTender') {
-        // For boolean fields, it's considered filled if it's explicitly true or false
-        if (section[field] !== undefined) {
+        // For boolean fields, it's considered filled if it's explicitly true or false (not undefined)
+        if (section[field] === true || section[field] === false) {
           completed++;
         }
       } else {

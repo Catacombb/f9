@@ -22,14 +22,15 @@ export function DesignBrief() {
   const { currentSection, updateFormData, updateFiles, projectData } = useDesignBrief();
   
   const loadTestData = () => {
+    // Generate comprehensive test data for all sections
     const testData = generateTestData();
     
-    // Update each section with test data
+    // Update each section with complete test data
     Object.entries(testData).forEach(([section, data]) => {
       updateFormData(section as any, data as any);
     });
     
-    // Generate and update test files
+    // Generate and update test files, including imagery and documents
     try {
       const fileData = generateTestFiles();
       updateFiles({
@@ -38,7 +39,7 @@ export function DesignBrief() {
         inspirationSelections: fileData.inspirationSelections
       });
       
-      toast.success("Test data loaded successfully!");
+      toast.success("Test data loaded successfully! All sections now 100% complete.");
     } catch (error) {
       console.error("Error generating test files:", error);
       toast.error("Test data loaded partially. Error with file generation.");
