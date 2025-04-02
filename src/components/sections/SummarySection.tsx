@@ -28,18 +28,22 @@ export function SummarySection() {
   const { toast } = useToast();
   
   useEffect(() => {
-    if (!summary.generatedSummary && !isGenerating) {
-      handleGenerateSummary();
-    }
-  }, [summary.generatedSummary]);
+    handleGenerateSummary();
+  }, []);
   
   const handleGenerateSummary = async () => {
     setIsGenerating(true);
     try {
-      await generateSummary();
+      const architecturalSummary = generateArchitecturalSummary(formData, files);
+      
+      updateSummary({
+        generatedSummary: architecturalSummary,
+        editedSummary: architecturalSummary
+      });
+      
       toast({
         title: "Summary Generated",
-        description: "We've created a summary based on your inputs.",
+        description: "We've created a comprehensive summary based on your design brief.",
       });
     } catch (error) {
       toast({
@@ -47,6 +51,7 @@ export function SummarySection() {
         description: "There was a problem generating your summary. Please try again.",
         variant: "destructive",
       });
+      console.error("Summary generation error:", error);
     } finally {
       setIsGenerating(false);
     }
@@ -112,46 +117,310 @@ export function SummarySection() {
     setCurrentSection('communication');
   };
   
-  const generateBetterSummary = () => {
-    const clientName = formData.projectInfo.clientName || '[Client Name]';
-    const projectAddress = formData.projectInfo.projectAddress || '[Project Address]';
-    const projectType = formData.projectInfo.projectType 
-      ? formData.projectInfo.projectType.replace('_', ' ') 
-      : 'not specified';
+  const generateArchitecturalSummary = (data: typeof formData, fileData: typeof files) => {
+    const sections: string[] = [];
+    const date = new Date().toLocaleDateString('en-NZ', { day: 'numeric', month: 'long', year: 'numeric' });
     
-    const budget = formData.budget.budgetRange || 'not specified';
-    const timeframe = formData.budget.timeframe || 'not specified';
-    
-    const occupants = formData.lifestyle.occupants || 'not specified';
-    
-    const style = formData.architecture.stylePrefences || 'not specified';
-    
-    const roomCount = formData.spaces.rooms.length;
-    const roomList = roomCount > 0 
-      ? formData.spaces.rooms.map(r => `${r.quantity} ${r.type}`).join(', ')
-      : 'not specified';
-    
-    return `Design Brief Summary for ${clientName} at ${projectAddress}
-
-This ${projectType} project has a budget of ${budget} with a timeframe of ${timeframe}. The home will be occupied by ${occupants} and is designed in a ${style} style.
-
-The project includes ${roomCount} defined spaces: ${roomList}.
-
-${formData.projectInfo.projectDescription ? `Additional project description: ${formData.projectInfo.projectDescription}` : ''}
-${formData.budget.priorityAreas ? `Priority areas include: ${formData.budget.priorityAreas}` : ''}
-${formData.lifestyle.specialRequirements ? `Special requirements: ${formData.lifestyle.specialRequirements}` : ''}
-`;
-  };
-  
-  useEffect(() => {
-    if (!summary.generatedSummary && !isGenerating) {
-      const betterSummary = generateBetterSummary();
-      updateSummary({
-        generatedSummary: betterSummary,
-        editedSummary: betterSummary
-      });
+    if (data.projectInfo.clientName || data.projectInfo.projectAddress || data.projectInfo.projectType) {
+      let intro = "# Design Brief\n\n";
+      intro += `_Design Brief prepared on ${date}_\n\n`;
+      
+      if (data.projectInfo.clientName) {
+        intro += `## Client: ${data.projectInfo.clientName}\n\n`;
+      }
+      
+      let projectTypeText = "";
+      if (data.projectInfo.projectType) {
+        projectTypeText = data.projectInfo.projectType
+          .split('_')
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(' ');
+      }
+      
+      if (data.projectInfo.projectAddress) {
+        intro += `This design brief outlines the architectural vision for a ${projectTypeText.toLowerCase()} project located at ${data.projectInfo.projectAddress}.`;
+      } else if (projectTypeText) {
+        intro += `This design brief outlines the architectural vision for a ${projectTypeText.toLowerCase()} project.`;
+      }
+      
+      if (data.projectInfo.projectDescription) {
+        intro += `\n\n${data.projectInfo.projectDescription}`;
+      }
+      
+      sections.push(intro);
     }
-  }, [formData]);
+    
+    if (data.budget.budgetRange || data.budget.timeframe || data.budget.priorityAreas || data.budget.flexibilityNotes) {
+      let budgetSection = "## Project Parameters\n\n";
+      
+      if (data.budget.budgetRange) {
+        budgetSection += `The project has an allocated budget range of ${data.budget.budgetRange}.`;
+      }
+      
+      if (data.budget.timeframe) {
+        budgetSection += data.budget.budgetRange ? ` ` : ``;
+        budgetSection += `The projected timeline for completion is ${data.budget.timeframe}.`;
+      }
+      
+      if (data.budget.priorityAreas) {
+        budgetSection += `\n\nPriority areas for investment include: ${data.budget.priorityAreas}.`;
+      }
+      
+      if (data.budget.flexibilityNotes) {
+        budgetSection += `\n\nRegarding budget flexibility: ${data.budget.flexibilityNotes}`;
+      }
+      
+      sections.push(budgetSection);
+    }
+    
+    if (data.lifestyle.occupants || data.lifestyle.occupationDetails || data.lifestyle.dailyRoutine || 
+        data.lifestyle.entertainmentStyle || data.lifestyle.specialRequirements) {
+      let lifestyleSection = "## Client Lifestyle Considerations\n\n";
+      
+      if (data.lifestyle.occupants) {
+        lifestyleSection += `The residence will accommodate ${data.lifestyle.occupants}.`;
+      }
+      
+      if (data.lifestyle.occupationDetails) {
+        lifestyleSection += `\n\nOccupational considerations: ${data.lifestyle.occupationDetails}`;
+      }
+      
+      if (data.lifestyle.dailyRoutine) {
+        lifestyleSection += `\n\nThe daily routines of the occupants involve ${data.lifestyle.dailyRoutine.toLowerCase()}.`;
+      }
+      
+      if (data.lifestyle.entertainmentStyle) {
+        lifestyleSection += `\n\nThe entertainment style is characterized by ${data.lifestyle.entertainmentStyle.toLowerCase()}.`;
+      }
+      
+      if (data.lifestyle.specialRequirements) {
+        lifestyleSection += `\n\nSpecial requirements noted: ${data.lifestyle.specialRequirements}`;
+      }
+      
+      sections.push(lifestyleSection);
+    }
+    
+    if (data.site.existingConditions || data.site.siteFeatures || data.site.viewsOrientations || 
+        data.site.accessConstraints || data.site.neighboringProperties) {
+      let siteSection = "## Site Analysis\n\n";
+      
+      if (data.site.existingConditions) {
+        siteSection += `**Existing Conditions:** ${data.site.existingConditions}\n\n`;
+      }
+      
+      if (data.site.siteFeatures) {
+        siteSection += `**Site Features:** ${data.site.siteFeatures}\n\n`;
+      }
+      
+      if (data.site.viewsOrientations) {
+        siteSection += `**Views and Orientation:** ${data.site.viewsOrientations}\n\n`;
+      }
+      
+      if (data.site.accessConstraints) {
+        siteSection += `**Access and Constraints:** ${data.site.accessConstraints}\n\n`;
+      }
+      
+      if (data.site.neighboringProperties) {
+        siteSection += `**Neighboring Context:** ${data.site.neighboringProperties}`;
+      }
+      
+      const siteDocuments = [];
+      if (data.site.topographicSurvey) siteDocuments.push(`Topographic Survey: ${data.site.topographicSurvey}`);
+      if (data.site.existingHouseDrawings) siteDocuments.push(`Existing House Drawings: ${data.site.existingHouseDrawings}`);
+      if (data.site.septicDesign) siteDocuments.push(`Septic Design: ${data.site.septicDesign}`);
+      if (data.site.certificateOfTitle) siteDocuments.push(`Certificate of Title: ${data.site.certificateOfTitle}`);
+      if (data.site.covenants) siteDocuments.push(`Covenants: ${data.site.covenants}`);
+      
+      if (siteDocuments.length > 0) {
+        siteSection += `\n\n**Available Documentation:**\n- ${siteDocuments.join('\n- ')}`;
+      }
+      
+      sections.push(siteSection);
+    }
+    
+    if (data.spaces.rooms.length > 0 || data.spaces.additionalNotes) {
+      let spacesSection = "## Spatial Programme\n\n";
+      
+      if (data.spaces.rooms.length > 0) {
+        spacesSection += "The spatial programme includes:\n\n";
+        
+        const roomsByType: Record<string, {count: number, descriptions: string[]}> = {};
+        
+        data.spaces.rooms.forEach(room => {
+          const formattedType = room.isCustom 
+            ? room.type 
+            : room.type.charAt(0).toUpperCase() + room.type.slice(1);
+            
+          if (!roomsByType[formattedType]) {
+            roomsByType[formattedType] = {
+              count: 0,
+              descriptions: []
+            };
+          }
+          
+          roomsByType[formattedType].count += room.quantity;
+          if (room.description) {
+            roomsByType[formattedType].descriptions.push(room.description);
+          }
+        });
+        
+        Object.entries(roomsByType).forEach(([type, details]) => {
+          spacesSection += `- **${type}s (${details.count})**: `;
+          if (details.descriptions.length > 0) {
+            spacesSection += details.descriptions.join("; ");
+          }
+          spacesSection += "\n";
+        });
+      }
+      
+      if (data.spaces.additionalNotes) {
+        spacesSection += `\n**Additional Spatial Notes:**\n${data.spaces.additionalNotes}`;
+      }
+      
+      sections.push(spacesSection);
+    }
+    
+    if (data.architecture.stylePrefences || data.architecture.externalMaterials || data.architecture.internalFinishes || 
+        data.architecture.sustainabilityGoals || data.architecture.specialFeatures) {
+      let architectureSection = "## Design Vision\n\n";
+      
+      if (data.architecture.stylePrefences) {
+        architectureSection += `The architectural language for this project is envisioned as ${data.architecture.stylePrefences.toLowerCase()}.`;
+      }
+      
+      if (data.architecture.externalMaterials) {
+        architectureSection += `\n\n**External Materials:** ${data.architecture.externalMaterials}`;
+      }
+      
+      if (data.architecture.internalFinishes) {
+        architectureSection += `\n\n**Internal Finishes:** ${data.architecture.internalFinishes}`;
+      }
+      
+      if (data.architecture.sustainabilityGoals) {
+        architectureSection += `\n\n**Sustainability Goals:** ${data.architecture.sustainabilityGoals}`;
+      }
+      
+      if (data.architecture.specialFeatures) {
+        architectureSection += `\n\n**Special Features:** ${data.architecture.specialFeatures}`;
+      }
+      
+      sections.push(architectureSection);
+    }
+    
+    if (data.contractors.preferredBuilder || data.contractors.professionals.length > 0 || data.contractors.additionalNotes) {
+      let teamSection = "## Project Team\n\n";
+      
+      if (data.contractors.preferredBuilder) {
+        teamSection += `**Preferred Builder:** ${data.contractors.preferredBuilder}\n\n`;
+      }
+      
+      if (data.contractors.goToTender) {
+        teamSection += `This project will go to tender.\n\n`;
+      }
+      
+      if (data.contractors.professionals.length > 0) {
+        teamSection += "**Current Professional Team:**\n\n";
+        
+        data.contractors.professionals.forEach(professional => {
+          const professionalType = professional.type
+            .split('_')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
+            
+          teamSection += `- **${professionalType}:** ${professional.name}`;
+          if (professional.contact) {
+            teamSection += ` (${professional.contact})`;
+          }
+          if (professional.notes) {
+            teamSection += ` — ${professional.notes}`;
+          }
+          teamSection += "\n";
+        });
+      }
+      
+      if (data.contractors.additionalNotes) {
+        teamSection += `\n**Additional Notes on Project Team:**\n${data.contractors.additionalNotes}`;
+      }
+      
+      sections.push(teamSection);
+    }
+    
+    if (data.communication.preferredMethods?.length || data.communication.bestTimes?.length || 
+        data.communication.availableDays?.length || data.communication.frequency || 
+        data.communication.urgentContact || data.communication.responseTime) {
+      
+      let commsSection = "## Communication Plan\n\n";
+      
+      if (data.communication.preferredMethods?.length) {
+        const methods = data.communication.preferredMethods.map(m => 
+          m.charAt(0).toUpperCase() + m.slice(1)
+        ).join(', ');
+        commsSection += `**Preferred Methods:** ${methods}\n\n`;
+      }
+      
+      if (data.communication.bestTimes?.length) {
+        const times = data.communication.bestTimes.map(t => 
+          t.charAt(0).toUpperCase() + t.slice(1)
+        ).join(', ');
+        commsSection += `**Best Contact Times:** ${times}\n\n`;
+      }
+      
+      if (data.communication.availableDays?.length) {
+        const days = data.communication.availableDays.map(d => 
+          d.charAt(0).toUpperCase() + d.slice(1)
+        ).join(', ');
+        commsSection += `**Available Days:** ${days}\n\n`;
+      }
+      
+      if (data.communication.frequency) {
+        commsSection += `**Update Frequency:** ${data.communication.frequency}\n\n`;
+      }
+      
+      if (data.communication.urgentContact) {
+        commsSection += `**For Urgent Matters:** ${data.communication.urgentContact}\n\n`;
+      }
+      
+      if (data.communication.responseTime) {
+        commsSection += `**Expected Response Time:** ${data.communication.responseTime}`;
+      }
+      
+      if (data.communication.additionalNotes) {
+        commsSection += `\n\n**Additional Communication Notes:**\n${data.communication.additionalNotes}`;
+      }
+      
+      sections.push(commsSection);
+    }
+    
+    if (fileData.inspirationSelections.length > 0) {
+      const inspirationSection = "## Design Inspiration\n\nThe client has selected specific design inspirations that should inform the architectural approach. These selections highlight preferences for:\n\n";
+      
+      const selectedImages = fileData.inspirationSelections.map(id => {
+        const image = inspirationImages.find(img => img.id === id);
+        return image ? image.alt : null;
+      }).filter(Boolean);
+      
+      const inspirationText = selectedImages.length > 0
+        ? inspirationSection + selectedImages.map(alt => `- ${alt}`).join('\n')
+        : '';
+        
+      if (inspirationText) {
+        sections.push(inspirationText);
+      }
+    }
+    
+    if (fileData.uploadedFiles.length > 0) {
+      let uploadsSection = "## Attachments\n\n";
+      uploadsSection += `The client has provided ${fileData.uploadedFiles.length} file(s) as supplementary documentation for this project:\n\n`;
+      
+      fileData.uploadedFiles.forEach(file => {
+        uploadsSection += `- ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)\n`;
+      });
+      
+      sections.push(uploadsSection);
+    }
+    
+    return sections.join("\n\n");
+  };
   
   return (
     <div className="design-brief-section-wrapper">

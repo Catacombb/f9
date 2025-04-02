@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import { ProjectData, SectionKey } from '@/types';
 import { generatePDF } from '@/utils/pdfGenerator';
@@ -233,17 +234,13 @@ export const DesignBriefProvider: React.FC<{ children: React.ReactNode }> = ({ c
     localStorage.setItem('projectData', JSON.stringify(projectData));
   }, [projectData]);
 
+  // This is a placeholder for the real API-based summary generation
+  // In a real app, this would likely use an AI service to generate the summary
   const generateSummary = useCallback(async (): Promise<void> => {
-    return new Promise<void>((resolve) => {
-      setTimeout(() => {
-        updateSummary({
-          generatedSummary: `This is a mock generated summary for ${projectData.formData.projectInfo.clientName || 'your'} project at ${projectData.formData.projectInfo.projectAddress || 'the specified address'}.`,
-          editedSummary: `This is a mock generated summary for ${projectData.formData.projectInfo.clientName || 'your'} project at ${projectData.formData.projectInfo.projectAddress || 'the specified address'}.`
-        });
-        resolve();
-      }, 1500);
-    });
-  }, [projectData.formData.projectInfo, updateSummary]);
+    // We don't do anything here as the actual summary generation happens in the SummarySection component
+    // This is just kept for backward compatibility with existing code
+    return Promise.resolve();
+  }, []);
 
   const sendByEmail = useCallback(async (email: string): Promise<boolean> => {
     console.log(`Sending email to ${email}`);

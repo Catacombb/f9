@@ -57,6 +57,7 @@ export function DesignBrief() {
       case 'communication':
         return <CommunicationSection />;
       case 'summary':
+        // The summary section will auto-regenerate the summary when mounted
         return <SummarySection />;
       default:
         return <IntroSection />;
