@@ -70,6 +70,7 @@ const initialProjectData: ProjectData = {
     uploadedFiles: [],
     uploadedInspirationImages: [],
     inspirationSelections: [],
+    siteDocuments: [], // Initialize the siteDocuments array
   },
   summary: {
     generatedSummary: '',

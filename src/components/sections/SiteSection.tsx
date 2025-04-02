@@ -5,14 +5,18 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { useDesignBrief } from '@/context/DesignBriefContext';
-import { ArrowLeft, ArrowRight, Upload, Image, X } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Upload, Image, X, FileText } from 'lucide-react';
 import { SectionHeader } from './SectionHeader';
 import { Card, CardContent } from '@/components/ui/card';
+import { toast } from 'sonner';
 
 export function SiteSection() {
   const { formData, updateFormData, setCurrentSection, projectData, updateFiles } = useDesignBrief();
   const [uploadedPhotos, setUploadedPhotos] = useState<File[]>(
     projectData.files.uploadedFiles || []
+  );
+  const [siteDocuments, setSiteDocuments] = useState<File[]>(
+    projectData.files.siteDocuments || []
   );
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -26,6 +30,47 @@ export function SiteSection() {
   
   const handleNext = () => {
     setCurrentSection('spaces');
+  };
+  
+  const handleSiteDocumentUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const newFiles = Array.from(e.target.files);
+      
+      // Filter for PDF files only
+      const pdfFiles = newFiles.filter(file => file.type === 'application/pdf');
+      
+      if (pdfFiles.length !== newFiles.length) {
+        toast.warning("Only PDF files are allowed. Non-PDF files were ignored.");
+      }
+      
+      if (pdfFiles.length === 0) {
+        e.target.value = '';
+        return;
+      }
+      
+      const updatedFiles = [...siteDocuments, ...pdfFiles];
+      setSiteDocuments(updatedFiles);
+      
+      // Update the global state with the new files
+      updateFiles({
+        ...projectData.files,
+        siteDocuments: updatedFiles
+      });
+      
+      e.target.value = '';
+    }
+  };
+  
+  const handleRemoveSiteDocument = (index: number) => {
+    const updatedFiles = [...siteDocuments];
+    updatedFiles.splice(index, 1);
+    setSiteDocuments(updatedFiles);
+    
+    // Update the global state with the updated files
+    updateFiles({
+      ...projectData.files,
+      siteDocuments: updatedFiles
+    });
   };
   
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -62,6 +107,78 @@ export function SiteSection() {
           description="Understanding your site helps us design with the natural environment and surroundings in mind."
           isBold={true}
         />
+        
+        {/* Site Documentation Upload Section - NEW */}
+        <div className="design-brief-form-group mb-8">
+          <div className="p-4 border rounded-md bg-muted/30">
+            <Label className="design-brief-question-title font-bold mb-2">
+              Site Documentation Upload
+            </Label>
+            <p className="design-brief-question-description mb-4">
+              Upload relevant site documents (PDF only): Certificate of Title, Covenants, Resource Consents, or any other relevant site information. If you don't have these on hand, that's okay — we can request them on your behalf.
+            </p>
+            
+            <div className="mt-4">
+              <Label 
+                htmlFor="site-documents" 
+                className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-md border-primary/50 cursor-pointer bg-background hover:bg-accent/10 transition-colors"
+              >
+                <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                  <FileText className="w-8 h-8 mb-2 text-primary" />
+                  <p className="mb-2 text-sm text-center">
+                    <span className="font-medium text-primary">Click to upload</span> or drag and drop
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    PDF files only
+                  </p>
+                </div>
+                <Input 
+                  id="site-documents" 
+                  type="file" 
+                  accept="application/pdf" 
+                  multiple 
+                  className="hidden" 
+                  onChange={handleSiteDocumentUpload}
+                />
+              </Label>
+            </div>
+            
+            {/* Display uploaded documents */}
+            {siteDocuments.length > 0 && (
+              <div className="mt-6">
+                <h3 className="font-medium mb-3">Uploaded Documents ({siteDocuments.length})</h3>
+                <div className="grid grid-cols-1 gap-2">
+                  {siteDocuments.map((file, index) => (
+                    <div 
+                      key={`${file.name}-${index}`} 
+                      className="flex items-center justify-between p-3 bg-background rounded-md border"
+                    >
+                      <div className="flex items-center">
+                        <div className="mr-3 p-2 bg-primary/10 rounded">
+                          <FileText className="h-5 w-5" />
+                        </div>
+                        <div>
+                          <p className="font-medium text-sm truncate max-w-xs">{file.name}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {(file.size / 1024 / 1024).toFixed(2)} MB
+                          </p>
+                        </div>
+                      </div>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={() => handleRemoveSiteDocument(index)}
+                        aria-label={`Remove ${file.name}`}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
         
         <div className="design-brief-form-group">
           <div className="mb-6">

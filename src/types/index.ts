@@ -132,6 +132,7 @@ export interface ProjectFiles {
   uploadedFiles: File[];
   uploadedInspirationImages: File[];
   inspirationSelections: string[];
+  siteDocuments?: File[]; // Added this new property
 }
 
 export interface BriefSummary {
