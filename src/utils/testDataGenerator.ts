@@ -70,17 +70,59 @@ export function generateTestData(): Partial<FormData> {
     },
     spaces: {
       rooms: [
-        { id: generateRandomString(10), type: 'Living Room', quantity: 1, description: 'Open concept with fireplace.', isCustom: false },
-        { id: generateRandomString(10), type: 'Kitchen', quantity: 1, description: 'Modern kitchen with island.', isCustom: false },
-        { id: generateRandomString(10), type: 'Bedroom', quantity: 3, description: 'Master bedroom with ensuite.', isCustom: false },
+        { 
+          id: generateRandomString(10), 
+          type: 'Living', 
+          quantity: 1, 
+          description: JSON.stringify({
+            entertainmentFocus: true,
+            entertainmentDesign: true,
+            entertainmentSpace: 'Integrated with Living Areas',
+            acousticNeeds: false,
+            notes: 'Open concept with fireplace.'
+          }), 
+          isCustom: false 
+        },
+        { 
+          id: generateRandomString(10), 
+          type: 'Kitchen', 
+          quantity: 1, 
+          description: JSON.stringify({
+            kitchenType: 'Both',
+            kitchenLayout: 'Open to Other Spaces',
+            kitchenUse: 'Also for Eating',
+            notes: 'Modern kitchen with island.'
+          }), 
+          isCustom: false 
+        },
+        { 
+          id: generateRandomString(10), 
+          type: 'Bedroom', 
+          quantity: 3, 
+          description: JSON.stringify({
+            notes: 'Master bedroom with ensuite.'
+          }), 
+          isCustom: false 
+        },
+        { 
+          id: generateRandomString(10), 
+          type: 'Office', 
+          quantity: 1, 
+          description: JSON.stringify({
+            workFromHome: true,
+            officeType: 'Dedicated Office',
+            notes: 'Quiet space with good natural light.'
+          }), 
+          isCustom: false 
+        },
       ],
       additionalNotes: 'Need a flexible space for home office.',
-      roomTypes: ['Living Room', 'Kitchen', 'Bedroom'],
-      specialSpaces: ['Home Office', 'Kids Play Area'],
-      storageNeeds: 'Ample storage space required.',
-      spatialRelationships: 'Open concept living and kitchen area.',
-      accessibilityNeeds: 'None.',
-      spacesNotes: 'Consider natural light and ventilation.',
+      roomTypes: ['Living Room', 'Kitchen', 'Bedroom', 'Office'],
+      specialSpaces: ['Vaulted Ceilings', 'Large Windows', 'Built-in Storage'],
+      storageNeeds: 'Could reduce the size of the guest bedroom if needed.',
+      spatialRelationships: 'Kitchen should flow into dining and living area. Office should be in a quiet part of the house.',
+      accessibilityNeeds: 'no',
+      spacesNotes: '200 square meters, two floors',
     },
     architecture: {
       stylePrefences: 'Modern, minimalist.',
