@@ -33,7 +33,7 @@ export const GeneralQuestionsTab = ({
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>General Space Planning</CardTitle>
+          <CardTitle>General Questions About Your Spaces</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="space-y-4">
@@ -41,7 +41,7 @@ export const GeneralQuestionsTab = ({
               What rooms and spaces do you want in your home?
             </Label>
             <p className="text-sm text-muted-foreground">
-              Select the types of rooms below, then go to the "Room Selection" tab to add details.
+              Select the types of rooms in the "Room Spaces" tab, then include must-have features below:
             </p>
           </div>
           
@@ -93,6 +93,9 @@ export const GeneralQuestionsTab = ({
             <Label className="text-base" htmlFor="homeSize">
               Do you have an idea of the final size of the home?
             </Label>
+            <p className="text-sm text-muted-foreground">
+              (Square meters, number of floors)
+            </p>
             <Input
               id="homeSize"
               placeholder="E.g., 200 square meters, two floors"

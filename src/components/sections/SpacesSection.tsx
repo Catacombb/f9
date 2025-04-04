@@ -24,7 +24,7 @@ export function SpacesSection() {
   const [customRoomType, setCustomRoomType] = useState('');
   const [showCustomInput, setShowCustomInput] = useState(false);
   const [roomsWithQuantities, setRoomsWithQuantities] = useState<{ type: string; quantity: number }[]>([]);
-  const [activeTab, setActiveTab] = useState("general");
+  const [activeTab, setActiveTab] = useState("rooms");
   
   const [generalAnswers, setGeneralAnswers] = useState({
     mustHaveFeatures: formData.spaces.specialSpaces || [],
@@ -212,17 +212,9 @@ export function SpacesSection() {
         <div className="space-y-8">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid grid-cols-2 mb-8">
+              <TabsTrigger value="rooms">Room Spaces</TabsTrigger>
               <TabsTrigger value="general">General Questions</TabsTrigger>
-              <TabsTrigger value="rooms">Room Selection</TabsTrigger>
             </TabsList>
-            
-            <TabsContent value="general">
-              <GeneralQuestionsTab
-                generalAnswers={generalAnswers}
-                handleGeneralAnswersChange={handleGeneralAnswersChange}
-                handleFeatureToggle={handleFeatureToggle}
-              />
-            </TabsContent>
             
             <TabsContent value="rooms">
               <RoomSelectionTab
@@ -241,6 +233,14 @@ export function SpacesSection() {
                 handleRoomQuantityChange={handleRoomQuantityChange}
                 updateRoom={updateRoom}
                 handleRemoveRoom={handleRemoveRoom}
+              />
+            </TabsContent>
+            
+            <TabsContent value="general">
+              <GeneralQuestionsTab
+                generalAnswers={generalAnswers}
+                handleGeneralAnswersChange={handleGeneralAnswersChange}
+                handleFeatureToggle={handleFeatureToggle}
               />
             </TabsContent>
           </Tabs>
