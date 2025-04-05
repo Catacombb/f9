@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -62,7 +61,6 @@ export function ContractorsSection() {
     if (newProfessional.type && newProfessional.name) {
       addProfessional({
         ...newProfessional,
-        id: crypto.randomUUID(),
       });
       
       setNewProfessional({
@@ -110,7 +108,6 @@ export function ContractorsSection() {
       const profLabel = predefinedProfessionals.find(p => p.value === professional)?.label;
       if (profLabel) {
         addProfessional({
-          id: crypto.randomUUID(),
           type: profLabel,
           name: '',
           contact: '',
@@ -139,7 +136,6 @@ export function ContractorsSection() {
       });
     } else if (profLabel && field === 'name' && value) {
       addProfessional({
-        id: crypto.randomUUID(),
         type: profLabel,
         name: value,
         contact: professionalPreferences[professional]?.contact || '',
