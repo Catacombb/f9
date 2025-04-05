@@ -25,6 +25,5 @@ export interface DesignBriefContextType {
   saveProjectData: () => void;
   updateFiles: (updates: Partial<ProjectData['files']>) => void;
   updateSummary: (updates: Partial<ProjectData['summary']>) => void;
-  sendByEmail: (email: string) => Promise<boolean>;
-  exportAsPDF: () => Promise<Blob>; // Changed from Promise<void> to Promise<Blob>
+  exportAsPDF: () => Promise<Blob>;
 }

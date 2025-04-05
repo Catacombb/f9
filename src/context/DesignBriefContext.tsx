@@ -33,7 +33,7 @@ export const DesignBriefProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const { addProfessional, updateProfessional, removeProfessional } = useProfessionalsManagement(projectData, setProjectData);
   
   // File and summary management hooks
-  const { updateFiles, updateSummary, saveProjectData, sendByEmail, exportAsPDF } = useFileAndSummaryManagement(projectData, setProjectData);
+  const { updateFiles, updateSummary, saveProjectData, exportAsPDF } = useFileAndSummaryManagement(projectData, setProjectData);
 
   const value: DesignBriefContextType = {
     projectData,
@@ -52,7 +52,6 @@ export const DesignBriefProvider: React.FC<{ children: React.ReactNode }> = ({ c
     currentSection,
     setCurrentSection,
     saveProjectData,
-    sendByEmail,
     exportAsPDF,
   };
 
