@@ -1,3 +1,4 @@
+
 import { useCallback } from 'react';
 import { ProjectData } from '@/types';
 import { generatePDF } from '@/utils/pdfGenerator/index';
@@ -48,22 +49,41 @@ export const useFileAndSummaryManagement = (
       formData.append('project_address', projectData.formData.projectInfo.projectAddress || 'Project Address');
       formData.append('attachment', pdfBlob, `Northstar_Brief_${projectData.formData.projectInfo.clientName || "Client"}_${new Date().toISOString().split('T')[0]}.pdf`);
       
-      // Send the email using the EmailJS service
-      const emailApiUrl = 'https://api.emailjs.com/api/v1.0/email/send-form';
+      // Use emailjs-com directly instead of the form API
+      const { init, send } = await import('emailjs-com');
       
-      // Add your EmailJS service credentials
-      formData.append('service_id', 'service_opdkitc');
-      formData.append('template_id', 'template_r3dcgye');
-      formData.append('user_id', '4MY7hfZH94KlILN09eiC6');
+      // Initialize EmailJS with your user ID (public key)
+      init("4MY7hfZH94KlILN09eiC6");
       
-      // Make the API call to send the email
-      const response = await fetch(emailApiUrl, {
-        method: 'POST',
-        body: formData,
-        mode: 'cors'
+      // Convert the PDF blob to base64 for sending via EmailJS
+      const reader = new FileReader();
+      reader.readAsDataURL(pdfBlob);
+      
+      // Create a promise that resolves when the file is read
+      const base64File = await new Promise<string>((resolve, reject) => {
+        reader.onload = () => {
+          if (typeof reader.result === 'string') {
+            resolve(reader.result);
+          } else {
+            reject(new Error('Failed to convert file to base64'));
+          }
+        };
+        reader.onerror = () => reject(reader.error);
       });
       
-      if (!response.ok) {
+      // Send the email using EmailJS
+      const response = await send(
+        "service_opdkitc", // Service ID
+        "template_r3dcgye", // Template ID
+        {
+          email: email,
+          client_name: projectData.formData.projectInfo.clientName || 'Client',
+          project_address: projectData.formData.projectInfo.projectAddress || 'Project Address',
+          attachment: base64File
+        }
+      );
+      
+      if (response.status !== 200) {
         throw new Error(`Email API responded with status ${response.status}`);
       }
       

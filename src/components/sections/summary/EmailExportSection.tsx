@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Mail, Download } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 
 interface EmailExportSectionProps {
   defaultEmail: string;
@@ -22,9 +23,13 @@ export function EmailExportSection({
   const [recipientEmail, setRecipientEmail] = useState(defaultEmail);
   const [isEmailSending, setIsEmailSending] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+  const [emailError, setEmailError] = useState<string | null>(null);
   const { toast } = useToast();
   
   const handleSendEmail = async () => {
+    // Reset error state
+    setEmailError(null);
+    
     // Email validation regex
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     
@@ -59,11 +64,13 @@ export function EmailExportSection({
           title: "Email Sent",
           description: "Your design brief has been sent to " + recipientEmail,
         });
+        setEmailError(null);
       } else {
         throw new Error("Failed to send email");
       }
     } catch (error) {
       console.error("Email sending error:", error);
+      setEmailError("We couldn't send your email. This could be due to temporary service issues. You can try again later or download the PDF instead.");
       toast({
         title: "Email Delivery Failed",
         description: "We couldn't send your email. Please try again later or download the PDF instead.",
@@ -135,6 +142,12 @@ export function EmailExportSection({
         
         <div>
           <h4 className="font-medium mb-2">Send by Email</h4>
+          {emailError && (
+            <Alert variant="destructive" className="mb-4">
+              <AlertTitle>Email Delivery Issue</AlertTitle>
+              <AlertDescription>{emailError}</AlertDescription>
+            </Alert>
+          )}
           <div className="flex items-start gap-4">
             <div className="flex-1">
               <Label htmlFor="recipientEmail">Email Address</Label>
