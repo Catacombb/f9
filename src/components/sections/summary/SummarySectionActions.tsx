@@ -15,6 +15,7 @@ export function SummarySectionActions({ onPrevious }: SummarySectionActionsProps
   const handleContinue = () => {
     toast.info("Design brief completed successfully!");
     setCurrentSection('feedback');
+    window.scrollTo(0, 0);
   };
   
   return (

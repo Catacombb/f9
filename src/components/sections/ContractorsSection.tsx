@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -153,71 +154,14 @@ export function ContractorsSection() {
     setCurrentSection('budget');
     window.scrollTo(0, 0);
   };
-  
-  const calculateCompletion = () => {
-    let completed = 0;
-    let total = 0;
-    
-    total++;
-    if (formData.contractors.goToTender === true || formData.contractors.goToTender === false) {
-      completed++;
-    }
-    
-    predefinedProfessionals.forEach(prof => {
-      const prefKey = prof.value;
-      const hasPreference = professionalPreferences[prefKey]?.hasPreferred;
-      
-      if (hasPreference) {
-        total++;
-        completed++;
-        
-        if (hasPreference === 'yes') {
-          total++;
-          if (professionalPreferences[prefKey]?.name && professionalPreferences[prefKey].name.trim() !== '') {
-            completed++;
-          }
-          
-          total++;
-          if (professionalPreferences[prefKey]?.contact && professionalPreferences[prefKey].contact.trim() !== '') {
-            completed++;
-          }
-        }
-      } else {
-        total++;
-      }
-    });
-    
-    const customProfessionals = formData.contractors.professionals.filter(
-      p => !predefinedProfessionals.some(pre => pre.label === p.type)
-    );
-    
-    if (customProfessionals.length > 0) {
-      total += customProfessionals.length;
-      completed += customProfessionals.length;
-    }
-    
-    total++;
-    if (formData.contractors.additionalNotes && formData.contractors.additionalNotes.trim() !== '') {
-      completed++;
-    }
-    
-    return total > 0 ? Math.round((completed / total) * 100) : 0;
-  };
-  
-  const completionPercentage = calculateCompletion();
 
   return (
     <div className="design-brief-section-wrapper">
       <div className="design-brief-section-container">
-        <div className="flex justify-between items-center mb-4">
-          <SectionHeader 
-            title="Project Team" 
-            description="Tell us about the professionals you'd like to work with on your project." 
-          />
-          <div className="text-sm font-medium">
-            {completionPercentage}% Complete
-          </div>
-        </div>
+        <SectionHeader 
+          title="Project Team" 
+          description="Tell us about the professionals you'd like to work with on your project." 
+        />
         
         <div className="design-brief-form-group">
           <h3 className="text-lg font-semibold mb-2">Project Professionals</h3>

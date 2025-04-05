@@ -1,3 +1,4 @@
+
 import React, { useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { useDesignBrief } from '@/context/DesignBriefContext';
@@ -43,7 +44,8 @@ export function UploadsSection() {
   };
   
   const handleNext = () => {
-    setCurrentSection('feedback');
+    setCurrentSection('communication');
+    window.scrollTo(0, 0);
   };
   
   // Helper function to determine file type icon
@@ -138,7 +140,7 @@ export function UploadsSection() {
           </Button>
           
           <Button onClick={handleNext} className="group">
-            <span>Next: Feedback</span>
+            <span>Next: Communication</span>
             <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
           </Button>
         </div>

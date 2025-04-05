@@ -60,4 +60,3 @@ export function DesignBrief() {
     </DesignBriefLayout>
   );
 }
-
