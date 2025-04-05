@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { SectionHeader } from './SectionHeader';
@@ -7,7 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
 import { Label } from '@/components/ui/label';
-import { Star, TestTube, MessageSquare } from 'lucide-react';
+import { Star, TestTube, MessageSquare, User, Mail } from 'lucide-react';
 import { toast } from 'sonner';
 import { 
   Select, 
@@ -39,6 +38,8 @@ export function FeedbackSection() {
       : ''
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [testerName, setTesterName] = useState('');
+  const [testerEmail, setTesterEmail] = useState('');
   
   const handleRatingChange = (field: string, value: number) => {
     updateFormData('feedback', { [field]: value });
@@ -68,17 +69,17 @@ export function FeedbackSection() {
   
   const sendFeedbackEmail = async () => {
     try {
-      // Create a formatted email body
+      // Get client info from project data or use tester provided values
       const clientInfo = projectData?.formData?.projectInfo || {};
       
       const templateParams = {
         to_email: 'nick@nickharrison.co',
-        from_name: clientInfo.clientName || 'Anonymous Tester',
-        from_email: clientInfo.contactEmail || formData.feedback.contactInfo || 'No Email Provided',
+        from_name: testerName || clientInfo.clientName || 'Anonymous Tester',
+        from_email: testerEmail || clientInfo.contactEmail || formData.feedback.contactInfo || 'No Email Provided',
         subject: 'Northstar Design Brief - Tester Feedback',
         message: `
 — Tester Feedback —
-Submitted by: ${clientInfo.clientName || 'Anonymous'} (${clientInfo.contactEmail || formData.feedback.contactInfo || 'No Email'})
+Submitted by: ${testerName || clientInfo.clientName || 'Anonymous'} (${testerEmail || clientInfo.contactEmail || formData.feedback.contactInfo || 'No Email'})
 
 RATINGS:
 Usability: ${formData.feedback.usabilityRating}/5
@@ -221,6 +222,44 @@ ${formData.feedback.canContact === 'yes' ? `Contact info: ${formData.feedback.co
           <CardContent className="p-6 space-y-8">
             <div className="space-y-6">
               <h3 className="text-lg font-medium text-purple-800 flex items-center gap-2">
+                <User className="h-5 w-5" /> 
+                Tester Information
+              </h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="testerName" className="font-medium">Your Name</Label>
+                  <Input
+                    id="testerName"
+                    value={testerName}
+                    onChange={(e) => setTesterName(e.target.value)}
+                    placeholder="Enter your name"
+                    className="w-full"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="testerEmail" className="font-medium">Your Email</Label>
+                  <Input
+                    id="testerEmail"
+                    type="email"
+                    value={testerEmail}
+                    onChange={(e) => setTesterEmail(e.target.value)}
+                    placeholder="Enter your email"
+                    className="w-full"
+                  />
+                </div>
+              </div>
+              
+              <div className="text-sm text-muted-foreground">
+                This information will be used to track who provided feedback and may be used for follow-up questions.
+              </div>
+            </div>
+            
+            <Separator className="bg-purple-100" />
+            
+            <div className="space-y-6">
+              <h3 className="text-lg font-medium text-purple-800 flex items-center gap-2">
                 <MessageSquare className="h-5 w-5" /> 
                 Please Rate Your Experience (1-5 stars)
               </h3>
@@ -262,204 +301,204 @@ ${formData.feedback.canContact === 'yes' ? `Contact info: ${formData.feedback.co
                   />
                 </div>
               </div>
+            </div>
+            
+            <Separator className="bg-purple-100" />
+            
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium text-purple-800">Open Text Feedback</h3>
               
-              <Separator className="bg-purple-100" />
-              
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium text-purple-800">Open Text Feedback</h3>
-                
-                <div className="pt-2">
-                  <Label htmlFor="likeMost" className="font-medium">What did you like most about this tool?*</Label>
-                  <div className="text-sm text-muted-foreground mt-1 mb-2">
-                    Please share your thoughts about the design brief tool.
-                  </div>
-                  <Textarea
-                    id="likeMost"
-                    value={formData.feedback.likeMost || ''}
-                    onChange={(e) => handleTextChange('likeMost', e.target.value)}
-                    placeholder="I really liked..."
-                    className="min-h-[100px]"
-                  />
+              <div className="pt-2">
+                <Label htmlFor="likeMost" className="font-medium">What did you like most about this tool?*</Label>
+                <div className="text-sm text-muted-foreground mt-1 mb-2">
+                  Please share your thoughts about the design brief tool.
                 </div>
-                
-                <div className="pt-2">
-                  <Label htmlFor="improvements" className="font-medium">Was anything unclear, frustrating, or unnecessary?*</Label>
-                  <Textarea
-                    id="improvements"
-                    value={formData.feedback.improvements || ''}
-                    onChange={(e) => handleTextChange('improvements', e.target.value)}
-                    placeholder="I found this confusing..."
-                    className="min-h-[100px] mt-2"
-                  />
-                </div>
-                
-                <div className="pt-2">
-                  <Label htmlFor="nextFeature" className="font-medium">What feature or improvement would you love to see next?*</Label>
-                  <Textarea
-                    id="nextFeature"
-                    value={formData.feedback.nextFeature || ''}
-                    onChange={(e) => handleTextChange('nextFeature', e.target.value)}
-                    placeholder="It would be great if..."
-                    className="min-h-[100px] mt-2"
-                  />
-                </div>
-                
-                <div className="pt-2">
-                  <Label htmlFor="additionalFeedback" className="font-medium">Any other feedback or ideas?*</Label>
-                  <Textarea
-                    id="additionalFeedback"
-                    value={formData.feedback.additionalFeedback || ''}
-                    onChange={(e) => handleTextChange('additionalFeedback', e.target.value)}
-                    placeholder="Other thoughts..."
-                    className="min-h-[100px] mt-2"
-                  />
-                </div>
+                <Textarea
+                  id="likeMost"
+                  value={formData.feedback.likeMost || ''}
+                  onChange={(e) => handleTextChange('likeMost', e.target.value)}
+                  placeholder="I really liked..."
+                  className="min-h-[100px]"
+                />
               </div>
               
-              <Separator className="bg-purple-100" />
-              
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium text-purple-800">
-                  Interested in a Custom Version of Northstar?
-                </h3>
-                
-                <div className="text-sm text-muted-foreground">
-                  Would you like a tailored version of this tool for your firm or workflow?
-                </div>
-                
-                <div>
-                  <Label htmlFor="customVersionInterest" className="font-medium">
-                    What would you want to customize or build?
-                  </Label>
-                  <Textarea
-                    id="customVersionInterest"
-                    value={formData.feedback.customVersionInterest || ''}
-                    onChange={(e) => handleTextChange('customVersionInterest', e.target.value)}
-                    placeholder="Describe your customization interests..."
-                    className="min-h-[100px] mt-2"
-                  />
-                </div>
+              <div className="pt-2">
+                <Label htmlFor="improvements" className="font-medium">Was anything unclear, frustrating, or unnecessary?*</Label>
+                <Textarea
+                  id="improvements"
+                  value={formData.feedback.improvements || ''}
+                  onChange={(e) => handleTextChange('improvements', e.target.value)}
+                  placeholder="I found this confusing..."
+                  className="min-h-[100px] mt-2"
+                />
               </div>
               
-              <Separator className="bg-purple-100" />
+              <div className="pt-2">
+                <Label htmlFor="nextFeature" className="font-medium">What feature or improvement would you love to see next?*</Label>
+                <Textarea
+                  id="nextFeature"
+                  value={formData.feedback.nextFeature || ''}
+                  onChange={(e) => handleTextChange('nextFeature', e.target.value)}
+                  placeholder="It would be great if..."
+                  className="min-h-[100px] mt-2"
+                />
+              </div>
               
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium text-purple-800">User Context</h3>
-                
-                <div className="pt-2">
-                  <Label className="font-medium mb-2 block">What is your role in the architecture/design process?*</Label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
-                    {['Architect', 'Interior Designer', 'Practice Manager', 'Draftsperson', 'Builder', 'Client / Homeowner', 'Other'].map((role) => (
-                      <div key={role} className="flex items-center space-x-2">
-                        <Checkbox 
-                          id={`role-${role}`}
-                          checked={formData.feedback.userRole?.includes(role) || false}
-                          onCheckedChange={() => handleRoleSelection(role)}
-                        />
-                        <label
-                          htmlFor={`role-${role}`}
-                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                        >
-                          {role}
-                        </label>
-                      </div>
-                    ))}
-                  </div>
-                  
-                  {formData.feedback.userRole?.includes('Other') && (
-                    <div className="mt-3">
-                      <Label htmlFor="otherRole" className="text-sm">Please specify:</Label>
-                      <Input
-                        id="otherRole"
-                        value={otherRole}
-                        onChange={(e) => {
-                          setOtherRole(e.target.value);
-                          updateFormData('feedback', { otherRoleSpecify: e.target.value });
-                        }}
-                        className="mt-1"
-                        placeholder="Your role"
+              <div className="pt-2">
+                <Label htmlFor="additionalFeedback" className="font-medium">Any other feedback or ideas?*</Label>
+                <Textarea
+                  id="additionalFeedback"
+                  value={formData.feedback.additionalFeedback || ''}
+                  onChange={(e) => handleTextChange('additionalFeedback', e.target.value)}
+                  placeholder="Other thoughts..."
+                  className="min-h-[100px] mt-2"
+                />
+              </div>
+            </div>
+            
+            <Separator className="bg-purple-100" />
+            
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium text-purple-800">
+                Interested in a Custom Version of Northstar?
+              </h3>
+              
+              <div className="text-sm text-muted-foreground">
+                Would you like a tailored version of this tool for your firm or workflow?
+              </div>
+              
+              <div>
+                <Label htmlFor="customVersionInterest" className="font-medium">
+                  What would you want to customize or build?
+                </Label>
+                <Textarea
+                  id="customVersionInterest"
+                  value={formData.feedback.customVersionInterest || ''}
+                  onChange={(e) => handleTextChange('customVersionInterest', e.target.value)}
+                  placeholder="Describe your customization interests..."
+                  className="min-h-[100px] mt-2"
+                />
+              </div>
+            </div>
+            
+            <Separator className="bg-purple-100" />
+            
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium text-purple-800">User Context</h3>
+              
+              <div className="pt-2">
+                <Label className="font-medium mb-2 block">What is your role in the architecture/design process?*</Label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
+                  {['Architect', 'Interior Designer', 'Practice Manager', 'Draftsperson', 'Builder', 'Client / Homeowner', 'Other'].map((role) => (
+                    <div key={role} className="flex items-center space-x-2">
+                      <Checkbox 
+                        id={`role-${role}`}
+                        checked={formData.feedback.userRole?.includes(role) || false}
+                        onCheckedChange={() => handleRoleSelection(role)}
                       />
+                      <label
+                        htmlFor={`role-${role}`}
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      >
+                        {role}
+                      </label>
                     </div>
-                  )}
+                  ))}
                 </div>
                 
-                <div className="pt-2">
-                  <Label htmlFor="teamSize" className="font-medium">How many people are in your firm or team?*</Label>
-                  <Select
-                    value={formData.feedback.teamSize || ''}
-                    onValueChange={(value) => handleTextChange('teamSize', value)}
-                  >
-                    <SelectTrigger className="mt-2" id="teamSize">
-                      <SelectValue placeholder="Select team size" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Just me">Just me</SelectItem>
-                      <SelectItem value="2-5">2-5</SelectItem>
-                      <SelectItem value="6-15">6-15</SelectItem>
-                      <SelectItem value="15+">15+</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                {formData.feedback.userRole?.includes('Other') && (
+                  <div className="mt-3">
+                    <Label htmlFor="otherRole" className="text-sm">Please specify:</Label>
+                    <Input
+                      id="otherRole"
+                      value={otherRole}
+                      onChange={(e) => {
+                        setOtherRole(e.target.value);
+                        updateFormData('feedback', { otherRoleSpecify: e.target.value });
+                      }}
+                      className="mt-1"
+                      placeholder="Your role"
+                    />
+                  </div>
+                )}
               </div>
               
-              <Separator className="bg-purple-100" />
+              <div className="pt-2">
+                <Label htmlFor="teamSize" className="font-medium">How many people are in your firm or team?*</Label>
+                <Select
+                  value={formData.feedback.teamSize || ''}
+                  onValueChange={(value) => handleTextChange('teamSize', value)}
+                >
+                  <SelectTrigger className="mt-2" id="teamSize">
+                    <SelectValue placeholder="Select team size" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Just me">Just me</SelectItem>
+                    <SelectItem value="2-5">2-5</SelectItem>
+                    <SelectItem value="6-15">6-15</SelectItem>
+                    <SelectItem value="15+">15+</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            
+            <Separator className="bg-purple-100" />
+            
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium text-purple-800">Referral + Follow-Up Interest</h3>
               
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium text-purple-800">Referral + Follow-Up Interest</h3>
+              <div className="pt-2">
+                <Label htmlFor="wouldRecommend" className="font-medium">Would you recommend this tool to others in your industry?*</Label>
+                <RadioGroup
+                  id="wouldRecommend"
+                  value={formData.feedback.wouldRecommend || ''}
+                  onValueChange={(value) => handleTextChange('wouldRecommend', value)}
+                  className="flex flex-row space-x-4 mt-2"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="yes" id="recommend-yes" />
+                    <Label htmlFor="recommend-yes">Yes</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="maybe" id="recommend-maybe" />
+                    <Label htmlFor="recommend-maybe">Maybe</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="no" id="recommend-no" />
+                    <Label htmlFor="recommend-no">No</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+              
+              <div className="pt-2">
+                <Label className="font-medium">Can we contact you to chat more about your feedback?*</Label>
+                <RadioGroup
+                  value={formData.feedback.canContact || ''}
+                  onValueChange={handleCanContactChange}
+                  className="flex flex-row space-x-4 mt-2"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="yes" id="contact-yes" />
+                    <Label htmlFor="contact-yes">Yes</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="no" id="contact-no" />
+                    <Label htmlFor="contact-no">No</Label>
+                  </div>
+                </RadioGroup>
                 
-                <div className="pt-2">
-                  <Label htmlFor="wouldRecommend" className="font-medium">Would you recommend this tool to others in your industry?*</Label>
-                  <RadioGroup
-                    id="wouldRecommend"
-                    value={formData.feedback.wouldRecommend || ''}
-                    onValueChange={(value) => handleTextChange('wouldRecommend', value)}
-                    className="flex flex-row space-x-4 mt-2"
-                  >
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="yes" id="recommend-yes" />
-                      <Label htmlFor="recommend-yes">Yes</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="maybe" id="recommend-maybe" />
-                      <Label htmlFor="recommend-maybe">Maybe</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="no" id="recommend-no" />
-                      <Label htmlFor="recommend-no">No</Label>
-                    </div>
-                  </RadioGroup>
-                </div>
-                
-                <div className="pt-2">
-                  <Label className="font-medium">Can we contact you to chat more about your feedback?*</Label>
-                  <RadioGroup
-                    value={formData.feedback.canContact || ''}
-                    onValueChange={handleCanContactChange}
-                    className="flex flex-row space-x-4 mt-2"
-                  >
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="yes" id="contact-yes" />
-                      <Label htmlFor="contact-yes">Yes</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="no" id="contact-no" />
-                      <Label htmlFor="contact-no">No</Label>
-                    </div>
-                  </RadioGroup>
-                  
-                  {showContactFields && (
-                    <div className="mt-4">
-                      <Label htmlFor="contactInfo" className="text-sm">Best way to reach you:</Label>
-                      <Input
-                        id="contactInfo"
-                        value={formData.feedback.contactInfo || ''}
-                        onChange={(e) => handleTextChange('contactInfo', e.target.value)}
-                        className="mt-1"
-                        placeholder="Email or phone number"
-                      />
-                    </div>
-                  )}
-                </div>
+                {showContactFields && (
+                  <div className="mt-4">
+                    <Label htmlFor="contactInfo" className="text-sm">Best way to reach you:</Label>
+                    <Input
+                      id="contactInfo"
+                      value={formData.feedback.contactInfo || ''}
+                      onChange={(e) => handleTextChange('contactInfo', e.target.value)}
+                      className="mt-1"
+                      placeholder="Email or phone number"
+                    />
+                  </div>
+                )}
               </div>
             </div>
           </CardContent>
