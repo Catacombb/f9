@@ -269,9 +269,7 @@ export function FeedbackSection() {
             
             <Separator className="bg-purple-100" />
             
-            <div className="space-y-4">
-              <h3 className="text-lg font-medium text-purple-800">Open Text Feedback</h3>
-              
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="pt-2">
                 <Label htmlFor="likeMost" className="font-medium">What did you like most about this tool?*</Label>
                 <div className="text-sm text-muted-foreground mt-1 mb-2">
@@ -323,9 +321,7 @@ export function FeedbackSection() {
             <Separator className="bg-purple-100" />
             
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-purple-800">
-                Interested in a Custom Version of Northstar?
-              </h3>
+              <h3 className="text-lg font-medium text-purple-800">Interested in a Custom Version of Northstar?</h3>
               
               <div className="text-sm text-muted-foreground">
                 Would you like a tailored version of this tool for your firm or workflow?
