@@ -32,7 +32,42 @@ export const renderSpacesInfo = (ctx: PDFContext, projectData: ProjectData): voi
     
     projectData.formData.spaces.rooms.forEach(room => {
       if (room.description) {
-        addText(ctx, `${room.type} (${room.quantity})`, room.description, true);
+        try {
+          const descObj = JSON.parse(room.description);
+          let formattedDescription = '';
+          
+          // Format level
+          if (descObj.level) {
+            formattedDescription += `Located on ${descObj.level} floor. `;
+          }
+          
+          // Room-specific properties
+          if (descObj.kitchenType) {
+            formattedDescription += `${descObj.kitchenType} kitchen. `;
+          }
+          
+          if (descObj.kitchenLayout) {
+            formattedDescription += `${descObj.kitchenLayout}. `;
+          }
+          
+          if (descObj.entertainmentFocus) {
+            formattedDescription += "Entertainment focused. ";
+          }
+          
+          if (descObj.workFromHome) {
+            formattedDescription += "Work from home ready. ";
+          }
+          
+          // Notes
+          if (descObj.notes) {
+            formattedDescription += descObj.notes;
+          }
+          
+          addText(ctx, `${room.type} (${room.quantity})`, formattedDescription.trim(), true);
+        } catch (e) {
+          // If JSON parsing fails, use the original description
+          addText(ctx, `${room.type} (${room.quantity})`, room.description, true);
+        }
       }
     });
   } else {

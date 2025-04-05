@@ -34,6 +34,61 @@ export function SummarySection() {
       return acc;
     }, {} as Record<string, typeof formData.spaces.rooms>);
     
+    const formatRoomDescription = (description: string) => {
+      try {
+        const descriptionObj = JSON.parse(description);
+        
+        // Create a human-readable format from the description object
+        const descriptionItems = [];
+        
+        // Level information
+        if (descriptionObj.level) {
+          descriptionItems.push(`Located on ${descriptionObj.level} floor`);
+        }
+        
+        // Room-specific properties
+        if (descriptionObj.kitchenType) {
+          descriptionItems.push(`${descriptionObj.kitchenType} kitchen`);
+        }
+        
+        if (descriptionObj.kitchenLayout) {
+          descriptionItems.push(`${descriptionObj.kitchenLayout}`);
+        }
+        
+        if (descriptionObj.kitchenUse) {
+          descriptionItems.push(`${descriptionObj.kitchenUse}`);
+        }
+        
+        if (descriptionObj.entertainmentFocus) {
+          descriptionItems.push("Entertainment focused");
+        }
+        
+        if (descriptionObj.entertainmentSpace) {
+          descriptionItems.push(`${descriptionObj.entertainmentSpace}`);
+        }
+        
+        if (descriptionObj.workFromHome) {
+          descriptionItems.push("Work from home ready");
+        }
+        
+        if (descriptionObj.officeType) {
+          descriptionItems.push(`${descriptionObj.officeType}`);
+        }
+        
+        // Notes
+        if (descriptionObj.notes) {
+          descriptionItems.push(descriptionObj.notes);
+        }
+        
+        return descriptionItems.length > 0 
+          ? descriptionItems.join(". ") 
+          : description;
+      } catch (e) {
+        // If parsing fails, return the original string
+        return description;
+      }
+    };
+    
     return (
       <div className="space-y-4">
         {Object.entries(groupedRooms).map(([type, rooms]) => (
@@ -44,7 +99,7 @@ export function SummarySection() {
             <ul className="list-disc pl-5 text-sm">
               {rooms.map((room, index) => (
                 <li key={index}>
-                  {room.description}
+                  {formatRoomDescription(room.description)}
                 </li>
               ))}
             </ul>
