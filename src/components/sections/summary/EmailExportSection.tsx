@@ -1,19 +1,23 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Download } from 'lucide-react';
+import { Download, Send } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import emailjs from 'emailjs-com';
 
 interface EmailExportSectionProps {
   onExportPDF: () => Promise<Blob>;
   clientName: string;
+  projectAddress?: string;
 }
 
 export function EmailExportSection({ 
   onExportPDF, 
-  clientName 
+  clientName,
+  projectAddress
 }: EmailExportSectionProps) {
   const [isExporting, setIsExporting] = useState(false);
+  const [isSending, setIsSending] = useState(false);
   const { toast } = useToast();
   
   const handleExportPDF = async () => {
@@ -47,6 +51,55 @@ export function EmailExportSection({
       setIsExporting(false);
     }
   };
+
+  const handleSendToArchitect = async () => {
+    setIsSending(true);
+    try {
+      // Prepare the PDF
+      const pdfBlob = await onExportPDF();
+      const pdfUrl = URL.createObjectURL(pdfBlob);
+      
+      // Get the architect's email (in a real app, this would come from the invitation context)
+      const architectEmail = "architect@example.com"; // This would be replaced with actual architect email
+      const architectName = "Your Architect"; // This would be replaced with actual architect name
+      
+      // Prepare email parameters
+      const emailParams = {
+        to_email: architectEmail,
+        to_name: architectName,
+        from_name: clientName || "Client",
+        project_address: projectAddress || "Project Address",
+        pdf_link: window.location.origin + "/download/" + encodeURIComponent(`Northstar_Brief_${clientName || "Client"}_${new Date().toISOString().split('T')[0]}.pdf`),
+        message: "This brief was completed by your client using Northstar.",
+        reply_to: "no-reply@northstar.design"
+      };
+      
+      // Send email using EmailJS
+      await emailjs.send(
+        'service_opdkitc',
+        'template_architect_brief', // Template ID (needs to be created in EmailJS)
+        emailParams,
+        'EMAILJS_USER_ID' // This would be the actual user ID
+      );
+      
+      // Cleanup
+      URL.revokeObjectURL(pdfUrl);
+      
+      toast({
+        title: "Done",
+        description: "Your architect has received the brief.",
+      });
+    } catch (error) {
+      console.error("Error sending to architect:", error);
+      toast({
+        title: "Error",
+        description: "There was a problem sending the brief to your architect. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSending(false);
+    }
+  };
   
   return (
     <div className="mt-8 space-y-6">
@@ -74,8 +127,26 @@ export function EmailExportSection({
             </Button>
           </div>
         </div>
+        
+        <div className="border-t pt-4">
+          <h4 className="font-medium mb-2">Send to My Architect</h4>
+          <div className="flex items-start gap-4">
+            <div className="flex-1">
+              <p className="text-sm text-muted-foreground mb-2">
+                Automatically send your brief to your architect including all details and attachments.
+              </p>
+            </div>
+            <Button 
+              onClick={handleSendToArchitect} 
+              disabled={isSending}
+              className="min-w-[140px]"
+            >
+              <Send className={`h-4 w-4 mr-2 ${isSending ? 'animate-spin' : ''}`} />
+              <span>{isSending ? 'Sending...' : 'Send to My Architect'}</span>
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   );
 }
-
