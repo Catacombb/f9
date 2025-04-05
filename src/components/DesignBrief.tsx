@@ -20,7 +20,7 @@ import { toast } from 'sonner';
 import { Beaker } from 'lucide-react';
 
 export function DesignBrief() {
-  const { currentSection, updateFormData, updateFiles, updateSummary, projectData } = useDesignBrief();
+  const { currentSection, updateFormData, updateFiles, updateSummary, setCurrentSection, projectData } = useDesignBrief();
   
   // Scroll to top when section changes
   useEffect(() => {

@@ -1,4 +1,3 @@
-
 import { FormData } from '@/types';
 
 // Function to generate a random string of a specified length
@@ -52,7 +51,7 @@ export const generateTestData = () => {
       }),
       occupationDetails: 'John works as an architect (partial WFH), Sarah is a pediatrician at Auckland Hospital',
       dailyRoutine: 'Early risers, busy mornings getting kids ready. Evening family dinners important. Weekends spent outdoors.',
-      entertainmentStyle: 'Regular dinner parties (6-8 guests), occasional larger gatherings (15-20 people), kids' birthday parties.',
+      entertainmentStyle: 'Regular dinner parties (6-8 guests), occasional larger gatherings (15-20 people), kids\' birthday parties.',
       specialRequirements: 'Need quiet home office for video calls, playroom for children, and secure outdoor space for pets.',
       pets: 'One medium-sized dog (Labrador) and two indoor cats',
       specialNeeds: 'Oldest child has mild asthma, so good ventilation and dust control important.',
