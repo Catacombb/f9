@@ -3,77 +3,13 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useDesignBrief } from '@/context/DesignBriefContext';
-import { ArrowLeft, ArrowRight, Users, Cat, Dog } from 'lucide-react';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { SectionHeader } from './SectionHeader';
-
-const AdultIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <circle cx="12" cy="5" r="3" />
-    <path d="M12 8v14" />
-    <path d="M8 16h8" />
-  </svg>
-);
-
-const ChildIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <circle cx="12" cy="5" r="2.5" />
-    <path d="M12 8v6" />
-    <path d="M10 14h4" />
-    <path d="M9 22v-6.5" />
-    <path d="M15 22v-6.5" />
-  </svg>
-);
+import { LifestyleOccupantsSection } from '../lifestyle/LifestyleOccupantsSection';
 
 export function LifestyleSection() {
   const { formData, updateFormData, setCurrentSection } = useDesignBrief();
-  
-  const [adults, setAdults] = useState<number>(0);
-  const [children, setChildren] = useState<number>(0);
-  const [dogs, setDogs] = useState<number>(0);
-  const [cats, setCats] = useState<number>(0);
-  
-  useEffect(() => {
-    if (formData.lifestyle.occupants) {
-      try {
-        const occupantsData = JSON.parse(formData.lifestyle.occupants);
-        if (occupantsData) {
-          setAdults(occupantsData.adults || 0);
-          setChildren(occupantsData.children || 0);
-          setDogs(occupantsData.dogs || 0);
-          setCats(occupantsData.cats || 0);
-        }
-      } catch (e) {
-      }
-    }
-  }, [formData.lifestyle]);
-  
-  useEffect(() => {
-    const occupantsData = JSON.stringify({ adults, children, dogs, cats });
-    updateFormData('lifestyle', { occupants: occupantsData });
-  }, [adults, children, dogs, cats, updateFormData]);
   
   const handleTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -90,11 +26,14 @@ export function LifestyleSection() {
     window.scrollTo(0, 0);
   };
   
-  const handleNumberInputChange = (setter: React.Dispatch<React.SetStateAction<number>>) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value === '' ? 0 : parseInt(e.target.value, 10);
-    if (!isNaN(value) && value >= 0) {
-      setter(value);
-    }
+  // Handle occupants data
+  const handleOccupantsChange = (occupantsData: string) => {
+    updateFormData('lifestyle', { occupants: occupantsData });
+  };
+  
+  // Handle occupant entries change
+  const handleOccupantEntriesChange = (entries: any[]) => {
+    updateFormData('lifestyle', { occupantEntries: entries });
   };
   
   return (
@@ -106,155 +45,14 @@ export function LifestyleSection() {
           isBold={true}
         />
         
-        <div className="design-brief-form-group">
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle>Who will be living in this home?</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground mb-4">
-                Select the number of people and pets who will be living in or regularly using this home.
-              </p>
-              
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="flex flex-col items-center">
-                  <div className="mb-2 p-3 rounded-full bg-primary/10 text-primary">
-                    <AdultIcon />
-                  </div>
-                  <Label className="mb-1">Adults</Label>
-                  <div className="flex items-center">
-                    <Button 
-                      variant="outline" 
-                      size="icon" 
-                      onClick={() => setAdults(Math.max(0, adults - 1))}
-                      disabled={adults <= 0}
-                      type="button"
-                    >
-                      -
-                    </Button>
-                    <Input 
-                      type="number" 
-                      min="0"
-                      value={adults} 
-                      onChange={handleNumberInputChange(setAdults)}
-                      className="w-16 mx-2 text-center"
-                      onWheel={(e) => e.currentTarget.blur()}
-                    />
-                    <Button 
-                      variant="outline" 
-                      size="icon" 
-                      onClick={() => setAdults(adults + 1)}
-                      type="button"
-                    >
-                      +
-                    </Button>
-                  </div>
-                </div>
-                
-                <div className="flex flex-col items-center">
-                  <div className="mb-2 p-3 rounded-full bg-primary/10 text-primary">
-                    <ChildIcon />
-                  </div>
-                  <Label className="mb-1">Children</Label>
-                  <div className="flex items-center">
-                    <Button 
-                      variant="outline" 
-                      size="icon" 
-                      onClick={() => setChildren(Math.max(0, children - 1))}
-                      disabled={children <= 0}
-                      type="button"
-                    >
-                      -
-                    </Button>
-                    <Input 
-                      type="number" 
-                      min="0" 
-                      value={children} 
-                      onChange={handleNumberInputChange(setChildren)}
-                      className="w-16 mx-2 text-center"
-                      onWheel={(e) => e.currentTarget.blur()}
-                    />
-                    <Button 
-                      variant="outline" 
-                      size="icon" 
-                      onClick={() => setChildren(children + 1)}
-                      type="button"
-                    >
-                      +
-                    </Button>
-                  </div>
-                </div>
-                
-                <div className="flex flex-col items-center">
-                  <div className="mb-2 p-3 rounded-full bg-primary/10 text-primary">
-                    <Dog />
-                  </div>
-                  <Label className="mb-1">Dogs</Label>
-                  <div className="flex items-center">
-                    <Button 
-                      variant="outline" 
-                      size="icon" 
-                      onClick={() => setDogs(Math.max(0, dogs - 1))}
-                      disabled={dogs <= 0}
-                      type="button"
-                    >
-                      -
-                    </Button>
-                    <Input 
-                      type="number" 
-                      min="0" 
-                      value={dogs}
-                      onChange={handleNumberInputChange(setDogs)}
-                      className="w-16 mx-2 text-center"
-                      onWheel={(e) => e.currentTarget.blur()}
-                    />
-                    <Button 
-                      variant="outline" 
-                      size="icon" 
-                      onClick={() => setDogs(dogs + 1)}
-                      type="button"
-                    >
-                      +
-                    </Button>
-                  </div>
-                </div>
-                
-                <div className="flex flex-col items-center">
-                  <div className="mb-2 p-3 rounded-full bg-primary/10 text-primary">
-                    <Cat />
-                  </div>
-                  <Label className="mb-1">Cats</Label>
-                  <div className="flex items-center">
-                    <Button 
-                      variant="outline" 
-                      size="icon" 
-                      onClick={() => setCats(Math.max(0, cats - 1))}
-                      disabled={cats <= 0}
-                      type="button"
-                    >
-                      -
-                    </Button>
-                    <Input 
-                      type="number" 
-                      min="0" 
-                      value={cats}
-                      onChange={handleNumberInputChange(setCats)}
-                      className="w-16 mx-2 text-center"
-                      onWheel={(e) => e.currentTarget.blur()}
-                    />
-                    <Button 
-                      variant="outline" 
-                      size="icon" 
-                      onClick={() => setCats(cats + 1)}
-                      type="button"
-                    >
-                      +
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        <div className="design-brief-form-group space-y-6">
+          {/* Occupants Section */}
+          <LifestyleOccupantsSection 
+            occupants={formData.lifestyle.occupants || ''}
+            onOccupantsChange={handleOccupantsChange}
+            occupantEntries={formData.lifestyle.occupantEntries || []}
+            onOccupantEntriesChange={handleOccupantEntriesChange}
+          />
           
           <div className="mb-6">
             <Label htmlFor="occupationDetails" className="design-brief-question-title">
