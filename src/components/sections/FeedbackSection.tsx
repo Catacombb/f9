@@ -22,7 +22,7 @@ import {
 } from '@/components/ui/radio-group';
 import { Checkbox } from '@/components/ui/checkbox';
 import emailjs from 'emailjs-com';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 export function FeedbackSection() {
   const { formData, updateFormData, setCurrentSection, projectData } = useDesignBrief();
@@ -173,34 +173,31 @@ export function FeedbackSection() {
     tooltipText: string;
   }) => {
     return (
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <div className="flex items-center gap-1">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <button
-                  key={star}
-                  type="button"
-                  onClick={() => onChange(star)}
-                  className={`p-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-full`}
-                  aria-label={`Rate ${star} out of 5`}
-                >
-                  <Star
-                    className={`h-6 w-6 ${
-                      star <= value
-                        ? 'fill-yellow-500 text-yellow-500'
-                        : 'text-gray-300'
-                    }`}
-                  />
-                </button>
-              ))}
-            </div>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>{tooltipText}</p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+      <div className="flex items-center gap-1">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <Tooltip key={star}>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                onClick={() => onChange(star)}
+                className="p-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-full"
+                aria-label={`Rate ${star} out of 5`}
+              >
+                <Star
+                  className={`h-6 w-6 ${
+                    star <= value
+                      ? 'fill-yellow-500 text-yellow-500'
+                      : 'text-gray-300'
+                  }`}
+                />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="top" className="bg-black text-white px-3 py-2">
+              <p>{tooltipText}</p>
+            </TooltipContent>
+          </Tooltip>
+        ))}
+      </div>
     );
   };
 

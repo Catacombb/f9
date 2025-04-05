@@ -24,7 +24,7 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <DesignBriefProvider>
-        <TooltipProvider>
+        <TooltipProvider delayDuration={300}>
           <div className="w-full max-w-[100vw] overflow-x-hidden">
             <Toaster />
             <Sonner />
