@@ -34,8 +34,7 @@ export const initialProjectData: ProjectData = {
       hobbies: [],
       entertaining: '',
       workFromHome: '',
-      lifestyleNotes: '',
-      homeFeeling: ''
+      lifestyleNotes: ''
     },
     site: {
       existingConditions: '',
@@ -82,9 +81,7 @@ export const initialProjectData: ProjectData = {
       technologyRequirements: [],
       architectureNotes: '',
       externalMaterialsSelected: [],
-      internalMaterialsSelected: [],
-      inspirationLinks: '',
-      inspirationComments: ''
+      internalMaterialsSelected: []
     },
     contractors: {
       preferredBuilder: '',
@@ -125,8 +122,7 @@ export const initialProjectData: ProjectData = {
     uploadedFiles: [],
     uploadedInspirationImages: [],
     inspirationSelections: [],
-    siteDocuments: [],
-    sitePhotos: [] // Add initial empty array for site photos
+    siteDocuments: []
   },
   summary: {
     generatedSummary: '',

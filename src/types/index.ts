@@ -21,8 +21,7 @@ export interface ProjectFiles {
   uploadedFiles: File[];
   uploadedInspirationImages: File[];
   inspirationSelections: string[];
-  siteDocuments: File[]; 
-  sitePhotos: File[]; // Add site photos field
+  siteDocuments?: File[]; 
 }
 
 export interface BriefSummary {
@@ -65,7 +64,6 @@ export interface FormData {
     entertaining?: string;
     workFromHome?: string;
     lifestyleNotes?: string;
-    homeFeeling?: string;
   };
   site: {
     existingConditions: string;
@@ -113,8 +111,6 @@ export interface FormData {
     architectureNotes?: string;
     externalMaterialsSelected?: string[];
     internalMaterialsSelected?: string[];
-    inspirationLinks?: string;
-    inspirationComments?: string;
   };
   contractors: {
     preferredBuilder: string;
