@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { Button } from '@/components/ui/button';
@@ -123,18 +122,19 @@ export function ArchitectureSection() {
   };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (!files) return;
+    const uploadedFiles = event.target.files;
+    if (!uploadedFiles) return;
 
     // Process each file
     const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf'];
     const maxSize = 5 * 1024 * 1024; // 5MB
     
-    const uploadedInspirationImages = files?.uploadedInspirationImages || [];
-    const newImages = [...uploadedInspirationImages];
+    // Get the current uploaded inspiration images from the files context
+    const currentUploadedImages = files?.uploadedInspirationImages || [];
+    const newImages = [...currentUploadedImages];
     let hasErrors = false;
 
-    Array.from(files).forEach(file => {
+    Array.from(uploadedFiles).forEach(file => {
       if (!allowedTypes.includes(file.type)) {
         toast.error(`${file.name} is not a supported file type`);
         hasErrors = true;
@@ -153,7 +153,7 @@ export function ArchitectureSection() {
     });
 
     if (!hasErrors) {
-      toast.success(`${files.length} file(s) uploaded successfully`);
+      toast.success(`${uploadedFiles.length} file(s) uploaded successfully`);
       updateFiles({ uploadedInspirationImages: newImages });
     }
 
