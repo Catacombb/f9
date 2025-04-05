@@ -19,7 +19,7 @@ export const renderSummaryInfo = (ctx: PDFContext, projectData: ProjectData): vo
     );
     
     if (architect) {
-      ctx.yPosition += 5;
+      ctx.yPosition += 10;
       addSectionTitle(ctx, 'Architect Information');
       addMultiLineText(ctx, `Name: ${architect.name || 'Not specified'}`);
       addMultiLineText(ctx, `Contact: ${architect.contact || 'Not specified'}`);
@@ -28,4 +28,14 @@ export const renderSummaryInfo = (ctx: PDFContext, projectData: ProjectData): vo
       }
     }
   }
+
+  // Add client and project information for reference
+  ctx.yPosition += 10;
+  addSectionTitle(ctx, 'Client Information');
+  addMultiLineText(ctx, `Client Name: ${projectData.formData.projectInfo.clientName || 'Not specified'}`);
+  addMultiLineText(ctx, `Project Address: ${projectData.formData.projectInfo.projectAddress || 'Not specified'}`);
+  
+  // Add date of PDF generation
+  const today = new Date();
+  addMultiLineText(ctx, `Brief generated on: ${today.toLocaleDateString()}`);
 };

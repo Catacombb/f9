@@ -57,11 +57,14 @@ export function EmailExportSection({
     try {
       // Prepare the PDF
       const pdfBlob = await onExportPDF();
-      const pdfUrl = URL.createObjectURL(pdfBlob);
       
-      // Get the architect's email (in a real app, this would come from the invitation context)
-      const architectEmail = "architect@example.com"; // This would be replaced with actual architect email
-      const architectName = "Your Architect"; // This would be replaced with actual architect name
+      // In a real app, get the architect's email from the project data
+      // For this implementation we use a placeholder that would be replaced by the actual architect
+      const architectEmail = "architect@example.com"; 
+      const architectName = "Your Architect"; 
+      
+      // Generate a unique filename for the PDF
+      const pdfFilename = `Northstar_Brief_${clientName || "Client"}_${new Date().toISOString().split('T')[0]}.pdf`;
       
       // Prepare email parameters
       const emailParams = {
@@ -69,7 +72,7 @@ export function EmailExportSection({
         to_name: architectName,
         from_name: clientName || "Client",
         project_address: projectAddress || "Project Address",
-        pdf_link: window.location.origin + "/download/" + encodeURIComponent(`Northstar_Brief_${clientName || "Client"}_${new Date().toISOString().split('T')[0]}.pdf`),
+        pdf_filename: pdfFilename,
         message: "This brief was completed by your client using Northstar.",
         reply_to: "no-reply@northstar.design"
       };
@@ -81,9 +84,6 @@ export function EmailExportSection({
         emailParams,
         'EMAILJS_USER_ID' // This would be the actual user ID
       );
-      
-      // Cleanup
-      URL.revokeObjectURL(pdfUrl);
       
       toast({
         title: "Done",

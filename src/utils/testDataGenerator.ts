@@ -1,3 +1,4 @@
+
 import { FormData } from '@/types';
 
 // Function to generate a random string of a specified length
@@ -70,6 +71,88 @@ export const generateTestData = () => {
     },
     spaces: {
       rooms: [
+        // Bedrooms (4)
+        { 
+          id: generateRandomString(10), 
+          type: 'Bedroom', 
+          displayName: 'Master Bedroom',
+          quantity: 1, 
+          description: JSON.stringify({
+            level: 'upper',
+            notes: 'This is a detailed note for the Master Bedroom. We would like a large ensuite and walk-in closet.'
+          }), 
+          isCustom: false 
+        },
+        { 
+          id: generateRandomString(10), 
+          type: 'Bedroom', 
+          displayName: 'Kids Bedroom 1',
+          quantity: 1, 
+          description: JSON.stringify({
+            level: 'upper',
+            notes: 'This room is for our 10-year-old son who needs space for toys and study.'
+          }), 
+          isCustom: false 
+        },
+        { 
+          id: generateRandomString(10), 
+          type: 'Bedroom', 
+          displayName: 'Kids Bedroom 2',
+          quantity: 1, 
+          description: JSON.stringify({
+            level: 'upper',
+            notes: 'This room is for our 8-year-old daughter who loves bright colors and needs storage.'
+          }), 
+          isCustom: false 
+        },
+        { 
+          id: generateRandomString(10), 
+          type: 'Bedroom', 
+          displayName: 'Guest Bedroom',
+          quantity: 1, 
+          description: JSON.stringify({
+            level: 'upper',
+            notes: 'A comfortable room for visitors with adequate closet space.'
+          }), 
+          isCustom: false 
+        },
+        
+        // Bathrooms (3)
+        { 
+          id: generateRandomString(10), 
+          type: 'Bathroom', 
+          displayName: 'Master Ensuite',
+          quantity: 1, 
+          description: JSON.stringify({
+            level: 'upper',
+            notes: 'Large bathroom with double vanity, walk-in shower, and separate bathtub.'
+          }), 
+          isCustom: false 
+        },
+        { 
+          id: generateRandomString(10), 
+          type: 'Bathroom', 
+          displayName: 'Family Bathroom',
+          quantity: 1, 
+          description: JSON.stringify({
+            level: 'upper',
+            notes: 'Shared bathroom for the kids with bathtub/shower combo.'
+          }), 
+          isCustom: false 
+        },
+        { 
+          id: generateRandomString(10), 
+          type: 'Bathroom', 
+          displayName: 'Powder Room',
+          quantity: 1, 
+          description: JSON.stringify({
+            level: 'ground',
+            notes: 'Small half bath for guests on the main floor.'
+          }), 
+          isCustom: false 
+        },
+        
+        // Living spaces
         { 
           id: generateRandomString(10), 
           type: 'Living', 
@@ -80,7 +163,17 @@ export const generateTestData = () => {
             entertainmentSpace: 'Integrated with Living Areas',
             acousticNeeds: false,
             level: 'ground',
-            notes: 'Open concept with fireplace.'
+            notes: 'Open concept living room with fireplace and large windows facing the garden.'
+          }), 
+          isCustom: false 
+        },
+        { 
+          id: generateRandomString(10), 
+          type: 'Dining', 
+          quantity: 1, 
+          description: JSON.stringify({
+            level: 'ground',
+            notes: 'Formal dining area for 8-10 people, adjacent to kitchen.'
           }), 
           isCustom: false 
         },
@@ -93,17 +186,19 @@ export const generateTestData = () => {
             kitchenLayout: 'Open to Other Spaces',
             kitchenUse: 'Also for Eating',
             level: 'ground',
-            notes: 'Modern kitchen with island.'
+            notes: 'Modern kitchen with island, walk-in pantry, and high-end appliances.'
           }), 
           isCustom: false 
         },
+        
+        // Utility spaces
         { 
           id: generateRandomString(10), 
-          type: 'Bedroom', 
-          quantity: 3, 
+          type: 'Laundry', 
+          quantity: 1, 
           description: JSON.stringify({
-            level: 'upper',
-            notes: 'Master bedroom with ensuite.'
+            level: 'ground',
+            notes: 'Functional laundry room with washer, dryer, sink, and storage.'
           }), 
           isCustom: false 
         },
@@ -115,61 +210,98 @@ export const generateTestData = () => {
             workFromHome: true,
             officeType: 'Dedicated Office',
             level: 'ground',
-            notes: 'Quiet space with good natural light.'
+            notes: 'Quiet home office with built-in desk and bookshelves.'
           }), 
           isCustom: false 
         },
+        { 
+          id: generateRandomString(10), 
+          type: 'Garage', 
+          quantity: 1, 
+          description: JSON.stringify({
+            level: 'ground',
+            notes: 'We want this garage to include storage for bikes and sports equipment.'
+          }), 
+          isCustom: false 
+        },
+        { 
+          id: generateRandomString(10), 
+          type: 'Other', 
+          displayName: 'Media Room',
+          quantity: 1, 
+          description: JSON.stringify({
+            level: 'ground',
+            notes: 'Dedicated home theater with sound insulation and comfortable seating.'
+          }), 
+          isCustom: true,
+          customName: 'Media Room'
+        },
+        { 
+          id: generateRandomString(10), 
+          type: 'Other', 
+          displayName: 'Gym',
+          quantity: 1, 
+          description: JSON.stringify({
+            level: 'ground',
+            notes: 'Small home gym with space for workout equipment.'
+          }), 
+          isCustom: true,
+          customName: 'Gym'
+        },
       ],
-      additionalNotes: 'Need a flexible space for home office.',
-      roomTypes: ['Living Room', 'Kitchen', 'Bedroom', 'Office'],
+      additionalNotes: 'We would like good flow between indoor and outdoor spaces.',
+      roomTypes: ['Living Room', 'Kitchen', 'Bedroom', 'Office', 'Bathroom', 'Dining Room', 'Laundry', 'Garage', 'Media Room', 'Gym'],
       specialSpaces: ['Vaulted Ceilings', 'Large Windows', 'Built-in Storage'],
-      storageNeeds: 'Could reduce the size of the guest bedroom if needed.',
+      storageNeeds: 'Walk-in closets in bedrooms, pantry in kitchen, linen closet near bathrooms.',
       spatialRelationships: 'Kitchen should flow into dining and living area. Office should be in a quiet part of the house.',
       accessibilityNeeds: 'no',
-      spacesNotes: '200 square meters, two floors',
+      spacesNotes: '350 square meters, two floors with most living spaces downstairs and bedrooms upstairs',
       homeLevelType: 'multi-level',
+      homeSize: '350 square meters',
+      eliminableSpaces: 'Could reduce the size of the guest bedroom if needed.',
       levelAssignmentNotes: 'Bedrooms on upper floor, living spaces on ground floor',
     },
     architecture: {
-      stylePrefences: 'Modern, minimalist.',
+      stylePrefences: 'Modern, minimalist with warm touches.',
       externalMaterials: 'Brick, wood, and glass.',
       internalFinishes: 'Neutral colors, natural materials.',
-      sustainabilityGoals: 'Energy-efficient design, solar panels.',
-      specialFeatures: 'Smart home technology, outdoor living space.',
-      preferredStyles: ['Modern', 'Minimalist'],
-      materialPreferences: ['Brick', 'Wood', 'Glass'],
-      sustainabilityFeatures: ['Solar Panels', 'Energy-Efficient Windows'],
-      technologyRequirements: ['Smart Home System', 'High-Speed Internet'],
-      architectureNotes: 'Focus on clean lines and natural light.',
-      inspirationNotes: 'Love natural light and open spaces.',
+      sustainabilityGoals: 'Energy-efficient design, solar panels, rainwater collection.',
+      specialFeatures: 'Smart home technology, outdoor living space with cover.',
+      preferredStyles: ['Modern', 'Minimalist', 'Contemporary'],
+      materialPreferences: ['Brick', 'Wood', 'Glass', 'Natural Stone'],
+      sustainabilityFeatures: ['Solar Panels', 'Energy-Efficient Windows', 'Rainwater Collection'],
+      technologyRequirements: ['Smart Home System', 'High-Speed Internet', 'Automated Lighting'],
+      architectureNotes: 'Focus on clean lines, natural light, and passive heating/cooling.',
+      inspirationNotes: 'Love natural light, open spaces, and connection to outdoors.',
     },
     contractors: {
-      preferredBuilder: "",
+      preferredBuilder: "Auckland Premium Builders",
       goToTender: true,
       professionals: [
-        { id: generateRandomString(10), type: 'Builder', name: 'ABC Builders', contact: 'abc@example.com', notes: 'Local builder with good reputation.', isCustom: false },
-        { id: generateRandomString(10), type: 'Interior Designer', name: 'Jane Smith', contact: 'jane.smith@example.com', notes: 'Experienced in residential design.', isCustom: false },
-        { id: generateRandomString(10), type: 'Engineer', name: 'Tom Brown', contact: 'tom.brown@example.com', notes: 'Structural engineer.', isCustom: false },
+        { id: generateRandomString(10), type: 'Architect', name: 'Jane Anderson', contact: 'jane@examplearchitects.com', notes: 'Recommended by friends who built last year.', isCustom: false },
+        { id: generateRandomString(10), type: 'Builder', name: 'Auckland Premium Builders', contact: 'info@aucklandpremiumbuilders.co.nz', notes: 'Local builder with good reputation.', isCustom: false },
+        { id: generateRandomString(10), type: 'Interior Designer', name: 'Sarah Williams', contact: 'sarah@interiorsbysarah.co.nz', notes: 'Experienced in residential design.', isCustom: false },
+        { id: generateRandomString(10), type: 'Engineer', name: 'Tom Brown', contact: 'tom.brown@structuralengineers.co.nz', notes: 'Structural engineer with experience in coastal properties.', isCustom: false },
       ],
-      additionalNotes: "We have been working with these professionals and have a good relationship with them."
+      additionalNotes: "We would like to work with professionals who have experience with modern, sustainable homes."
     },
     communication: {
-      preferredMethods: ['Email', 'Phone'],
-      bestTimes: ['Afternoon', 'Evening'],
+      preferredMethods: ['Email', 'Phone', 'Video Call'],
+      bestTimes: ['Morning', 'Evening', 'Anytime'],
       availableDays: ['Weekdays', 'Weekends'],
       frequency: 'Weekly',
       urgentContact: 'Phone',
       responseTime: '24 hours',
-      additionalNotes: 'Prefer detailed email updates.',
+      additionalNotes: 'Prefer detailed email updates with phone calls for urgent matters.',
       communicationNotes: 'Please provide regular updates on progress.',
     },
     feedback: {
-      usabilityRating: 4,
+      usabilityRating: 5,
       performanceRating: 5,
-      functionalityRating: 4,
+      functionalityRating: 5,
       designRating: 5,
-      feedbackComments: "The design brief tool was easy to use and very comprehensive. I particularly liked the spaces section and room selection features. Some of the form fields could have more detailed explanations.",
-      customVersionInterest: "We would be interested in a version that integrates with our project management system and includes custom branding for our firm.",
+      feedbackComments: "The design brief tool was very comprehensive and easy to use. I appreciated the detailed questions about each room and the ability to specify preferences for different spaces.",
+      customVersionInterest: "We would be interested in a version that includes 3D visualization of room layouts.",
     }
   };
 };
@@ -187,16 +319,17 @@ export function generateTestFiles(): {
 
   // Create an array of dummy uploaded files (for site photos)
   const uploadedFiles = [
-    createDummyFile('site-photo-1.jpg', 'image/jpeg'),
-    createDummyFile('site-photo-2.jpg', 'image/jpeg'),
-    createDummyFile('site-photo-3.jpg', 'image/jpeg'),
+    createDummyFile('site-photo-front.jpg', 'image/jpeg'),
+    createDummyFile('site-photo-rear.jpg', 'image/jpeg'),
+    createDummyFile('site-photo-view.jpg', 'image/jpeg'),
   ];
 
   // Create an array of dummy inspiration images
   const uploadedInspirationImages = [
-    createDummyFile('inspiration-1.jpg', 'image/jpeg'),
-    createDummyFile('inspiration-2.jpg', 'image/jpeg'),
-    createDummyFile('inspiration-3.jpg', 'image/jpeg'),
+    createDummyFile('inspiration-living-room.jpg', 'image/jpeg'),
+    createDummyFile('inspiration-kitchen.jpg', 'image/jpeg'),
+    createDummyFile('inspiration-exterior.jpg', 'image/jpeg'),
+    createDummyFile('inspiration-bathroom.jpg', 'image/jpeg'),
   ];
 
   // Create an array of dummy site documents
@@ -204,12 +337,12 @@ export function generateTestFiles(): {
     createDummyFile('certificate-of-title.pdf', 'application/pdf'),
     createDummyFile('site-survey.pdf', 'application/pdf'),
     createDummyFile('resource-consent.pdf', 'application/pdf'),
-    createDummyFile('floor-plan.pdf', 'application/pdf'),
+    createDummyFile('existing-floor-plan.pdf', 'application/pdf'),
   ];
 
   // Create an array of dummy inspiration selections
   const inspirationSelections = [
-    'modern', 'minimalist', 'natural light'
+    'modern', 'minimalist', 'natural light', 'open concept', 'indoor-outdoor flow'
   ];
 
   return {

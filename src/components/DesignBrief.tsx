@@ -17,6 +17,7 @@ import { useDesignBrief } from '@/context/DesignBriefContext';
 import { Button } from './ui/button';
 import { generateTestData, generateTestFiles } from '@/utils/testDataGenerator';
 import { toast } from 'sonner';
+import { Beaker } from 'lucide-react';
 
 export function DesignBrief() {
   const { currentSection, updateFormData, updateFiles, projectData } = useDesignBrief();
@@ -27,29 +28,47 @@ export function DesignBrief() {
   }, [currentSection]);
   
   const loadTestData = () => {
-    // Generate comprehensive test data for all sections
-    const testData = generateTestData();
+    toast.info("Loading test data. This may take a moment...");
     
-    // Update each section with complete test data
-    Object.entries(testData).forEach(([section, data]) => {
-      updateFormData(section as any, data as any);
-    });
-    
-    // Generate and update test files, including imagery and documents
-    try {
-      const fileData = generateTestFiles();
-      updateFiles({
-        uploadedFiles: fileData.uploadedFiles,
-        uploadedInspirationImages: fileData.uploadedInspirationImages,
-        inspirationSelections: fileData.inspirationSelections,
-        siteDocuments: fileData.siteDocuments,
-      });
-      
-      toast.success("Test data loaded successfully! All sections now 100% complete.");
-    } catch (error) {
-      console.error("Error generating test files:", error);
-      toast.error("Test data loaded partially. Error with file generation.");
-    }
+    setTimeout(() => {
+      try {
+        // Generate comprehensive test data for all sections
+        const testData = generateTestData();
+        
+        // Update each section with complete test data
+        Object.entries(testData).forEach(([section, data]) => {
+          updateFormData(section as any, data as any);
+        });
+        
+        // Generate and update test files, including imagery and documents
+        try {
+          const fileData = generateTestFiles();
+          updateFiles({
+            uploadedFiles: fileData.uploadedFiles,
+            uploadedInspirationImages: fileData.uploadedInspirationImages,
+            inspirationSelections: fileData.inspirationSelections,
+            siteDocuments: fileData.siteDocuments,
+          });
+          
+          toast.success("Test data loaded successfully! All sections now 100% complete.", {
+            duration: 5000,
+          });
+          
+          // Automatically navigate to the summary section after loading test data
+          setTimeout(() => {
+            toast("Navigating to Summary section...");
+            window.scrollTo(0, 0);
+            updateFormData('summary', { editedSummary: "This design brief was auto-generated using the Load Test function. It represents a comprehensive example of a filled-out brief for a modern family home. All sections have been populated with realistic sample data to demonstrate the full capabilities of the Northstar brief system." });
+          }, 1000);
+        } catch (error) {
+          console.error("Error generating test files:", error);
+          toast.error("Test data loaded partially. Error with file generation.");
+        }
+      } catch (error) {
+        console.error("Error loading test data:", error);
+        toast.error("Failed to load test data. Please try again.");
+      }
+    }, 500);
   };
   
   const renderSection = () => {
@@ -85,15 +104,15 @@ export function DesignBrief() {
   
   return (
     <DesignBriefLayout>
-      {process.env.NODE_ENV === 'development' && (
+      {(process.env.NODE_ENV === 'development' || process.env.VITE_ENABLE_TEST_MODE === 'true') && (
         <div className="fixed top-20 right-4 z-50">
           <Button 
-            variant="outline" 
-            size="sm" 
             onClick={loadTestData}
-            className="bg-yellow-100 hover:bg-yellow-200 text-yellow-800 border-yellow-300"
+            className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium shadow-md"
+            size="sm"
           >
-            Load Test Data
+            <Beaker className="h-4 w-4 mr-2" />
+            Load Test
           </Button>
         </div>
       )}
