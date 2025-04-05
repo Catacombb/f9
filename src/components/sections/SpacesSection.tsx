@@ -12,10 +12,69 @@ import { SpaceRoom } from '@/types';
 
 export function SpacesSection() {
   const [activeTab, setActiveTab] = useState('room-selection');
-  const { formData, updateFormData, setCurrentSection } = useDesignBrief();
+  const { formData, updateFormData, setCurrentSection, addRoom, updateRoom, removeRoom } = useDesignBrief();
+  const [newRoomType, setNewRoomType] = useState('');
+  const [customRoomType, setCustomRoomType] = useState('');
+  const [showCustomInput, setShowCustomInput] = useState(false);
   
-  const handleRoomsChange = (rooms: SpaceRoom[]) => {
-    updateFormData('spaces', { rooms });
+  // Room quantity management
+  const [roomQuantities, setRoomQuantities] = useState<{[key: string]: number}>({});
+  
+  const handleRoomTypeChange = (value: string) => {
+    if (value === 'Other') {
+      setShowCustomInput(true);
+      setNewRoomType('Other');
+    } else {
+      setNewRoomType(value);
+    }
+  };
+  
+  const handleAddRoom = () => {
+    const roomType = showCustomInput ? customRoomType : newRoomType;
+    if (roomType) {
+      addRoom({
+        type: roomType,
+        quantity: 1,
+        description: '',
+        isCustom: showCustomInput
+      });
+      
+      // Reset form state
+      setNewRoomType('');
+      setCustomRoomType('');
+      setShowCustomInput(false);
+    }
+  };
+  
+  const handleRemoveRoom = (id: string) => {
+    removeRoom(id);
+  };
+  
+  const getRoomQuantity = (type: string): number => {
+    return roomQuantities[type] || 0;
+  };
+  
+  const incrementRoomQuantity = (type: string) => {
+    setRoomQuantities(prev => ({
+      ...prev,
+      [type]: (prev[type] || 0) + 1
+    }));
+  };
+  
+  const decrementRoomQuantity = (type: string) => {
+    if (roomQuantities[type] > 0) {
+      setRoomQuantities(prev => ({
+        ...prev,
+        [type]: prev[type] - 1
+      }));
+    }
+  };
+  
+  const handleRoomQuantityChange = (type: string, quantity: number) => {
+    setRoomQuantities(prev => ({
+      ...prev,
+      [type]: Math.max(0, quantity)
+    }));
   };
   
   const handleAdditionalNotesChange = (notes: string) => {
@@ -84,7 +143,20 @@ export function SpacesSection() {
           <TabsContent value="room-selection" className="mt-0">
             <RoomSelectionTab
               rooms={formData.spaces.rooms}
-              onRoomsChange={handleRoomsChange}
+              roomsWithQuantities={roomsWithQuantities}
+              newRoomType={newRoomType}
+              customRoomType={customRoomType}
+              showCustomInput={showCustomInput}
+              handleRoomTypeChange={handleRoomTypeChange}
+              setCustomRoomType={setCustomRoomType}
+              setShowCustomInput={setShowCustomInput}
+              handleAddRoom={handleAddRoom}
+              getRoomQuantity={getRoomQuantity}
+              incrementRoomQuantity={incrementRoomQuantity}
+              decrementRoomQuantity={decrementRoomQuantity}
+              handleRoomQuantityChange={handleRoomQuantityChange}
+              updateRoom={updateRoom}
+              handleRemoveRoom={handleRemoveRoom}
             />
           </TabsContent>
           
