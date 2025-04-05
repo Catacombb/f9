@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -78,7 +79,8 @@ export function SummarySection() {
   };
   
   const handlePrevious = () => {
-    setCurrentSection('uploads');
+    setCurrentSection('communication');
+    window.scrollTo(0, 0);
   };
   
   const formatOccupantsData = () => {
@@ -114,6 +116,46 @@ export function SummarySection() {
       return "Data format error";
     }
   };
+
+  // Format room information for human-readable display
+  const formatRoomInfo = (room) => {
+    let displayText = '';
+    
+    // Add room type and quantity
+    const roomType = room.isCustom && room.customName ? room.customName : room.type;
+    displayText = `${roomType} (${room.quantity})`;
+    
+    // Add description if available
+    if (room.description) {
+      displayText += `\n${room.description}`;
+    }
+    
+    return displayText;
+  };
+  
+  // Group rooms by type for cleaner display
+  const groupRoomsByType = () => {
+    const groupedRooms = {};
+    
+    formData.spaces.rooms.forEach(room => {
+      const type = room.isCustom && room.customName ? room.customName : room.type;
+      
+      if (!groupedRooms[type]) {
+        groupedRooms[type] = {
+          quantity: 0,
+          descriptions: []
+        };
+      }
+      
+      groupedRooms[type].quantity += room.quantity;
+      
+      if (room.description) {
+        groupedRooms[type].descriptions.push(room.description);
+      }
+    });
+    
+    return groupedRooms;
+  };
   
   return (
     <div className="design-brief-section-wrapper">
@@ -134,6 +176,7 @@ export function SummarySection() {
                 <h3 className="text-xl font-bold mb-4">Design Brief Overview</h3>
                 
                 <div className="border rounded-lg p-6 space-y-8">
+                  {/* Project Information section */}
                   <div className="pb-6 border-b">
                     <h4 className="text-lg font-bold mb-4">Project Information</h4>
                     <div className="grid md:grid-cols-2 gap-4">
@@ -169,6 +212,7 @@ export function SummarySection() {
                     )}
                   </div>
                   
+                  {/* Budget Information section */}
                   <div className="pb-6 border-b">
                     <h4 className="text-lg font-bold mb-4">Budget Information</h4>
                     <div className="space-y-4">
@@ -197,6 +241,7 @@ export function SummarySection() {
                     </div>
                   </div>
                   
+                  {/* Lifestyle section */}
                   <div className="pb-6 border-b">
                     <h4 className="text-lg font-bold mb-4">Lifestyle</h4>
                     <div className="space-y-4">
@@ -233,6 +278,7 @@ export function SummarySection() {
                     </div>
                   </div>
                   
+                  {/* Site Information section */}
                   <div className="pb-6 border-b">
                     <h4 className="text-lg font-bold mb-4">Site Information</h4>
                     <div className="space-y-4">
@@ -273,16 +319,23 @@ export function SummarySection() {
                     </div>
                   </div>
                   
+                  {/* Spaces section - UPDATED to improve formatting */}
                   {formData.spaces.rooms.length > 0 && (
                     <div className="pb-6 border-b">
                       <h4 className="text-lg font-bold mb-4">Spaces</h4>
                       <div className="space-y-4">
-                        {formData.spaces.rooms.map((room, index) => (
-                          <div key={room.id || index}>
-                            <p className="text-sm font-medium">
-                              {room.isCustom && room.customName ? room.customName : room.type} ({room.quantity}):
-                            </p>
-                            <p className="text-sm">{room.description}</p>
+                        {Object.entries(groupRoomsByType()).map(([type, info], index) => (
+                          <div key={`room-group-${index}`} className="mb-4">
+                            <p className="text-sm font-medium">{type} ({info.quantity})</p>
+                            {info.descriptions.length > 0 && (
+                              <ul className="list-disc pl-6 mt-1">
+                                {info.descriptions.map((desc, descIndex) => (
+                                  <li key={`desc-${index}-${descIndex}`} className="text-sm">
+                                    {desc}
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
                           </div>
                         ))}
                         
@@ -296,6 +349,7 @@ export function SummarySection() {
                     </div>
                   )}
                   
+                  {/* Architectural Preferences section */}
                   <div className="pb-6 border-b">
                     <h4 className="text-lg font-bold mb-4">Architectural Preferences</h4>
                     <div className="space-y-4">
@@ -332,6 +386,7 @@ export function SummarySection() {
                     </div>
                   </div>
                   
+                  {/* Project Team section */}
                   {formData.contractors.professionals.length > 0 && (
                     <div className="pb-6 border-b">
                       <h4 className="text-lg font-bold mb-4">Project Team</h4>
@@ -373,6 +428,7 @@ export function SummarySection() {
                     </div>
                   )}
                   
+                  {/* Uploaded Files section */}
                   {files.uploadedFiles.length > 0 && (
                     <div className="pb-6 border-b">
                       <h4 className="text-lg font-bold mb-4">Uploaded Files</h4>
@@ -386,6 +442,7 @@ export function SummarySection() {
                     </div>
                   )}
                   
+                  {/* Site Documents section */}
                   {files.siteDocuments && files.siteDocuments.length > 0 && (
                     <div className="pb-6 border-b">
                       <h4 className="text-lg font-bold mb-4">Site Documents</h4>
@@ -399,6 +456,7 @@ export function SummarySection() {
                     </div>
                   )}
                   
+                  {/* Inspiration Selections section */}
                   {files.inspirationSelections.length > 0 && (
                     <div>
                       <h4 className="text-lg font-bold mb-4">Inspiration Selections</h4>
@@ -420,6 +478,7 @@ export function SummarySection() {
                     </div>
                   )}
 
+                  {/* Communication Preferences section */}
                   {(formData.communication.preferredMethods?.length > 0 || 
                     formData.communication.bestTimes?.length > 0 ||
                     formData.communication.availableDays?.length > 0 ||
@@ -537,7 +596,7 @@ export function SummarySection() {
         <div className="flex justify-between mt-6">
           <Button variant="outline" onClick={handlePrevious} className="group">
             <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-            <span>Previous: Uploads</span>
+            <span>Previous: Communication</span>
           </Button>
         </div>
       </div>

@@ -1,3 +1,4 @@
+
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 import { ProjectData } from '@/types';
@@ -433,6 +434,8 @@ export const generatePDF = async (projectData: ProjectData): Promise<void> => {
     case 'tbd':
       budgetRange = 'To be determined';
       break;
+    default:
+      budgetRange = projectData.formData.budget.budgetRange || 'Not specified';
   }
   addText('Budget Range', budgetRange);
   
@@ -463,6 +466,8 @@ export const generatePDF = async (projectData: ProjectData): Promise<void> => {
     case 'over_2years':
       timeframe = 'More than 2 years';
       break;
+    default:
+      timeframe = projectData.formData.budget.timeframe || 'Not specified';
   }
   addText('Project Timeframe', timeframe);
   
@@ -508,14 +513,26 @@ export const generatePDF = async (projectData: ProjectData): Promise<void> => {
     // Group rooms by type and sum quantities
     const roomsByType = new Map();
     projectData.formData.spaces.rooms.forEach(room => {
-      const { type, quantity } = room;
-      roomsByType.set(type, (roomsByType.get(type) || 0) + quantity);
+      const type = room.isCustom && room.customName ? room.customName : room.type;
+      if (!roomsByType.has(type)) {
+        roomsByType.set(type, {
+          quantity: 0,
+          descriptions: []
+        });
+      }
+      
+      const entry = roomsByType.get(type);
+      entry.quantity += room.quantity;
+      
+      if (room.description) {
+        entry.descriptions.push(room.description);
+      }
     });
     
     // Format as a bullet list
     const roomList: string[] = [];
-    roomsByType.forEach((quantity, type) => {
-      roomList.push(`${quantity} ${type}${quantity > 1 ? 's' : ''}`);
+    roomsByType.forEach((info, type) => {
+      roomList.push(`${info.quantity} ${type}${info.quantity > 1 ? 's' : ''}`);
     });
     
     addBulletPoints(roomList);
@@ -525,9 +542,29 @@ export const generatePDF = async (projectData: ProjectData): Promise<void> => {
     addText('Room Descriptions', '');
     addSpace(2);
     
-    projectData.formData.spaces.rooms.forEach(room => {
-      if (room.description) {
-        addText(`${room.type} (${room.quantity})`, room.description, true);
+    roomsByType.forEach((info, type) => {
+      if (info.descriptions.length > 0) {
+        addText(`${type} (${info.quantity})`, '', true);
+        
+        // Add each description as a bullet point
+        info.descriptions.forEach(description => {
+          // Check if we need a new page
+          if (yPosition > pageHeight - 20) {
+            addNewPage();
+          }
+          
+          pdf.setTextColor(COLORS.secondary);
+          pdf.setFont('helvetica', 'normal');
+          pdf.setFontSize(10);
+          pdf.text('•', margin + 4, yPosition);
+          
+          const bulletWidth = pdf.getTextWidth('• ');
+          const textLines = pdf.splitTextToSize(description, contentWidth - bulletWidth - 8);
+          pdf.text(textLines, margin + 8, yPosition);
+          yPosition += (textLines.length * 5) + 2;
+        });
+        
+        addSpace(2);
       }
     });
   } else {
@@ -692,6 +729,8 @@ export const generatePDF = async (projectData: ProjectData): Promise<void> => {
       case 'week':
         responseTime = 'Within a Week';
         break;
+      default:
+        responseTime = projectData.formData.communication.responseTime || 'Not specified';
     }
     addText('Expected Response Time', responseTime);
   }
@@ -717,6 +756,88 @@ export const generatePDF = async (projectData: ProjectData): Promise<void> => {
     addSectionTitle('Project Summary');
     // Apply removeMarkdown to the summary text
     addMultiLineText(projectData.summary.editedSummary);
+  }
+  
+  // 11. NEW: Supporting Files / Uploaded Documents section
+  const hasUploadedFiles = projectData.files.uploadedFiles && projectData.files.uploadedFiles.length > 0;
+  const hasSiteDocuments = projectData.files.siteDocuments && projectData.files.siteDocuments.length > 0;
+  
+  if (hasUploadedFiles || hasSiteDocuments) {
+    // Add section header
+    addSectionTitle('Supporting Files');
+    
+    // Format and list uploaded files
+    if (hasUploadedFiles) {
+      addText('Uploaded Files', '');
+      addSpace(2);
+      
+      projectData.files.uploadedFiles.forEach((file, index) => {
+        const fileSize = (file.size / 1024 / 1024).toFixed(2);
+        const fileInfo = `${file.name} (${fileSize} MB)`;
+        
+        // Check if we need a new page
+        if (yPosition > pageHeight - 20) {
+          addNewPage();
+        }
+        
+        pdf.setFont('helvetica', 'normal');
+        pdf.setTextColor(COLORS.secondary);
+        pdf.setFontSize(10);
+        pdf.text(`${index + 1}.`, margin, yPosition);
+        
+        // Calculate indentation for text after number
+        const numberWidth = pdf.getTextWidth(`${index + 1}. `);
+        
+        // Display filename and size
+        const textLines = pdf.splitTextToSize(fileInfo, contentWidth - numberWidth - 2);
+        pdf.text(textLines, margin + numberWidth + 2, yPosition);
+        
+        // Move position for next item
+        yPosition += (textLines.length * 5) + 2;
+      });
+      
+      addSpace(4);
+    }
+    
+    // Format and list site documents
+    if (hasSiteDocuments) {
+      addText('Site Documents', '');
+      addSpace(2);
+      
+      projectData.files.siteDocuments.forEach((file, index) => {
+        const fileSize = (file.size / 1024 / 1024).toFixed(2);
+        const fileInfo = `${file.name} (${fileSize} MB)`;
+        
+        // Check if we need a new page
+        if (yPosition > pageHeight - 20) {
+          addNewPage();
+        }
+        
+        pdf.setFont('helvetica', 'normal');
+        pdf.setTextColor(COLORS.secondary);
+        pdf.setFontSize(10);
+        pdf.text(`${index + 1}.`, margin, yPosition);
+        
+        // Calculate indentation for text after number
+        const numberWidth = pdf.getTextWidth(`${index + 1}. `);
+        
+        // Display filename and size
+        const textLines = pdf.splitTextToSize(fileInfo, contentWidth - numberWidth - 2);
+        pdf.text(textLines, margin + numberWidth + 2, yPosition);
+        
+        // Move position for next item
+        yPosition += (textLines.length * 5) + 2;
+      });
+    }
+    
+    addSpace(4);
+    
+    // Add note about file access
+    pdf.setFont('helvetica', 'italic');
+    pdf.setTextColor(COLORS.secondary);
+    pdf.setFontSize(9);
+    const accessNote = "Note: Original files can be accessed through the Northstar project management system.";
+    pdf.text(accessNote, margin, yPosition);
   }
   
   // Save the PDF

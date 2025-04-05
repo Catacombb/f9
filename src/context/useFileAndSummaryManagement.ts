@@ -2,11 +2,14 @@
 import { useCallback } from 'react';
 import { ProjectData } from '@/types';
 import { generatePDF } from '@/utils/pdfGenerator';
+import { useToast } from '@/hooks/use-toast';
 
 export const useFileAndSummaryManagement = (
   projectData: ProjectData,
   setProjectData: React.Dispatch<React.SetStateAction<ProjectData>>
 ) => {
+  const { toast } = useToast();
+
   const updateFiles = useCallback((updates: Partial<ProjectData['files']>) => {
     setProjectData(draft => {
       const updatedDraft = { ...draft };
@@ -37,12 +40,39 @@ export const useFileAndSummaryManagement = (
 
   const sendByEmail = useCallback(async (email: string): Promise<boolean> => {
     console.log(`Sending email to ${email}`);
-    return new Promise<boolean>((resolve) => {
-      setTimeout(() => {
-        resolve(true);
-      }, 1500);
-    });
-  }, []);
+    
+    try {
+      // Generate PDF first
+      await generatePDF(projectData);
+      
+      // In a real implementation this would be an API call to a backend service
+      // For now, we'll simulate the email sending with a delay
+      return new Promise<boolean>((resolve) => {
+        setTimeout(() => {
+          // Log success message with timestamp for debugging
+          const timestamp = new Date().toISOString();
+          console.log(`[${timestamp}] Email sent successfully to ${email}`);
+          
+          // Store the last email sent in localStorage for debugging/tracking
+          localStorage.setItem('lastEmailSent', JSON.stringify({
+            email,
+            timestamp,
+            projectName: projectData.formData.projectInfo.clientName || "Unnamed Project"
+          }));
+          
+          resolve(true);
+        }, 1500);
+      });
+    } catch (error) {
+      console.error("Error sending email:", error);
+      toast({
+        title: "Error Sending Email",
+        description: "There was a problem generating or sending the PDF. Please try again.",
+        variant: "destructive",
+      });
+      return Promise.resolve(false);
+    }
+  }, [projectData, toast]);
 
   const exportAsPDF = useCallback(async (): Promise<void> => {
     try {
