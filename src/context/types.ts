@@ -5,7 +5,7 @@ export interface UpdateFormData {
   <K extends keyof ProjectData['formData']>(
     section: K,
     updates: Partial<ProjectData['formData'][K]>
-  ) => void;
+  ): void;
 }
 
 export interface DesignBriefContextType {
