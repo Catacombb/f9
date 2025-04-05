@@ -17,7 +17,7 @@ const inspirationImages = [
 ];
 
 export function SummarySection() {
-  const { formData, files, sendByEmail, exportAsPDF, setCurrentSection } = useDesignBrief();
+  const { formData, files, exportAsPDF, setCurrentSection } = useDesignBrief();
   
   const formatSpacesData = () => {
     if (!formData.spaces.rooms || formData.spaces.rooms.length === 0) {
@@ -216,8 +216,6 @@ export function SummarySection() {
             />
             
             <EmailExportSection 
-              defaultEmail={formData.projectInfo.contactEmail || ''}
-              onSendEmail={sendByEmail}
               onExportPDF={handleExportPDF}
               clientName={formData.projectInfo.clientName}
             />

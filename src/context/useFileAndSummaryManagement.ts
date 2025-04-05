@@ -1,4 +1,3 @@
-
 import { useCallback } from 'react';
 import { ProjectData } from '@/types';
 import { generatePDF } from '@/utils/pdfGenerator/index';
@@ -124,5 +123,10 @@ The Northstar Team`;
     }
   }, [projectData]);
 
-  return { updateFiles, updateSummary, saveProjectData, sendByEmail, exportAsPDF };
+  return { 
+    updateFiles, 
+    updateSummary, 
+    saveProjectData, 
+    exportAsPDF 
+  };
 };
