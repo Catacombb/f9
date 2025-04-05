@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { SectionHeader } from './SectionHeader';
@@ -23,6 +22,7 @@ import {
 } from '@/components/ui/radio-group';
 import { Checkbox } from '@/components/ui/checkbox';
 import emailjs from 'emailjs-com';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 export function FeedbackSection() {
   const { formData, updateFormData, setCurrentSection, projectData } = useDesignBrief();
@@ -164,32 +164,43 @@ export function FeedbackSection() {
   const RatingStars = ({ 
     name, 
     value, 
-    onChange 
+    onChange,
+    tooltipText 
   }: { 
     name: string; 
     value: number; 
-    onChange: (value: number) => void 
+    onChange: (value: number) => void;
+    tooltipText: string;
   }) => {
     return (
-      <div className="flex items-center gap-1">
-        {[1, 2, 3, 4, 5].map((star) => (
-          <button
-            key={star}
-            type="button"
-            onClick={() => onChange(star)}
-            className={`p-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-full`}
-            aria-label={`Rate ${star} out of 5`}
-          >
-            <Star
-              className={`h-6 w-6 ${
-                star <= value
-                  ? 'fill-yellow-500 text-yellow-500'
-                  : 'text-gray-300'
-              }`}
-            />
-          </button>
-        ))}
-      </div>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div className="flex items-center gap-1">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <button
+                  key={star}
+                  type="button"
+                  onClick={() => onChange(star)}
+                  className={`p-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-full`}
+                  aria-label={`Rate ${star} out of 5`}
+                >
+                  <Star
+                    className={`h-6 w-6 ${
+                      star <= value
+                        ? 'fill-yellow-500 text-yellow-500'
+                        : 'text-gray-300'
+                    }`}
+                  />
+                </button>
+              ))}
+            </div>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>{tooltipText}</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
     );
   };
 
@@ -313,7 +324,8 @@ export function FeedbackSection() {
                   <RatingStars 
                     name="usabilityRating" 
                     value={formData.feedback.usabilityRating} 
-                    onChange={(v) => handleRatingChange('usabilityRating', v)} 
+                    onChange={(v) => handleRatingChange('usabilityRating', v)}
+                    tooltipText="How easy and intuitive was the tool to navigate and use?"
                   />
                 </div>
                 
@@ -322,7 +334,8 @@ export function FeedbackSection() {
                   <RatingStars 
                     name="performanceRating" 
                     value={formData.feedback.performanceRating} 
-                    onChange={(v) => handleRatingChange('performanceRating', v)} 
+                    onChange={(v) => handleRatingChange('performanceRating', v)}
+                    tooltipText="How quickly did the tool load and respond to your interactions?"
                   />
                 </div>
                 
@@ -331,7 +344,8 @@ export function FeedbackSection() {
                   <RatingStars 
                     name="functionalityRating" 
                     value={formData.feedback.functionalityRating} 
-                    onChange={(v) => handleRatingChange('functionalityRating', v)} 
+                    onChange={(v) => handleRatingChange('functionalityRating', v)}
+                    tooltipText="How well did the tool's features meet your design brief creation needs?"
                   />
                 </div>
                 
@@ -340,7 +354,8 @@ export function FeedbackSection() {
                   <RatingStars 
                     name="designRating" 
                     value={formData.feedback.designRating} 
-                    onChange={(v) => handleRatingChange('designRating', v)} 
+                    onChange={(v) => handleRatingChange('designRating', v)}
+                    tooltipText="How visually appealing and professional did you find the interface?"
                   />
                 </div>
               </div>
