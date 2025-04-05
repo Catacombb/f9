@@ -58,8 +58,10 @@ export function DesignBrief() {
           setTimeout(() => {
             toast("Navigating to Summary section...");
             window.scrollTo(0, 0);
-            // Use updateSummary instead of updateFormData for summary data
-            updateSummary({ editedSummary: "This design brief was auto-generated using the Load Test function. It represents a comprehensive example of a filled-out brief for a modern family home. All sections have been populated with realistic sample data to demonstrate the full capabilities of the Northstar brief system." });
+            updateSummary({ 
+              editedSummary: "This design brief was auto-generated using the Load Test function. It represents a comprehensive example of a filled-out brief for a modern family home. All sections have been populated with realistic sample data to demonstrate the full capabilities of the Northstar brief system." 
+            });
+            setCurrentSection('summary');
           }, 1000);
         } catch (error) {
           console.error("Error generating test files:", error);
