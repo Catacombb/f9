@@ -1,11 +1,10 @@
-
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, ArrowRight, Upload, X, FileText, Image, FileArchive } from 'lucide-react';
 import { SectionHeader } from './SectionHeader';
 import { toast } from 'sonner';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 
@@ -21,7 +20,10 @@ const ALLOWED_FILE_TYPES = {
     'application/vnd.ms-excel',
     'text/plain',
     'application/zip',
-    'application/x-zip-compressed'
+    'application/x-zip-compressed',
+    'application/dwg',
+    'application/dxf',
+    'application/x-dwg'
   ],
   images: [
     'image/jpeg',
@@ -37,8 +39,8 @@ const FILE_CATEGORIES = [
   { 
     id: 'siteDocuments', 
     label: 'Site Documents', 
-    description: 'Upload Certificate of Title, LIM Report, Resource Consent Documents',
-    accept: '.pdf,.doc,.docx,.xls,.xlsx,.txt,.zip'
+    description: 'Upload Certificate of Title, LIM Report, Resource Consent, Site Survey, and Topographic Files',
+    accept: '.pdf,.doc,.docx,.xls,.xlsx,.txt,.zip,.dwg,.dxf'
   },
   { 
     id: 'sitePhotos', 
@@ -100,24 +102,20 @@ export function UploadsSection() {
     if (e.target.files && e.target.files.length > 0) {
       const selectedFiles = Array.from(e.target.files);
       handleFileUpload(selectedFiles, categoryId);
-      // Reset the input value so the same file can be uploaded again if needed
       e.target.value = '';
     }
   }, []);
   
   const handleFileUpload = useCallback((selectedFiles: File[], categoryId: string) => {
-    // Filter files by type based on category
     const isImageCategory = ['sitePhotos', 'inspirationFiles'].includes(categoryId);
     const allowedTypes = isImageCategory ? ALLOWED_FILE_TYPES.images : ALLOWED_FILE_TYPES.documents;
     
     const validFiles = selectedFiles.filter(file => {
-      // Check file size
       if (file.size > MAX_FILE_SIZE) {
         toast.error(`File ${file.name} is too large. Maximum size is 10MB.`);
         return false;
       }
       
-      // Check file type
       if (!allowedTypes.includes(file.type)) {
         toast.error(`File ${file.name} is not a valid file type for this category.`);
         return false;
@@ -130,7 +128,6 @@ export function UploadsSection() {
       return;
     }
     
-    // Simulate upload progress
     validFiles.forEach(file => {
       const fileId = `${file.name}-${Date.now()}`;
       setUploadProgress(prev => ({ ...prev, [fileId]: 0 }));
@@ -142,7 +139,6 @@ export function UploadsSection() {
           progress = 100;
           clearInterval(interval);
           
-          // Remove progress indicator after a delay
           setTimeout(() => {
             setUploadProgress(prev => {
               const newProgress = { ...prev };
@@ -156,7 +152,6 @@ export function UploadsSection() {
       }, 200);
     });
     
-    // Update files in context
     updateFiles({
       [categoryId]: [...(files[categoryId as keyof typeof files] || []), ...validFiles]
     });
@@ -231,7 +226,6 @@ export function UploadsSection() {
             </div>
           </div>
           
-          {/* File list */}
           {hasFiles && (
             <div className="mt-4">
               <h4 className="text-sm font-medium mb-2">Uploaded Files</h4>
@@ -259,7 +253,6 @@ export function UploadsSection() {
             </div>
           )}
           
-          {/* Upload progress indicators */}
           {Object.keys(uploadProgress).length > 0 && (
             <div className="mt-4 space-y-2">
               {Object.entries(uploadProgress).map(([fileId, progress]) => (
