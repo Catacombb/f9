@@ -1,48 +1,103 @@
-
 import React, { useState } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
-import { MultiSelectButtons } from '@/components/MultiSelectButtons';
+import { Input } from '@/components/ui/input';
 import { useDesignBrief } from '@/context/DesignBriefContext';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Upload, Image, X, FileText } from 'lucide-react';
 import { SectionHeader } from './SectionHeader';
-
-// Options for site features and constraints
-const siteFeatureOptions = [
-  'Flat land', 'Sloping site', 'Waterfront', 'Bush setting',
-  'Urban setting', 'Rural setting', 'Mountain views', 'Sea views',
-  'Garden established', 'North facing', 'South facing', 'East facing', 'West facing'
-];
-
-const siteConstraintOptions = [
-  'Heritage constraints', 'Flood zone', 'Bush fire zone', 'Height restrictions',
-  'Boundary setbacks', 'Overshadowing issues', 'Noise issues', 'Privacy issues',
-  'Limited access', 'Easements', 'Covenants', 'Protected trees'
-];
+import { Card, CardContent } from '@/components/ui/card';
+import { toast } from 'sonner';
 
 export function SiteSection() {
-  const { formData, updateFormData, setCurrentSection } = useDesignBrief();
+  const { formData, updateFormData, setCurrentSection, projectData, updateFiles } = useDesignBrief();
+  const [uploadedPhotos, setUploadedPhotos] = useState<File[]>(
+    projectData.files.uploadedFiles || []
+  );
+  const [siteDocuments, setSiteDocuments] = useState<File[]>(
+    projectData.files.siteDocuments || []
+  );
   
-  const handleSiteFeaturesChange = (features: string[]) => {
-    updateFormData('site', { siteFeatures: features });
-  };
-  
-  const handleSiteConstraintsChange = (constraints: string[]) => {
-    updateFormData('site', { siteConstraints: constraints });
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    updateFormData('site', { [name]: value });
   };
   
   const handlePrevious = () => {
-    // Navigation to previous section
-    setCurrentSection('lifestyle');
+    setCurrentSection('projectInfo');
     window.scrollTo(0, 0);
   };
   
   const handleNext = () => {
-    // Navigation to next section
-    setCurrentSection('spaces');
+    setCurrentSection('lifestyle');
     window.scrollTo(0, 0);
+  };
+  
+  const handleSiteDocumentUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const newFiles = Array.from(e.target.files);
+      
+      // Filter for PDF files only
+      const pdfFiles = newFiles.filter(file => file.type === 'application/pdf');
+      
+      if (pdfFiles.length !== newFiles.length) {
+        toast.warning("Only PDF files are allowed. Non-PDF files were ignored.");
+      }
+      
+      if (pdfFiles.length === 0) {
+        e.target.value = '';
+        return;
+      }
+      
+      const updatedFiles = [...siteDocuments, ...pdfFiles];
+      setSiteDocuments(updatedFiles);
+      
+      // Update the global state with the new files
+      updateFiles({
+        ...projectData.files,
+        siteDocuments: updatedFiles
+      });
+      
+      e.target.value = '';
+    }
+  };
+  
+  const handleRemoveSiteDocument = (index: number) => {
+    const updatedFiles = [...siteDocuments];
+    updatedFiles.splice(index, 1);
+    setSiteDocuments(updatedFiles);
+    
+    // Update the global state with the updated files
+    updateFiles({
+      ...projectData.files,
+      siteDocuments: updatedFiles
+    });
+  };
+  
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const newFiles = Array.from(e.target.files);
+      const updatedFiles = [...uploadedPhotos, ...newFiles];
+      setUploadedPhotos(updatedFiles);
+      
+      // Update the global state with the new files
+      updateFiles({
+        ...projectData.files,
+        uploadedFiles: updatedFiles
+      });
+    }
+  };
+  
+  const handleRemovePhoto = (index: number) => {
+    const updatedFiles = [...uploadedPhotos];
+    updatedFiles.splice(index, 1);
+    setUploadedPhotos(updatedFiles);
+    
+    // Update the global state with the updated files
+    updateFiles({
+      ...projectData.files,
+      uploadedFiles: updatedFiles
+    });
   };
   
   return (
@@ -50,128 +105,236 @@ export function SiteSection() {
       <div className="design-brief-section-container">
         <SectionHeader 
           title="Site Information" 
-          description="Tell us about your site, its characteristics, and any constraints."
+          description="Understanding your site helps us design with the natural environment and surroundings in mind."
           isBold={true}
         />
         
-        <Card className="mb-8">
-          <CardContent className="pt-6 space-y-8">
-            <div>
-              <Label htmlFor="existingConditions" className="text-base font-medium">
-                Existing Conditions
+        {/* Site Documentation Upload Section - NEW */}
+        <div className="design-brief-form-group mb-8">
+          <div className="p-4 border rounded-md bg-muted/30">
+            <Label className="design-brief-question-title font-bold mb-2">
+              Site Documentation Upload
+            </Label>
+            <p className="design-brief-question-description mb-4">
+              Upload relevant site documents (PDF only): Certificate of Title, Covenants, Resource Consents, or any other relevant site information. If you don't have these on hand, that's okay — we can request them on your behalf.
+            </p>
+            
+            <div className="mt-4">
+              <Label 
+                htmlFor="site-documents" 
+                className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-md border-primary/50 cursor-pointer bg-background hover:bg-accent/10 transition-colors"
+              >
+                <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                  <FileText className="w-8 h-8 mb-2 text-primary" />
+                  <p className="mb-2 text-sm text-center">
+                    <span className="font-medium text-primary">Click to upload</span> or drag and drop
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    PDF files only
+                  </p>
+                </div>
+                <Input 
+                  id="site-documents" 
+                  type="file" 
+                  accept="application/pdf" 
+                  multiple 
+                  className="hidden" 
+                  onChange={handleSiteDocumentUpload}
+                />
               </Label>
-              <div className="text-sm text-slate-500 mb-2">
-                What is currently on the site? (e.g., empty lot, existing house to be demolished)
-              </div>
-              <Textarea
-                id="existingConditions"
-                placeholder="Describe the current state of your site..."
-                value={formData.site.existingConditions || ''}
-                onChange={(e) => updateFormData('site', { existingConditions: e.target.value })}
-                className="min-h-[100px]"
-              />
             </div>
             
-            <div>
-              <Label className="text-base font-medium">Site Features</Label>
-              <div className="text-sm text-slate-500 mb-2">
-                Select the features that describe your site
+            {/* Display uploaded documents */}
+            {siteDocuments.length > 0 && (
+              <div className="mt-6">
+                <h3 className="font-medium mb-3">Uploaded Documents ({siteDocuments.length})</h3>
+                <div className="grid grid-cols-1 gap-2">
+                  {siteDocuments.map((file, index) => (
+                    <div 
+                      key={`${file.name}-${index}`} 
+                      className="flex items-center justify-between p-3 bg-background rounded-md border"
+                    >
+                      <div className="flex items-center">
+                        <div className="mr-3 p-2 bg-primary/10 rounded">
+                          <FileText className="h-5 w-5" />
+                        </div>
+                        <div>
+                          <p className="font-medium text-sm truncate max-w-xs">{file.name}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {(file.size / 1024 / 1024).toFixed(2)} MB
+                          </p>
+                        </div>
+                      </div>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={() => handleRemoveSiteDocument(index)}
+                        aria-label={`Remove ${file.name}`}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
               </div>
-              <MultiSelectButtons
-                options={siteFeatureOptions}
-                selected={Array.isArray(formData.site.siteFeatures) ? formData.site.siteFeatures : []}
-                onChange={handleSiteFeaturesChange}
-                allowMultiple={true}
-              />
-            </div>
-            
-            <div>
-              <Label className="text-base font-medium">Site Constraints</Label>
-              <div className="text-sm text-slate-500 mb-2">
-                Select any known constraints for your site
-              </div>
-              <MultiSelectButtons
-                options={siteConstraintOptions}
-                selected={formData.site.siteConstraints || []}
-                onChange={handleSiteConstraintsChange}
-                allowMultiple={true}
-              />
-            </div>
-            
-            <div>
-              <Label htmlFor="viewsOrientations" className="text-base font-medium">
-                Views and Orientation
-              </Label>
-              <div className="text-sm text-slate-500 mb-2">
-                Describe the best views from your site and sun orientation
-              </div>
-              <Textarea
-                id="viewsOrientations"
-                placeholder="e.g., Best views are to the north, morning sun in the east..."
-                value={formData.site.viewsOrientations || ''}
-                onChange={(e) => updateFormData('site', { viewsOrientations: e.target.value })}
-                className="min-h-[100px]"
-              />
-            </div>
-            
-            <div>
-              <Label htmlFor="accessConstraints" className="text-base font-medium">
-                Access and Constraints
-              </Label>
-              <div className="text-sm text-slate-500 mb-2">
-                Describe access to the site and any limitations
-              </div>
-              <Textarea
-                id="accessConstraints"
-                placeholder="e.g., Steep driveway, limited street frontage..."
-                value={formData.site.accessConstraints || ''}
-                onChange={(e) => updateFormData('site', { accessConstraints: e.target.value })}
-                className="min-h-[100px]"
-              />
-            </div>
-            
-            <div>
-              <Label htmlFor="neighboringProperties" className="text-base font-medium">
-                Neighboring Properties
-              </Label>
-              <div className="text-sm text-slate-500 mb-2">
-                Describe neighboring properties and any considerations
-              </div>
-              <Textarea
-                id="neighboringProperties"
-                placeholder="e.g., Two-story house to the north, commercial property to the west..."
-                value={formData.site.neighboringProperties || ''}
-                onChange={(e) => updateFormData('site', { neighboringProperties: e.target.value })}
-                className="min-h-[100px]"
-              />
-            </div>
-            
-            <div>
-              <Label htmlFor="siteNotes" className="text-base font-medium">
-                Additional Site Notes
-              </Label>
-              <div className="text-sm text-slate-500 mb-2">
-                Any other important information about your site
-              </div>
-              <Textarea
-                id="siteNotes"
-                placeholder="e.g., Soil conditions, drainage issues, specific council requirements..."
-                value={formData.site.siteNotes || ''}
-                onChange={(e) => updateFormData('site', { siteNotes: e.target.value })}
-                className="min-h-[100px]"
-              />
-            </div>
-          </CardContent>
-        </Card>
+            )}
+          </div>
+        </div>
         
-        <div className="flex justify-between">
+        <div className="design-brief-form-group">
+          <div className="mb-6">
+            <Label htmlFor="existingConditions" className="design-brief-question-title font-bold">
+              Site Description
+              <span className="text-muted-foreground text-sm ml-2">(optional)</span>
+            </Label>
+            <p className="design-brief-question-description">
+              Describe the general characteristics of the site (e.g., urban, suburban, rural, coastal).
+            </p>
+            <Textarea
+              id="existingConditions"
+              name="existingConditions"
+              placeholder="Describe the site's general environment and setting..."
+              value={formData.site.existingConditions}
+              onChange={handleChange}
+              className="mt-1"
+            />
+          </div>
+          
+          <div className="mb-6">
+            <Label htmlFor="siteFeatures" className="design-brief-question-title font-bold">
+              Topography
+              <span className="text-muted-foreground text-sm ml-2">(optional)</span>
+            </Label>
+            <p className="design-brief-question-description">
+              Describe the site's topography (e.g., flat, sloping, steep).
+            </p>
+            <Textarea
+              id="siteFeatures"
+              name="siteFeatures"
+              placeholder="Describe the site's topography and any significant elevation changes..."
+              value={formData.site.siteFeatures}
+              onChange={handleChange}
+              className="mt-1"
+            />
+          </div>
+          
+          <div className="mb-6">
+            <Label htmlFor="neighboringProperties" className="design-brief-question-title font-bold">
+              Vegetation
+              <span className="text-muted-foreground text-sm ml-2">(optional)</span>
+            </Label>
+            <p className="design-brief-question-description">
+              Describe the existing vegetation on the site (e.g., trees, shrubs, grass).
+            </p>
+            <Textarea
+              id="neighboringProperties"
+              name="neighboringProperties"
+              placeholder="Describe the site's vegetation and any significant trees or plants..."
+              value={formData.site.neighboringProperties}
+              onChange={handleChange}
+              className="mt-1"
+            />
+          </div>
+          
+          <div className="mb-6">
+            <Label htmlFor="viewsOrientations" className="design-brief-question-title font-bold">
+              Views
+              <span className="text-muted-foreground text-sm ml-2">(optional)</span>
+            </Label>
+            <p className="design-brief-question-description">
+              Describe the views from the site (e.g., ocean, mountains, city skyline).
+            </p>
+            <Textarea
+              id="viewsOrientations"
+              name="viewsOrientations"
+              placeholder="Describe the views from the site and any significant landmarks..."
+              value={formData.site.viewsOrientations}
+              onChange={handleChange}
+              className="mt-1"
+            />
+          </div>
+          
+          {/* Site Photos Upload Section */}
+          <div className="mt-8">
+            <Label className="design-brief-question-title font-bold">
+              Site Photos
+              <span className="text-muted-foreground text-sm ml-2">(optional)</span>
+            </Label>
+            <p className="design-brief-question-description">
+              Upload photos of your site to help us better understand the location and its features.
+            </p>
+            
+            <div className="mt-4">
+              <Label 
+                htmlFor="site-photos" 
+                className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-md border-primary/50 cursor-pointer bg-background hover:bg-accent/10 transition-colors"
+              >
+                <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                  <Upload className="w-8 h-8 mb-2 text-primary" />
+                  <p className="mb-2 text-sm text-center">
+                    <span className="font-medium text-primary">Click to upload</span> or drag and drop
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    JPG, PNG, GIF (MAX. 10MB each)
+                  </p>
+                </div>
+                <Input 
+                  id="site-photos" 
+                  type="file" 
+                  accept="image/*" 
+                  multiple 
+                  className="hidden" 
+                  onChange={handleFileUpload}
+                />
+              </Label>
+            </div>
+            
+            {/* Display uploaded photos */}
+            {uploadedPhotos.length > 0 && (
+              <div className="mt-6">
+                <h3 className="font-medium mb-3">Uploaded Photos ({uploadedPhotos.length})</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {uploadedPhotos.map((file, index) => (
+                    <Card key={index} className="overflow-hidden">
+                      <CardContent className="p-2">
+                        <div className="relative h-40 bg-muted rounded-md overflow-hidden">
+                          <img 
+                            src={URL.createObjectURL(file)} 
+                            alt={`Uploaded Photo ${index + 1}`}
+                            className="w-full h-full object-cover"
+                          />
+                          <Button 
+                            variant="destructive" 
+                            size="icon" 
+                            className="absolute top-2 right-2 h-6 w-6 rounded-full" 
+                            onClick={() => handleRemovePhoto(index)}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                        <p className="text-sm font-medium mt-2 truncate">
+                          Uploaded Photo {index + 1}
+                        </p>
+                        <p className="text-xs text-muted-foreground truncate">
+                          {file.name}
+                        </p>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+        
+        <div className="flex justify-between mt-6">
           <Button variant="outline" onClick={handlePrevious} className="group">
             <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-            <span>Previous: Lifestyle</span>
+            <span>Previous: Project Info</span>
           </Button>
           
           <Button onClick={handleNext} className="group">
-            <span>Next: Spaces</span>
+            <span>Next: Lifestyle</span>
             <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
           </Button>
         </div>
