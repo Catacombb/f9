@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { SectionHeader } from './SectionHeader';
@@ -7,7 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
 import { Label } from '@/components/ui/label';
-import { Star, TestTube, MessageSquare, User, Mail } from 'lucide-react';
+import { Star, TestTube, User, Mail } from 'lucide-react';
 import { toast } from 'sonner';
 import { 
   Select, 
@@ -234,6 +233,65 @@ export function FeedbackSection() {
                   />
                 </div>
               </div>
+
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium text-purple-800">Your Role</h3>
+                
+                <div className="pt-2">
+                  <Label className="font-medium mb-2 block">What is your role in the architecture/design process?*</Label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
+                    {['Architect', 'Interior Designer', 'Practice Manager', 'Draftsperson', 'Builder', 'Client / Homeowner', 'Other'].map((role) => (
+                      <div key={role} className="flex items-center space-x-2">
+                        <Checkbox 
+                          id={`role-${role}`}
+                          checked={formData.feedback.userRole?.includes(role) || false}
+                          onCheckedChange={() => handleRoleSelection(role)}
+                        />
+                        <label
+                          htmlFor={`role-${role}`}
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
+                          {role}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  {formData.feedback.userRole?.includes('Other') && (
+                    <div className="mt-3">
+                      <Label htmlFor="otherRole" className="text-sm">Please specify:</Label>
+                      <Input
+                        id="otherRole"
+                        value={otherRole}
+                        onChange={(e) => {
+                          setOtherRole(e.target.value);
+                          updateFormData('feedback', { otherRoleSpecify: e.target.value });
+                        }}
+                        className="mt-1"
+                        placeholder="Your role"
+                      />
+                    </div>
+                  )}
+                </div>
+                
+                <div className="pt-2">
+                  <Label htmlFor="teamSize" className="font-medium">How many people are in your firm or team?*</Label>
+                  <Select
+                    value={formData.feedback.teamSize || ''}
+                    onValueChange={(value) => handleTextChange('teamSize', value)}
+                  >
+                    <SelectTrigger className="mt-2" id="teamSize">
+                      <SelectValue placeholder="Select team size" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Just me">Just me</SelectItem>
+                      <SelectItem value="2-5">2-5</SelectItem>
+                      <SelectItem value="6-15">6-15</SelectItem>
+                      <SelectItem value="15+">15+</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
               
               <div className="text-sm text-muted-foreground">
                 This information will be used to track who provided feedback and may be used for follow-up questions.
@@ -313,17 +371,6 @@ export function FeedbackSection() {
               </div>
               
               <div className="pt-2">
-                <Label htmlFor="nextFeature" className="font-medium">What feature or improvement would you love to see next?*</Label>
-                <Textarea
-                  id="nextFeature"
-                  value={formData.feedback.nextFeature || ''}
-                  onChange={(e) => handleTextChange('nextFeature', e.target.value)}
-                  placeholder="It would be great if..."
-                  className="min-h-[100px] mt-2"
-                />
-              </div>
-              
-              <div className="pt-2">
                 <Label htmlFor="additionalFeedback" className="font-medium">Any other feedback or ideas?*</Label>
                 <Textarea
                   id="additionalFeedback"
@@ -376,67 +423,6 @@ export function FeedbackSection() {
                   />
                 </div>
               )}
-            </div>
-            
-            <Separator className="bg-purple-100" />
-            
-            <div className="space-y-4">
-              <h3 className="text-lg font-medium text-purple-800">Your Role</h3>
-              
-              <div className="pt-2">
-                <Label className="font-medium mb-2 block">What is your role in the architecture/design process?*</Label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
-                  {['Architect', 'Interior Designer', 'Practice Manager', 'Draftsperson', 'Builder', 'Client / Homeowner', 'Other'].map((role) => (
-                    <div key={role} className="flex items-center space-x-2">
-                      <Checkbox 
-                        id={`role-${role}`}
-                        checked={formData.feedback.userRole?.includes(role) || false}
-                        onCheckedChange={() => handleRoleSelection(role)}
-                      />
-                      <label
-                        htmlFor={`role-${role}`}
-                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                      >
-                        {role}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-                
-                {formData.feedback.userRole?.includes('Other') && (
-                  <div className="mt-3">
-                    <Label htmlFor="otherRole" className="text-sm">Please specify:</Label>
-                    <Input
-                      id="otherRole"
-                      value={otherRole}
-                      onChange={(e) => {
-                        setOtherRole(e.target.value);
-                        updateFormData('feedback', { otherRoleSpecify: e.target.value });
-                      }}
-                      className="mt-1"
-                      placeholder="Your role"
-                    />
-                  </div>
-                )}
-              </div>
-              
-              <div className="pt-2">
-                <Label htmlFor="teamSize" className="font-medium">How many people are in your firm or team?*</Label>
-                <Select
-                  value={formData.feedback.teamSize || ''}
-                  onValueChange={(value) => handleTextChange('teamSize', value)}
-                >
-                  <SelectTrigger className="mt-2" id="teamSize">
-                    <SelectValue placeholder="Select team size" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Just me">Just me</SelectItem>
-                    <SelectItem value="2-5">2-5</SelectItem>
-                    <SelectItem value="6-15">6-15</SelectItem>
-                    <SelectItem value="15+">15+</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
             </div>
             
             <Separator className="bg-purple-100" />
@@ -504,4 +490,3 @@ export function FeedbackSection() {
     </div>
   );
 }
-
