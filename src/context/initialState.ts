@@ -125,7 +125,8 @@ export const initialProjectData: ProjectData = {
     uploadedFiles: [],
     uploadedInspirationImages: [],
     inspirationSelections: [],
-    siteDocuments: []
+    siteDocuments: [],
+    sitePhotos: [] // Add initial empty array for site photos
   },
   summary: {
     generatedSummary: '',

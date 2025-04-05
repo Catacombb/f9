@@ -50,7 +50,10 @@ export function SummaryTabContent({
           />
           
           {/* Site Information */}
-          <SiteInfoDisplay site={formData.site} />
+          <SiteInfoDisplay 
+            site={formData.site} 
+            sitePhotos={files.sitePhotos} 
+          />
           
           {/* Spaces */}
           <SpacesInfoDisplay 

@@ -41,5 +41,17 @@ export const renderSiteInfo = (ctx: PDFContext, projectData: ProjectData): void 
     addMultiLineText(ctx, projectData.formData.site.neighboringProperties);
   }
   
+  // Add site photos information
+  if (projectData.files.sitePhotos && projectData.files.sitePhotos.length > 0) {
+    addText(ctx, 'Site Photos', '');
+    addMultiLineText(ctx, `${projectData.files.sitePhotos.length} photos uploaded`);
+  }
+  
+  // Add site notes if available
+  if (projectData.formData.site.siteNotes) {
+    addText(ctx, 'Additional Notes', '');
+    addMultiLineText(ctx, projectData.formData.site.siteNotes);
+  }
+  
   addSpace(ctx, 8);
 };

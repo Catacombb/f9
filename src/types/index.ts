@@ -1,4 +1,3 @@
-
 export interface SpaceRoom {
   id: string;
   type: string;
@@ -23,6 +22,7 @@ export interface ProjectFiles {
   uploadedInspirationImages: File[];
   inspirationSelections: string[];
   siteDocuments: File[]; 
+  sitePhotos: File[]; // Add site photos field
 }
 
 export interface BriefSummary {
