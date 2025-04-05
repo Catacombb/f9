@@ -31,5 +31,16 @@ export const renderArchitectureInfo = (ctx: PDFContext, projectData: ProjectData
     addMultiLineText(ctx, projectData.formData.architecture.specialFeatures);
   }
   
+  // Add the inspiration links and comments to the PDF
+  if (projectData.formData.architecture.inspirationLinks) {
+    addText(ctx, 'Inspiration Links', '');
+    addMultiLineText(ctx, projectData.formData.architecture.inspirationLinks);
+  }
+  
+  if (projectData.formData.architecture.inspirationComments) {
+    addText(ctx, 'Inspiration Comments', '');
+    addMultiLineText(ctx, projectData.formData.architecture.inspirationComments);
+  }
+  
   addSpace(ctx, 8);
 };

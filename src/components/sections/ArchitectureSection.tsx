@@ -140,7 +140,7 @@ export function ArchitectureSection() {
           onInputChange={handleInputChange}
         />
         
-        {/* New Inspiration Section - replacing image selection */}
+        {/* Inspiration References Section */}
         <div className="design-brief-form-group mt-8">
           <Card>
             <CardContent className="pt-6 pb-6">
