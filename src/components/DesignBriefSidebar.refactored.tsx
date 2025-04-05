@@ -51,7 +51,7 @@ const sectionOrder: SectionKey[] = [
 ];
 
 export function DesignBriefSidebar() {
-  const { currentSection, setCurrentSection, formData } = useDesignBrief();
+  const { currentSection, setCurrentSection, formData, files } = useDesignBrief();
 
   const completionStatus = useMemo(() => {
     return {
@@ -64,10 +64,10 @@ export function DesignBriefSidebar() {
       contractors: calculateContractorsCompletion(formData.contractors),
       budget: calculateBudgetCompletion(formData.budget),
       communication: calculateCommunicationCompletion(formData.communication),
-      uploads: calculateUploadsCompletion(formData.files),
+      uploads: calculateUploadsCompletion(files),
       summary: 100
     };
-  }, [formData]);
+  }, [formData, files]);
 
   const handleSectionClick = (section: SectionKey) => {
     setCurrentSection(section);
@@ -256,12 +256,12 @@ function calculateCommunicationCompletion(data: any): number {
   return Math.round((completed / total) * 100);
 }
 
-function calculateUploadsCompletion(data: any): number {
+function calculateUploadsCompletion(files: any): number {
   let completed = 0;
   let total = 2;
   
-  if (data.uploadedFiles && data.uploadedFiles.length > 0) completed++;
-  if (data.siteDocuments && data.siteDocuments.length > 0) completed++;
+  if (files?.uploadedFiles && files.uploadedFiles.length > 0) completed++;
+  if (files?.siteDocuments && files.siteDocuments.length > 0) completed++;
   
   return Math.round((completed / total) * 100);
 }
