@@ -247,7 +247,9 @@ export function SummarySection() {
                           <p className="text-sm font-medium">Site Features:</p>
                           <p className="text-sm">{typeof formData.site.siteFeatures === 'string' 
                               ? formData.site.siteFeatures 
-                              : formData.site.siteFeatures.join(', ')}</p>
+                              : Array.isArray(formData.site.siteFeatures) 
+                                ? formData.site.siteFeatures.join(', ')
+                                : String(formData.site.siteFeatures)}</p>
                         </div>
                       )}
                       {formData.site.viewsOrientations && (
