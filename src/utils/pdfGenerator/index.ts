@@ -86,8 +86,5 @@ export const generatePDF = async (projectData: ProjectData): Promise<Blob> => {
   
   // Return the PDF as a Blob for download or sending via email
   const pdfBlob = pdf.output('blob');
-  
-  // We're not saving it here anymore - we return the blob for the caller to handle
-  // The filename will be determined by the caller
   return pdfBlob;
 };
