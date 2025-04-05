@@ -25,16 +25,17 @@ export const RoomItem = ({ room, onEdit, onRemove }: RoomItemProps) => {
     }
   };
 
+  const [answers, setAnswers] = useState<Record<string, any>>({});
+
   const handleDescriptionChange = (value: string) => {
     onEdit({ ...room, description: value });
   };
-
-  const [answers, setAnswers] = useState<Record<string, any>>({});
 
   const handleAnswerChange = (questionId: string, value: any) => {
     const updatedAnswers = { ...answers, [questionId]: value };
     setAnswers(updatedAnswers);
     
+    // Convert answers object to a JSON string for storage
     const updatedDescription = JSON.stringify(updatedAnswers);
     onEdit({ ...room, description: updatedDescription });
   };
@@ -47,12 +48,15 @@ export const RoomItem = ({ room, onEdit, onRemove }: RoomItemProps) => {
           setAnswers(parsedAnswers);
         }
       } catch (e) {
+        // If description isn't valid JSON, use it as a notes field
         setAnswers({ notes: room.description });
       }
     }
   }, [room.description]);
 
-  const questions = roomSpecificQuestions[room.type as keyof typeof roomSpecificQuestions] || [];
+  // Get the room type and look up corresponding questions
+  const roomType = room.isCustom ? (room.customName || room.type) : room.type;
+  const questions = roomSpecificQuestions[roomType as keyof typeof roomSpecificQuestions] || [];
 
   const renderQuestion = (question: any) => {
     switch (question.type) {
@@ -120,7 +124,7 @@ export const RoomItem = ({ room, onEdit, onRemove }: RoomItemProps) => {
       <Card>
         <CardHeader className="p-4 pb-0 flex flex-row items-center justify-between">
           <CardTitle className="text-lg">
-            {room.isCustom ? room.type : room.type}
+            {room.isCustom && room.customName ? room.customName : room.type}
           </CardTitle>
           <Button variant="ghost" size="icon" onClick={() => onRemove(room.id)}>
             <Trash2 className="h-4 w-4 text-destructive" />

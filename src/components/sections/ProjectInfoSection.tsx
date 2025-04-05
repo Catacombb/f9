@@ -3,8 +3,6 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { ArrowRight } from 'lucide-react';
 import { SectionHeader } from './SectionHeader';
@@ -19,10 +17,6 @@ export function ProjectInfoSection() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     updateFormData('projectInfo', { [name]: value });
-  };
-  
-  const handleProjectTypeChange = (value: string) => {
-    updateFormData('projectInfo', { projectType: value });
   };
 
   const handleAddressChange = (address: string) => {
@@ -40,7 +34,7 @@ export function ProjectInfoSection() {
   
   // Calculate completion percentage based on required fields
   const calculateCompletion = () => {
-    const requiredFields = ['clientName', 'projectAddress', 'contactEmail', 'contactPhone', 'projectType'];
+    const requiredFields = ['clientName', 'projectAddress', 'contactEmail', 'contactPhone'];
     let filledCount = 0;
     
     requiredFields.forEach(field => {
@@ -110,42 +104,6 @@ export function ProjectInfoSection() {
                 className="mt-1"
               />
             </div>
-          </div>
-        </div>
-        
-        <div className="design-brief-form-group">
-          <div className="mb-6">
-            <Label htmlFor="projectType">Project Type</Label>
-            <Select 
-              value={formData.projectInfo.projectType} 
-              onValueChange={handleProjectTypeChange}
-            >
-              <SelectTrigger id="projectType" className="mt-1">
-                <SelectValue placeholder="Select project type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="new_build">New Build</SelectItem>
-                <SelectItem value="renovation">Renovation</SelectItem>
-                <SelectItem value="extension">Extension</SelectItem>
-                <SelectItem value="interior_only">Interior Design Only</SelectItem>
-                <SelectItem value="other">Other</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <div>
-            <Label htmlFor="projectDescription">
-              Project Description
-              <span className="text-muted-foreground text-sm ml-2">(optional)</span>
-            </Label>
-            <Textarea
-              id="projectDescription"
-              name="projectDescription"
-              placeholder="Briefly describe your project and what you hope to achieve..."
-              value={formData.projectInfo.projectDescription}
-              onChange={handleChange}
-              className="mt-1 h-32"
-            />
           </div>
         </div>
         
