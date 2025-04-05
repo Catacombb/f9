@@ -20,7 +20,7 @@ import { toast } from 'sonner';
 import { Beaker } from 'lucide-react';
 
 export function DesignBrief() {
-  const { currentSection, updateFormData, updateFiles, projectData } = useDesignBrief();
+  const { currentSection, updateFormData, updateFiles, updateSummary, projectData } = useDesignBrief();
   
   // Scroll to top when section changes
   useEffect(() => {
@@ -58,7 +58,8 @@ export function DesignBrief() {
           setTimeout(() => {
             toast("Navigating to Summary section...");
             window.scrollTo(0, 0);
-            updateFormData('summary', { editedSummary: "This design brief was auto-generated using the Load Test function. It represents a comprehensive example of a filled-out brief for a modern family home. All sections have been populated with realistic sample data to demonstrate the full capabilities of the Northstar brief system." });
+            // Use updateSummary instead of updateFormData for summary data
+            updateSummary({ editedSummary: "This design brief was auto-generated using the Load Test function. It represents a comprehensive example of a filled-out brief for a modern family home. All sections have been populated with realistic sample data to demonstrate the full capabilities of the Northstar brief system." });
           }, 1000);
         } catch (error) {
           console.error("Error generating test files:", error);
