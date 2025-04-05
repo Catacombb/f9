@@ -65,7 +65,7 @@ export function FeedbackSection() {
       };
       
       const templateParams = {
-        to_email: 'nick@nickharrison.co',
+        to_email: 'nicholasbharrison@gmail.com', // Updated recipient email
         from_name: testerName || clientInfo.clientName || 'Anonymous Tester',
         from_email: testerEmail || clientInfo.contactEmail || 'No Email Provided',
         subject: 'Northstar Design Brief - Tester Feedback',
@@ -100,10 +100,10 @@ Can contact: ${formData.feedback.canContact || 'No'}
         `
       };
 
-      // Send email using your EmailJS credentials
+      // Send email using the correct EmailJS credentials
       await emailjs.send(
-        'service_94y36iq', // Your EmailJS service ID needed here
-        'template_l4lrz4g', // Your provided template ID
+        'service_94y36iq', // Your EmailJS service ID
+        'template_l4lrz4g', // Your template ID
         templateParams,
         'UTp_oJDgVq3AxICn0' // Your public key
       );
