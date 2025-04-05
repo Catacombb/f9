@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -79,40 +80,60 @@ export function SummarySection() {
   
   const handlePrevious = () => {
     setCurrentSection('uploads');
+    window.scrollTo(0, 0);
   };
   
+  // Improved formatter for occupants data
   const formatOccupantsData = () => {
     try {
       if (!formData.lifestyle.occupants) return "None specified";
       
-      const occupantsData = JSON.parse(formData.lifestyle.occupants);
-      let totalOccupants = 0;
-      const parts = [];
-      
-      if (occupantsData.adults && occupantsData.adults > 0) {
-        totalOccupants += occupantsData.adults;
-        parts.push(`${occupantsData.adults} adult${occupantsData.adults !== 1 ? 's' : ''}`);
+      // Try to parse if it's JSON, otherwise return as is
+      try {
+        const occupantsData = JSON.parse(formData.lifestyle.occupants);
+        const parts = [];
+        
+        if (occupantsData.adults && occupantsData.adults > 0) {
+          parts.push(`${occupantsData.adults} adult${occupantsData.adults !== 1 ? 's' : ''}`);
+        }
+        
+        if (occupantsData.children && occupantsData.children > 0) {
+          parts.push(`${occupantsData.children} child${occupantsData.children !== 1 ? 'ren' : ''}`);
+        }
+        
+        if (occupantsData.dogs && occupantsData.dogs > 0) {
+          parts.push(`${occupantsData.dogs} dog${occupantsData.dogs !== 1 ? 's' : ''}`);
+        }
+        
+        if (occupantsData.cats && occupantsData.cats > 0) {
+          parts.push(`${occupantsData.cats} cat${occupantsData.cats !== 1 ? 's' : ''}`);
+        }
+        
+        const totalSpaces = formData.spaces.rooms.length;
+        
+        if (parts.length === 0) {
+          return formData.lifestyle.occupants; // Return as entered if parsed but empty
+        }
+        
+        return `${parts.join(', ')} - ${totalSpaces} space${totalSpaces !== 1 ? 's' : ''}`;
+      } catch (e) {
+        // If not valid JSON, return the string as entered by the user
+        return formData.lifestyle.occupants;
       }
-      
-      if (occupantsData.children && occupantsData.children > 0) {
-        totalOccupants += occupantsData.children;
-        parts.push(`${occupantsData.children} child${occupantsData.children !== 1 ? 'ren' : ''}`);
-      }
-      
-      if (occupantsData.dogs && occupantsData.dogs > 0) {
-        parts.push(`${occupantsData.dogs} dog${occupantsData.dogs !== 1 ? 's' : ''}`);
-      }
-      
-      if (occupantsData.cats && occupantsData.cats > 0) {
-        parts.push(`${occupantsData.cats} cat${occupantsData.cats !== 1 ? 's' : ''}`);
-      }
-      
-      const totalSpaces = formData.spaces.rooms.length;
-      
-      return `${totalOccupants} occupant${totalOccupants !== 1 ? 's' : ''} / ${totalSpaces} space${totalSpaces !== 1 ? 's' : ''} selected (${parts.join(', ')})`;
     } catch (e) {
-      return "Data format error";
+      return "Not specified";
     }
+  };
+  
+  // Format site features for human-readable display
+  const formatSiteFeatures = (features: string | string[] | undefined): string => {
+    if (!features) return "Not specified";
+    
+    if (Array.isArray(features)) {
+      return features.join(', ');
+    }
+    
+    return features;
   };
   
   return (
@@ -245,11 +266,7 @@ export function SummarySection() {
                       {formData.site.siteFeatures && (
                         <div>
                           <p className="text-sm font-medium">Site Features:</p>
-                          <p className="text-sm">{typeof formData.site.siteFeatures === 'string' 
-                              ? formData.site.siteFeatures 
-                              : Array.isArray(formData.site.siteFeatures) 
-                                ? formData.site.siteFeatures.join(', ')
-                                : String(formData.site.siteFeatures)}</p>
+                          <p className="text-sm">{formatSiteFeatures(formData.site.siteFeatures)}</p>
                         </div>
                       )}
                       {formData.site.viewsOrientations && (
