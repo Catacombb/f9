@@ -1,4 +1,3 @@
-
 import React, { useMemo } from 'react';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { cn } from '@/lib/utils';
@@ -23,7 +22,6 @@ import {
 } from 'lucide-react';
 import { SectionKey } from '@/types';
 
-// Section definitions with new ordering
 const sectionData: Record<SectionKey, { icon: React.ReactNode, label: string }> = {
   intro: { icon: <InfoIcon className="h-5 w-5" />, label: 'Introduction' },
   projectInfo: { icon: <BuildingIcon className="h-5 w-5" />, label: 'Project Information' },
@@ -38,7 +36,6 @@ const sectionData: Record<SectionKey, { icon: React.ReactNode, label: string }> 
   summary: { icon: <CheckCircleIcon className="h-5 w-5" />, label: 'Summary' }
 };
 
-// Order of sections in the sidebar
 const sectionOrder: SectionKey[] = [
   'intro', 
   'projectInfo', 
@@ -68,7 +65,7 @@ export function DesignBriefSidebar() {
       budget: calculateBudgetCompletion(formData.budget),
       communication: calculateCommunicationCompletion(formData.communication),
       uploads: calculateUploadsCompletion(formData.files),
-      summary: 100, // Summary is always 100% complete as it just displays collected info
+      summary: 100
     };
   }, [formData]);
 
@@ -148,10 +145,9 @@ export function DesignBriefSidebar() {
   );
 }
 
-// Helper functions for calculating completion status
 function calculateProjectInfoCompletion(data: any): number {
   let completed = 0;
-  let total = 8; // Number of important fields to complete
+  let total = 8;
   
   if (data.clientName) completed++;
   if (data.projectAddress) completed++;
@@ -167,7 +163,7 @@ function calculateProjectInfoCompletion(data: any): number {
 
 function calculateSiteCompletion(data: any): number {
   let completed = 0;
-  let total = 6; // Core fields
+  let total = 6;
   
   if (data.existingConditions) completed++;
   if (data.siteFeatures) completed++;
@@ -181,7 +177,7 @@ function calculateSiteCompletion(data: any): number {
 
 function calculateLifestyleCompletion(data: any): number {
   let completed = 0;
-  let total = 7; // Core fields
+  let total = 7;
   
   if (data.occupants) completed++;
   if (data.occupationDetails) completed++;
@@ -196,9 +192,8 @@ function calculateLifestyleCompletion(data: any): number {
 
 function calculateSpacesCompletion(data: any): number {
   let completed = 0;
-  let total = 6; // Core fields + rooms
+  let total = 6;
   
-  // Count rooms as a single item for completion percentage
   if (data.rooms && data.rooms.length > 0) completed++;
   
   if (data.homeLevelType) completed++;
@@ -212,7 +207,7 @@ function calculateSpacesCompletion(data: any): number {
 
 function calculateArchitectureCompletion(data: any): number {
   let completed = 0;
-  let total = 6; // Core fields
+  let total = 6;
   
   if (data.stylePrefences) completed++;
   if (data.externalMaterials) completed++;
@@ -226,12 +221,10 @@ function calculateArchitectureCompletion(data: any): number {
 
 function calculateContractorsCompletion(data: any): number {
   let completed = 0;
-  let total = 2; // Core fields
+  let total = 2;
   
-  // Count professionals as a single item for completion percentage
   if (data.professionals && data.professionals.length > 0) completed++;
   
-  // Count goToTender only if explicitly set
   if (data.goToTender === true || data.goToTender === false) completed++;
   
   return Math.round((completed / total) * 100);
@@ -239,7 +232,7 @@ function calculateContractorsCompletion(data: any): number {
 
 function calculateBudgetCompletion(data: any): number {
   let completed = 0;
-  let total = 5; // Core fields
+  let total = 5;
   
   if (data.budgetRange) completed++;
   if (data.flexibilityNotes) completed++;
@@ -252,7 +245,7 @@ function calculateBudgetCompletion(data: any): number {
 
 function calculateCommunicationCompletion(data: any): number {
   let completed = 0;
-  let total = 5; // Core fields
+  let total = 5;
   
   if (data.preferredMethods && data.preferredMethods.length) completed++;
   if (data.bestTimes && data.bestTimes.length) completed++;
@@ -265,7 +258,7 @@ function calculateCommunicationCompletion(data: any): number {
 
 function calculateUploadsCompletion(data: any): number {
   let completed = 0;
-  let total = 2; // Core uploads
+  let total = 2;
   
   if (data.uploadedFiles && data.uploadedFiles.length > 0) completed++;
   if (data.siteDocuments && data.siteDocuments.length > 0) completed++;

@@ -1,4 +1,3 @@
-
 import { FormData } from '@/types';
 
 // Function to generate a random string of a specified length
@@ -145,13 +144,14 @@ export function generateTestData(): Partial<FormData> {
       inspirationNotes: 'Love natural light and open spaces.',
     },
     contractors: {
+      preferredBuilder: "",
       goToTender: true,
       professionals: [
         { id: generateRandomString(10), type: 'Builder', name: 'ABC Builders', contact: 'abc@example.com', notes: 'Local builder with good reputation.', isCustom: false },
         { id: generateRandomString(10), type: 'Interior Designer', name: 'Jane Smith', contact: 'jane.smith@example.com', notes: 'Experienced in residential design.', isCustom: false },
         { id: generateRandomString(10), type: 'Engineer', name: 'Tom Brown', contact: 'tom.brown@example.com', notes: 'Structural engineer.', isCustom: false },
       ],
-      additionalNotes: 'Looking for experienced and reliable contractors.',
+      additionalNotes: "We have been working with these professionals and have a good relationship with them."
     },
     communication: {
       preferredMethods: ['Email', 'Phone'],
