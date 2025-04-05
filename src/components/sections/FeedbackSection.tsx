@@ -57,51 +57,35 @@ export function FeedbackSection() {
   
   const sendFeedbackEmail = async () => {
     try {
-      // Get client info from project data or use tester provided values
       const clientInfo = projectData?.formData?.projectInfo || {
         clientName: '',
         contactEmail: ''
       };
       
       const templateParams = {
-        to_email: 'nicholasbharrison@gmail.com', // Updated recipient email
+        to_email: 'nicholasbharrison@gmail.com',
         from_name: testerName || clientInfo.clientName || 'Anonymous Tester',
         from_email: testerEmail || clientInfo.contactEmail || 'No Email Provided',
         subject: 'Northstar Design Brief - Tester Feedback',
-        message: `
-— Tester Feedback —
-Submitted by: ${testerName || clientInfo.clientName || 'Anonymous'} (${testerEmail || clientInfo.contactEmail || 'No Email'})
-
-RATINGS:
-Usability: ${formData.feedback.usabilityRating}/5
-Performance: ${formData.feedback.performanceRating}/5
-Functionality: ${formData.feedback.functionalityRating}/5
-Design: ${formData.feedback.designRating}/5
-
-FEEDBACK:
-What they liked most: "${formData.feedback.likeMost}"
-Frustrations/Unclear aspects: "${formData.feedback.improvements}"
-Requested features: "${formData.feedback.nextFeature}"
-Additional feedback: "${formData.feedback.additionalFeedback}"
-
-CUSTOM VERSION INTEREST:
-Interested in custom version: ${formData.feedback.customVersionInterest ? 'Yes' : 'No'}
-Details: "${formData.feedback.customVersionInterest}"
-
-USER CONTEXT:
-Role: ${formData.feedback.userRole?.join(', ') || 'Not specified'}
-${formData.feedback.userRole?.includes('Other') ? `Other role: ${formData.feedback.otherRoleSpecify}` : ''}
-Team size: ${formData.feedback.teamSize || 'Not specified'}
-
-FOLLOW-UP:
-Would recommend: ${formData.feedback.wouldRecommend || 'Not specified'}
-Can contact: ${formData.feedback.canContact || 'No'}
-        `
+        usability_rating: formData.feedback.usabilityRating || 'Not rated',
+        performance_rating: formData.feedback.performanceRating || 'Not rated',
+        functionality_rating: formData.feedback.functionalityRating || 'Not rated',
+        design_rating: formData.feedback.designRating || 'Not rated',
+        like_most: formData.feedback.likeMost || 'No response',
+        improvements: formData.feedback.improvements || 'No response',
+        next_feature: formData.feedback.nextFeature || 'No response',
+        additional_feedback: formData.feedback.additionalFeedback || 'No response',
+        custom_interest: formData.feedback.customVersionInterest ? 'Yes' : 'No',
+        custom_details: formData.feedback.customVersionInterest || 'None provided',
+        user_role: formData.feedback.userRole?.join(', ') || 'Not specified',
+        other_role: formData.feedback.userRole?.includes('Other') ? formData.feedback.otherRoleSpecify || 'Not specified' : 'N/A',
+        team_size: formData.feedback.teamSize || 'Not specified',
+        would_recommend: formData.feedback.wouldRecommend || 'Not specified',
+        can_contact: formData.feedback.canContact ? 'Yes' : 'No'
       };
 
-      // Send email using the correct EmailJS credentials
       await emailjs.send(
-        'service_opdkitc', // Updated service ID
+        'service_opdkitc',
         'template_l4lrz4g', 
         templateParams,
         'UTp_oJDgVq3AxICn0'
@@ -115,7 +99,6 @@ Can contact: ${formData.feedback.canContact || 'No'}
   };
   
   const handleNext = async () => {
-    // Validate required fields
     if (
       !formData.feedback.usabilityRating ||
       !formData.feedback.performanceRating ||
@@ -134,7 +117,6 @@ Can contact: ${formData.feedback.canContact || 'No'}
       return;
     }
     
-    // If "Other" role is selected but not specified
     if (formData.feedback.userRole.includes('Other') && !otherRole) {
       toast.error("Please specify your role");
       return;
@@ -142,7 +124,6 @@ Can contact: ${formData.feedback.canContact || 'No'}
     
     setIsSubmitting(true);
     
-    // Try to send the feedback email
     const emailSuccess = await sendFeedbackEmail();
     
     setIsSubmitting(false);
@@ -153,7 +134,6 @@ Can contact: ${formData.feedback.canContact || 'No'}
       toast.warning("Your feedback was saved but we couldn't send the notification email. The team will still receive your feedback.");
     }
     
-    // Navigate back to summary
     setCurrentSection('summary');
   };
   
