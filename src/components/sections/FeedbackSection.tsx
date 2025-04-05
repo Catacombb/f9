@@ -300,54 +300,7 @@ export function FeedbackSection() {
             
             <Separator className="bg-purple-100" />
             
-            <div className="space-y-6">
-              <h3 className="text-lg font-medium text-purple-800 flex items-center gap-2">
-                <MessageSquare className="h-5 w-5" /> 
-                Please Rate Your Experience (1-5 stars)
-              </h3>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="flex flex-col gap-2">
-                  <Label htmlFor="usabilityRating" className="font-medium">Usability Rating*</Label>
-                  <RatingStars 
-                    name="usabilityRating" 
-                    value={formData.feedback.usabilityRating} 
-                    onChange={(v) => handleRatingChange('usabilityRating', v)} 
-                  />
-                </div>
-                
-                <div className="flex flex-col gap-2">
-                  <Label htmlFor="performanceRating" className="font-medium">Performance Rating*</Label>
-                  <RatingStars 
-                    name="performanceRating" 
-                    value={formData.feedback.performanceRating} 
-                    onChange={(v) => handleRatingChange('performanceRating', v)} 
-                  />
-                </div>
-                
-                <div className="flex flex-col gap-2">
-                  <Label htmlFor="functionalityRating" className="font-medium">Functionality Rating*</Label>
-                  <RatingStars 
-                    name="functionalityRating" 
-                    value={formData.feedback.functionalityRating} 
-                    onChange={(v) => handleRatingChange('functionalityRating', v)} 
-                  />
-                </div>
-                
-                <div className="flex flex-col gap-2">
-                  <Label htmlFor="designRating" className="font-medium">Design Rating*</Label>
-                  <RatingStars 
-                    name="designRating" 
-                    value={formData.feedback.designRating} 
-                    onChange={(v) => handleRatingChange('designRating', v)} 
-                  />
-                </div>
-              </div>
-            </div>
-            
-            <Separator className="bg-purple-100" />
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="pt-2">
                 <Label htmlFor="likeMost" className="font-medium">What did you like most about this tool?*</Label>
                 <Textarea
@@ -355,7 +308,7 @@ export function FeedbackSection() {
                   value={formData.feedback.likeMost || ''}
                   onChange={(e) => handleTextChange('likeMost', e.target.value)}
                   placeholder="I really liked..."
-                  className="min-h-[100px] mt-2"
+                  className="min-h-[200px] mt-2"
                 />
               </div>
               
@@ -366,7 +319,7 @@ export function FeedbackSection() {
                   value={formData.feedback.improvements || ''}
                   onChange={(e) => handleTextChange('improvements', e.target.value)}
                   placeholder="I found this confusing..."
-                  className="min-h-[100px] mt-2"
+                  className="min-h-[200px] mt-2"
                 />
               </div>
               
@@ -377,7 +330,7 @@ export function FeedbackSection() {
                   value={formData.feedback.additionalFeedback || ''}
                   onChange={(e) => handleTextChange('additionalFeedback', e.target.value)}
                   placeholder="Other thoughts..."
-                  className="min-h-[100px] mt-2"
+                  className="min-h-[200px] mt-2"
                 />
               </div>
             </div>
