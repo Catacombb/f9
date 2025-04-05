@@ -20,9 +20,9 @@ export function IntroSection() {
             <strong>Welcome to Northstar!</strong>
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Let's create a design brief that will bring your vision to life. 
-            With our step-by-step guide, you'll have a comprehensive plan for your dream home — 
-            all tailored to your unique needs and preferences.
+            This tool helps you get clear on your vision for your new home.
+            You'll walk through a few easy sections to share what matters most — from your lifestyle to the spaces you want and how you want to feel when you walk in the door.
+            At the end, you'll receive a summary you can review, download, and share with your architect or designer.
           </p>
         </div>
         
@@ -42,33 +42,33 @@ export function IntroSection() {
             </div>
             
             <div className="grid gap-6 md:grid-cols-3">
-              <div className="text-center p-4">
+              <div className="text-center p-4 hover:bg-primary/5 rounded-lg transition-colors duration-300">
                 <div className="mb-4 mx-auto bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center">
                   <Clipboard className="h-8 w-8 text-primary" />
                 </div>
-                <h3 className="font-medium mb-2">Complete the Sections</h3>
+                <h3 className="font-medium mb-2">Share Your Intentions</h3>
                 <p className="text-sm text-muted-foreground">
-                  Navigate through each section and answer the questions at your own pace.
+                  Navigate through each section and tell us about your vision and requirements for your dream home.
                 </p>
               </div>
               
-              <div className="text-center p-4">
+              <div className="text-center p-4 hover:bg-primary/5 rounded-lg transition-colors duration-300">
                 <div className="mb-4 mx-auto bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center">
                   <PenLine className="h-8 w-8 text-primary" />
                 </div>
-                <h3 className="font-medium mb-2">Review the Summary</h3>
+                <h3 className="font-medium mb-2">Check That We've Captured Your Vision</h3>
                 <p className="text-sm text-muted-foreground">
-                  We'll generate an AI-written summary of your brief, which you can review and edit.
+                  Review the AI-written summary of your brief to ensure it accurately reflects your needs and desires.
                 </p>
               </div>
               
-              <div className="text-center p-4">
+              <div className="text-center p-4 hover:bg-primary/5 rounded-lg transition-colors duration-300">
                 <div className="mb-4 mx-auto bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center">
                   <Share className="h-8 w-8 text-primary" />
                 </div>
-                <h3 className="font-medium mb-2">Get Your Report</h3>
+                <h3 className="font-medium mb-2">Download and Share Your Brief With Us</h3>
                 <p className="text-sm text-muted-foreground">
-                  Download or share your comprehensive design brief with your chosen architect or designer.
+                  Download or share your comprehensive design brief with your chosen architect or designer to bring your vision to life.
                 </p>
               </div>
             </div>
