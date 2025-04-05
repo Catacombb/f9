@@ -90,10 +90,10 @@ export const formatCodedValue = (
   return mappings[code] || defaultValue;
 };
 
-// Group room objects by their level
+// Group room objects by their level (now ensuring level is uppercase)
 export const groupRoomsByLevel = (
   rooms: Array<{ description: string, [key: string]: any }>,
-  defaultLevel = 'Unspecified'
+  defaultLevel = 'UNSPECIFIED'
 ) => {
   const roomsByLevel: Record<string, Array<any>> = {};
   
@@ -103,7 +103,8 @@ export const groupRoomsByLevel = (
     try {
       const descObj = JSON.parse(room.description);
       if (descObj.level) {
-        level = descObj.level;
+        // Convert level to uppercase for consistency
+        level = descObj.level.toUpperCase();
       }
     } catch (e) {
       // Use default level if parsing fails
@@ -122,21 +123,25 @@ export const groupRoomsByLevel = (
 // Order levels in a logical sequence
 export const getOrderedLevels = (levels: string[]) => {
   const levelOrder = {
-    'Basement': 0,
-    'Ground': 1,
-    'Ground Floor': 1,
-    'First': 2, 
-    'First Floor': 2,
-    'Second': 3,
-    'Second Floor': 3,
-    'Third': 4,
-    'Third Floor': 4,
-    'Unspecified': 999
+    'BASEMENT': 0,
+    'GROUND': 1,
+    'GROUND FLOOR': 1,
+    'FIRST': 2, 
+    'FIRST FLOOR': 2,
+    'SECOND': 3,
+    'SECOND FLOOR': 3,
+    'THIRD': 4,
+    'THIRD FLOOR': 4,
+    'UNSPECIFIED': 999
   };
   
   return levels.sort((a, b) => {
-    const orderA = levelOrder[a] !== undefined ? levelOrder[a] : a.toLowerCase().includes('basement') ? 0 : 998;
-    const orderB = levelOrder[b] !== undefined ? levelOrder[b] : b.toLowerCase().includes('basement') ? 0 : 998;
+    // Convert to uppercase for consistent comparison
+    const levelA = a.toUpperCase();
+    const levelB = b.toUpperCase();
+    
+    const orderA = levelOrder[levelA] !== undefined ? levelOrder[levelA] : levelA.includes('BASEMENT') ? 0 : 998;
+    const orderB = levelOrder[levelB] !== undefined ? levelOrder[levelB] : levelB.includes('BASEMENT') ? 0 : 998;
     return orderA - orderB;
   });
 };

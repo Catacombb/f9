@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { ProjectData } from '@/types';
+import { ProjectData, SpaceRoom } from '@/types';
 
 interface SpacesInfoDisplayProps {
   spaces: ProjectData['formData']['spaces'];

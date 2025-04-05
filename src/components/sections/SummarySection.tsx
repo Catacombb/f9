@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -49,48 +48,26 @@ export function SummarySection() {
       return <p className="text-sm text-muted-foreground">No spaces defined</p>;
     }
     
-    const roomsByLevel = formData.spaces.rooms.reduce((acc, room) => {
-      try {
-        const descriptionObj = JSON.parse(room.description);
-        const level = descriptionObj.level || 'Unspecified';
-        
-        if (!acc[level]) {
-          acc[level] = [];
-        }
-        
-        acc[level].push(room);
-        return acc;
-      } catch (e) {
-        if (!acc['Unspecified']) {
-          acc['Unspecified'] = [];
-        }
-        acc['Unspecified'].push(room);
-        return acc;
+    const roomsByType = formData.spaces.rooms.reduce((acc, room) => {
+      const type = room.isCustom && room.customName ? room.customName : room.type;
+      
+      if (!acc[type]) {
+        acc[type] = [];
       }
+      
+      acc[type].push(room);
+      return acc;
     }, {} as Record<string, typeof formData.spaces.rooms>);
     
-    const orderedLevels = Object.keys(roomsByLevel).sort((a, b) => {
-      const levelOrder = {
-        'Basement': 0,
-        'Ground': 1,
-        'Ground Floor': 1,
-        'First': 2,
-        'First Floor': 2,
-        'Second': 3,
-        'Second Floor': 3,
-        'Third': 4,
-        'Third Floor': 4,
-        'Unspecified': 999,
-      };
-      
-      const orderA = levelOrder[a] !== undefined ? levelOrder[a] : a.toLowerCase().includes('basement') ? 0 : 998;
-      const orderB = levelOrder[b] !== undefined ? levelOrder[b] : b.toLowerCase().includes('basement') ? 0 : 998;
-      return orderA - orderB;
-    });
-    
-    const formatRoomDescription = (description: string) => {
+    const formatRoomDescription = (room, index) => {
       try {
-        const descriptionObj = JSON.parse(description);
+        const descriptionObj = JSON.parse(room.description);
+        const displayName = room.displayName || room.customName || `${room.type} ${index + 1}`;
+        
+        let levelInfo = '';
+        if (descriptionObj.level) {
+          levelInfo = `(${descriptionObj.level.toUpperCase()}) `;
+        }
         
         const descriptionItems = [];
         
@@ -126,45 +103,35 @@ export function SummarySection() {
           descriptionItems.push(descriptionObj.notes);
         }
         
-        return descriptionItems.length > 0 
+        const description = descriptionItems.length > 0 
           ? descriptionItems.join(". ") 
           : "No specific details";
+          
+        return (
+          <li key={room.id} className="mb-2">
+            <span className="font-medium">{displayName}</span> – {levelInfo}{description}
+          </li>
+        );
       } catch (e) {
-        return description;
+        const displayName = room.displayName || room.customName || `${room.type} ${index + 1}`;
+        return (
+          <li key={room.id} className="mb-2">
+            <span className="font-medium">{displayName}</span> – {room.description || "No description"}
+          </li>
+        );
       }
     };
     
     return (
       <div className="space-y-6">
-        {orderedLevels.map(level => (
-          <div key={level} className="space-y-4">
-            <h5 className="font-medium text-base border-b pb-1">{level}</h5>
-            
-            {(() => {
-              const roomsByType = roomsByLevel[level].reduce((acc, room) => {
-                const type = room.isCustom && room.customName ? room.customName : room.type;
-                if (!acc[type]) {
-                  acc[type] = [];
-                }
-                acc[type].push(room);
-                return acc;
-              }, {} as Record<string, typeof formData.spaces.rooms>);
-              
-              return Object.entries(roomsByType).map(([type, rooms]) => (
-                <div key={`${level}-${type}`}>
-                  <p className="text-sm font-medium">
-                    {type} ({rooms.length})
-                  </p>
-                  <ul className="list-disc pl-5 text-sm">
-                    {rooms.map((room, index) => (
-                      <li key={index}>
-                        {formatRoomDescription(room.description)}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ));
-            })()}
+        {Object.entries(roomsByType).map(([type, rooms]) => (
+          <div key={type} className="space-y-2">
+            <h5 className="font-medium text-base">
+              {rooms.length} {type}{rooms.length !== 1 ? 's' : ''}:
+            </h5>
+            <ul className="list-disc pl-5 text-sm space-y-1">
+              {rooms.map((room, index) => formatRoomDescription(room, index))}
+            </ul>
           </div>
         ))}
       </div>
