@@ -10,7 +10,6 @@ import { SpacesSection } from './sections/SpacesSection';
 import { ArchitectureSection } from './sections/ArchitectureSection';
 import { ContractorsSection } from './sections/ContractorsSection';
 import { CommunicationSection } from './sections/CommunicationSection';
-import { InspirationSection } from './sections/InspirationSection';
 import { UploadsSection } from './sections/UploadsSection';
 import { SummarySection } from './sections/SummarySection';
 import { useDesignBrief } from '@/context/DesignBriefContext';
@@ -65,8 +64,6 @@ export function DesignBrief() {
         return <SpacesSection />;
       case 'architecture':
         return <ArchitectureSection />;
-      case 'inspiration':
-        return <InspirationSection />;
       case 'uploads':
         return <UploadsSection />;
       case 'communication':

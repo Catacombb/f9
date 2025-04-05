@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { ArrowRight } from 'lucide-react';
 import { SectionHeader } from './SectionHeader';
@@ -77,6 +78,25 @@ export function ProjectInfoSection() {
                 onCoordinatesChange={handleCoordinatesChange}
               />
             </div>
+          </div>
+          
+          <div className="mb-6">
+            <Label htmlFor="timeframe">Project Timeframe</Label>
+            <Select 
+              value={formData.budget.timeframe} 
+              onValueChange={(value) => updateFormData('budget', { timeframe: value })}
+            >
+              <SelectTrigger id="timeframe" className="mt-1">
+                <SelectValue placeholder="Select your preferred timeframe" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="flexible">Flexible / No specific timeline</SelectItem>
+                <SelectItem value="under_6months">Less than 6 months</SelectItem>
+                <SelectItem value="6months_1year">6 months to 1 year</SelectItem>
+                <SelectItem value="1year_2years">1-2 years</SelectItem>
+                <SelectItem value="over_2years">More than 2 years</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           
           <div className="grid gap-6 md:grid-cols-2">

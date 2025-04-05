@@ -33,22 +33,6 @@ export const GeneralQuestionsTab = ({
       <CardContent>
         <div className="space-y-6">
           <div>
-            <Label htmlFor="additionalNotes" className="text-base">
-              What rooms and spaces do you want in your home?
-            </Label>
-            <p className="text-sm text-muted-foreground mb-2">
-              Include must-have features (e.g., vaulted ceilings, large windows, built-in storage, specific lighting preferences).
-            </p>
-            <Textarea
-              id="additionalNotes"
-              value={additionalNotes || ''}
-              onChange={(e) => onAdditionalNotesChange(e.target.value)}
-              placeholder="Describe your must-have spaces and features..."
-              className="mt-1 h-28"
-            />
-          </div>
-
-          <div>
             <Label htmlFor="eliminableSpaces" className="text-base">
               Are there any of these spaces that you would deem less important or could eliminate if budget were an issue?
             </Label>
@@ -96,4 +80,4 @@ export const GeneralQuestionsTab = ({
       </CardContent>
     </Card>
   );
-};
+}

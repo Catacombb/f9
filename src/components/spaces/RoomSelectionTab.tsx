@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -45,6 +45,49 @@ export const RoomSelectionTab = ({
   updateRoom,
   handleRemoveRoom
 }: RoomSelectionTabProps) => {
+  // Add predefined rooms when selected from the grid
+  useEffect(() => {
+    const addRoomsFromQuantities = () => {
+      Object.entries(roomQuantitiesMap).forEach(([type, quantity]) => {
+        const existingRooms = rooms.filter(room => room.type === type).length;
+        const diff = quantity - existingRooms;
+        
+        if (diff > 0) {
+          // Add new rooms of this type
+          for (let i = 0; i < diff; i++) {
+            const newRoom: Omit<SpaceRoom, 'id'> = {
+              type,
+              quantity: 1,
+              description: '',
+              isCustom: false
+            };
+            addRoom(newRoom);
+          }
+        } else if (diff < 0) {
+          // Remove excess rooms of this type
+          const roomsToRemove = rooms.filter(room => room.type === type).slice(0, -diff);
+          roomsToRemove.forEach(room => {
+            handleRemoveRoom(room.id);
+          });
+        }
+      });
+    };
+    
+    addRoomsFromQuantities();
+  }, [rooms]);
+  
+  // Convert roomQuantities prop to a map for easier access
+  const roomQuantitiesMap = predefinedRoomTypes.reduce((acc, roomType) => {
+    acc[roomType.value] = getRoomQuantity(roomType.value);
+    return acc;
+  }, {} as Record<string, number>);
+  
+  // Function to add a room (simulated from parent)
+  const addRoom = (room: Omit<SpaceRoom, 'id'>) => {
+    // This is just to call the parent's add room function through a prop
+    handleAddRoom();
+  };
+
   return (
     <div className="space-y-6">
       <Card>

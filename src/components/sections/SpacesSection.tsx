@@ -21,6 +21,15 @@ export function SpacesSection() {
   // Room quantity management
   const [roomQuantities, setRoomQuantities] = useState<{[key: string]: number}>({});
   
+  useEffect(() => {
+    // Initialize room quantities from existing rooms
+    const quantities: {[key: string]: number} = {};
+    formData.spaces.rooms.forEach(room => {
+      quantities[room.type] = (quantities[room.type] || 0) + 1;
+    });
+    setRoomQuantities(quantities);
+  }, [formData.spaces.rooms]);
+  
   const handleRoomTypeChange = (value: string) => {
     if (value === 'Other') {
       setShowCustomInput(true);
@@ -37,7 +46,8 @@ export function SpacesSection() {
         type: roomType,
         quantity: 1,
         description: '',
-        isCustom: showCustomInput
+        isCustom: showCustomInput,
+        customName: showCustomInput ? customRoomType : undefined
       });
       
       // Reset form state
@@ -56,26 +66,71 @@ export function SpacesSection() {
   };
   
   const incrementRoomQuantity = (type: string) => {
-    setRoomQuantities(prev => ({
-      ...prev,
-      [type]: (prev[type] || 0) + 1
-    }));
+    setRoomQuantities(prev => {
+      const updatedQuantities = {
+        ...prev,
+        [type]: (prev[type] || 0) + 1
+      };
+      
+      // Add a new room of this type
+      addRoom({
+        type: type,
+        quantity: 1,
+        description: '',
+        isCustom: false
+      });
+      
+      return updatedQuantities;
+    });
   };
   
   const decrementRoomQuantity = (type: string) => {
     if (roomQuantities[type] > 0) {
-      setRoomQuantities(prev => ({
-        ...prev,
-        [type]: prev[type] - 1
-      }));
+      setRoomQuantities(prev => {
+        const updatedQuantities = {
+          ...prev,
+          [type]: prev[type] - 1
+        };
+        
+        // Remove the last room of this type
+        const roomsOfType = formData.spaces.rooms.filter(r => r.type === type);
+        if (roomsOfType.length > 0) {
+          removeRoom(roomsOfType[roomsOfType.length - 1].id);
+        }
+        
+        return updatedQuantities;
+      });
     }
   };
   
   const handleRoomQuantityChange = (type: string, quantity: number) => {
+    const currentQuantity = getRoomQuantity(type);
+    const diff = quantity - currentQuantity;
+    
     setRoomQuantities(prev => ({
       ...prev,
       [type]: Math.max(0, quantity)
     }));
+    
+    // Add or remove rooms based on quantity change
+    if (diff > 0) {
+      // Add rooms
+      for (let i = 0; i < diff; i++) {
+        addRoom({
+          type: type,
+          quantity: 1,
+          description: '',
+          isCustom: false
+        });
+      }
+    } else if (diff < 0) {
+      // Remove rooms
+      const roomsOfType = formData.spaces.rooms.filter(r => r.type === type);
+      const roomsToRemove = roomsOfType.slice(roomsOfType.length + diff);
+      roomsToRemove.forEach(room => {
+        removeRoom(room.id);
+      });
+    }
   };
   
   const handleAdditionalNotesChange = (notes: string) => {
@@ -187,7 +242,7 @@ export function SpacesSection() {
           
           <TabsContent value="general-questions" className="mt-0">
             <GeneralQuestionsTab
-              additionalNotes={formData.spaces.additionalNotes}
+              additionalNotes={formData.spaces.additionalNotes || ''}
               eliminableSpaces={formData.spaces.eliminableSpaces}
               homeSize={formData.spaces.homeSize}
               roomArrangement={formData.spaces.roomArrangement}
