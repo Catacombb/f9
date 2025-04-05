@@ -17,12 +17,13 @@ export function IntroSection() {
       <div className="design-brief-section-container">
         <div className="text-center mb-12 animate-fade-in">
           <h1 className="text-4xl font-bold mb-4 font-heading">
-            <strong>Welcome to Northstar!</strong>
+            <strong>Welcome!</strong>
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Let's create a design brief that will bring your vision to life. 
-            Together, we'll develop a comprehensive plan for your dream home — 
-            tailored perfectly to your unique needs and lifestyle.
+            This tool helps you get clear on your vision for your new home. 
+            You'll walk through a few easy sections to share what matters most — 
+            from your lifestyle to the spaces you want and how you want to feel when you walk in the door. 
+            At the end, you'll receive a summary you can review, download, and share with your architect or designer.
           </p>
         </div>
         
@@ -89,3 +90,4 @@ export function IntroSection() {
     </div>
   );
 }
+
