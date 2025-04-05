@@ -3,6 +3,7 @@ import React from 'react';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { SectionHeader } from './SectionHeader';
 
 export function BudgetSection() {
   const { setCurrentSection } = useDesignBrief();
@@ -18,8 +19,18 @@ export function BudgetSection() {
   };
 
   return (
-    <div>
-      {/* Budget section content */}
+    <div className="space-y-6">
+      <SectionHeader 
+        title="Budget & Timeline" 
+        description="Provide information about your project budget and timeline expectations."
+      />
+      
+      <div className="space-y-6">
+        {/* Budget content will be added here */}
+        <div className="py-8 text-center text-muted-foreground">
+          <p>Budget and timeline content to be completed.</p>
+        </div>
+      </div>
       
       {/* Navigation buttons */}
       <div className="flex justify-between mt-6">
