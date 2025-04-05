@@ -5,6 +5,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { OccupantEntry } from '@/types';
 import { NamedOccupantsSection } from './NamedOccupantsSection';
+import { animations } from '@/lib/animation';
+import { cn } from '@/lib/utils';
 
 interface LifestyleOccupantsSectionProps {
   occupants: string;
@@ -46,7 +48,7 @@ export function LifestyleOccupantsSection({
   
   return (
     <div className="space-y-6">
-      <Card>
+      <Card className={cn("transition-all duration-300", animations.fadeIn)}>
         <CardHeader>
           <CardTitle className="text-xl">Household Occupants</CardTitle>
         </CardHeader>
@@ -55,7 +57,7 @@ export function LifestyleOccupantsSection({
             Please tell us who will be living in the home.
           </p>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-4">
-            <div>
+            <div className="transition-all duration-200 hover:scale-105">
               <Label htmlFor="adult-count" className="mb-2 block">Adults</Label>
               <Input
                 id="adult-count"
@@ -63,9 +65,10 @@ export function LifestyleOccupantsSection({
                 min="0"
                 value={values.adults}
                 onChange={(e) => handleChange('adults', parseInt(e.target.value, 10))}
+                className="focus:ring-2 focus:ring-primary focus:ring-opacity-50 transition-shadow"
               />
             </div>
-            <div>
+            <div className="transition-all duration-200 hover:scale-105">
               <Label htmlFor="child-count" className="mb-2 block">Children</Label>
               <Input
                 id="child-count" 
@@ -73,9 +76,10 @@ export function LifestyleOccupantsSection({
                 min="0"
                 value={values.children}
                 onChange={(e) => handleChange('children', parseInt(e.target.value, 10))}
+                className="focus:ring-2 focus:ring-primary focus:ring-opacity-50 transition-shadow"
               />
             </div>
-            <div>
+            <div className="transition-all duration-200 hover:scale-105">
               <Label htmlFor="dog-count" className="mb-2 block">Dogs</Label>
               <Input 
                 id="dog-count"
@@ -83,9 +87,10 @@ export function LifestyleOccupantsSection({
                 min="0"
                 value={values.dogs}
                 onChange={(e) => handleChange('dogs', parseInt(e.target.value, 10))}
+                className="focus:ring-2 focus:ring-primary focus:ring-opacity-50 transition-shadow"
               />
             </div>
-            <div>
+            <div className="transition-all duration-200 hover:scale-105">
               <Label htmlFor="cat-count" className="mb-2 block">Cats</Label>
               <Input 
                 id="cat-count"
@@ -93,9 +98,10 @@ export function LifestyleOccupantsSection({
                 min="0"
                 value={values.cats}
                 onChange={(e) => handleChange('cats', parseInt(e.target.value, 10))}
+                className="focus:ring-2 focus:ring-primary focus:ring-opacity-50 transition-shadow"
               />
             </div>
-            <div>
+            <div className="transition-all duration-200 hover:scale-105">
               <Label htmlFor="other-count" className="mb-2 block">Other Pets</Label>
               <Input 
                 id="other-count"
@@ -103,6 +109,7 @@ export function LifestyleOccupantsSection({
                 min="0"
                 value={values.other}
                 onChange={(e) => handleChange('other', parseInt(e.target.value, 10))}
+                className="focus:ring-2 focus:ring-primary focus:ring-opacity-50 transition-shadow"
               />
             </div>
           </div>

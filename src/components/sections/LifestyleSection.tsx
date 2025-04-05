@@ -7,6 +7,9 @@ import { useDesignBrief } from '@/context/DesignBriefContext';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { SectionHeader } from './SectionHeader';
 import { LifestyleOccupantsSection } from '../lifestyle/LifestyleOccupantsSection';
+import { cn } from '@/lib/utils';
+import { animations } from '@/lib/animation';
+import { Toaster } from '@/components/ui/toaster';
 
 export function LifestyleSection() {
   const { formData, updateFormData, setCurrentSection } = useDesignBrief();
@@ -54,7 +57,7 @@ export function LifestyleSection() {
             onOccupantEntriesChange={handleOccupantEntriesChange}
           />
           
-          <div className="mb-6">
+          <div className={cn("mb-6 transition-all", animations.fadeIn, "delay-100")}>
             <Label htmlFor="occupationDetails" className="design-brief-question-title">
               Occupations and Work Needs
               <span className="text-muted-foreground text-sm ml-2">(optional)</span>
@@ -68,11 +71,11 @@ export function LifestyleSection() {
               placeholder="Describe your work situation and any home workspace needs..."
               value={formData.lifestyle.occupationDetails}
               onChange={handleTextAreaChange}
-              className="mt-1"
+              className="mt-1 focus:ring-2 focus:ring-primary focus:ring-opacity-50 transition-shadow"
             />
           </div>
           
-          <div className="mb-6">
+          <div className={cn("mb-6 transition-all", animations.fadeIn, "delay-200")}>
             <Label htmlFor="dailyRoutine" className="design-brief-question-title">
               Daily Routines
               <span className="text-muted-foreground text-sm ml-2">(optional)</span>
@@ -86,11 +89,11 @@ export function LifestyleSection() {
               placeholder="Outline how you typically move through your day at home..."
               value={formData.lifestyle.dailyRoutine}
               onChange={handleTextAreaChange}
-              className="mt-1"
+              className="mt-1 focus:ring-2 focus:ring-primary focus:ring-opacity-50 transition-shadow"
             />
           </div>
           
-          <div className="mb-6">
+          <div className={cn("mb-6 transition-all", animations.fadeIn, "delay-300")}>
             <Label htmlFor="entertainmentStyle" className="design-brief-question-title">
               Entertainment and Social Activities
               <span className="text-muted-foreground text-sm ml-2">(optional)</span>
@@ -104,11 +107,11 @@ export function LifestyleSection() {
               placeholder="Describe how you like to entertain guests and use social spaces..."
               value={formData.lifestyle.entertainmentStyle}
               onChange={handleTextAreaChange}
-              className="mt-1"
+              className="mt-1 focus:ring-2 focus:ring-primary focus:ring-opacity-50 transition-shadow"
             />
           </div>
           
-          <div className="mb-6">
+          <div className={cn("mb-6 transition-all", animations.fadeIn, "delay-400")}>
             <Label htmlFor="specialRequirements" className="design-brief-question-title">
               Special Requirements
               <span className="text-muted-foreground text-sm ml-2">(optional)</span>
@@ -122,11 +125,11 @@ export function LifestyleSection() {
               placeholder="Note any special needs or future considerations for your home..."
               value={formData.lifestyle.specialRequirements}
               onChange={handleTextAreaChange}
-              className="mt-1"
+              className="mt-1 focus:ring-2 focus:ring-primary focus:ring-opacity-50 transition-shadow"
             />
           </div>
           
-          <div>
+          <div className={cn("transition-all", animations.fadeIn, "delay-500")}>
             <Label htmlFor="homeFeeling" className="design-brief-question-title">
               How do you want to feel when you come home?
             </Label>
@@ -139,23 +142,32 @@ export function LifestyleSection() {
               placeholder="e.g., I want to feel calm and relaxed, with a sense of warmth and security..."
               value={formData.lifestyle.homeFeeling || ''}
               onChange={handleTextAreaChange}
-              className="mt-1"
+              className="mt-1 focus:ring-2 focus:ring-primary focus:ring-opacity-50 transition-shadow"
             />
           </div>
         </div>
         
         <div className="flex justify-between mt-6">
-          <Button variant="outline" onClick={handlePrevious} className="group">
+          <Button 
+            variant="outline" 
+            onClick={handlePrevious} 
+            className="group transition-all duration-200"
+          >
             <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
             <span>Previous: Budget</span>
           </Button>
           
-          <Button onClick={handleNext} className="group">
+          <Button 
+            onClick={handleNext} 
+            className="group transition-all duration-200"
+          >
             <span>Next: Site</span>
             <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
           </Button>
         </div>
       </div>
+      
+      <Toaster />
     </div>
   );
 }
