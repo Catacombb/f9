@@ -1,134 +1,129 @@
 
 import React from 'react';
+import { useDesignBrief } from '@/context/DesignBriefContext';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Separator } from '@/components/ui/separator';
-import { useDesignBrief } from '@/context/DesignBriefContext';
-import { SectionKey } from '@/types';
-import { ChevronRight, Info, Home, PiggyBank, Users, MapPin, Layout, Building, Image, Upload, FileText, ExternalLink, MessageSquare, Star } from 'lucide-react';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { Link } from 'react-router-dom';
 import { AppLogo } from '@/components/AppLogo';
+import {
+  ArchiveIcon,
+  BedIcon,
+  BriefcaseIcon,
+  BuildingIcon,
+  CameraIcon,
+  CheckCircleIcon,
+  HomeIcon,
+  ImageIcon,
+  InfoIcon,
+  LandmarkIcon,
+  LayoutIcon,
+  MessageSquareIcon,
+  DollarSignIcon,
+  HeartIcon,
+  MapIcon,
+  Star,
+} from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { SectionKey } from '@/types';
 
 interface DesignBriefSidebarProps {
   showLastSaved?: boolean;
   lastSavedFormatted?: string;
 }
 
-// Reorder to make "feedback" come after "summary"
-const sections = [
-  { id: 'intro', title: 'Introduction', icon: <Info className="h-5 w-5" /> },
-  { id: 'projectInfo', title: 'Project Info', icon: <Home className="h-5 w-5" /> },
-  { id: 'contractors', title: 'Project Team', icon: <Users className="h-5 w-5" /> },
-  { id: 'budget', title: 'Budget', icon: <PiggyBank className="h-5 w-5" /> },
-  { id: 'lifestyle', title: 'Lifestyle', icon: <Users className="h-5 w-5" /> },
-  { id: 'site', title: 'Site', icon: <MapPin className="h-5 w-5" /> },
-  { id: 'spaces', title: 'Spaces', icon: <Layout className="h-5 w-5" /> },
-  { id: 'architecture', title: 'Architecture', icon: <Building className="h-5 w-5" /> },
-  { id: 'uploads', title: 'Uploads', icon: <Upload className="h-5 w-5" /> },
-  { id: 'communication', title: 'Communication', icon: <MessageSquare className="h-5 w-5" /> },
-  { id: 'summary', title: 'Summary', icon: <FileText className="h-5 w-5" /> },
-  { id: 'feedback', title: 'Feedback', icon: <Star className="h-5 w-5 text-white" />, isTesterOnly: true },
+const sectionData: Record<SectionKey, { icon: React.ReactNode, label: string, isTesterOnly?: boolean }> = {
+  intro: { icon: <InfoIcon className="h-5 w-5" />, label: 'Introduction' },
+  projectInfo: { icon: <BuildingIcon className="h-5 w-5" />, label: 'Project Information' },
+  site: { icon: <MapIcon className="h-5 w-5" />, label: 'Site' },
+  lifestyle: { icon: <HeartIcon className="h-5 w-5" />, label: 'Lifestyle' },
+  spaces: { icon: <LayoutIcon className="h-5 w-5" />, label: 'Spaces' },
+  architecture: { icon: <HomeIcon className="h-5 w-5" />, label: 'Architecture' },
+  contractors: { icon: <BriefcaseIcon className="h-5 w-5" />, label: 'Project Team' },
+  budget: { icon: <DollarSignIcon className="h-5 w-5" />, label: 'Budget' },
+  communication: { icon: <MessageSquareIcon className="h-5 w-5" />, label: 'Communication' },
+  uploads: { icon: <CameraIcon className="h-5 w-5" />, label: 'Uploads' },
+  summary: { icon: <CheckCircleIcon className="h-5 w-5" />, label: 'Summary' },
+  feedback: { icon: <Star className="h-5 w-5 text-purple-500" />, label: 'Feedback', isTesterOnly: true }
+};
+
+const sectionOrder: SectionKey[] = [
+  'intro', 
+  'projectInfo', 
+  'site', 
+  'lifestyle', 
+  'spaces', 
+  'architecture', 
+  'contractors', 
+  'budget', 
+  'communication', 
+  'uploads', 
+  'summary',
+  'feedback'
 ];
 
-export function DesignBriefSidebar({ showLastSaved = false, lastSavedFormatted = '' }: DesignBriefSidebarProps) {
+export function DesignBriefSidebar({ showLastSaved, lastSavedFormatted }: DesignBriefSidebarProps) {
   const { currentSection, setCurrentSection } = useDesignBrief();
-  const isMobile = useIsMobile();
 
-  const navigateToSection = (sectionId: SectionKey) => {
-    setCurrentSection(sectionId);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  const handleSectionClick = (section: SectionKey) => {
+    setCurrentSection(section);
+    window.scrollTo(0, 0);
   };
 
   return (
-    <div className={`h-full border-r bg-sidebar transition-all duration-300 relative ${isMobile ? 'w-full' : 'w-64'} overflow-hidden`}>
-      <div className="h-full flex flex-col">
-        <div className="py-6 px-4 flex flex-col items-center">
-          <AppLogo size="large" />
-          <span className="text-xs text-muted-foreground mt-2 mb-3">Guiding Your Vision</span>
-          
-          {showLastSaved && lastSavedFormatted && (
-            <div className="mt-1 text-xs text-muted-foreground text-center pb-2 border-b border-sidebar-border w-full">
-              Last saved {lastSavedFormatted}
-            </div>
-          )}
-        </div>
-        
-        {!showLastSaved && <Separator className="mb-2 bg-sidebar-border" />}
-        
-        <ScrollArea className="flex-1">
-          <div className="px-2 py-2">
-            {sections.map((section) => {
-              if (section.id === 'feedback') {
-                // Special styling for the Feedback button
-                return (
-                  <Button 
-                    key={section.id}
-                    variant="ghost" 
-                    className={cn(
-                      "w-full justify-start mb-1 relative mt-2",
-                      "bg-purple-600 hover:bg-purple-700 text-white font-medium",
-                      isMobile ? "text-sm py-2" : "",
-                      "transition-all duration-300"
-                    )}
-                    onClick={() => navigateToSection(section.id as SectionKey)}
-                  >
-                    <div className="flex items-center w-full">
-                      <span className="mr-2 transition-transform group-hover:scale-110 duration-200">{section.icon}</span>
-                      <span className="truncate">{section.title}</span>
-                      <Badge variant="outline" className="ml-2 text-[0.6rem] py-0 px-1.5 bg-white/20 text-white border-white/30">
-                        Testers
-                      </Badge>
-                    </div>
-                  </Button>
-                );
-              }
-
-              return (
-                <Button
-                  key={section.id}
-                  variant={currentSection === section.id ? "secondary" : "ghost"}
-                  className={cn(
-                    "w-full justify-start mb-1 relative group",
-                    currentSection === section.id 
-                      ? "bg-sidebar-accent text-sidebar-accent-foreground animate-slide-in" 
-                      : "hover:bg-sidebar-accent/20 transition-colors duration-200",
-                    isMobile ? "text-sm py-2" : ""
-                  )}
-                  onClick={() => navigateToSection(section.id as SectionKey)}
-                >
-                  <div className="flex items-center w-full">
-                    <span className={`mr-2 ${currentSection !== section.id ? 'group-hover:text-primary group-hover:scale-110 transition-all duration-200' : ''}`}>
-                      {section.icon}
-                    </span>
-                    <span className="truncate">{section.title}</span>
-                  </div>
-                  {currentSection === section.id && (
-                    <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-primary rounded-r animate-fade-in" />
-                  )}
-                </Button>
-              );
-            })}
-          </div>
-        </ScrollArea>
-        
-        <div className="p-4 border-t bg-sidebar-accent/10 border-sidebar-border mt-auto">
-          <div className="space-y-2">
-            <Button 
-              variant="ghost" 
-              className="w-full justify-start truncate bg-sidebar-accent/20 hover:bg-sidebar-accent/30 text-sidebar-foreground font-medium text-sm transition-all duration-200 group" 
-              asChild
-            >
-              <Link to="/about" className="flex items-center">
-                <ExternalLink className="mr-2 h-5 w-5 shrink-0 text-accent group-hover:scale-110 transition-transform duration-200" />
-                <span className="truncate">About Northstar</span>
-              </Link>
-            </Button>
-          </div>
-        </div>
+    <aside className="bg-slate-50 dark:bg-slate-900 border-r min-h-screen flex flex-col w-[280px] flex-shrink-0">
+      <div className="p-4 border-b">
+        <AppLogo />
       </div>
-    </div>
+      
+      <div className="flex-grow overflow-auto p-4">
+        <nav className="space-y-2">
+          {sectionOrder.map((sectionKey) => {
+            const section = sectionData[sectionKey];
+            const isActive = currentSection === sectionKey;
+            
+            return (
+              <Button
+                key={sectionKey}
+                variant={isActive ? "default" : "ghost"}
+                className={cn(
+                  "w-full justify-start text-left font-normal relative h-auto py-2 transition-all duration-200",
+                  isActive 
+                    ? "bg-primary text-primary-foreground animate-slide-in-right" 
+                    : "hover:bg-muted/50",
+                  section.isTesterOnly ? "border-purple-300 hover:border-purple-400" : ""
+                )}
+                onClick={() => handleSectionClick(sectionKey)}
+              >
+                <div className="flex items-center w-full">
+                  <div className={cn(
+                    "mr-2 h-5 w-5 shrink-0 transition-transform", 
+                    isActive ? "" : "group-hover:scale-110"
+                  )}>
+                    {section.icon}
+                  </div>
+                  <span>{section.label}</span>
+                  
+                  {section.isTesterOnly && (
+                    <Badge variant="outline" className="ml-2 text-[0.6rem] py-0 px-1.5 bg-purple-100 text-purple-800 border-purple-300">
+                      Testers
+                    </Badge>
+                  )}
+                </div>
+              </Button>
+            );
+          })}
+        </nav>
+      </div>
+      
+      {showLastSaved && lastSavedFormatted && (
+        <div className="p-2 border-t text-center text-xs text-muted-foreground">
+          Last saved {lastSavedFormatted}
+        </div>
+      )}
+      
+      <div className="p-4 border-t text-center text-xs text-muted-foreground">
+        Design Brief Tool © {new Date().getFullYear()}<br />
+        <span className="opacity-50">v1.0.0</span>
+      </div>
+    </aside>
   );
 }
