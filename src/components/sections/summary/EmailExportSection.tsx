@@ -25,6 +25,9 @@ export function EmailExportSection({
   const { toast } = useToast();
   
   const handleSendEmail = async () => {
+    // Email validation regex
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    
     if (!recipientEmail) {
       toast({
         title: "Email Required",
@@ -34,7 +37,21 @@ export function EmailExportSection({
       return;
     }
     
+    if (!emailRegex.test(recipientEmail)) {
+      toast({
+        title: "Invalid Email",
+        description: "Please enter a valid email address.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setIsEmailSending(true);
+    toast({
+      title: "Preparing Email",
+      description: "Generating PDF and preparing to send email...",
+    });
+    
     try {
       const success = await onSendEmail(recipientEmail);
       if (success) {
@@ -49,7 +66,7 @@ export function EmailExportSection({
       console.error("Email sending error:", error);
       toast({
         title: "Email Delivery Failed",
-        description: "We couldn't send your email. The issue has been logged and we'll try again soon.",
+        description: "We couldn't send your email. Please try again later or download the PDF instead.",
         variant: "destructive",
       });
     } finally {
@@ -111,7 +128,7 @@ export function EmailExportSection({
               className="min-w-[140px]"
             >
               <Download className={`h-4 w-4 mr-2 ${isExporting ? 'animate-spin' : ''}`} />
-              <span>Export PDF</span>
+              <span>{isExporting ? 'Exporting...' : 'Export PDF'}</span>
             </Button>
           </div>
         </div>
@@ -137,7 +154,7 @@ export function EmailExportSection({
                 className="min-w-[140px]"
               >
                 <Mail className={`h-4 w-4 mr-2 ${isEmailSending ? 'animate-spin' : ''}`} />
-                <span>Send Email</span>
+                <span>{isEmailSending ? 'Sending...' : 'Send Email'}</span>
               </Button>
             </div>
           </div>

@@ -42,36 +42,35 @@ export const useFileAndSummaryManagement = (
       // Generate the PDF first
       const pdfBlob = await generatePDF(projectData);
       
-      // In a real-world scenario, we would upload this PDF to a server
-      // and then trigger an email sending process
-      
-      // Mock API call to email service
+      // Create a FormData object to send the PDF and email details
       const formData = new FormData();
       formData.append('email', email);
       formData.append('clientName', projectData.formData.projectInfo.clientName || 'Client');
       formData.append('projectAddress', projectData.formData.projectInfo.projectAddress || 'Project Address');
       formData.append('attachment', pdfBlob, `Northstar_Brief_${projectData.formData.projectInfo.clientName || "Client"}_${new Date().toISOString().split('T')[0]}.pdf`);
       
-      // Simulate API call with timeout
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Send the email using the EmailJS service
+      // In a production environment, you would replace this with your actual email API endpoint
+      const emailApiUrl = 'https://api.emailjs.com/api/v1.0/email/send-form';
+      
+      // Add your EmailJS service credentials
+      formData.append('service_id', 'service_northstar');
+      formData.append('template_id', 'template_designbrief');
+      formData.append('user_id', 'your_emailjs_user_id'); // Replace with your actual EmailJS user ID
+      
+      // Make the API call to send the email
+      const response = await fetch(emailApiUrl, {
+        method: 'POST',
+        body: formData,
+        mode: 'cors'
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Email API responded with status ${response.status}`);
+      }
       
       // Log successful email attempt
       console.log(`Successfully sent design brief to ${email}`);
-      
-      // In a production environment, this would be an actual API call:
-      // const response = await fetch('https://api.example.com/send-email', {
-      //   method: 'POST',
-      //   body: formData,
-      // });
-      // 
-      // if (!response.ok) {
-      //   throw new Error(`Email API responded with status ${response.status}`);
-      // }
-      // 
-      // const result = await response.json();
-      // if (!result.success) {
-      //   throw new Error(result.message || 'Failed to send email');
-      // }
       
       return true;
     } catch (error) {
@@ -79,7 +78,6 @@ export const useFileAndSummaryManagement = (
       console.error("Failed to send email:", error);
       
       // Implement fallback mechanism if needed
-      // e.g., store the failed email request in local storage for retry
       try {
         const failedEmails = JSON.parse(localStorage.getItem('failedEmails') || '[]');
         failedEmails.push({
