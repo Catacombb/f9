@@ -89,3 +89,54 @@ export const formatCodedValue = (
   if (!code) return defaultValue;
   return mappings[code] || defaultValue;
 };
+
+// Group room objects by their level
+export const groupRoomsByLevel = (
+  rooms: Array<{ description: string, [key: string]: any }>,
+  defaultLevel = 'Unspecified'
+) => {
+  const roomsByLevel: Record<string, Array<any>> = {};
+  
+  rooms.forEach(room => {
+    let level = defaultLevel;
+    
+    try {
+      const descObj = JSON.parse(room.description);
+      if (descObj.level) {
+        level = descObj.level;
+      }
+    } catch (e) {
+      // Use default level if parsing fails
+    }
+    
+    if (!roomsByLevel[level]) {
+      roomsByLevel[level] = [];
+    }
+    
+    roomsByLevel[level].push(room);
+  });
+  
+  return roomsByLevel;
+};
+
+// Order levels in a logical sequence
+export const getOrderedLevels = (levels: string[]) => {
+  const levelOrder = {
+    'Basement': 0,
+    'Ground': 1,
+    'Ground Floor': 1,
+    'First': 2, 
+    'First Floor': 2,
+    'Second': 3,
+    'Second Floor': 3,
+    'Third': 4,
+    'Third Floor': 4,
+    'Unspecified': 999
+  };
+  
+  return levels.sort((a, b) => {
+    const orderA = levelOrder[a] !== undefined ? levelOrder[a] : a.toLowerCase().includes('basement') ? 0 : 998;
+    const orderB = levelOrder[b] !== undefined ? levelOrder[b] : b.toLowerCase().includes('basement') ? 0 : 998;
+    return orderA - orderB;
+  });
+};

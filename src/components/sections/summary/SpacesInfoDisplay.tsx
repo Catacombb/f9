@@ -21,6 +21,14 @@ export function SpacesInfoDisplay({ spaces, formatSpacesData }: SpacesInfoDispla
           <p className="text-sm">{spaces.additionalNotes}</p>
         </div>
       )}
+      
+      {spaces.homeLevelType && (
+        <div className="mt-4">
+          <p className="text-sm font-medium">Level Preference:</p>
+          <p className="text-sm">{spaces.homeLevelType === 'single-level' ? 'Single-level home' : 
+            spaces.homeLevelType === 'multi-level' ? 'Multi-level home' : 'No specific preference'}</p>
+        </div>
+      )}
     </div>
   );
 }

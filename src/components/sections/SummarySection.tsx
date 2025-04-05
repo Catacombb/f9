@@ -24,28 +24,51 @@ export function SummarySection() {
       return <p className="text-sm text-muted-foreground">No spaces defined</p>;
     }
     
-    const groupedRooms = formData.spaces.rooms.reduce((acc, room) => {
-      const type = room.isCustom && room.customName ? room.customName : room.type;
-      if (!acc[type]) {
-        acc[type] = [];
+    const roomsByLevel = formData.spaces.rooms.reduce((acc, room) => {
+      try {
+        const descriptionObj = JSON.parse(room.description);
+        const level = descriptionObj.level || 'Unspecified';
+        
+        if (!acc[level]) {
+          acc[level] = [];
+        }
+        
+        acc[level].push(room);
+        return acc;
+      } catch (e) {
+        if (!acc['Unspecified']) {
+          acc['Unspecified'] = [];
+        }
+        acc['Unspecified'].push(room);
+        return acc;
       }
-      acc[type].push(room);
-      return acc;
     }, {} as Record<string, typeof formData.spaces.rooms>);
+    
+    const orderedLevels = Object.keys(roomsByLevel).sort((a, b) => {
+      const levelOrder = {
+        'Basement': 0,
+        'Ground': 1,
+        'Ground Floor': 1,
+        'First': 2,
+        'First Floor': 2,
+        'Second': 3,
+        'Second Floor': 3,
+        'Third': 4,
+        'Third Floor': 4,
+        'Unspecified': 999,
+      };
+      
+      const orderA = levelOrder[a] !== undefined ? levelOrder[a] : a.toLowerCase().includes('basement') ? 0 : 998;
+      const orderB = levelOrder[b] !== undefined ? levelOrder[b] : b.toLowerCase().includes('basement') ? 0 : 998;
+      return orderA - orderB;
+    });
     
     const formatRoomDescription = (description: string) => {
       try {
         const descriptionObj = JSON.parse(description);
         
-        // Create a human-readable format from the description object
         const descriptionItems = [];
         
-        // Level information
-        if (descriptionObj.level) {
-          descriptionItems.push(`Located on ${descriptionObj.level} floor`);
-        }
-        
-        // Room-specific properties
         if (descriptionObj.kitchenType) {
           descriptionItems.push(`${descriptionObj.kitchenType} kitchen`);
         }
@@ -74,34 +97,49 @@ export function SummarySection() {
           descriptionItems.push(`${descriptionObj.officeType}`);
         }
         
-        // Notes
         if (descriptionObj.notes) {
           descriptionItems.push(descriptionObj.notes);
         }
         
         return descriptionItems.length > 0 
           ? descriptionItems.join(". ") 
-          : description;
+          : "No specific details";
       } catch (e) {
-        // If parsing fails, return the original string
         return description;
       }
     };
     
     return (
-      <div className="space-y-4">
-        {Object.entries(groupedRooms).map(([type, rooms]) => (
-          <div key={type}>
-            <p className="text-sm font-medium">
-              {type} ({rooms.length})
-            </p>
-            <ul className="list-disc pl-5 text-sm">
-              {rooms.map((room, index) => (
-                <li key={index}>
-                  {formatRoomDescription(room.description)}
-                </li>
-              ))}
-            </ul>
+      <div className="space-y-6">
+        {orderedLevels.map(level => (
+          <div key={level} className="space-y-4">
+            <h5 className="font-medium text-base border-b pb-1">{level}</h5>
+            
+            {(() => {
+              const roomsByType = roomsByLevel[level].reduce((acc, room) => {
+                const type = room.isCustom && room.customName ? room.customName : room.type;
+                if (!acc[type]) {
+                  acc[type] = [];
+                }
+                acc[type].push(room);
+                return acc;
+              }, {} as Record<string, typeof formData.spaces.rooms>);
+              
+              return Object.entries(roomsByType).map(([type, rooms]) => (
+                <div key={`${level}-${type}`}>
+                  <p className="text-sm font-medium">
+                    {type} ({rooms.length})
+                  </p>
+                  <ul className="list-disc pl-5 text-sm">
+                    {rooms.map((room, index) => (
+                      <li key={index}>
+                        {formatRoomDescription(room.description)}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ));
+            })()}
           </div>
         ))}
       </div>
@@ -142,10 +180,8 @@ export function SummarySection() {
     }
   };
 
-  // Handle PDF export with proper return type
   const handleExportPDF = async (): Promise<Blob> => {
     try {
-      // Now we correctly return the Blob from exportAsPDF
       return await exportAsPDF();
     } catch (error) {
       console.error("PDF export error:", error);
@@ -179,7 +215,6 @@ export function SummarySection() {
               inspirationImages={inspirationImages}
             />
             
-            {/* Email and Export Section */}
             <EmailExportSection 
               defaultEmail={formData.projectInfo.contactEmail || ''}
               onSendEmail={sendByEmail}
