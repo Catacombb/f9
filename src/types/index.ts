@@ -18,6 +18,11 @@ export interface Professional {
   isCustom?: boolean;
 }
 
+export interface InspirationEntry {
+  link: string;
+  description: string;
+}
+
 export interface ProjectFiles {
   uploadedFiles: File[];
   uploadedInspirationImages: File[];
@@ -115,6 +120,7 @@ export interface FormData {
     internalMaterialsSelected?: string[];
     inspirationLinks?: string; // Added missing property
     inspirationComments?: string; // Added missing property
+    inspirationEntries?: InspirationEntry[]; // Add the new property for inspiration entries
   };
   contractors: {
     preferredBuilder: string;

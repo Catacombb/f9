@@ -84,7 +84,8 @@ export const initialProjectData: ProjectData = {
       externalMaterialsSelected: [],
       internalMaterialsSelected: [],
       inspirationLinks: '', // Added missing property
-      inspirationComments: '' // Added missing property
+      inspirationComments: '', // Added missing property
+      inspirationEntries: [] // Add default empty array for inspiration entries
     },
     contractors: {
       preferredBuilder: '',
