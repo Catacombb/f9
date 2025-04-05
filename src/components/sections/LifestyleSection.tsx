@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -10,6 +9,7 @@ import { LifestyleOccupantsSection } from '../lifestyle/LifestyleOccupantsSectio
 import { cn } from '@/lib/utils';
 import { animations } from '@/lib/animation';
 import { Toaster } from '@/components/ui/toaster';
+import { OccupantEntry } from '@/types';
 
 export function LifestyleSection() {
   const { formData, updateFormData, setCurrentSection } = useDesignBrief();
@@ -29,14 +29,18 @@ export function LifestyleSection() {
     window.scrollTo(0, 0);
   };
   
-  // Handle occupants data
-  const handleOccupantsChange = (occupantsData: string) => {
-    updateFormData('lifestyle', { occupants: occupantsData });
-  };
-  
   // Handle occupant entries change
-  const handleOccupantEntriesChange = (entries: any[]) => {
+  const handleOccupantEntriesChange = (entries: OccupantEntry[]) => {
     updateFormData('lifestyle', { occupantEntries: entries });
+    
+    // Also update the legacy occupants field as a JSON string with counts
+    const counts = entries.reduce((acc, entry) => {
+      const type = entry.type === 'child' ? 'children' : entry.type + 's';
+      acc[type] = (acc[type] || 0) + 1;
+      return acc;
+    }, { adults: 0, children: 0, dogs: 0, cats: 0, other: 0 });
+    
+    updateFormData('lifestyle', { occupants: JSON.stringify(counts) });
   };
   
   return (
@@ -51,8 +55,6 @@ export function LifestyleSection() {
         <div className="design-brief-form-group space-y-6">
           {/* Occupants Section */}
           <LifestyleOccupantsSection 
-            occupants={formData.lifestyle.occupants || ''}
-            onOccupantsChange={handleOccupantsChange}
             occupantEntries={formData.lifestyle.occupantEntries || []}
             onOccupantEntriesChange={handleOccupantEntriesChange}
           />
