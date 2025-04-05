@@ -80,6 +80,7 @@ export function generateTestData(): Partial<FormData> {
             entertainmentDesign: true,
             entertainmentSpace: 'Integrated with Living Areas',
             acousticNeeds: false,
+            level: 'ground',
             notes: 'Open concept with fireplace.'
           }), 
           isCustom: false 
@@ -92,6 +93,7 @@ export function generateTestData(): Partial<FormData> {
             kitchenType: 'Both',
             kitchenLayout: 'Open to Other Spaces',
             kitchenUse: 'Also for Eating',
+            level: 'ground',
             notes: 'Modern kitchen with island.'
           }), 
           isCustom: false 
@@ -101,6 +103,7 @@ export function generateTestData(): Partial<FormData> {
           type: 'Bedroom', 
           quantity: 3, 
           description: JSON.stringify({
+            level: 'upper',
             notes: 'Master bedroom with ensuite.'
           }), 
           isCustom: false 
@@ -112,6 +115,7 @@ export function generateTestData(): Partial<FormData> {
           description: JSON.stringify({
             workFromHome: true,
             officeType: 'Dedicated Office',
+            level: 'ground',
             notes: 'Quiet space with good natural light.'
           }), 
           isCustom: false 
@@ -124,6 +128,8 @@ export function generateTestData(): Partial<FormData> {
       spatialRelationships: 'Kitchen should flow into dining and living area. Office should be in a quiet part of the house.',
       accessibilityNeeds: 'no',
       spacesNotes: '200 square meters, two floors',
+      homeLevelType: 'multi-level',
+      levelAssignmentNotes: 'Bedrooms on upper floor, living spaces on ground floor',
     },
     architecture: {
       stylePrefences: 'Modern, minimalist.',
@@ -139,10 +145,10 @@ export function generateTestData(): Partial<FormData> {
       inspirationNotes: 'Love natural light and open spaces.',
     },
     contractors: {
-      preferredBuilder: 'ABC Builders',
       goToTender: true,
       professionals: [
-        { id: generateRandomString(10), type: 'Architect', name: 'Jane Smith', contact: 'jane.smith@example.com', notes: 'Experienced in residential design.', isCustom: false },
+        { id: generateRandomString(10), type: 'Builder', name: 'ABC Builders', contact: 'abc@example.com', notes: 'Local builder with good reputation.', isCustom: false },
+        { id: generateRandomString(10), type: 'Interior Designer', name: 'Jane Smith', contact: 'jane.smith@example.com', notes: 'Experienced in residential design.', isCustom: false },
         { id: generateRandomString(10), type: 'Engineer', name: 'Tom Brown', contact: 'tom.brown@example.com', notes: 'Structural engineer.', isCustom: false },
       ],
       additionalNotes: 'Looking for experienced and reliable contractors.',

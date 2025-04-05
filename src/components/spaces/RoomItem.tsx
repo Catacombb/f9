@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Trash2 } from 'lucide-react';
 import { roomSpecificQuestions } from './roomQuestions';
+import { useDesignBrief } from '@/context/DesignBriefContext';
 
 interface RoomItemProps {
   room: SpaceRoom;
@@ -18,6 +19,9 @@ interface RoomItemProps {
 }
 
 export const RoomItem = ({ room, onEdit, onRemove }: RoomItemProps) => {
+  const { formData } = useDesignBrief();
+  const isMultiLevel = formData.spaces.homeLevelType === 'multi-level';
+
   const handleQuantityChange = (value: string) => {
     const quantity = parseInt(value, 10);
     if (!isNaN(quantity) && quantity > 0) {
@@ -142,6 +146,26 @@ export const RoomItem = ({ room, onEdit, onRemove }: RoomItemProps) => {
               className="w-24"
             />
           </div>
+          
+          {/* Level selection - only shown for multi-level homes */}
+          {isMultiLevel && (
+            <div className="flex flex-col space-y-2">
+              <Label htmlFor={`level-${room.id}`}>Preferred Level</Label>
+              <Select 
+                value={answers.level || ''}
+                onValueChange={(value) => handleAnswerChange('level', value)}
+              >
+                <SelectTrigger id={`level-${room.id}`}>
+                  <SelectValue placeholder="Select preferred level" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ground">Ground Floor</SelectItem>
+                  <SelectItem value="upper">Upper Floor</SelectItem>
+                  <SelectItem value="either">Either / No Preference</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          )}
           
           {questions.length > 0 && (
             <div className="mt-4 space-y-4 border-t pt-4">

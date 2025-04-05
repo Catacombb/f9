@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,10 +13,9 @@ import { Professional } from '@/types';
 import { MultiSelectButtons } from '@/components/MultiSelectButtons';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
-// Simplified list of professionals
+// Simplified list of professionals - removed Architect
 const predefinedProfessionals = [
   { value: 'builder', label: 'Builder' },
-  { value: 'architect', label: 'Architect' },
   { value: 'interior_designer', label: 'Interior Designer' },
   { value: 'landscape_architect', label: 'Landscape Architect' },
 ];
@@ -157,23 +157,19 @@ export function ContractorsSection() {
   };
   
   const handlePrevious = () => {
-    setCurrentSection('projectInfo');
+    setCurrentSection('site');
+    window.scrollTo(0, 0);
   };
   
   const handleNext = () => {
-    setCurrentSection('budget');
+    setCurrentSection('lifestyle');
+    window.scrollTo(0, 0);
   };
   
   // Calculate completion percentage - revised to only count explicit user selections
   const calculateCompletion = () => {
     let completed = 0;
     let total = 0;
-    
-    // Check preferredBuilder field
-    total++;
-    if (formData.contractors.preferredBuilder && formData.contractors.preferredBuilder.trim() !== '') {
-      completed++;
-    }
     
     // Check goToTender field - only count if explicitly set by user
     total++;
@@ -250,34 +246,72 @@ export function ContractorsSection() {
         </div>
         
         <div className="design-brief-form-group">
-          <div className="mb-6">
-            <Label htmlFor="preferredBuilder">Preferred Builder</Label>
-            <Input
-              id="preferredBuilder"
-              name="preferredBuilder"
-              placeholder="Enter the name of your preferred builder (if any)"
-              value={formData.contractors.preferredBuilder}
-              onChange={handleInputChange}
-              className="mt-1"
-            />
-          </div>
-          
-          <div className="mb-6 flex items-center space-x-2">
-            <Switch
-              id="goToTender"
-              checked={formData.contractors.goToTender}
-              onCheckedChange={handleSwitchChange}
-            />
-            <Label htmlFor="goToTender">I would like to go to tender for a builder</Label>
-          </div>
-        </div>
-        
-        <div className="design-brief-form-group">
           <h3 className="text-lg font-semibold mb-2">Project Professionals</h3>
           <p className="text-sm text-muted-foreground mb-4">Do you have any preferred professionals for the roles below?</p>
+
+          {/* Builder section with tender option */}
+          <Card key="builder" className="overflow-hidden mb-6">
+            <CardContent className="p-4">
+              <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-6 sm:justify-between sm:items-center">
+                <div className="mb-4 sm:mb-0 sm:flex-1">
+                  <h4 className="text-md font-medium mb-2">Builder</h4>
+                  
+                  <RadioGroup 
+                    value={professionalPreferences['builder']?.hasPreferred || ''}
+                    onValueChange={(value) => handlePreferenceChange('builder', value)}
+                    className="flex space-x-4"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="yes" id="builder-yes" />
+                      <Label htmlFor="builder-yes">Yes</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="no" id="builder-no" />
+                      <Label htmlFor="builder-no">No</Label>
+                    </div>
+                  </RadioGroup>
+                </div>
+
+                <div className="flex items-center space-x-2 sm:justify-end sm:flex-1">
+                  <Switch
+                    id="goToTender"
+                    checked={formData.contractors.goToTender}
+                    onCheckedChange={handleSwitchChange}
+                  />
+                  <Label htmlFor="goToTender">I would like to go to tender for a builder</Label>
+                </div>
+              </div>
+              
+              {professionalPreferences['builder']?.hasPreferred === 'yes' && (
+                <div className="grid gap-4 pl-6 border-l-2 border-primary/20 mt-4">
+                  <div>
+                    <Label htmlFor="builder-name">Name</Label>
+                    <Input
+                      id="builder-name"
+                      value={professionalPreferences['builder']?.name || ''}
+                      onChange={(e) => handlePreferredProfessionalInfo('builder', 'name', e.target.value)}
+                      className="mt-1"
+                      placeholder="Enter preferred Builder's name"
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="builder-contact">Contact Info</Label>
+                    <Input
+                      id="builder-contact"
+                      value={professionalPreferences['builder']?.contact || ''}
+                      onChange={(e) => handlePreferredProfessionalInfo('builder', 'contact', e.target.value)}
+                      className="mt-1"
+                      placeholder="Email or phone number"
+                    />
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
           
           <div className="space-y-6">
-            {predefinedProfessionals.map((professional) => (
+            {predefinedProfessionals.slice(1).map((professional) => (
               <Card key={professional.value} className="overflow-hidden">
                 <CardContent className="p-4">
                   <div className="mb-4">
@@ -412,11 +446,11 @@ export function ContractorsSection() {
         <div className="flex justify-between mt-6">
           <Button variant="outline" onClick={handlePrevious} className="group">
             <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-            <span>Previous: Project Info</span>
+            <span>Previous: Site</span>
           </Button>
           
           <Button onClick={handleNext} className="group">
-            <span>Next: Budget</span>
+            <span>Next: Lifestyle</span>
             <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
           </Button>
         </div>

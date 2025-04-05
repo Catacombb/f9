@@ -4,25 +4,18 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface LevelPreferenceTabProps {
   homeLevelType: string | undefined;
-  levelAssignments: Record<string, string> | undefined;
   levelAssignmentNotes: string | undefined;
-  roomsWithQuantities: { type: string; quantity: number }[];
   onHomeLevelTypeChange: (value: string) => void;
-  onLevelAssignmentChange: (roomType: string, level: string) => void;
   onLevelAssignmentNotesChange: (notes: string) => void;
 }
 
 export const LevelPreferenceTab: React.FC<LevelPreferenceTabProps> = ({
   homeLevelType,
-  levelAssignments = {},
   levelAssignmentNotes = '',
-  roomsWithQuantities,
   onHomeLevelTypeChange,
-  onLevelAssignmentChange,
   onLevelAssignmentNotesChange
 }) => {
   return (
@@ -70,38 +63,6 @@ export const LevelPreferenceTab: React.FC<LevelPreferenceTabProps> = ({
 
           {homeLevelType === 'multi-level' && (
             <div className="mt-8 space-y-5 border-t pt-6">
-              <div>
-                <Label className="text-base font-medium">
-                  Which level would you like each space to be on?
-                </Label>
-                <p className="text-sm text-muted-foreground mt-1 mb-4">
-                  For each space you're considering, indicate your preferred level placement.
-                </p>
-                
-                <div className="space-y-4 mt-4">
-                  {roomsWithQuantities
-                    .filter(room => room.quantity > 0)
-                    .map(room => (
-                      <div key={room.type} className="grid grid-cols-2 gap-4 items-center border-b pb-4">
-                        <div className="font-medium">{room.type}</div>
-                        <Select
-                          value={levelAssignments[room.type] || ''}
-                          onValueChange={(value) => onLevelAssignmentChange(room.type, value)}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select level..." />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="ground">Ground Floor</SelectItem>
-                            <SelectItem value="upper">Upper Floor</SelectItem>
-                            <SelectItem value="either">Either / No Preference</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    ))}
-                </div>
-              </div>
-              
               <div className="mt-6">
                 <Label className="text-base font-medium" htmlFor="levelAssignmentNotes">
                   Any notes or preferences for how the levels are arranged?

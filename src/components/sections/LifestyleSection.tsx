@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -87,11 +86,13 @@ export function LifestyleSection() {
   };
   
   const handlePrevious = () => {
-    setCurrentSection('budget');
+    setCurrentSection('site');
+    window.scrollTo(0, 0);
   };
   
   const handleNext = () => {
-    setCurrentSection('site');
+    setCurrentSection('spaces');
+    window.scrollTo(0, 0);
   };
   
   return (
@@ -317,11 +318,11 @@ export function LifestyleSection() {
         <div className="flex justify-between mt-6">
           <Button variant="outline" onClick={handlePrevious} className="group">
             <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-            <span>Previous: Budget</span>
+            <span>Previous: Site</span>
           </Button>
           
           <Button onClick={handleNext} className="group">
-            <span>Next: Site</span>
+            <span>Next: Spaces</span>
             <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
           </Button>
         </div>

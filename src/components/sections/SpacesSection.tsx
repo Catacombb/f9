@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -152,29 +153,21 @@ export function SpacesSection() {
     updateFormData('spaces', { homeLevelType: value });
   };
   
-  const handleLevelAssignmentChange = (roomType: string, level: string) => {
-    const currentAssignments = formData.spaces.levelAssignments || {};
-    updateFormData('spaces', { 
-      levelAssignments: {
-        ...currentAssignments,
-        [roomType]: level
-      }
-    });
-  };
-  
   const handleLevelAssignmentNotesChange = (notes: string) => {
     updateFormData('spaces', { levelAssignmentNotes: notes });
   };
   
   const handlePrevious = () => {
     setCurrentSection('site');
+    window.scrollTo(0, 0);
   };
   
   const handleNext = () => {
     setCurrentSection('architecture');
+    window.scrollTo(0, 0);
   };
   
-  // Get unique room types with quantities for level assignments
+  // Get unique room types with quantities
   const roomsWithQuantities = formData.spaces.rooms.reduce((acc: { type: string; quantity: number }[], room) => {
     const existingRoom = acc.find(r => r.type === room.type);
     if (existingRoom) {
@@ -210,11 +203,8 @@ export function SpacesSection() {
           <TabsContent value="level-preference" className="mt-0">
             <LevelPreferenceTab
               homeLevelType={formData.spaces.homeLevelType}
-              levelAssignments={formData.spaces.levelAssignments}
               levelAssignmentNotes={formData.spaces.levelAssignmentNotes}
-              roomsWithQuantities={roomsWithQuantities}
               onHomeLevelTypeChange={handleHomeLevelTypeChange}
-              onLevelAssignmentChange={handleLevelAssignmentChange}
               onLevelAssignmentNotesChange={handleLevelAssignmentNotesChange}
             />
           </TabsContent>

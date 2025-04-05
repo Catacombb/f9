@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { DesignBriefLayout } from './DesignBriefLayout';
 import { IntroSection } from './sections/IntroSection';
 import { ProjectInfoSection } from './sections/ProjectInfoSection';
@@ -19,6 +19,11 @@ import { toast } from 'sonner';
 
 export function DesignBrief() {
   const { currentSection, updateFormData, updateFiles, projectData } = useDesignBrief();
+  
+  // Scroll to top when section changes
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [currentSection]);
   
   const loadTestData = () => {
     // Generate comprehensive test data for all sections
@@ -52,22 +57,22 @@ export function DesignBrief() {
         return <IntroSection />;
       case 'projectInfo':
         return <ProjectInfoSection />;
-      case 'contractors':
-        return <ContractorsSection />;
-      case 'budget':
-        return <BudgetSection />;
-      case 'lifestyle':
-        return <LifestyleSection />;
       case 'site':
         return <SiteSection />;
+      case 'lifestyle':
+        return <LifestyleSection />;
       case 'spaces':
         return <SpacesSection />;
       case 'architecture':
         return <ArchitectureSection />;
-      case 'uploads':
-        return <UploadsSection />;
+      case 'contractors':
+        return <ContractorsSection />;
+      case 'budget':
+        return <BudgetSection />;
       case 'communication':
         return <CommunicationSection />;
+      case 'uploads':
+        return <UploadsSection />;
       case 'summary':
         return <SummarySection />;
       default:

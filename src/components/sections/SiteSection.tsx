@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -25,11 +24,13 @@ export function SiteSection() {
   };
   
   const handlePrevious = () => {
-    setCurrentSection('lifestyle');
+    setCurrentSection('projectInfo');
+    window.scrollTo(0, 0);
   };
   
   const handleNext = () => {
-    setCurrentSection('spaces');
+    setCurrentSection('lifestyle');
+    window.scrollTo(0, 0);
   };
   
   const handleSiteDocumentUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -329,11 +330,11 @@ export function SiteSection() {
         <div className="flex justify-between mt-6">
           <Button variant="outline" onClick={handlePrevious} className="group">
             <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-            <span>Previous: Lifestyle</span>
+            <span>Previous: Project Info</span>
           </Button>
           
           <Button onClick={handleNext} className="group">
-            <span>Next: Spaces</span>
+            <span>Next: Lifestyle</span>
             <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
           </Button>
         </div>
