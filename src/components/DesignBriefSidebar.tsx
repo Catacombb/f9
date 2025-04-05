@@ -70,10 +70,7 @@ export function DesignBriefSidebar({ showLastSaved = false, lastSavedFormatted =
       ],
       architecture: [
         'preferredStyles', 'materialPreferences', 'sustainabilityFeatures',
-        'technologyRequirements', 'architectureNotes'
-      ],
-      inspiration: [
-        'inspirationNotes'
+        'technologyRequirements', 'architectureNotes', 'inspirationNotes' 
       ],
       uploads: [],
       communication: [
@@ -127,20 +124,7 @@ export function DesignBriefSidebar({ showLastSaved = false, lastSavedFormatted =
     
     const fields = sectionFields[sectionId];
     if (!fields || fields.length === 0) {
-      // For special sections like inspiration, uploads, and site
-      if (sectionId === 'inspiration') {
-        // Check if there are any selected inspiration images or uploads
-        const hasInspiration = projectData.files?.inspirationSelections && 
-                             projectData.files.inspirationSelections.length > 0;
-        const hasInspirationImages = projectData.files?.uploadedInspirationImages && 
-                             projectData.files.uploadedInspirationImages.length > 0;
-        const hasNotes = section.inspirationNotes && section.inspirationNotes.trim() !== '';
-        
-        if ((hasInspiration || hasInspirationImages) && hasNotes) return 100;
-        if (hasInspiration || hasInspirationImages || hasNotes) return 50;
-        return 0;
-      }
-      
+      // For special sections like uploads and site
       if (sectionId === 'uploads') {
         // Check if there are any uploaded files
         const hasUploads = projectData.files?.uploadedFiles && projectData.files.uploadedFiles.length > 0;

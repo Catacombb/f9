@@ -1,4 +1,3 @@
-
 import { FormData } from '@/types';
 
 // Function to generate a random string of a specified length
@@ -27,6 +26,8 @@ export function generateTestData(): Partial<FormData> {
       projectDescription: 'Renovate existing house to modern standards.',
       projectGoals: 'Improve energy efficiency and aesthetics.',
       coordinates: [-73.9857, 40.7484],
+      moveInPreference: 'as_soon_as_possible',
+      moveInDate: '2025-06-15',
     },
     budget: {
       budgetRange: '$100,000 - $200,000',
@@ -39,7 +40,6 @@ export function generateTestData(): Partial<FormData> {
     },
     lifestyle: {
       occupants: JSON.stringify({ familyMembers: ['2 adults', '2 children'], pets: ['dog', 'cat'] }),
-      projectTimeframe: JSON.stringify({ startDate: '2024-01-01', endDate: '2024-12-31' }),
       occupationDetails: 'Software Engineer',
       dailyRoutine: 'Work from home, family activities in the evening.',
       entertainmentStyle: 'Casual gatherings with friends and family.',
@@ -135,6 +135,7 @@ export function generateTestData(): Partial<FormData> {
       sustainabilityFeatures: ['Solar Panels', 'Energy-Efficient Windows'],
       technologyRequirements: ['Smart Home System', 'High-Speed Internet'],
       architectureNotes: 'Focus on clean lines and natural light.',
+      inspirationNotes: 'Love natural light and open spaces.',
     },
     contractors: {
       preferredBuilder: 'ABC Builders',
@@ -154,9 +155,6 @@ export function generateTestData(): Partial<FormData> {
       responseTime: '24 hours',
       additionalNotes: 'Prefer detailed email updates.',
       communicationNotes: 'Please provide regular updates on progress.',
-    },
-    inspiration: {
-      inspirationNotes: 'Love natural light and open spaces.',
     },
   };
 }
