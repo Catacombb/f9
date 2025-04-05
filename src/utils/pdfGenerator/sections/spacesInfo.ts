@@ -41,43 +41,57 @@ export const renderSpacesInfo = (ctx: PDFContext, projectData: ProjectData): voi
             descriptionItems.push(`Located on ${descObj.level} floor`);
           }
           
-          // Room-specific properties
-          if (descObj.kitchenType) {
-            descriptionItems.push(`${descObj.kitchenType} kitchen`);
+          // Room-specific properties based on room type
+          if (room.type === 'Kitchen' || room.type === 'Kitchenette') {
+            if (descObj.kitchenType) {
+              descriptionItems.push(`${descObj.kitchenType} kitchen`);
+            }
+            
+            if (descObj.kitchenLayout) {
+              descriptionItems.push(`${descObj.kitchenLayout}`);
+            }
+            
+            if (descObj.kitchenUse) {
+              descriptionItems.push(`${descObj.kitchenUse}`);
+            }
           }
           
-          if (descObj.kitchenLayout) {
-            descriptionItems.push(`${descObj.kitchenLayout}`);
+          if (room.type === 'Living' || room.type === 'Family Room') {
+            if (descObj.entertainmentFocus) {
+              descriptionItems.push("Entertainment focused");
+            }
+            
+            if (descObj.entertainmentSpace) {
+              descriptionItems.push(`${descObj.entertainmentSpace}`);
+            }
+            
+            if (descObj.acousticNeeds) {
+              descriptionItems.push(`Special acoustic considerations needed`);
+            }
           }
           
-          if (descObj.kitchenUse) {
-            descriptionItems.push(`${descObj.kitchenUse}`);
+          if (room.type === 'Office' || room.type === 'Study') {
+            if (descObj.workFromHome) {
+              descriptionItems.push("Work from home ready");
+            }
+            
+            if (descObj.officeType) {
+              descriptionItems.push(`${descObj.officeType}`);
+            }
           }
           
-          if (descObj.entertainmentFocus) {
-            descriptionItems.push("Entertainment focused");
-          }
-          
-          if (descObj.entertainmentSpace) {
-            descriptionItems.push(`${descObj.entertainmentSpace}`);
-          }
-          
-          if (descObj.workFromHome) {
-            descriptionItems.push("Work from home ready");
-          }
-          
-          if (descObj.officeType) {
-            descriptionItems.push(`${descObj.officeType}`);
-          }
-          
-          // Notes
+          // Notes - always include if available
           if (descObj.notes) {
             descriptionItems.push(descObj.notes);
           }
           
-          const formattedDescription = descriptionItems.length > 0 
-            ? descriptionItems.join(". ") 
-            : "No specific details";
+          // Format the final description text
+          let formattedDescription;
+          if (descriptionItems.length > 0) {
+            formattedDescription = descriptionItems.join(". ") + ".";
+          } else {
+            formattedDescription = "No specific details";
+          }
           
           addText(ctx, `${room.type} (${room.quantity})`, formattedDescription, true);
         } catch (e) {
