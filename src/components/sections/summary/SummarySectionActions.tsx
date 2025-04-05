@@ -2,6 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { useDesignBrief } from '@/context/DesignBriefContext';
+import { toast } from 'sonner';
 
 interface SummarySectionActionsProps {
   onPrevious: () => void;
@@ -11,6 +12,7 @@ export function SummarySectionActions({ onPrevious }: SummarySectionActionsProps
   const { setCurrentSection } = useDesignBrief();
   
   const handleContinue = () => {
+    toast.info("Opening feedback form...");
     setCurrentSection('feedback');
   };
   

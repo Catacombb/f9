@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { SectionHeader } from './SectionHeader';
@@ -99,12 +100,12 @@ Can contact: ${formData.feedback.canContact || 'No'}
         `
       };
 
-      // Send email - replace with your actual EmailJS service, template and user IDs
+      // Send email using your EmailJS credentials
       await emailjs.send(
-        'service_id', // Replace with your EmailJS service ID
-        'template_id', // Replace with your EmailJS template ID
+        'YOUR_SERVICE_ID', // Replace with your EmailJS service ID
+        'YOUR_TEMPLATE_ID', // Replace with your EmailJS template ID
         templateParams,
-        'user_id' // Replace with your EmailJS user ID
+        'YOUR_USER_ID' // Replace with your EmailJS user ID
       );
       
       return true;
