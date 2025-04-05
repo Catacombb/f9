@@ -1,4 +1,3 @@
-
 export interface SpaceRoom {
   id: string;
   type: string;
@@ -68,7 +67,7 @@ export interface FormData {
   };
   site: {
     existingConditions: string;
-    siteFeatures: string;
+    siteFeatures: string | string[] | undefined;
     viewsOrientations: string;
     accessConstraints: string;
     neighboringProperties: string;
