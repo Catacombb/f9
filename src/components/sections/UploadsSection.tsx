@@ -1,3 +1,4 @@
+
 import React, { useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { useDesignBrief } from '@/context/DesignBriefContext';
@@ -38,11 +39,10 @@ export function UploadsSection() {
   };
   
   const handlePrevious = () => {
-    setCurrentSection('inspiration');
+    setCurrentSection('architecture');
   };
   
   const handleNext = () => {
-    // Update to go to the communication section
     setCurrentSection('communication');
   };
   
@@ -134,7 +134,7 @@ export function UploadsSection() {
         <div className="flex justify-between mt-6">
           <Button variant="outline" onClick={handlePrevious} className="group">
             <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-            <span>Previous: Inspiration</span>
+            <span>Previous: Architecture & Inspiration</span>
           </Button>
           
           <Button onClick={handleNext} className="group">

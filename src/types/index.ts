@@ -109,11 +109,6 @@ export interface FormData {
     additionalNotes: string;
     communicationNotes?: string;
   };
-  
-  // Inspiration
-  inspiration?: {
-    inspirationNotes?: string;
-  };
 }
 
 export interface SpaceRoom {
@@ -154,7 +149,7 @@ export interface ProjectData {
   currentSection?: string;
 }
 
-export type SectionKey = 'intro' | 'projectInfo' | 'budget' | 'lifestyle' | 'site' | 'spaces' | 'architecture' | 'contractors' | 'communication' | 'inspiration' | 'uploads' | 'summary';
+export type SectionKey = 'intro' | 'projectInfo' | 'budget' | 'lifestyle' | 'site' | 'spaces' | 'architecture' | 'contractors' | 'communication' | 'uploads' | 'summary';
 
 export interface Section {
   id: SectionKey;
