@@ -19,5 +19,5 @@ export interface DesignBriefContextType {
   setCurrentSection: React.Dispatch<React.SetStateAction<SectionKey>>;
   saveProjectData: () => void;
   exportAsPDF: () => Promise<Blob>;
-  markAsTestData: () => void;
 }
+

@@ -10,28 +10,12 @@ import { useFileAndSummaryManagement } from './useFileAndSummaryManagement';
 const DesignBriefContext = createContext<DesignBriefContextType | undefined>(undefined);
 
 const LOCAL_STORAGE_KEY = 'design_brief_data';
-const TEST_DATA_FLAG = 'is_test_data';
 
 export const DesignBriefProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [projectData, setProjectData] = useState<ProjectData>(() => {
     // Try to get saved data from localStorage
     try {
-      // Check if the current page load is a refresh
-      const pageAccessedByReload = (
-        (window.performance.navigation && window.performance.navigation.type === 1) ||
-        window.performance.getEntriesByType('navigation').map((nav) => (nav as PerformanceNavigationTiming).type).includes('reload')
-      );
-      
       const savedData = localStorage.getItem(LOCAL_STORAGE_KEY);
-      const isTestData = localStorage.getItem(TEST_DATA_FLAG);
-      
-      // If this is a page refresh AND the saved data was test data, don't use it
-      if (pageAccessedByReload && isTestData === 'true') {
-        console.log('Page refreshed - clearing test data');
-        localStorage.removeItem(LOCAL_STORAGE_KEY);
-        localStorage.removeItem(TEST_DATA_FLAG);
-        return initialProjectData;
-      }
       
       if (savedData) {
         return JSON.parse(savedData);
@@ -75,11 +59,6 @@ export const DesignBriefProvider: React.FC<{ children: React.ReactNode }> = ({ c
   // File and summary management hooks
   const { updateFiles, updateSummary, saveProjectData, exportAsPDF } = useFileAndSummaryManagement(projectData, setProjectData);
 
-  // Function to flag data as test data
-  const markAsTestData = useCallback(() => {
-    localStorage.setItem(TEST_DATA_FLAG, 'true');
-  }, []);
-
   const value: DesignBriefContextType = {
     projectData,
     formData: projectData.formData,
@@ -98,7 +77,6 @@ export const DesignBriefProvider: React.FC<{ children: React.ReactNode }> = ({ c
     setCurrentSection,
     saveProjectData,
     exportAsPDF,
-    markAsTestData,
   };
 
   return (
@@ -115,3 +93,4 @@ export const useDesignBrief = () => {
   }
   return context;
 };
+
