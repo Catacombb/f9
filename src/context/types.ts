@@ -1,5 +1,5 @@
 
-import { ProjectData, SectionKey } from '@/types';
+import { ProjectData, SectionKey, SpaceRoom } from '@/types';
 
 export interface UpdateFormData {
   <K extends keyof ProjectData['formData']>(
@@ -14,7 +14,7 @@ export interface DesignBriefContextType {
   files: ProjectData['files'];
   summary: ProjectData['summary'];
   updateFormData: UpdateFormData;
-  addRoom: (room: { type: string; quantity: number; description: string; isCustom: boolean }) => void;
+  addRoom: (room: Omit<SpaceRoom, 'id'>) => void;
   updateRoom: (room: ProjectData['formData']['spaces']['rooms'][0]) => void;
   removeRoom: (id: string) => void;
   addProfessional: (professional: ProjectData['formData']['contractors']['professionals'][0]) => void;

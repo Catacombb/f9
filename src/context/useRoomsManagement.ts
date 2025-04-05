@@ -1,12 +1,12 @@
 
 import { useState, useCallback } from 'react';
-import { ProjectData } from '@/types';
+import { ProjectData, SpaceRoom } from '@/types';
 
 export const useRoomsManagement = (
   projectData: ProjectData,
   setProjectData: React.Dispatch<React.SetStateAction<ProjectData>>
 ) => {
-  const addRoom = useCallback((room: { type: string; quantity: number; description: string; isCustom: boolean }) => {
+  const addRoom = useCallback((room: Omit<SpaceRoom, 'id'>) => {
     setProjectData(draft => {
       const newRoom = {
         ...room,
