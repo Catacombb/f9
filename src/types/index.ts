@@ -1,4 +1,3 @@
-
 export interface FormData {
   // Project Info
   projectInfo: {
@@ -68,6 +67,9 @@ export interface FormData {
     spatialRelationships?: string;
     accessibilityNeeds?: string;
     spacesNotes?: string;
+    homeLevelType?: string;
+    levelAssignments?: Record<string, string>;
+    levelAssignmentNotes?: string;
   };
   
   // Architecture

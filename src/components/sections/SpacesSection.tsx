@@ -8,18 +8,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SpaceRoom } from '@/types';
 import { GeneralQuestionsTab } from '../spaces/GeneralQuestionsTab';
 import { RoomSelectionTab } from '../spaces/RoomSelectionTab';
+import { LevelPreferenceTab } from '../spaces/LevelPreferenceTab';
 import { predefinedRoomTypes } from '../spaces/roomTypes';
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 
 export function SpacesSection() {
   const { 
@@ -275,80 +265,15 @@ export function SpacesSection() {
             
             <TabsContent value="general">
               <div className="space-y-6">
-                <Card className="mb-6">
-                  <CardHeader>
-                    <CardTitle>Home Level Preferences</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <Label className="text-base">
-                        Do you want your home to be single-level, multi-level, or are you unsure?
-                      </Label>
-                      <RadioGroup
-                        value={generalAnswers.homeLevelType}
-                        onValueChange={(value) => handleGeneralAnswersChange('homeLevelType', value)}
-                        className="space-y-2"
-                      >
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="single-level" id="level-single" />
-                          <Label htmlFor="level-single">Single-Level</Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="multi-level" id="level-multi" />
-                          <Label htmlFor="level-multi">Multi-Level</Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="unsure" id="level-unsure" />
-                          <Label htmlFor="level-unsure">I'm Not Sure / Don't Mind</Label>
-                        </div>
-                      </RadioGroup>
-                    </div>
-
-                    {generalAnswers.homeLevelType === 'multi-level' && (
-                      <div className="mt-6 space-y-4">
-                        <Label className="text-base">
-                          Which level would you like each space to be on?
-                        </Label>
-                        <div className="space-y-4">
-                          {roomsWithQuantities
-                            .filter(room => room.quantity > 0)
-                            .map(room => (
-                              <div key={room.type} className="grid grid-cols-2 gap-4 items-center border-b pb-2">
-                                <div className="font-medium">{room.type}</div>
-                                <Select
-                                  value={generalAnswers.levelAssignments?.[room.type] || ''}
-                                  onValueChange={(value) => handleLevelAssignment(room.type, value)}
-                                >
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="Select level..." />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="ground">Ground Floor</SelectItem>
-                                    <SelectItem value="upper">Upper Floor</SelectItem>
-                                    <SelectItem value="either">Either / No Preference</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                              </div>
-                            ))}
-                        </div>
-                        
-                        <div className="mt-4">
-                          <Label className="text-base" htmlFor="levelAssignmentNotes">
-                            Any notes or reasoning behind how you've arranged the levels?
-                          </Label>
-                          <Textarea
-                            id="levelAssignmentNotes"
-                            value={generalAnswers.levelAssignmentNotes}
-                            onChange={(e) => handleGeneralAnswersChange('levelAssignmentNotes', e.target.value)}
-                            placeholder="e.g., I want bedrooms upstairs for privacy..."
-                            className="mt-2"
-                            rows={4}
-                          />
-                        </div>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
+                <LevelPreferenceTab
+                  homeLevelType={generalAnswers.homeLevelType}
+                  levelAssignments={generalAnswers.levelAssignments}
+                  levelAssignmentNotes={generalAnswers.levelAssignmentNotes}
+                  roomsWithQuantities={roomsWithQuantities}
+                  onHomeLevelTypeChange={(value) => handleGeneralAnswersChange('homeLevelType', value)}
+                  onLevelAssignmentChange={handleLevelAssignment}
+                  onLevelAssignmentNotesChange={(value) => handleGeneralAnswersChange('levelAssignmentNotes', value)}
+                />
 
                 <GeneralQuestionsTab
                   generalAnswers={generalAnswers}
