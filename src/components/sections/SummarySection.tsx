@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -190,7 +191,7 @@ export function SummarySection() {
   };
   
   const handlePrevious = () => {
-    setCurrentSection('communication');
+    setCurrentSection('feedback');
   };
   
   return (

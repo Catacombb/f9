@@ -15,19 +15,19 @@ const generateRandomNumber = (min: number, max: number) => {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
-export function generateTestData(): Partial<FormData> {
+export const generateTestData = () => {
   return {
     projectInfo: {
-      clientName: 'John Doe',
-      projectAddress: '123 Main St, Anytown',
-      contactEmail: 'john.doe@example.com',
-      contactPhone: '555-123-4567',
-      projectType: 'Residential Renovation',
-      projectDescription: 'Renovate existing house to modern standards.',
-      projectGoals: 'Improve energy efficiency and aesthetics.',
-      coordinates: [-73.9857, 40.7484],
-      moveInPreference: 'as_soon_as_possible',
-      moveInDate: '2025-06-15',
+      clientName: "John & Sarah Smith",
+      projectAddress: "123 Beach Road, Auckland 0622, New Zealand",
+      contactEmail: "john.smith@example.com",
+      contactPhone: "+64 21 123 4567",
+      projectType: "New residential build",
+      projectDescription: "Contemporary family home on coastal section",
+      moveInPreference: "As soon as possible",
+      projectGoals: "Create a sustainable, modern home with indoor-outdoor flow",
+      moveInDate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365).toISOString().split('T')[0], // 1 year from now
+      coordinates: [-36.8485, 174.7633] as [number, number], // Auckland
     },
     budget: {
       budgetRange: '$100,000 - $200,000',
@@ -163,8 +163,16 @@ export function generateTestData(): Partial<FormData> {
       additionalNotes: 'Prefer detailed email updates.',
       communicationNotes: 'Please provide regular updates on progress.',
     },
+    feedback: {
+      usabilityRating: 4,
+      performanceRating: 5,
+      functionalityRating: 4,
+      designRating: 5,
+      feedbackComments: "The design brief tool was easy to use and very comprehensive. I particularly liked the spaces section and room selection features. Some of the form fields could have more detailed explanations.",
+      customVersionInterest: "We would be interested in a version that integrates with our project management system and includes custom branding for our firm.",
+    }
   };
-}
+};
 
 export function generateTestFiles(): {
   uploadedFiles: File[];

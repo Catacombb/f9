@@ -1,4 +1,3 @@
-
 import { ProjectData } from '@/types';
 
 export const initialProjectData: ProjectData = {
@@ -10,13 +9,18 @@ export const initialProjectData: ProjectData = {
       contactPhone: '',
       projectType: '',
       projectDescription: '',
-      moveInPreference: 'as_soon_as_possible',
+      moveInPreference: '',
+      projectGoals: '',
+      moveInDate: '',
     },
     budget: {
       budgetRange: '',
       flexibilityNotes: '',
       priorityAreas: '',
       timeframe: '',
+      budgetFlexibility: '',
+      budgetPriorities: [],
+      budgetNotes: ''
     },
     lifestyle: {
       occupants: '',
@@ -24,10 +28,16 @@ export const initialProjectData: ProjectData = {
       dailyRoutine: '',
       entertainmentStyle: '',
       specialRequirements: '',
+      pets: '',
+      specialNeeds: '',
+      hobbies: [],
+      entertaining: '',
+      workFromHome: '',
+      lifestyleNotes: ''
     },
     site: {
       existingConditions: '',
-      siteFeatures: '',
+      siteFeatures: [],
       viewsOrientations: '',
       accessConstraints: '',
       neighboringProperties: '',
@@ -36,10 +46,26 @@ export const initialProjectData: ProjectData = {
       septicDesign: '',
       certificateOfTitle: '',
       covenants: '',
+      siteConstraints: [],
+      siteAccess: '',
+      siteViews: '',
+      outdoorSpaces: [],
+      siteNotes: ''
     },
     spaces: {
       rooms: [],
       additionalNotes: '',
+      roomTypes: [],
+      specialSpaces: [],
+      storageNeeds: '',
+      spatialRelationships: '',
+      accessibilityNeeds: '',
+      spacesNotes: '',
+      homeLevelType: '',
+      levelAssignmentNotes: '',
+      homeSize: '',
+      eliminableSpaces: '',
+      roomArrangement: ''
     },
     architecture: {
       stylePrefences: '',
@@ -48,12 +74,19 @@ export const initialProjectData: ProjectData = {
       sustainabilityGoals: '',
       specialFeatures: '',
       inspirationNotes: '',
+      preferredStyles: [],
+      materialPreferences: [],
+      sustainabilityFeatures: [],
+      technologyRequirements: [],
+      architectureNotes: '',
+      externalMaterialsSelected: [],
+      internalMaterialsSelected: []
     },
     contractors: {
       preferredBuilder: '',
       goToTender: false,
       professionals: [],
-      additionalNotes: '',
+      additionalNotes: ''
     },
     communication: {
       preferredMethods: [],
@@ -63,17 +96,26 @@ export const initialProjectData: ProjectData = {
       urgentContact: '',
       responseTime: '',
       additionalNotes: '',
+      communicationNotes: ''
     },
+    feedback: {
+      usabilityRating: 0,
+      performanceRating: 0,
+      functionalityRating: 0,
+      designRating: 0,
+      feedbackComments: '',
+      customVersionInterest: '',
+    }
   },
   files: {
     uploadedFiles: [],
     uploadedInspirationImages: [],
     inspirationSelections: [],
-    siteDocuments: [], // Initialize the siteDocuments array
+    siteDocuments: []
   },
   summary: {
     generatedSummary: '',
-    editedSummary: '',
+    editedSummary: ''
   },
   lastSaved: new Date().toISOString(),
   currentSection: 'intro',

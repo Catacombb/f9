@@ -11,6 +11,7 @@ import { ArchitectureSection } from './sections/ArchitectureSection';
 import { ContractorsSection } from './sections/ContractorsSection';
 import { CommunicationSection } from './sections/CommunicationSection';
 import { UploadsSection } from './sections/UploadsSection';
+import { FeedbackSection } from './sections/FeedbackSection';
 import { SummarySection } from './sections/SummarySection';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { Button } from './ui/button';
@@ -73,6 +74,8 @@ export function DesignBrief() {
         return <CommunicationSection />;
       case 'uploads':
         return <UploadsSection />;
+      case 'feedback':
+        return <FeedbackSection />;
       case 'summary':
         return <SummarySection />;
       default:

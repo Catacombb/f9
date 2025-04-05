@@ -43,8 +43,7 @@ export function UploadsSection() {
   };
   
   const handleNext = () => {
-    setCurrentSection('communication');
-    window.scrollTo(0, 0);
+    setCurrentSection('feedback');
   };
   
   // Helper function to determine file type icon
@@ -139,7 +138,7 @@ export function UploadsSection() {
           </Button>
           
           <Button onClick={handleNext} className="group">
-            <span>Next: Communication</span>
+            <span>Next: Feedback</span>
             <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
           </Button>
         </div>

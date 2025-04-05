@@ -1,3 +1,4 @@
+
 export interface SpaceRoom {
   id: string;
   type: string;
@@ -128,6 +129,14 @@ export interface FormData {
     additionalNotes: string;
     communicationNotes?: string;
   };
+  feedback: {
+    usabilityRating: number;
+    performanceRating: number;
+    functionalityRating: number;
+    designRating: number;
+    feedbackComments: string;
+    customVersionInterest: string;
+  };
 }
 
 export interface ProjectData {
@@ -138,7 +147,7 @@ export interface ProjectData {
   currentSection?: string;
 }
 
-export type SectionKey = 'intro' | 'projectInfo' | 'budget' | 'lifestyle' | 'site' | 'spaces' | 'architecture' | 'contractors' | 'communication' | 'uploads' | 'summary';
+export type SectionKey = 'intro' | 'projectInfo' | 'budget' | 'lifestyle' | 'site' | 'spaces' | 'architecture' | 'contractors' | 'communication' | 'uploads' | 'summary' | 'feedback';
 
 export interface Section {
   id: SectionKey;
