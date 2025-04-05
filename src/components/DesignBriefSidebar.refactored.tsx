@@ -19,6 +19,7 @@ import {
   DollarSignIcon,
   HeartIcon,
   MapIcon,
+  Star,
 } from 'lucide-react';
 import { SectionKey } from '@/types';
 
@@ -33,6 +34,7 @@ const sectionData: Record<SectionKey, { icon: React.ReactNode, label: string }> 
   budget: { icon: <DollarSignIcon className="h-5 w-5" />, label: 'Budget' },
   communication: { icon: <MessageSquareIcon className="h-5 w-5" />, label: 'Communication' },
   uploads: { icon: <CameraIcon className="h-5 w-5" />, label: 'Uploads' },
+  feedback: { icon: <Star className="h-5 w-5" />, label: 'Feedback' },
   summary: { icon: <CheckCircleIcon className="h-5 w-5" />, label: 'Summary' }
 };
 
@@ -47,6 +49,7 @@ const sectionOrder: SectionKey[] = [
   'budget', 
   'communication', 
   'uploads', 
+  'feedback',
   'summary'
 ];
 
@@ -65,6 +68,7 @@ export function DesignBriefSidebar() {
       budget: calculateBudgetCompletion(formData.budget),
       communication: calculateCommunicationCompletion(formData.communication),
       uploads: calculateUploadsCompletion(files),
+      feedback: calculateFeedbackCompletion(formData.feedback),
       summary: 100
     };
   }, [formData, files]);
@@ -262,6 +266,19 @@ function calculateUploadsCompletion(files: any): number {
   
   if (files?.uploadedFiles && files.uploadedFiles.length > 0) completed++;
   if (files?.siteDocuments && files.siteDocuments.length > 0) completed++;
+  
+  return Math.round((completed / total) * 100);
+}
+
+function calculateFeedbackCompletion(data: any): number {
+  let completed = 0;
+  let total = 5; // 4 ratings + comments
+  
+  if (data?.usabilityRating > 0) completed++;
+  if (data?.performanceRating > 0) completed++;
+  if (data?.functionalityRating > 0) completed++;
+  if (data?.designRating > 0) completed++;
+  if (data?.feedbackComments) completed++;
   
   return Math.round((completed / total) * 100);
 }
