@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { SectionHeader } from './SectionHeader';
@@ -70,7 +71,10 @@ export function FeedbackSection() {
   const sendFeedbackEmail = async () => {
     try {
       // Get client info from project data or use tester provided values
-      const clientInfo = projectData?.formData?.projectInfo || {};
+      const clientInfo = projectData?.formData?.projectInfo || {
+        clientName: '',
+        contactEmail: ''
+      };
       
       const templateParams = {
         to_email: 'nick@nickharrison.co',
