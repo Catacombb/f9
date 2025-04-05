@@ -1,4 +1,5 @@
-import React from 'react';
+
+import React, { useState } from 'react';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { SectionHeader } from './SectionHeader';
 import { Button } from '@/components/ui/button';
@@ -6,11 +7,36 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
 import { Label } from '@/components/ui/label';
-import { Star } from 'lucide-react';
+import { Star, TestTube, MessageSquare } from 'lucide-react';
 import { toast } from 'sonner';
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from '@/components/ui/select';
+import { 
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
+} from '@/components/ui/tooltip';
+import { Input } from '@/components/ui/input';
+import { 
+  RadioGroup, 
+  RadioGroupItem 
+} from '@/components/ui/radio-group';
+import { Checkbox } from '@/components/ui/checkbox';
 
 export function FeedbackSection() {
   const { formData, updateFormData, setCurrentSection } = useDesignBrief();
+  const [showContactFields, setShowContactFields] = useState(formData.feedback.canContact === 'yes');
+  const [otherRole, setOtherRole] = useState(
+    formData.feedback.userRole?.includes('Other') 
+      ? formData.feedback.otherRoleSpecify || '' 
+      : ''
+  );
   
   const handleRatingChange = (field: string, value: number) => {
     updateFormData('feedback', { [field]: value });
@@ -20,6 +46,24 @@ export function FeedbackSection() {
     updateFormData('feedback', { [field]: value });
   };
   
+  const handleRoleSelection = (role: string) => {
+    const currentRoles = formData.feedback.userRole || [];
+    let newRoles = [...currentRoles];
+    
+    if (currentRoles.includes(role)) {
+      newRoles = newRoles.filter(item => item !== role);
+    } else {
+      newRoles.push(role);
+    }
+    
+    updateFormData('feedback', { userRole: newRoles });
+  };
+  
+  const handleCanContactChange = (value: string) => {
+    updateFormData('feedback', { canContact: value });
+    setShowContactFields(value === 'yes');
+  };
+  
   const handleNext = () => {
     // Validate required fields
     if (
@@ -27,17 +71,37 @@ export function FeedbackSection() {
       !formData.feedback.performanceRating ||
       !formData.feedback.functionalityRating ||
       !formData.feedback.designRating ||
-      !formData.feedback.feedbackComments
+      !formData.feedback.likeMost ||
+      !formData.feedback.improvements ||
+      !formData.feedback.nextFeature ||
+      !formData.feedback.additionalFeedback ||
+      !formData.feedback.userRole ||
+      formData.feedback.userRole.length === 0 ||
+      !formData.feedback.teamSize ||
+      !formData.feedback.wouldRecommend
     ) {
       toast.error("Please complete all required fields before proceeding");
       return;
     }
     
+    // If "Other" role is selected but not specified
+    if (formData.feedback.userRole.includes('Other') && !otherRole) {
+      toast.error("Please specify your role");
+      return;
+    }
+    
+    // If "Yes" to contact but no contact info
+    if (formData.feedback.canContact === 'yes' && !formData.feedback.contactInfo) {
+      toast.error("Please provide your contact information");
+      return;
+    }
+    
     setCurrentSection('summary');
+    toast.success("Thank you for your feedback!");
   };
   
   const handlePrevious = () => {
-    setCurrentSection('uploads');
+    setCurrentSection('summary');
   };
   
   const RatingStars = ({ 
@@ -76,14 +140,34 @@ export function FeedbackSection() {
     <div className="design-brief-section-wrapper">
       <div className="design-brief-section-container">
         <SectionHeader
-          title="Feedback"
-          description="Help us improve our design brief tool with your feedback."
+          title={
+            <div className="flex items-center gap-2">
+              <TestTube className="h-6 w-6 text-purple-600" />
+              <span>Feedback for Testers</span> 
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="ml-2 bg-purple-200 text-purple-800 text-xs px-2 py-0.5 rounded-full">
+                      TESTERS ONLY
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>This section is only for testers and will be removed before client rollout</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+          }
+          description="Help us improve the design brief tool by providing your feedback. This section is for testers only and won't be included in the final version."
         />
         
-        <Card className="bg-gradient-to-b from-amber-50 to-white border-amber-200">
+        <Card className="bg-gradient-to-b from-purple-50 to-white border-purple-200">
           <CardContent className="p-6 space-y-8">
             <div className="space-y-6">
-              <h3 className="text-lg font-medium text-yellow-800">Please Rate Your Experience (1-5 stars)</h3>
+              <h3 className="text-lg font-medium text-purple-800 flex items-center gap-2">
+                <MessageSquare className="h-5 w-5" /> 
+                Please Rate Your Experience (1-5 stars)
+              </h3>
               
               <div className="space-y-4">
                 <div className="flex flex-col gap-2">
@@ -123,43 +207,203 @@ export function FeedbackSection() {
                 </div>
               </div>
               
-              <div className="pt-2">
-                <Label htmlFor="feedbackComments" className="font-medium">Feedback Comments*</Label>
-                <div className="text-sm text-muted-foreground mt-1 mb-2">
-                  Please share your thoughts about the design brief tool.
+              <Separator className="bg-purple-100" />
+              
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium text-purple-800">Open Text Feedback</h3>
+                
+                <div className="pt-2">
+                  <Label htmlFor="likeMost" className="font-medium">What did you like most about this tool?*</Label>
+                  <div className="text-sm text-muted-foreground mt-1 mb-2">
+                    Please share your thoughts about the design brief tool.
+                  </div>
+                  <Textarea
+                    id="likeMost"
+                    value={formData.feedback.likeMost || ''}
+                    onChange={(e) => handleTextChange('likeMost', e.target.value)}
+                    placeholder="I really liked..."
+                    className="min-h-[100px]"
+                  />
                 </div>
-                <Textarea
-                  id="feedbackComments"
-                  value={formData.feedback.feedbackComments}
-                  onChange={(e) => handleTextChange('feedbackComments', e.target.value)}
-                  placeholder="What worked well? What could be improved?"
-                  className="min-h-[100px]"
-                />
+                
+                <div className="pt-2">
+                  <Label htmlFor="improvements" className="font-medium">Was anything unclear, frustrating, or unnecessary?*</Label>
+                  <Textarea
+                    id="improvements"
+                    value={formData.feedback.improvements || ''}
+                    onChange={(e) => handleTextChange('improvements', e.target.value)}
+                    placeholder="I found this confusing..."
+                    className="min-h-[100px] mt-2"
+                  />
+                </div>
+                
+                <div className="pt-2">
+                  <Label htmlFor="nextFeature" className="font-medium">What feature or improvement would you love to see next?*</Label>
+                  <Textarea
+                    id="nextFeature"
+                    value={formData.feedback.nextFeature || ''}
+                    onChange={(e) => handleTextChange('nextFeature', e.target.value)}
+                    placeholder="It would be great if..."
+                    className="min-h-[100px] mt-2"
+                  />
+                </div>
+                
+                <div className="pt-2">
+                  <Label htmlFor="additionalFeedback" className="font-medium">Any other feedback or ideas?*</Label>
+                  <Textarea
+                    id="additionalFeedback"
+                    value={formData.feedback.additionalFeedback || ''}
+                    onChange={(e) => handleTextChange('additionalFeedback', e.target.value)}
+                    placeholder="Other thoughts..."
+                    className="min-h-[100px] mt-2"
+                  />
+                </div>
               </div>
-            </div>
-            
-            <Separator className="bg-amber-200" />
-            
-            <div className="space-y-4">
-              <h3 className="text-lg font-medium text-yellow-800">
-                Interested in a Custom Version of Northstar?
-              </h3>
               
-              <div className="text-sm text-muted-foreground">
-                Would you like a tailored version of this tool for your firm or workflow?
+              <Separator className="bg-purple-100" />
+              
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium text-purple-800">
+                  Interested in a Custom Version of Northstar?
+                </h3>
+                
+                <div className="text-sm text-muted-foreground">
+                  Would you like a tailored version of this tool for your firm or workflow?
+                </div>
+                
+                <div>
+                  <Label htmlFor="customVersionInterest" className="font-medium">
+                    What would you want to customize or build?
+                  </Label>
+                  <Textarea
+                    id="customVersionInterest"
+                    value={formData.feedback.customVersionInterest || ''}
+                    onChange={(e) => handleTextChange('customVersionInterest', e.target.value)}
+                    placeholder="Describe your customization interests..."
+                    className="min-h-[100px] mt-2"
+                  />
+                </div>
               </div>
               
-              <div>
-                <Label htmlFor="customVersionInterest" className="font-medium">
-                  What would you want to customize or build?
-                </Label>
-                <Textarea
-                  id="customVersionInterest"
-                  value={formData.feedback.customVersionInterest}
-                  onChange={(e) => handleTextChange('customVersionInterest', e.target.value)}
-                  placeholder="Describe your customization interests..."
-                  className="min-h-[100px]"
-                />
+              <Separator className="bg-purple-100" />
+              
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium text-purple-800">User Context</h3>
+                
+                <div className="pt-2">
+                  <Label className="font-medium mb-2 block">What is your role in the architecture/design process?*</Label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
+                    {['Architect', 'Interior Designer', 'Practice Manager', 'Draftsperson', 'Builder', 'Client / Homeowner', 'Other'].map((role) => (
+                      <div key={role} className="flex items-center space-x-2">
+                        <Checkbox 
+                          id={`role-${role}`}
+                          checked={formData.feedback.userRole?.includes(role) || false}
+                          onCheckedChange={() => handleRoleSelection(role)}
+                        />
+                        <label
+                          htmlFor={`role-${role}`}
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
+                          {role}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  {formData.feedback.userRole?.includes('Other') && (
+                    <div className="mt-3">
+                      <Label htmlFor="otherRole" className="text-sm">Please specify:</Label>
+                      <Input
+                        id="otherRole"
+                        value={otherRole}
+                        onChange={(e) => {
+                          setOtherRole(e.target.value);
+                          updateFormData('feedback', { otherRoleSpecify: e.target.value });
+                        }}
+                        className="mt-1"
+                        placeholder="Your role"
+                      />
+                    </div>
+                  )}
+                </div>
+                
+                <div className="pt-2">
+                  <Label htmlFor="teamSize" className="font-medium">How many people are in your firm or team?*</Label>
+                  <Select
+                    value={formData.feedback.teamSize || ''}
+                    onValueChange={(value) => handleTextChange('teamSize', value)}
+                  >
+                    <SelectTrigger className="mt-2" id="teamSize">
+                      <SelectValue placeholder="Select team size" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Just me">Just me</SelectItem>
+                      <SelectItem value="2-5">2-5</SelectItem>
+                      <SelectItem value="6-15">6-15</SelectItem>
+                      <SelectItem value="15+">15+</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              
+              <Separator className="bg-purple-100" />
+              
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium text-purple-800">Referral + Follow-Up Interest</h3>
+                
+                <div className="pt-2">
+                  <Label htmlFor="wouldRecommend" className="font-medium">Would you recommend this tool to others in your industry?*</Label>
+                  <RadioGroup
+                    id="wouldRecommend"
+                    value={formData.feedback.wouldRecommend || ''}
+                    onValueChange={(value) => handleTextChange('wouldRecommend', value)}
+                    className="flex flex-row space-x-4 mt-2"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="yes" id="recommend-yes" />
+                      <Label htmlFor="recommend-yes">Yes</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="maybe" id="recommend-maybe" />
+                      <Label htmlFor="recommend-maybe">Maybe</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="no" id="recommend-no" />
+                      <Label htmlFor="recommend-no">No</Label>
+                    </div>
+                  </RadioGroup>
+                </div>
+                
+                <div className="pt-2">
+                  <Label className="font-medium">Can we contact you to chat more about your feedback?*</Label>
+                  <RadioGroup
+                    value={formData.feedback.canContact || ''}
+                    onValueChange={handleCanContactChange}
+                    className="flex flex-row space-x-4 mt-2"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="yes" id="contact-yes" />
+                      <Label htmlFor="contact-yes">Yes</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="no" id="contact-no" />
+                      <Label htmlFor="contact-no">No</Label>
+                    </div>
+                  </RadioGroup>
+                  
+                  {showContactFields && (
+                    <div className="mt-4">
+                      <Label htmlFor="contactInfo" className="text-sm">Best way to reach you:</Label>
+                      <Input
+                        id="contactInfo"
+                        value={formData.feedback.contactInfo || ''}
+                        onChange={(e) => handleTextChange('contactInfo', e.target.value)}
+                        className="mt-1"
+                        placeholder="Email or phone number"
+                      />
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </CardContent>
@@ -176,9 +420,9 @@ export function FeedbackSection() {
           
           <Button
             onClick={handleNext}
-            className="w-[100px] bg-yellow-500 hover:bg-yellow-600 text-black"
+            className="w-[100px] bg-purple-500 hover:bg-purple-600 text-white"
           >
-            Next
+            Submit
           </Button>
         </div>
       </div>

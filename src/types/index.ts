@@ -1,4 +1,3 @@
-
 export interface SpaceRoom {
   id: string;
   type: string;
@@ -134,8 +133,18 @@ export interface FormData {
     performanceRating: number;
     functionalityRating: number;
     designRating: number;
-    feedbackComments: string;
+    likeMost: string;
+    improvements: string;
+    nextFeature: string;
+    additionalFeedback: string;
     customVersionInterest: string;
+    userRole: string[];
+    otherRoleSpecify?: string;
+    teamSize: string;
+    wouldRecommend: string;
+    canContact: string;
+    contactInfo?: string;
+    feedbackComments?: string; // Keep for backward compatibility
   };
 }
 
