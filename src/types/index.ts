@@ -85,11 +85,11 @@ export interface FormData {
     sustainabilityGoals: string;
     specialFeatures: string;
     preferredStyles?: string[];
-    materialPreferences?: string[];
+    materialPreferences?: string[];  // This will store both internal and external materials
     sustainabilityFeatures?: string[];
     technologyRequirements?: string[];
     architectureNotes?: string;
-    inspirationNotes?: string; // Added from Inspiration section
+    inspirationNotes?: string; 
   };
 
   // Contractors
@@ -135,7 +135,7 @@ export interface ProjectFiles {
   uploadedFiles: File[];
   uploadedInspirationImages: File[];
   inspirationSelections: string[];
-  siteDocuments?: File[]; // Added this new property
+  siteDocuments?: File[]; 
 }
 
 export interface BriefSummary {

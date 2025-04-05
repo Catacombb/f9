@@ -116,11 +116,43 @@ export function ArchitectureSection() {
   };
 
   const handleExternalMaterialsChange = (values: string[]) => {
-    updateFormData('architecture', { externalMaterialPreferences: values });
+    // Use the correct property name from the type definition
+    const externalValues = values.filter(v => 
+      externalMaterialOptions.some(o => o.value === v)
+    );
+    
+    // Get current material preferences or initialize empty array
+    const currentPreferences = architectureData.materialPreferences || [];
+    
+    // Filter out any existing external materials (those in externalMaterialOptions)
+    const internalValues = currentPreferences.filter(p => 
+      !externalMaterialOptions.some(o => o.value === p)
+    );
+    
+    // Combine the internal values with the new external values
+    updateFormData('architecture', { 
+      materialPreferences: [...internalValues, ...externalValues] 
+    });
   };
 
   const handleInternalMaterialsChange = (values: string[]) => {
-    updateFormData('architecture', { internalMaterialPreferences: values });
+    // Use the correct property name from the type definition
+    const internalValues = values.filter(v => 
+      internalMaterialOptions.some(o => o.value === v)
+    );
+    
+    // Get current material preferences or initialize empty array
+    const currentPreferences = architectureData.materialPreferences || [];
+    
+    // Filter out any existing internal materials (those in internalMaterialOptions)
+    const externalValues = currentPreferences.filter(p => 
+      !internalMaterialOptions.some(o => o.value === p)
+    );
+    
+    // Combine the external values with the new internal values
+    updateFormData('architecture', { 
+      materialPreferences: [...externalValues, ...internalValues] 
+    });
   };
 
   const handleSustainabilityChange = (values: string[]) => {
@@ -181,6 +213,21 @@ export function ArchitectureSection() {
 
     // Clear the input
     event.target.value = '';
+  };
+
+  // Helper functions to get external and internal materials from materialPreferences
+  const getExternalMaterials = () => {
+    const materialPreferences = architectureData.materialPreferences || [];
+    return materialPreferences.filter(p => 
+      externalMaterialOptions.some(o => o.value === p)
+    );
+  };
+
+  const getInternalMaterials = () => {
+    const materialPreferences = architectureData.materialPreferences || [];
+    return materialPreferences.filter(p => 
+      internalMaterialOptions.some(o => o.value === p)
+    );
   };
 
   return (
@@ -314,8 +361,9 @@ export function ArchitectureSection() {
                 Select your preferred external cladding and finishes.
               </p>
               <MultiSelectButtons
+                label="External Materials"
                 options={externalMaterialOptions}
-                selectedValues={architectureData.externalMaterialPreferences || []}
+                selectedValues={getExternalMaterials()}
                 onChange={handleExternalMaterialsChange}
               />
               <Textarea 
@@ -333,8 +381,9 @@ export function ArchitectureSection() {
                 Select your preferred internal materials and finishes.
               </p>
               <MultiSelectButtons
+                label="Internal Materials"
                 options={internalMaterialOptions}
-                selectedValues={architectureData.internalMaterialPreferences || []}
+                selectedValues={getInternalMaterials()}
                 onChange={handleInternalMaterialsChange}
               />
               <Textarea 
