@@ -34,36 +34,52 @@ export const renderSpacesInfo = (ctx: PDFContext, projectData: ProjectData): voi
       if (room.description) {
         try {
           const descObj = JSON.parse(room.description);
-          let formattedDescription = '';
+          const descriptionItems = [];
           
-          // Format level
+          // Level information
           if (descObj.level) {
-            formattedDescription += `Located on ${descObj.level} floor. `;
+            descriptionItems.push(`Located on ${descObj.level} floor`);
           }
           
           // Room-specific properties
           if (descObj.kitchenType) {
-            formattedDescription += `${descObj.kitchenType} kitchen. `;
+            descriptionItems.push(`${descObj.kitchenType} kitchen`);
           }
           
           if (descObj.kitchenLayout) {
-            formattedDescription += `${descObj.kitchenLayout}. `;
+            descriptionItems.push(`${descObj.kitchenLayout}`);
+          }
+          
+          if (descObj.kitchenUse) {
+            descriptionItems.push(`${descObj.kitchenUse}`);
           }
           
           if (descObj.entertainmentFocus) {
-            formattedDescription += "Entertainment focused. ";
+            descriptionItems.push("Entertainment focused");
+          }
+          
+          if (descObj.entertainmentSpace) {
+            descriptionItems.push(`${descObj.entertainmentSpace}`);
           }
           
           if (descObj.workFromHome) {
-            formattedDescription += "Work from home ready. ";
+            descriptionItems.push("Work from home ready");
+          }
+          
+          if (descObj.officeType) {
+            descriptionItems.push(`${descObj.officeType}`);
           }
           
           // Notes
           if (descObj.notes) {
-            formattedDescription += descObj.notes;
+            descriptionItems.push(descObj.notes);
           }
           
-          addText(ctx, `${room.type} (${room.quantity})`, formattedDescription.trim(), true);
+          const formattedDescription = descriptionItems.length > 0 
+            ? descriptionItems.join(". ") 
+            : "No specific details";
+          
+          addText(ctx, `${room.type} (${room.quantity})`, formattedDescription, true);
         } catch (e) {
           // If JSON parsing fails, use the original description
           addText(ctx, `${room.type} (${room.quantity})`, room.description, true);
