@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { Button } from '@/components/ui/button';
@@ -62,7 +61,7 @@ export function ArchitectureSection() {
   };
 
   const handleNext = () => {
-    setCurrentSection('contractors');
+    setCurrentSection('uploads');
     window.scrollTo(0, 0);
   };
 
@@ -75,40 +74,32 @@ export function ArchitectureSection() {
   };
 
   const handleExternalMaterialsChange = (values: string[]) => {
-    // Use the correct property name from the type definition
     const externalValues = values.filter(v => 
       externalMaterialOptions.some(o => o.value === v)
     );
     
-    // Get current material preferences or initialize empty array
     const currentPreferences = architectureData.materialPreferences || [];
     
-    // Filter out any existing external materials (those in externalMaterialOptions)
     const internalValues = currentPreferences.filter(p => 
       !externalMaterialOptions.some(o => o.value === p)
     );
     
-    // Combine the internal values with the new external values
     updateFormData('architecture', { 
       materialPreferences: [...internalValues, ...externalValues] 
     });
   };
 
   const handleInternalMaterialsChange = (values: string[]) => {
-    // Use the correct property name from the type definition
     const internalValues = values.filter(v => 
       internalMaterialOptions.some(o => o.value === v)
     );
     
-    // Get current material preferences or initialize empty array
     const currentPreferences = architectureData.materialPreferences || [];
     
-    // Filter out any existing internal materials (those in internalMaterialOptions)
     const externalValues = currentPreferences.filter(p => 
       !internalMaterialOptions.some(o => o.value === p)
     );
     
-    // Combine the external values with the new internal values
     updateFormData('architecture', { 
       materialPreferences: [...externalValues, ...internalValues] 
     });
@@ -128,7 +119,6 @@ export function ArchitectureSection() {
         ? prev.filter(id => id !== imageId)
         : [...prev, imageId];
       
-      // Update in context
       updateFiles({ inspirationSelections: newSelection });
       return newSelection;
     });
@@ -154,7 +144,6 @@ export function ArchitectureSection() {
     }
   };
 
-  // Get the external and internal materials from materialPreferences
   const externalMaterialsSelected = getExternalMaterials(
     architectureData.materialPreferences, 
     externalMaterialOptions
@@ -173,7 +162,6 @@ export function ArchitectureSection() {
           description="Provide details about your design preferences, materials, and special architectural features."
         />
         
-        {/* Style Preferences Component */}
         <StylePreferences 
           preferredStyles={architectureData.preferredStyles || []}
           stylePrefences={architectureData.stylePrefences || ''}
@@ -181,7 +169,6 @@ export function ArchitectureSection() {
           onInputChange={handleInputChange}
         />
         
-        {/* Inspiration Images Component */}
         <InspirationImages 
           selectedImages={selectedImages}
           files={files}
@@ -189,7 +176,6 @@ export function ArchitectureSection() {
           onFileUpload={handleImageUpload}
         />
         
-        {/* Materials Section Component */}
         <MaterialsSection 
           externalMaterials={architectureData.externalMaterials || ''}
           internalFinishes={architectureData.internalFinishes || ''}
@@ -200,7 +186,6 @@ export function ArchitectureSection() {
           onInputChange={handleInputChange}
         />
         
-        {/* Sustainability Section Component */}
         <SustainabilitySection 
           sustainabilityGoals={architectureData.sustainabilityGoals || ''}
           sustainabilityFeatures={architectureData.sustainabilityFeatures || []}
@@ -208,7 +193,6 @@ export function ArchitectureSection() {
           onInputChange={handleInputChange}
         />
         
-        {/* Technology & Additional Notes Component */}
         <TechnologySection 
           specialFeatures={architectureData.specialFeatures || ''}
           inspirationNotes={architectureData.inspirationNotes || ''}
@@ -218,7 +202,6 @@ export function ArchitectureSection() {
           onInputChange={handleInputChange}
         />
         
-        {/* Navigation buttons */}
         <div className="flex justify-between mt-6">
           <Button variant="outline" onClick={handlePrevious} className="group">
             <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
@@ -226,7 +209,7 @@ export function ArchitectureSection() {
           </Button>
           
           <Button onClick={handleNext} className="group">
-            <span>Next: Project Team</span>
+            <span>Next: Uploads</span>
             <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
           </Button>
         </div>

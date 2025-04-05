@@ -19,7 +19,7 @@ export function BudgetSection() {
   };
 
   const handleNext = () => {
-    setCurrentSection('communication');
+    setCurrentSection('lifestyle');
     window.scrollTo(0, 0);
   };
 
@@ -122,7 +122,7 @@ export function BudgetSection() {
           </Button>
           
           <Button onClick={handleNext} className="group">
-            <span>Next: Communication</span>
+            <span>Next: Lifestyle</span>
             <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
           </Button>
         </div>

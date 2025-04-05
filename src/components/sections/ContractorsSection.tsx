@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -148,7 +149,7 @@ export function ContractorsSection() {
   };
   
   const handlePrevious = () => {
-    setCurrentSection('architecture');
+    setCurrentSection('projectInfo');
     window.scrollTo(0, 0);
   };
   
@@ -422,7 +423,7 @@ export function ContractorsSection() {
         <div className="flex justify-between mt-6">
           <Button variant="outline" onClick={handlePrevious} className="group">
             <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-            <span>Previous: Architecture</span>
+            <span>Previous: Project Info</span>
           </Button>
           
           <Button onClick={handleNext} className="group">

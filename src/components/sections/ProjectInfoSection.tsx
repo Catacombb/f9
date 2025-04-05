@@ -59,6 +59,7 @@ export function ProjectInfoSection() {
   
   const handleNext = () => {
     setCurrentSection('contractors');
+    window.scrollTo(0, 0);
   };
   
   // Calculate completion percentage based on required fields

@@ -1,4 +1,3 @@
-
 import React, { useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { useDesignBrief } from '@/context/DesignBriefContext';
@@ -40,10 +39,12 @@ export function UploadsSection() {
   
   const handlePrevious = () => {
     setCurrentSection('architecture');
+    window.scrollTo(0, 0);
   };
   
   const handleNext = () => {
     setCurrentSection('communication');
+    window.scrollTo(0, 0);
   };
   
   // Helper function to determine file type icon
@@ -134,7 +135,7 @@ export function UploadsSection() {
         <div className="flex justify-between mt-6">
           <Button variant="outline" onClick={handlePrevious} className="group">
             <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-            <span>Previous: Architecture & Inspiration</span>
+            <span>Previous: Architecture</span>
           </Button>
           
           <Button onClick={handleNext} className="group">

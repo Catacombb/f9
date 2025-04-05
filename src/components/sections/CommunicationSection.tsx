@@ -35,10 +35,12 @@ export function CommunicationSection() {
 
   const handlePrevious = () => {
     setCurrentSection('uploads');
+    window.scrollTo(0, 0);
   };
 
   const handleNext = () => {
     setCurrentSection('summary');
+    window.scrollTo(0, 0);
   };
 
   const contactMethodOptions = [

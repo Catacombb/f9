@@ -150,7 +150,7 @@ export function SpacesSection() {
   };
   
   const handlePrevious = () => {
-    setCurrentSection('lifestyle');
+    setCurrentSection('site');
     window.scrollTo(0, 0);
   };
   
@@ -234,7 +234,7 @@ export function SpacesSection() {
         <div className="flex justify-between mt-6">
           <Button variant="outline" onClick={handlePrevious} className="group">
             <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-            <span>Previous: Lifestyle</span>
+            <span>Previous: Site</span>
           </Button>
           
           <Button onClick={handleNext} className="group">
