@@ -1,28 +1,32 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { ArrowRight, Clipboard, PenLine, Share, AlertTriangle } from 'lucide-react';
+
 export function IntroSection() {
   const {
     setCurrentSection
   } = useDesignBrief();
+  
   const handleStart = () => {
     setCurrentSection('projectInfo');
   };
+  
   return <div className="design-brief-section-wrapper">
       <div className="design-brief-section-container">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold mb-4 font-heading">
-            <strong>Welcome to Northstar!</strong>
+            <strong>Welcome</strong>
           </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">Northstar helps you get clear on your vision for your new home. 
-
-
-You'll walk through a few easy sections to share what matters most,  from your lifestyle to the spaces you want and how you want to feel when you walk in the door. 
-
-
-At the end, you'll receive a summary you can review, download, and share with your architect or designer.</p>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            Hi there — I've put this together to help you share your thoughts about your new home. 
+            <br /><br />
+            It's a quick and simple way for me to understand what matters most to you — how you live, what kind of spaces you need, and what's important to your lifestyle.
+            <br /><br />
+            Once you've filled it out, I'll be able to use your answers to shape the design direction.
+          </p>
         </div>
         
         <Card className="mb-8">
@@ -45,9 +49,9 @@ At the end, you'll receive a summary you can review, download, and share with yo
                 <div className="mb-4 mx-auto bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center">
                   <Clipboard className="h-8 w-8 text-primary" />
                 </div>
-                <h3 className="font-medium mb-2">Share Your Intentions</h3>
+                <h3 className="font-medium mb-2">Share your intentions</h3>
                 <p className="text-sm text-muted-foreground">
-                  Navigate through each section and tell us about your vision and requirements for your dream home.
+                  Walk through a few simple sections and tell me what matters to you.
                 </p>
               </div>
               
@@ -55,9 +59,9 @@ At the end, you'll receive a summary you can review, download, and share with yo
                 <div className="mb-4 mx-auto bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center">
                   <PenLine className="h-8 w-8 text-primary" />
                 </div>
-                <h3 className="font-medium mb-2">Check That We've Captured Your Vision</h3>
+                <h3 className="font-medium mb-2">Check that I've captured your vision</h3>
                 <p className="text-sm text-muted-foreground">
-                  Review the AI-written summary of your brief to ensure it accurately reflects your needs and desires.
+                  You'll get a summary to review before sending it through.
                 </p>
               </div>
               
@@ -65,14 +69,20 @@ At the end, you'll receive a summary you can review, download, and share with yo
                 <div className="mb-4 mx-auto bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center">
                   <Share className="h-8 w-8 text-primary" />
                 </div>
-                <h3 className="font-medium mb-2">Download and Share Your Brief With Us</h3>
+                <h3 className="font-medium mb-2">Download and share your brief</h3>
                 <p className="text-sm text-muted-foreground">
-                  Download or share your comprehensive design brief with your chosen architect or designer to bring your vision to life.
+                  Send me the final version so I can begin the design process with clarity.
                 </p>
               </div>
             </div>
           </CardContent>
         </Card>
+        
+        <div className="text-center mb-6">
+          <p className="text-sm text-muted-foreground">
+            You can revisit this link anytime if you want to update or refine your answers.
+          </p>
+        </div>
         
         <div className="text-center">
           <Button size="lg" onClick={handleStart} className="group">
