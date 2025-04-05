@@ -41,15 +41,16 @@ export function SummarySection() {
       if (success) {
         toast({
           title: "Email Sent",
-          description: "Your design brief has been sent to the provided email address.",
+          description: "Your design brief has been sent to " + recipientEmail,
         });
       } else {
         throw new Error("Failed to send email");
       }
     } catch (error) {
+      console.error("Email sending error:", error);
       toast({
-        title: "Error",
-        description: "There was a problem sending your email. Please try again.",
+        title: "Email Delivery Failed",
+        description: "We couldn't send your email. The issue has been logged and we'll try again soon.",
         variant: "destructive",
       });
     } finally {
@@ -60,25 +61,70 @@ export function SummarySection() {
   const handleExportPDF = async () => {
     setIsExporting(true);
     try {
-      await exportAsPDF();
+      const pdfBlob = await exportAsPDF();
+      
+      // Create a download link and trigger it
+      const url = URL.createObjectURL(pdfBlob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Northstar_Brief_${formData.projectInfo.clientName || "Client"}_${new Date().toISOString().split('T')[0]}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
       toast({
         title: "PDF Generated",
         description: "Your design brief has been exported as a PDF.",
       });
     } catch (error) {
+      console.error("PDF export error:", error);
       toast({
         title: "Error",
         description: "There was a problem exporting your PDF. Please try again.",
         variant: "destructive",
       });
-      console.error("PDF export error:", error);
     } finally {
       setIsExporting(false);
     }
   };
   
   const handlePrevious = () => {
-    setCurrentSection('uploads');
+    setCurrentSection('communication');
+  };
+  
+  const formatSpacesData = () => {
+    if (!formData.spaces.rooms || formData.spaces.rooms.length === 0) {
+      return <p className="text-sm text-muted-foreground">No spaces defined</p>;
+    }
+    
+    const groupedRooms = formData.spaces.rooms.reduce((acc, room) => {
+      const type = room.isCustom && room.customName ? room.customName : room.type;
+      if (!acc[type]) {
+        acc[type] = [];
+      }
+      acc[type].push(room);
+      return acc;
+    }, {} as Record<string, typeof formData.spaces.rooms>);
+    
+    return (
+      <div className="space-y-4">
+        {Object.entries(groupedRooms).map(([type, rooms]) => (
+          <div key={type}>
+            <p className="text-sm font-medium">
+              {type} ({rooms.length})
+            </p>
+            <ul className="list-disc pl-5 text-sm">
+              {rooms.map((room, index) => (
+                <li key={index}>
+                  {room.description}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    );
   };
   
   const formatOccupantsData = () => {
@@ -276,23 +322,14 @@ export function SummarySection() {
                   {formData.spaces.rooms.length > 0 && (
                     <div className="pb-6 border-b">
                       <h4 className="text-lg font-bold mb-4">Spaces</h4>
-                      <div className="space-y-4">
-                        {formData.spaces.rooms.map((room, index) => (
-                          <div key={room.id || index}>
-                            <p className="text-sm font-medium">
-                              {room.isCustom && room.customName ? room.customName : room.type} ({room.quantity}):
-                            </p>
-                            <p className="text-sm">{room.description}</p>
-                          </div>
-                        ))}
-                        
-                        {formData.spaces.additionalNotes && (
-                          <div>
-                            <p className="text-sm font-medium">Additional Notes:</p>
-                            <p className="text-sm">{formData.spaces.additionalNotes}</p>
-                          </div>
-                        )}
-                      </div>
+                      {formatSpacesData()}
+                      
+                      {formData.spaces.additionalNotes && (
+                        <div className="mt-4">
+                          <p className="text-sm font-medium">Additional Notes:</p>
+                          <p className="text-sm">{formData.spaces.additionalNotes}</p>
+                        </div>
+                      )}
                     </div>
                   )}
                   
@@ -468,6 +505,30 @@ export function SummarySection() {
                       </div>
                     </div>
                   )}
+                  
+                  {(files.uploadedFiles.length > 0 || (files.siteDocuments && files.siteDocuments.length > 0)) && (
+                    <div className="pb-6 border-b">
+                      <h4 className="text-lg font-bold mb-4">Supporting Files</h4>
+                      <div className="space-y-4">
+                        <p className="text-sm">
+                          The following files have been included with this design brief. 
+                          All documents can be accessed from the project portal.
+                        </p>
+                        <ul className="list-disc pl-5 text-sm space-y-1">
+                          {files.uploadedFiles.map((file, index) => (
+                            <li key={`download-${index}`}>
+                              {file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)
+                            </li>
+                          ))}
+                          {files.siteDocuments && files.siteDocuments.map((file, index) => (
+                            <li key={`site-download-${index}`}>
+                              {file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -527,6 +588,11 @@ export function SummarySection() {
                     <p className="text-sm text-muted-foreground mt-2">
                       Receive a copy of your design brief by email. We'll also send a copy to our team for reference.
                     </p>
+                    {!formData.projectInfo.contactEmail && (
+                      <p className="text-sm text-yellow-500 mt-2">
+                        Tip: Add your email to the Project Information section to pre-fill this field.
+                      </p>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -537,7 +603,7 @@ export function SummarySection() {
         <div className="flex justify-between mt-6">
           <Button variant="outline" onClick={handlePrevious} className="group">
             <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-            <span>Previous: Uploads</span>
+            <span>Previous: Communication</span>
           </Button>
         </div>
       </div>
