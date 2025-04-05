@@ -9,7 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 interface EmailExportSectionProps {
   defaultEmail: string;
   onSendEmail: (email: string) => Promise<boolean>;
-  onExportPDF: () => Promise<void>;
+  onExportPDF: () => Promise<Blob>;
   clientName: string;
 }
 
@@ -60,10 +60,22 @@ export function EmailExportSection({
   const handleExportPDF = async () => {
     setIsExporting(true);
     try {
-      await onExportPDF();
+      const pdfBlob = await onExportPDF();
+      // Create a download link for the blob
+      const url = URL.createObjectURL(pdfBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `Northstar_Brief_${clientName || "Client"}_${new Date().toISOString().split('T')[0]}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      
+      // Clean up
+      URL.revokeObjectURL(url);
+      document.body.removeChild(link);
+      
       toast({
         title: "PDF Generated",
-        description: "Your design brief has been exported as a PDF.",
+        description: "Your design brief has been downloaded as a PDF.",
       });
     } catch (error) {
       console.error("PDF export error:", error);
