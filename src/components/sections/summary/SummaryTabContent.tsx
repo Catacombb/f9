@@ -64,17 +64,29 @@ export function SummaryTabContent({
           {/* Project Team */}
           <ContractorsInfoDisplay contractors={formData.contractors} />
           
-          {/* Uploaded Files */}
+          {/* Files by category */}
           <FilesDisplay 
-            uploadedFiles={files.uploadedFiles} 
-            title="Uploaded Files" 
+            files={files.siteDocuments} 
+            title="Site Documents" 
+            description="Certificate of Title, LIM Report, Resource Consent Documents"
           />
           
-          {/* Site Documents */}
           <FilesDisplay 
-            uploadedFiles={[]} 
-            siteDocuments={files.siteDocuments} 
-            title="Site Documents" 
+            files={files.designFiles} 
+            title="Design Files" 
+            description="Floor Plans, Concept Drawings, Site Survey or Topo Files"
+          />
+          
+          <FilesDisplay 
+            files={files.inspirationFiles} 
+            title="Inspiration & Visuals" 
+            description="Moodboards, Exterior/Interior Example Images, Materials"
+          />
+          
+          {/* Legacy file display if any */}
+          <FilesDisplay 
+            files={files.uploadedFiles} 
+            title="Other Files" 
           />
           
           {/* Inspiration Selections */}
@@ -87,10 +99,7 @@ export function SummaryTabContent({
           <CommunicationInfoDisplay communication={formData.communication} />
           
           {/* Supporting Files */}
-          <SupportingFilesDisplay 
-            uploadedFiles={files.uploadedFiles}
-            siteDocuments={files.siteDocuments}
-          />
+          <SupportingFilesDisplay files={files} />
         </div>
       </CardContent>
     </Card>

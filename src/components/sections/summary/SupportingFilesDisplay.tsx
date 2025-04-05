@@ -3,12 +3,18 @@ import React from 'react';
 import { ProjectData } from '@/types';
 
 interface SupportingFilesDisplayProps {
-  uploadedFiles: ProjectData['files']['uploadedFiles'];
-  siteDocuments: ProjectData['files']['siteDocuments'];
+  files: ProjectData['files'];
 }
 
-export function SupportingFilesDisplay({ uploadedFiles, siteDocuments }: SupportingFilesDisplayProps) {
-  if ((uploadedFiles.length === 0) && (!siteDocuments || siteDocuments.length === 0)) {
+export function SupportingFilesDisplay({ files }: SupportingFilesDisplayProps) {
+  const allFiles = [
+    ...(files.uploadedFiles || []),
+    ...(files.siteDocuments || []),
+    ...(files.designFiles || []),
+    ...(files.inspirationFiles || [])
+  ];
+  
+  if (allFiles.length === 0) {
     return null;
   }
   
@@ -21,13 +27,23 @@ export function SupportingFilesDisplay({ uploadedFiles, siteDocuments }: Support
           All documents can be accessed from the project portal.
         </p>
         <ul className="list-disc pl-5 text-sm space-y-1">
-          {uploadedFiles.map((file, index) => (
-            <li key={`download-${index}`}>
-              {file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)
+          {files.siteDocuments?.map((file, index) => (
+            <li key={`site-doc-${index}`}>
+              <span className="font-medium">Site Document:</span> {file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)
             </li>
           ))}
-          {siteDocuments && siteDocuments.map((file, index) => (
-            <li key={`site-download-${index}`}>
+          {files.designFiles?.map((file, index) => (
+            <li key={`design-file-${index}`}>
+              <span className="font-medium">Design File:</span> {file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)
+            </li>
+          ))}
+          {files.inspirationFiles?.map((file, index) => (
+            <li key={`inspiration-file-${index}`}>
+              <span className="font-medium">Inspiration File:</span> {file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)
+            </li>
+          ))}
+          {files.uploadedFiles?.map((file, index) => (
+            <li key={`other-file-${index}`}>
               {file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)
             </li>
           ))}

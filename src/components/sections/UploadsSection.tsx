@@ -2,40 +2,252 @@
 import React, { useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { useDesignBrief } from '@/context/DesignBriefContext';
-import { ArrowLeft, ArrowRight, Upload, X, File, Image as ImageIcon } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { ArrowLeft, ArrowRight, Upload, X, File, Image as ImageIcon, FileArchive, FileText } from 'lucide-react';
+import { toast } from 'sonner';
 import { SectionHeader } from './SectionHeader';
+import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+const MAX_FILES_PER_CATEGORY = 20;
+
+interface FileItemProps {
+  file: File;
+  onRemove: () => void;
+}
+
+const FileItem = ({ file, onRemove }: FileItemProps) => {
+  // Helper function to determine file type icon
+  const getFileIcon = (file: File) => {
+    if (file.type.startsWith('image/')) return <ImageIcon className="h-5 w-5" />;
+    if (file.type.includes('pdf')) return <FileText className="h-5 w-5" />;
+    if (file.type.includes('zip') || file.type.includes('rar')) return <FileArchive className="h-5 w-5" />;
+    return <File className="h-5 w-5" />;
+  };
+
+  return (
+    <div className="flex items-center justify-between p-3 bg-background rounded-lg border">
+      <div className="flex items-center">
+        <div className="mr-3 p-2 bg-primary/10 rounded">
+          {getFileIcon(file)}
+        </div>
+        <div>
+          <p className="font-medium text-sm truncate max-w-xs">{file.name}</p>
+          <p className="text-xs text-muted-foreground">
+            {(file.size / 1024 / 1024).toFixed(2)} MB
+            <Badge variant="outline" className="ml-2 text-xs bg-primary/10 text-primary">
+              ✓ Uploaded
+            </Badge>
+          </p>
+        </div>
+      </div>
+      <Button 
+        variant="ghost" 
+        size="icon" 
+        onClick={onRemove}
+        aria-label={`Remove ${file.name}`}
+      >
+        <X className="h-4 w-4" />
+      </Button>
+    </div>
+  );
+};
+
+interface FileUploadSectionProps {
+  title: string;
+  description: string;
+  files: File[];
+  onFileUpload: (files: FileList) => void;
+  onRemoveFile: (index: number) => void;
+  icon: React.ReactNode;
+  acceptTypes: string;
+  id: string;
+}
+
+const FileUploadSection = ({
+  title,
+  description,
+  files,
+  onFileUpload,
+  onRemoveFile,
+  icon,
+  acceptTypes,
+  id
+}: FileUploadSectionProps) => {
+  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const fileList = e.target.files;
+    if (fileList && fileList.length > 0) {
+      onFileUpload(fileList);
+      // Reset the input value to allow uploading the same file again
+      e.target.value = '';
+    }
+  };
+  
+  return (
+    <Card className="mb-8">
+      <div className="p-6">
+        <div className="mb-4">
+          <h3 className="text-lg font-medium">{title}</h3>
+          <p className="text-sm text-muted-foreground mt-1">{description}</p>
+        </div>
+        
+        <div className="border-2 border-dashed border-primary/40 rounded-lg p-8 mb-4">
+          <div className="flex flex-col items-center">
+            {icon}
+            <h3 className="font-medium text-lg mb-2">Upload {title}</h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              Drag and drop files here or click to browse
+            </p>
+            <p className="text-xs text-muted-foreground mb-6">
+              Accepted file types: {acceptTypes} (Max 10MB per file)
+            </p>
+            <label htmlFor={`file-upload-${id}`}>
+              <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90">
+                <span>
+                  <Upload className="h-4 w-4 mr-2" />
+                  Browse Files
+                </span>
+              </Button>
+            </label>
+            <input
+              id={`file-upload-${id}`}
+              type="file"
+              multiple
+              className="hidden"
+              onChange={handleFileInputChange}
+              accept={acceptTypes}
+            />
+          </div>
+        </div>
+        
+        <p className="text-sm text-muted-foreground mb-4">
+          {files.length} of {MAX_FILES_PER_CATEGORY} files uploaded
+        </p>
+        
+        {files.length > 0 && (
+          <div className="space-y-3">
+            {files.map((file, index) => (
+              <FileItem 
+                key={`${file.name}-${index}`} 
+                file={file} 
+                onRemove={() => onRemoveFile(index)} 
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    </Card>
+  );
+};
 
 export function UploadsSection() {
   const { files, updateFiles, setCurrentSection } = useDesignBrief();
-  const { toast } = useToast();
   
-  const handleFileUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const fileList = e.target.files;
-    if (!fileList) return;
+  const validateAndProcessFiles = (fileList: FileList, maxFiles: number): File[] => {
+    const validFiles: File[] = [];
     
-    // Check if adding these files would exceed the 20-file limit
-    if (files.uploadedFiles.length + fileList.length > 20) {
+    for (let i = 0; i < fileList.length; i++) {
+      const file = fileList[i];
+      
+      // Check file size
+      if (file.size > MAX_FILE_SIZE) {
+        toast({
+          title: "File too large",
+          description: `${file.name} is larger than 10MB.`,
+        });
+        continue;
+      }
+      
+      validFiles.push(file);
+      
+      // Check if we've hit the max files limit
+      if (validFiles.length >= maxFiles) {
+        break;
+      }
+    }
+    
+    return validFiles;
+  };
+  
+  const handleSiteDocumentUpload = (fileList: FileList) => {
+    const remainingSlots = MAX_FILES_PER_CATEGORY - (files.siteDocuments?.length || 0);
+    
+    if (remainingSlots <= 0) {
       toast({
         title: "Upload limit reached",
-        description: "You can upload a maximum of 20 files.",
-        variant: "destructive",
+        description: "You can upload a maximum of 20 site documents.",
       });
       return;
     }
     
-    // Add the new files to the uploaded files array
-    const newFiles = Array.from(fileList);
-    updateFiles({ uploadedFiles: [...files.uploadedFiles, ...newFiles] });
+    const maxFilesToAdd = Math.min(fileList.length, remainingSlots);
+    const validFiles = validateAndProcessFiles(fileList, maxFilesToAdd);
     
-    // Reset the input value to allow uploading the same file again
-    e.target.value = '';
-  }, [files.uploadedFiles, updateFiles, toast]);
+    if (validFiles.length > 0) {
+      updateFiles({ 
+        siteDocuments: [...(files.siteDocuments || []), ...validFiles]
+      });
+    }
+  };
   
-  const handleRemoveFile = (index: number) => {
-    const updatedFiles = [...files.uploadedFiles];
+  const handleDesignFilesUpload = (fileList: FileList) => {
+    const remainingSlots = MAX_FILES_PER_CATEGORY - (files.designFiles?.length || 0);
+    
+    if (remainingSlots <= 0) {
+      toast({
+        title: "Upload limit reached",
+        description: "You can upload a maximum of 20 design files.",
+      });
+      return;
+    }
+    
+    const maxFilesToAdd = Math.min(fileList.length, remainingSlots);
+    const validFiles = validateAndProcessFiles(fileList, maxFilesToAdd);
+    
+    if (validFiles.length > 0) {
+      updateFiles({ 
+        designFiles: [...(files.designFiles || []), ...validFiles]
+      });
+    }
+  };
+  
+  const handleInspirationFilesUpload = (fileList: FileList) => {
+    const remainingSlots = MAX_FILES_PER_CATEGORY - (files.inspirationFiles?.length || 0);
+    
+    if (remainingSlots <= 0) {
+      toast({
+        title: "Upload limit reached",
+        description: "You can upload a maximum of 20 inspiration files.",
+      });
+      return;
+    }
+    
+    const maxFilesToAdd = Math.min(fileList.length, remainingSlots);
+    const validFiles = validateAndProcessFiles(fileList, maxFilesToAdd);
+    
+    if (validFiles.length > 0) {
+      updateFiles({ 
+        inspirationFiles: [...(files.inspirationFiles || []), ...validFiles]
+      });
+    }
+  };
+  
+  const handleRemoveSiteDocument = (index: number) => {
+    const updatedFiles = [...(files.siteDocuments || [])];
     updatedFiles.splice(index, 1);
-    updateFiles({ uploadedFiles: updatedFiles });
+    updateFiles({ siteDocuments: updatedFiles });
+  };
+  
+  const handleRemoveDesignFile = (index: number) => {
+    const updatedFiles = [...(files.designFiles || [])];
+    updatedFiles.splice(index, 1);
+    updateFiles({ designFiles: updatedFiles });
+  };
+  
+  const handleRemoveInspirationFile = (index: number) => {
+    const updatedFiles = [...(files.inspirationFiles || [])];
+    updatedFiles.splice(index, 1);
+    updateFiles({ inspirationFiles: updatedFiles });
   };
   
   const handlePrevious = () => {
@@ -48,90 +260,49 @@ export function UploadsSection() {
     window.scrollTo(0, 0);
   };
   
-  // Helper function to determine file type icon
-  const getFileIcon = (file: File) => {
-    const isImage = file.type.startsWith('image/');
-    return isImage ? <ImageIcon className="h-5 w-5" /> : <File className="h-5 w-5" />;
-  };
-  
   return (
     <div className="design-brief-section-wrapper">
       <div className="design-brief-section-container">
         <SectionHeader 
           title="Upload Files" 
-          description="Upload any relevant documents for your project, such as site plans, floor plans, or architectural drawings. These will help us understand the technical aspects of your project."
+          description="Upload any relevant documents for your project by category. These files will help us understand your project requirements and references."
         />
         
-        <div className="design-brief-card p-8 border border-primary/20 bg-primary/5 rounded-lg">
-          <div className="mb-8 text-center">
-            <div className="border-2 border-dashed border-primary/40 rounded-lg p-8 mb-4">
-              <div className="flex flex-col items-center">
-                <Upload className="h-10 w-10 text-primary mb-4" />
-                <h3 className="font-medium text-lg mb-2">Upload your plans and documents</h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Drag and drop files here or click to browse
-                </p>
-                <p className="text-xs text-muted-foreground mb-6">
-                  Accepted file types: PDFs, DWG, images of plans, and other technical documents (Max 10MB per file)
-                </p>
-                <label htmlFor="file-upload">
-                  <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90">
-                    <span>
-                      <Upload className="h-4 w-4 mr-2" />
-                      Browse Files
-                    </span>
-                  </Button>
-                </label>
-                <input
-                  id="file-upload"
-                  type="file"
-                  multiple
-                  className="hidden"
-                  onChange={handleFileUpload}
-                  accept=".pdf,.dwg,.dxf,.skp,.doc,.docx,.xls,.xlsx,image/*"
-                />
-              </div>
-            </div>
-            
-            <p className="text-sm text-muted-foreground">
-              {files.uploadedFiles.length} of 20 files uploaded
-            </p>
-          </div>
-          
-          {files.uploadedFiles.length > 0 && (
-            <div>
-              <h3 className="font-medium mb-4">Uploaded Plans & Documents</h3>
-              <div className="space-y-3">
-                {files.uploadedFiles.map((file, index) => (
-                  <div 
-                    key={`${file.name}-${index}`}
-                    className="flex items-center justify-between p-3 bg-background rounded-lg border"
-                  >
-                    <div className="flex items-center">
-                      <div className="mr-3 p-2 bg-primary/10 rounded">
-                        {getFileIcon(file)}
-                      </div>
-                      <div>
-                        <p className="font-medium text-sm truncate max-w-xs">{file.name}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {(file.size / 1024 / 1024).toFixed(2)} MB
-                        </p>
-                      </div>
-                    </div>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      onClick={() => handleRemoveFile(index)}
-                      aria-label={`Remove ${file.name}`}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
+        {/* Site Documents Upload Section */}
+        <FileUploadSection
+          title="Site Documents"
+          description="Upload Certificate of Title, LIM Report, Resource Consent Documents, and other site-related documents."
+          files={files.siteDocuments || []}
+          onFileUpload={handleSiteDocumentUpload}
+          onRemoveFile={handleRemoveSiteDocument}
+          icon={<FileText className="h-10 w-10 text-primary mb-4" />}
+          acceptTypes=".pdf,.doc,.docx,.xls,.xlsx,image/*"
+          id="site-docs"
+        />
+        
+        {/* Design Files Upload Section */}
+        <FileUploadSection
+          title="Design Files"
+          description="Upload Floor Plans, Concept Drawings, Site Survey or Topo Files, and other design-related documents."
+          files={files.designFiles || []}
+          onFileUpload={handleDesignFilesUpload}
+          onRemoveFile={handleRemoveDesignFile}
+          icon={<File className="h-10 w-10 text-primary mb-4" />}
+          acceptTypes=".pdf,.dwg,.dxf,.skp,.doc,.docx,.xls,.xlsx,image/*"
+          id="design-files"
+        />
+        
+        {/* Inspiration Files Upload Section */}
+        <FileUploadSection
+          title="Inspiration & Visuals"
+          description="Upload Moodboards, Exterior/Interior Example Images, Product or Material References."
+          files={files.inspirationFiles || []}
+          onFileUpload={handleInspirationFilesUpload}
+          onRemoveFile={handleRemoveInspirationFile}
+          icon={<ImageIcon className="h-10 w-10 text-primary mb-4" />}
+          acceptTypes="image/*,.pdf"
+          id="inspiration-files"
+        />
         
         <div className="flex justify-between mt-6">
           <Button variant="outline" onClick={handlePrevious} className="group">

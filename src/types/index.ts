@@ -27,7 +27,9 @@ export interface ProjectFiles {
   uploadedFiles: File[];
   uploadedInspirationImages: File[];
   inspirationSelections: string[];
-  siteDocuments?: File[]; 
+  siteDocuments: File[]; 
+  designFiles: File[];
+  inspirationFiles: File[];
 }
 
 export interface BriefSummary {

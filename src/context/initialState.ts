@@ -126,7 +126,9 @@ export const initialProjectData: ProjectData = {
     uploadedFiles: [],
     uploadedInspirationImages: [],
     inspirationSelections: [],
-    siteDocuments: []
+    siteDocuments: [],
+    designFiles: [],
+    inspirationFiles: []
   },
   summary: {
     generatedSummary: '',

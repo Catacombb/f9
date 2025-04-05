@@ -41,5 +41,16 @@ export const renderSiteInfo = (ctx: PDFContext, projectData: ProjectData): void 
     addMultiLineText(ctx, projectData.formData.site.neighboringProperties);
   }
   
+  // Add site documents information
+  if (projectData.files.siteDocuments && projectData.files.siteDocuments.length > 0) {
+    addText(ctx, 'Site Documents', '');
+    ctx.pdf.setFontSize(10);
+    ctx.pdf.setTextColor(ctx.colors.secondary);
+    
+    projectData.files.siteDocuments.forEach((file) => {
+      addText(ctx, '', `${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`, true);
+    });
+  }
+  
   addSpace(ctx, 8);
 };
