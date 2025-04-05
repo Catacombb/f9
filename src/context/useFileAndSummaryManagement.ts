@@ -1,4 +1,3 @@
-
 import { useCallback } from 'react';
 import { ProjectData } from '@/types';
 import { generatePDF } from '@/utils/pdfGenerator/index';
@@ -45,18 +44,17 @@ export const useFileAndSummaryManagement = (
       // Create a FormData object to send the PDF and email details
       const formData = new FormData();
       formData.append('email', email);
-      formData.append('clientName', projectData.formData.projectInfo.clientName || 'Client');
-      formData.append('projectAddress', projectData.formData.projectInfo.projectAddress || 'Project Address');
+      formData.append('client_name', projectData.formData.projectInfo.clientName || 'Client');
+      formData.append('project_address', projectData.formData.projectInfo.projectAddress || 'Project Address');
       formData.append('attachment', pdfBlob, `Northstar_Brief_${projectData.formData.projectInfo.clientName || "Client"}_${new Date().toISOString().split('T')[0]}.pdf`);
       
       // Send the email using the EmailJS service
-      // In a production environment, you would replace this with your actual email API endpoint
       const emailApiUrl = 'https://api.emailjs.com/api/v1.0/email/send-form';
       
       // Add your EmailJS service credentials
-      formData.append('service_id', 'service_northstar');
-      formData.append('template_id', 'template_designbrief');
-      formData.append('user_id', 'your_emailjs_user_id'); // Replace with your actual EmailJS user ID
+      formData.append('service_id', 'service_opdkitc');
+      formData.append('template_id', 'template_r3dcgye');
+      formData.append('user_id', '4MY7hfZH94KlILN09eiC6');
       
       // Make the API call to send the email
       const response = await fetch(emailApiUrl, {
