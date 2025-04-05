@@ -12,9 +12,9 @@ import { Card } from '@/components/ui/card';
 import { toast } from 'sonner';
 
 export function ArchitectureSection() {
-  const { setCurrentSection, updateFormData, formData, updateFiles } = useDesignBrief();
+  const { setCurrentSection, updateFormData, formData, files, updateFiles } = useDesignBrief();
   const architectureData = formData.architecture;
-  const [selectedImages, setSelectedImages] = useState<string[]>(formData.files?.inspirationSelections || []);
+  const [selectedImages, setSelectedImages] = useState<string[]>(files?.inspirationSelections || []);
   
   const handlePrevious = () => {
     setCurrentSection('spaces');
@@ -130,7 +130,7 @@ export function ArchitectureSection() {
     const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf'];
     const maxSize = 5 * 1024 * 1024; // 5MB
     
-    const uploadedInspirationImages = formData.files?.uploadedInspirationImages || [];
+    const uploadedInspirationImages = files?.uploadedInspirationImages || [];
     const newImages = [...uploadedInspirationImages];
     let hasErrors = false;
 
@@ -149,14 +149,7 @@ export function ArchitectureSection() {
 
       // In a real app, we would upload the file to a server here
       // For now, we'll just add it to the list with a local URL
-      const fileUrl = URL.createObjectURL(file);
-      newImages.push({
-        id: `uploaded-${Date.now()}-${file.name}`,
-        name: file.name,
-        url: fileUrl,
-        type: file.type,
-        size: file.size
-      });
+      newImages.push(file);
     });
 
     if (!hasErrors) {
@@ -234,16 +227,16 @@ export function ArchitectureSection() {
             </div>
 
             {/* Display uploaded images */}
-            {formData.files?.uploadedInspirationImages && formData.files.uploadedInspirationImages.length > 0 && (
+            {files?.uploadedInspirationImages && files.uploadedInspirationImages.length > 0 && (
               <div className="mt-6">
                 <h4 className="text-md font-medium mb-2">Your Uploaded Images</h4>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {formData.files.uploadedInspirationImages.map((image) => (
-                    <div key={image.id} className="relative overflow-hidden rounded-md aspect-video">
+                  {files.uploadedInspirationImages.map((image, index) => (
+                    <div key={index} className="relative overflow-hidden rounded-md aspect-video">
                       {image.type.startsWith('image/') ? (
                         <img 
-                          src={image.url} 
-                          alt={image.name} 
+                          src={URL.createObjectURL(image)} 
+                          alt={`Uploaded Image ${index + 1}`}
                           className="object-cover w-full h-full"
                         />
                       ) : (
