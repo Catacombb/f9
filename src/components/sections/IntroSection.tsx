@@ -17,16 +17,20 @@ export function IntroSection() {
   return <div className="design-brief-section-wrapper">
       <div className="design-brief-section-container">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4 font-heading">
-            <strong>Welcome</strong>
+          <h1 className="text-2xl font-bold mb-4 font-heading">
+            Welcome
           </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Hi there — I've put this together to help you share your thoughts about your new home.
-            <br /><br />
-            It's a quick and simple way for me to understand what matters most to you — how you live, what kind of spaces you need, and what's important to your lifestyle.
-            <br /><br />
-            Once you've filled it out, I'll receive everything I need to guide the design of your home.
-          </p>
+          <div className="text-base text-muted-foreground max-w-2xl mx-auto space-y-4">
+            <p>The design process always begins with an idea.</p>
+            
+            <p>To help me understand more about you, your needs for this project, and to explore its potential, I've developed the following list of questions. This questionnaire helps explore ideas for your project.</p>
+            
+            <p>Feel free to skip any questions that don't apply, and add any insights you think are important.</p>
+            
+            <p>Hi there — I've put this together to help you share your thoughts about your new home. It's a quick and simple way for me to understand what matters most to you — how you live, what kind of spaces you need, and what's important to your lifestyle.</p>
+            
+            <p>Once you've filled it out, I'll receive everything I need to guide the design of your home.</p>
+          </div>
         </div>
         
         <Card className="mb-8">
@@ -79,7 +83,7 @@ export function IntroSection() {
                 <div className="mb-4 mx-auto bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center">
                   <MessageCircle className="h-8 w-8 text-primary" />
                 </div>
-                <h3 className="font-medium mb-2">Step 4: I'll be in touch</h3>
+                <h3 className="font-medium mb-2">Step 4: I'll be in touch to progress your dream home</h3>
                 <p className="text-sm text-muted-foreground">
                   I'll use your brief to guide our next steps and bring your vision to life.
                 </p>
