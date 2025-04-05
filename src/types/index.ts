@@ -1,3 +1,4 @@
+
 export interface SpaceRoom {
   id: string;
   type: string;
@@ -27,6 +28,107 @@ export interface ProjectFiles {
 export interface BriefSummary {
   generatedSummary: string;
   editedSummary: string;
+}
+
+// Define the form data sections with their respective properties
+export interface FormData {
+  projectInfo: {
+    clientName: string;
+    projectAddress: string;
+    contactEmail: string;
+    contactPhone: string;
+    projectType: string;
+    projectDescription: string;
+    moveInPreference: string;
+    projectGoals?: string;
+    moveInDate?: string;
+    coordinates?: [number, number];
+  };
+  budget: {
+    budgetRange: string;
+    flexibilityNotes: string;
+    priorityAreas: string;
+    timeframe: string;
+    budgetFlexibility?: string;
+    budgetPriorities?: string[];
+    budgetNotes?: string;
+  };
+  lifestyle: {
+    occupants: string;
+    occupationDetails: string;
+    dailyRoutine: string;
+    entertainmentStyle: string;
+    specialRequirements: string;
+    pets?: string;
+    specialNeeds?: string;
+    hobbies?: string[];
+    entertaining?: string;
+    workFromHome?: string;
+    lifestyleNotes?: string;
+  };
+  site: {
+    existingConditions: string;
+    siteFeatures: string;
+    viewsOrientations: string;
+    accessConstraints: string;
+    neighboringProperties: string;
+    topographicSurvey?: string;
+    existingHouseDrawings?: string;
+    septicDesign?: string;
+    certificateOfTitle?: string;
+    covenants?: string;
+    siteConstraints?: string[];
+    siteAccess?: string;
+    siteViews?: string;
+    outdoorSpaces?: string[];
+    siteNotes?: string;
+  };
+  spaces: {
+    rooms: SpaceRoom[];
+    additionalNotes: string;
+    roomTypes?: string[];
+    specialSpaces?: string[];
+    storageNeeds?: string;
+    spatialRelationships?: string;
+    accessibilityNeeds?: string;
+    spacesNotes?: string;
+    homeLevelType?: string;
+    levelAssignmentNotes?: string;
+    homeSize?: string;
+    eliminableSpaces?: string;
+    roomArrangement?: string;
+  };
+  architecture: {
+    stylePrefences: string;
+    externalMaterials: string;
+    internalFinishes: string;
+    sustainabilityGoals: string;
+    specialFeatures: string;
+    inspirationNotes: string;
+    preferredStyles?: string[];
+    materialPreferences?: string[];
+    sustainabilityFeatures?: string[];
+    technologyRequirements?: string[];
+    architectureNotes?: string;
+    externalMaterialsSelected?: string[];
+    internalMaterialsSelected?: string[];
+  };
+  contractors: {
+    preferredBuilder: string;
+    goToTender: boolean;
+    professionals: Professional[];
+    additionalNotes: string;
+  };
+  communication: {
+    preferredMethods: string[];
+    bestTimes: string[];
+    availableDays: string[];
+    frequency: string;
+    urgentContact: string;
+    responseTime: string;
+    additionalNotes: string;
+    communicationNotes?: string;
+  };
 }
 
 export interface ProjectData {
