@@ -105,7 +105,9 @@ export const useFileAndSummaryManagement = (
       console.error("Error generating PDF:", error);
       // Instead of rethrowing the error, create an empty PDF blob as a fallback
       // This ensures we always return a Blob to match the return type
-      return new Blob(['Error generating PDF'], { type: 'application/pdf' });
+      const errorPdf = new jsPDF();
+      errorPdf.text("Error generating PDF. Please try again.", 10, 10);
+      return errorPdf.output('blob');
     }
   }, [projectData]);
 
