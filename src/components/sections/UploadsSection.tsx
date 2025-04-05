@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback, useEffect } from 'react';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { Button } from '@/components/ui/button';
@@ -5,10 +6,8 @@ import { ArrowLeft, ArrowRight, Upload, X, FileText, Image, FileArchive } from '
 import { SectionHeader } from './SectionHeader';
 import { toast } from 'sonner';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
-import { InspirationGallery } from '@/components/uploads/InspirationGallery';
 
 // Maximum file size in bytes (10MB)
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
@@ -63,7 +62,6 @@ const FILE_CATEGORIES = [
 
 export function UploadsSection() {
   const { setCurrentSection, files, updateFiles } = useDesignBrief();
-  const [activeTab, setActiveTab] = useState('files');
   const [uploadProgress, setUploadProgress] = useState<{[key: string]: number}>({});
   const [dragOver, setDragOver] = useState<string | null>(null);
   
@@ -285,20 +283,9 @@ export function UploadsSection() {
           description="Upload relevant files for your project, such as site documents, photos, and inspiration."
         />
         
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="mb-6">
-            <TabsTrigger value="files">Document Uploads</TabsTrigger>
-            <TabsTrigger value="inspiration">Inspiration Gallery</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="files" className="space-y-6">
-            {FILE_CATEGORIES.map(renderFileUploadCard)}
-          </TabsContent>
-          
-          <TabsContent value="inspiration">
-            <InspirationGallery />
-          </TabsContent>
-        </Tabs>
+        <div className="space-y-6">
+          {FILE_CATEGORIES.map(renderFileUploadCard)}
+        </div>
         
         <div className="flex justify-between mt-6">
           <Button variant="outline" onClick={handlePrevious} className="group">
