@@ -278,3 +278,28 @@ export const roomSpecificQuestions = {
     }
   ]
 };
+
+// Add the missing getRoomQuestions function
+export function getRoomQuestions(roomType: string) {
+  const roomTypeKey = roomType as keyof typeof roomSpecificQuestions;
+  
+  if (roomSpecificQuestions[roomTypeKey]) {
+    // Transform the array of question objects into a more usable format for the RoomItem component
+    return roomSpecificQuestions[roomTypeKey].map(question => ({
+      id: question.id,
+      label: question.question,
+      type: question.type === 'select' ? 'select' : 'checkbox',
+      placeholder: `Select ${question.question.toLowerCase()}`,
+      checkboxLabel: question.question,
+      options: question.type === 'select' ? 
+        question.options.map((option: string) => ({ 
+          value: option.toLowerCase().replace(/\s+/g, '-'), 
+          label: option 
+        })) : 
+        undefined
+    }));
+  }
+  
+  // Return empty array if room type not found
+  return [];
+}
