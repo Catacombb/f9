@@ -39,6 +39,7 @@ export function DesignBriefSidebar({ showLastSaved = false, lastSavedFormatted =
 
   const navigateToSection = (sectionId: SectionKey) => {
     setCurrentSection(sectionId);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
@@ -69,12 +70,13 @@ export function DesignBriefSidebar({ showLastSaved = false, lastSavedFormatted =
                     className={cn(
                       "w-full justify-start mb-1 relative mt-2",
                       "bg-purple-600 hover:bg-purple-700 text-white font-medium",
-                      isMobile ? "text-sm py-2" : ""
+                      isMobile ? "text-sm py-2" : "",
+                      "transition-all duration-300"
                     )}
                     onClick={() => navigateToSection(section.id as SectionKey)}
                   >
                     <div className="flex items-center w-full">
-                      <span className="mr-2">{section.icon}</span>
+                      <span className="mr-2 transition-transform group-hover:scale-110 duration-200">{section.icon}</span>
                       <span className="truncate">{section.title}</span>
                       <Badge variant="outline" className="ml-2 text-[0.6rem] py-0 px-1.5 bg-white/20 text-white border-white/30">
                         Testers
@@ -89,16 +91,23 @@ export function DesignBriefSidebar({ showLastSaved = false, lastSavedFormatted =
                   key={section.id}
                   variant={currentSection === section.id ? "secondary" : "ghost"}
                   className={cn(
-                    "w-full justify-start mb-1 relative",
-                    currentSection === section.id ? "bg-sidebar-accent text-sidebar-accent-foreground" : "",
+                    "w-full justify-start mb-1 relative group",
+                    currentSection === section.id 
+                      ? "bg-sidebar-accent text-sidebar-accent-foreground animate-slide-in" 
+                      : "hover:bg-sidebar-accent/20 transition-colors duration-200",
                     isMobile ? "text-sm py-2" : ""
                   )}
                   onClick={() => navigateToSection(section.id as SectionKey)}
                 >
                   <div className="flex items-center w-full">
-                    <span className="mr-2">{section.icon}</span>
+                    <span className={`mr-2 ${currentSection !== section.id ? 'group-hover:text-primary group-hover:scale-110 transition-all duration-200' : ''}`}>
+                      {section.icon}
+                    </span>
                     <span className="truncate">{section.title}</span>
                   </div>
+                  {currentSection === section.id && (
+                    <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-primary rounded-r animate-fade-in" />
+                  )}
                 </Button>
               );
             })}
@@ -109,11 +118,11 @@ export function DesignBriefSidebar({ showLastSaved = false, lastSavedFormatted =
           <div className="space-y-2">
             <Button 
               variant="ghost" 
-              className="w-full justify-start truncate bg-sidebar-accent/20 hover:bg-sidebar-accent/30 text-sidebar-foreground font-medium text-sm" 
+              className="w-full justify-start truncate bg-sidebar-accent/20 hover:bg-sidebar-accent/30 text-sidebar-foreground font-medium text-sm transition-all duration-200 group" 
               asChild
             >
               <Link to="/about" className="flex items-center">
-                <ExternalLink className="mr-2 h-5 w-5 shrink-0 text-accent" />
+                <ExternalLink className="mr-2 h-5 w-5 shrink-0 text-accent group-hover:scale-110 transition-transform duration-200" />
                 <span className="truncate">About Northstar</span>
               </Link>
             </Button>

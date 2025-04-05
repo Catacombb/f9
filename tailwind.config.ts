@@ -123,11 +123,92 @@ export default {
           to: {
             height: '0'
           }
+        },
+        'fade-in': {
+          from: { 
+            opacity: '0',
+            transform: 'translateY(10px)'
+          },
+          to: { 
+            opacity: '1',
+            transform: 'translateY(0)'
+          }
+        },
+        'fade-out': {
+          from: { 
+            opacity: '1',
+            transform: 'translateY(0)'  
+          },
+          to: { 
+            opacity: '0',
+            transform: 'translateY(10px)'
+          }
+        },
+        'slide-in': {
+          from: { 
+            transform: 'translateX(-20px)',
+            opacity: '0'
+          },
+          to: { 
+            transform: 'translateX(0)',
+            opacity: '1'
+          }
+        },
+        'slide-in-right': {
+          from: { 
+            transform: 'translateX(20px)',
+            opacity: '0'
+          },
+          to: { 
+            transform: 'translateX(0)',
+            opacity: '1'
+          }
+        },
+        'pop': {
+          '0%': { 
+            transform: 'scale(0.95)',
+            opacity: '0.7'
+          },
+          '50%': { 
+            transform: 'scale(1.05)',
+            opacity: '1'
+          },
+          '100%': { 
+            transform: 'scale(1)',
+            opacity: '1'
+          }
+        },
+        'pulse-glow': {
+          '0%, 100%': { 
+            boxShadow: '0 0 0 rgba(147, 51, 234, 0)',
+            opacity: '1'
+          },
+          '50%': { 
+            boxShadow: '0 0 20px rgba(147, 51, 234, 0.3)',
+            opacity: '0.9'
+          }
+        },
+        'checkmark': {
+          from: { 
+            strokeDashoffset: '20',
+            opacity: '0'
+          },
+          to: { 
+            strokeDashoffset: '0',
+            opacity: '1'
+          }
         }
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
-        'accordion-up': 'accordion-up 0.2s ease-out'
+        'accordion-up': 'accordion-up 0.2s ease-out',
+        'fade-in': 'fade-in 0.3s ease-out',
+        'fade-out': 'fade-out 0.3s ease-out',
+        'slide-in': 'slide-in 0.2s ease-out',
+        'slide-in-right': 'slide-in-right 0.2s ease-out',
+        'pop': 'pop 0.3s ease-out',
+        'pulse-glow': 'pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'checkmark': 'checkmark 0.3s ease-out forwards'
       }
     }
   },

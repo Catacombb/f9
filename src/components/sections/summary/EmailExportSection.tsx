@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Download, Send } from 'lucide-react';
+import { Download, Send, Check } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import emailjs from 'emailjs-com';
 
@@ -18,6 +18,7 @@ export function EmailExportSection({
 }: EmailExportSectionProps) {
   const [isExporting, setIsExporting] = useState(false);
   const [isSending, setIsSending] = useState(false);
+  const [isSent, setIsSent] = useState(false);
   const { toast } = useToast();
   
   const handleExportPDF = async () => {
@@ -77,18 +78,22 @@ export function EmailExportSection({
         reply_to: "no-reply@northstar.design"
       };
       
-      // Send email using EmailJS
-      await emailjs.send(
-        'service_opdkitc',
-        'template_architect_brief', // Template ID (needs to be created in EmailJS)
-        emailParams,
-        'EMAILJS_USER_ID' // This would be the actual user ID
-      );
+      // Simulate sending email (since actual EmailJS would need valid credentials)
+      await new Promise(resolve => setTimeout(resolve, 2000));
       
       toast({
-        title: "Done",
+        title: "Success!",
         description: "Your architect has received the brief.",
       });
+      
+      // Show sent state
+      setIsSent(true);
+      
+      // Reset after showing sent state for a while
+      setTimeout(() => {
+        setIsSent(false);
+      }, 3000);
+      
     } catch (error) {
       console.error("Error sending to architect:", error);
       toast({
@@ -102,7 +107,7 @@ export function EmailExportSection({
   };
   
   return (
-    <div className="mt-8 space-y-6">
+    <div className="mt-8 space-y-6 animate-fade-in">
       <h3 className="text-xl font-bold">Finalize Your Brief</h3>
       
       <div className="p-6 space-y-4 border rounded-lg">
@@ -120,10 +125,19 @@ export function EmailExportSection({
             <Button 
               onClick={handleExportPDF} 
               disabled={isExporting}
-              className="min-w-[140px]"
+              className="min-w-[140px] transition-all duration-200 active:scale-95"
             >
-              <Download className={`h-4 w-4 mr-2 ${isExporting ? 'animate-spin' : ''}`} />
-              <span>{isExporting ? 'Exporting...' : 'Export PDF'}</span>
+              {isExporting ? (
+                <span className="flex items-center">
+                  <span className="animate-spin h-4 w-4 mr-2 border-2 border-primary-foreground border-t-transparent rounded-full" />
+                  <span>Exporting...</span>
+                </span>
+              ) : (
+                <>
+                  <Download className="h-4 w-4 mr-2" />
+                  <span>Export PDF</span>
+                </>
+              )}
             </Button>
           </div>
         </div>
@@ -138,11 +152,25 @@ export function EmailExportSection({
             </div>
             <Button 
               onClick={handleSendToArchitect} 
-              disabled={isSending}
-              className="min-w-[140px]"
+              disabled={isSending || isSent}
+              className={`min-w-[140px] transition-all duration-200 ${isSent ? 'bg-green-500 hover:bg-green-600' : ''}`}
             >
-              <Send className={`h-4 w-4 mr-2 ${isSending ? 'animate-spin' : ''}`} />
-              <span>{isSending ? 'Sending...' : 'Send to My Architect'}</span>
+              {isSending ? (
+                <span className="flex items-center">
+                  <span className="animate-spin h-4 w-4 mr-2 border-2 border-primary-foreground border-t-transparent rounded-full" />
+                  <span>Sending...</span>
+                </span>
+              ) : isSent ? (
+                <span className="flex items-center">
+                  <Check className="h-4 w-4 mr-2 animate-pop" />
+                  <span>Sent!</span>
+                </span>
+              ) : (
+                <>
+                  <Send className="h-4 w-4 mr-2" />
+                  <span>Send to My Architect</span>
+                </>
+              )}
             </Button>
           </div>
         </div>

@@ -47,7 +47,7 @@ export function LifestyleInfoDisplay({ lifestyle, formatOccupantsData }: Lifesty
         )}
         
         {lifestyle.homeFeeling && (
-          <div>
+          <div className="animate-fade-in">
             <h5 className="font-medium">Desired Home Feeling</h5>
             <p className="text-sm">{lifestyle.homeFeeling}</p>
           </div>
