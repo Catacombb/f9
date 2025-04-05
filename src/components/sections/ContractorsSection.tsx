@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,7 +12,6 @@ import { Professional } from '@/types';
 import { MultiSelectButtons } from '@/components/MultiSelectButtons';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
-// Simplified list of professionals - removed Architect
 const predefinedProfessionals = [
   { value: 'builder', label: 'Builder' },
   { value: 'interior_designer', label: 'Interior Designer' },
@@ -30,14 +28,12 @@ export function ContractorsSection() {
   });
   const [professionalPreferences, setProfessionalPreferences] = useState<Record<string, { hasPreferred: string | null, name: string, contact: string }>>({});
 
-  // Initialize professional preferences without default selections
   useEffect(() => {
     const initialPreferences: Record<string, { hasPreferred: string | null, name: string, contact: string }> = {};
     
     predefinedProfessionals.forEach(prof => {
       const existing = formData.contractors.professionals.find(p => p.type === prof.label);
       initialPreferences[prof.value] = {
-        // Start with null (unselected) unless there's existing data
         hasPreferred: existing ? 'yes' : null,
         name: existing?.name || '',
         contact: existing?.contact || ''
@@ -68,7 +64,6 @@ export function ContractorsSection() {
         id: crypto.randomUUID(),
       });
       
-      // Reset form
       setNewProfessional({
         type: '',
         name: '',
@@ -101,7 +96,6 @@ export function ContractorsSection() {
       }
     }));
     
-    // If changing from yes to no, remove the professional
     if (value === 'no') {
       const profToRemove = formData.contractors.professionals.find(
         p => p.type === predefinedProfessionals.find(pre => pre.value === professional)?.label
@@ -111,7 +105,6 @@ export function ContractorsSection() {
       }
     }
     
-    // If changing from null/no to yes, add placeholder
     if (value === 'yes' && professionalPreferences[professional]?.hasPreferred !== 'yes') {
       const profLabel = predefinedProfessionals.find(p => p.value === professional)?.label;
       if (profLabel) {
@@ -135,7 +128,6 @@ export function ContractorsSection() {
       }
     }));
     
-    // Update the professional in the form data
     const profLabel = predefinedProfessionals.find(p => p.value === professional)?.label;
     const existingProf = formData.contractors.professionals.find(p => p.type === profLabel);
     
@@ -145,7 +137,6 @@ export function ContractorsSection() {
         [field]: value
       });
     } else if (profLabel && field === 'name' && value) {
-      // Add new professional if it doesn't exist
       addProfessional({
         id: crypto.randomUUID(),
         type: profLabel,
@@ -157,76 +148,62 @@ export function ContractorsSection() {
   };
   
   const handlePrevious = () => {
-    setCurrentSection('site');
+    setCurrentSection('architecture');
     window.scrollTo(0, 0);
   };
   
   const handleNext = () => {
-    setCurrentSection('lifestyle');
+    setCurrentSection('budget');
     window.scrollTo(0, 0);
   };
   
-  // Calculate completion percentage - revised to only count explicit user selections
   const calculateCompletion = () => {
     let completed = 0;
     let total = 0;
     
-    // Check goToTender field - only count if explicitly set by user
     total++;
     if (formData.contractors.goToTender === true || formData.contractors.goToTender === false) {
       completed++;
     }
     
-    // Check professionals - Only count fields where user made explicit selection
     predefinedProfessionals.forEach(prof => {
-      // First check if user has made a selection (yes/no) for this professional
       const prefKey = prof.value;
       const hasPreference = professionalPreferences[prefKey]?.hasPreferred;
       
-      // Only count if user has made an explicit choice (yes or no)
       if (hasPreference) {
-        // The selection itself counts as a completed field
         total++;
         completed++;
         
-        // If user selected "Yes", check if they provided name and contact info
         if (hasPreference === 'yes') {
-          // Name field
           total++;
           if (professionalPreferences[prefKey]?.name && professionalPreferences[prefKey].name.trim() !== '') {
             completed++;
           }
           
-          // Contact field
           total++;
           if (professionalPreferences[prefKey]?.contact && professionalPreferences[prefKey].contact.trim() !== '') {
             completed++;
           }
         }
       } else {
-        // If user hasn't made a selection, still count the field in total but not completed
         total++;
       }
     });
     
-    // Custom professionals
     const customProfessionals = formData.contractors.professionals.filter(
       p => !predefinedProfessionals.some(pre => pre.label === p.type)
     );
     
     if (customProfessionals.length > 0) {
-      // Each custom professional counts as a completed item
       total += customProfessionals.length;
       completed += customProfessionals.length;
     }
     
-    // Additional notes
     total++;
     if (formData.contractors.additionalNotes && formData.contractors.additionalNotes.trim() !== '') {
       completed++;
     }
     
-    // Calculate percentage
     return total > 0 ? Math.round((completed / total) * 100) : 0;
   };
   
@@ -249,7 +226,6 @@ export function ContractorsSection() {
           <h3 className="text-lg font-semibold mb-2">Project Professionals</h3>
           <p className="text-sm text-muted-foreground mb-4">Do you have any preferred professionals for the roles below?</p>
 
-          {/* Builder section with tender option */}
           <Card key="builder" className="overflow-hidden mb-6">
             <CardContent className="p-4">
               <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-6 sm:justify-between sm:items-center">
@@ -446,11 +422,11 @@ export function ContractorsSection() {
         <div className="flex justify-between mt-6">
           <Button variant="outline" onClick={handlePrevious} className="group">
             <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-            <span>Previous: Site</span>
+            <span>Previous: Architecture</span>
           </Button>
           
           <Button onClick={handleNext} className="group">
-            <span>Next: Lifestyle</span>
+            <span>Next: Budget</span>
             <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
           </Button>
         </div>
