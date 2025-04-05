@@ -1,13 +1,25 @@
-import React, { useState } from 'react';
+
+import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useDesignBrief } from '@/context/DesignBriefContext';
-import { ArrowLeft, FileText, Mail, Download } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { ArrowLeft } from 'lucide-react';
 import { SectionHeader } from './SectionHeader';
+
+// Import all our new components
+import { ProjectInfoDisplay } from './summary/ProjectInfoDisplay';
+import { BudgetInfoDisplay } from './summary/BudgetInfoDisplay';
+import { LifestyleInfoDisplay } from './summary/LifestyleInfoDisplay';
+import { SiteInfoDisplay } from './summary/SiteInfoDisplay';
+import { SpacesInfoDisplay } from './summary/SpacesInfoDisplay';
+import { ArchitectureInfoDisplay } from './summary/ArchitectureInfoDisplay';
+import { ContractorsInfoDisplay } from './summary/ContractorsInfoDisplay';
+import { FilesDisplay } from './summary/FilesDisplay';
+import { InspirationDisplay } from './summary/InspirationDisplay';
+import { CommunicationInfoDisplay } from './summary/CommunicationInfoDisplay';
+import { SupportingFilesDisplay } from './summary/SupportingFilesDisplay';
+import { EmailExportSection } from './summary/EmailExportSection';
 
 const inspirationImages = [
   { id: '1', src: 'https://images.unsplash.com/photo-1571055107559-3e67626fa8be?w=800&auto=format&fit=crop', alt: 'Modern New Zealand house with glass facade' },
@@ -20,78 +32,6 @@ const inspirationImages = [
 
 export function SummarySection() {
   const { formData, files, sendByEmail, exportAsPDF, setCurrentSection } = useDesignBrief();
-  const [isEmailSending, setIsEmailSending] = useState(false);
-  const [isExporting, setIsExporting] = useState(false);
-  const [recipientEmail, setRecipientEmail] = useState(formData.projectInfo.contactEmail || '');
-  const { toast } = useToast();
-  
-  const handleSendEmail = async () => {
-    if (!recipientEmail) {
-      toast({
-        title: "Email Required",
-        description: "Please enter an email address to receive the brief.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    setIsEmailSending(true);
-    try {
-      const success = await sendByEmail(recipientEmail);
-      if (success) {
-        toast({
-          title: "Email Sent",
-          description: "Your design brief has been sent to " + recipientEmail,
-        });
-      } else {
-        throw new Error("Failed to send email");
-      }
-    } catch (error) {
-      console.error("Email sending error:", error);
-      toast({
-        title: "Email Delivery Failed",
-        description: "We couldn't send your email. The issue has been logged and we'll try again soon.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsEmailSending(false);
-    }
-  };
-  
-  const handleExportPDF = async () => {
-    setIsExporting(true);
-    try {
-      const pdfBlob = await exportAsPDF();
-      
-      // Create a download link and trigger it
-      const url = URL.createObjectURL(pdfBlob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `Northstar_Brief_${formData.projectInfo.clientName || "Client"}_${new Date().toISOString().split('T')[0]}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      
-      toast({
-        title: "PDF Generated",
-        description: "Your design brief has been exported as a PDF.",
-      });
-    } catch (error) {
-      console.error("PDF export error:", error);
-      toast({
-        title: "Error",
-        description: "There was a problem exporting your PDF. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsExporting(false);
-    }
-  };
-  
-  const handlePrevious = () => {
-    setCurrentSection('communication');
-  };
   
   const formatSpacesData = () => {
     if (!formData.spaces.rooms || formData.spaces.rooms.length === 0) {
@@ -160,6 +100,30 @@ export function SummarySection() {
       return "Data format error";
     }
   };
+
+  // Handle PDF export with proper return type
+  const handleExportPDF = async (): Promise<void> => {
+    try {
+      const pdfBlob = await exportAsPDF();
+      
+      // Create a download link and trigger it
+      const url = URL.createObjectURL(pdfBlob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Northstar_Brief_${formData.projectInfo.clientName || "Client"}_${new Date().toISOString().split('T')[0]}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("PDF export error:", error);
+      throw error;
+    }
+  };
+  
+  const handlePrevious = () => {
+    setCurrentSection('communication');
+  };
   
   return (
     <div className="design-brief-section-wrapper">
@@ -180,423 +144,71 @@ export function SummarySection() {
                 <h3 className="text-xl font-bold mb-4">Design Brief Overview</h3>
                 
                 <div className="border rounded-lg p-6 space-y-8">
-                  <div className="pb-6 border-b">
-                    <h4 className="text-lg font-bold mb-4">Project Information</h4>
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div>
-                        <p className="text-sm font-medium">Client Name:</p>
-                        <p className="text-sm">{formData.projectInfo.clientName || "Not provided"}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium">Project Address:</p>
-                        <p className="text-sm">{formData.projectInfo.projectAddress || "Not provided"}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium">Contact Email:</p>
-                        <p className="text-sm">{formData.projectInfo.contactEmail || "Not provided"}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium">Contact Phone:</p>
-                        <p className="text-sm">{formData.projectInfo.contactPhone || "Not provided"}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium">Project Type:</p>
-                        <p className="text-sm">
-                          {formData.projectInfo.projectType ? formData.projectInfo.projectType.replace('_', ' ') : "Not provided"}
-                        </p>
-                      </div>
-                    </div>
-                    
-                    {formData.projectInfo.projectDescription && (
-                      <div className="mt-4">
-                        <p className="text-sm font-medium">Project Description:</p>
-                        <p className="text-sm">{formData.projectInfo.projectDescription}</p>
-                      </div>
-                    )}
-                  </div>
+                  {/* Project Info */}
+                  <ProjectInfoDisplay projectInfo={formData.projectInfo} />
                   
-                  <div className="pb-6 border-b">
-                    <h4 className="text-lg font-bold mb-4">Budget Information</h4>
-                    <div className="space-y-4">
-                      <div>
-                        <p className="text-sm font-medium">Budget Range:</p>
-                        <p className="text-sm">{formData.budget.budgetRange || "Not provided"}</p>
-                      </div>
-                      {formData.budget.flexibilityNotes && (
-                        <div>
-                          <p className="text-sm font-medium">Budget Flexibility Notes:</p>
-                          <p className="text-sm">{formData.budget.flexibilityNotes}</p>
-                        </div>
-                      )}
-                      {formData.budget.priorityAreas && (
-                        <div>
-                          <p className="text-sm font-medium">Priority Areas:</p>
-                          <p className="text-sm">{formData.budget.priorityAreas}</p>
-                        </div>
-                      )}
-                      {formData.budget.timeframe && (
-                        <div>
-                          <p className="text-sm font-medium">Timeframe:</p>
-                          <p className="text-sm">{formData.budget.timeframe}</p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                  {/* Budget Info */}
+                  <BudgetInfoDisplay budget={formData.budget} />
                   
-                  <div className="pb-6 border-b">
-                    <h4 className="text-lg font-bold mb-4">Lifestyle</h4>
-                    <div className="space-y-4">
-                      {formData.lifestyle.occupants && (
-                        <div>
-                          <p className="text-sm font-medium">Occupants and Spaces:</p>
-                          <p className="text-sm">{formatOccupantsData()}</p>
-                        </div>
-                      )}
-                      {formData.lifestyle.occupationDetails && (
-                        <div>
-                          <p className="text-sm font-medium">Occupation Details:</p>
-                          <p className="text-sm">{formData.lifestyle.occupationDetails}</p>
-                        </div>
-                      )}
-                      {formData.lifestyle.dailyRoutine && (
-                        <div>
-                          <p className="text-sm font-medium">Daily Routine:</p>
-                          <p className="text-sm">{formData.lifestyle.dailyRoutine}</p>
-                        </div>
-                      )}
-                      {formData.lifestyle.entertainmentStyle && (
-                        <div>
-                          <p className="text-sm font-medium">Entertainment Style:</p>
-                          <p className="text-sm">{formData.lifestyle.entertainmentStyle}</p>
-                        </div>
-                      )}
-                      {formData.lifestyle.specialRequirements && (
-                        <div>
-                          <p className="text-sm font-medium">Special Requirements:</p>
-                          <p className="text-sm">{formData.lifestyle.specialRequirements}</p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                  {/* Lifestyle */}
+                  <LifestyleInfoDisplay 
+                    lifestyle={formData.lifestyle} 
+                    formatOccupantsData={formatOccupantsData} 
+                  />
                   
-                  <div className="pb-6 border-b">
-                    <h4 className="text-lg font-bold mb-4">Site Information</h4>
-                    <div className="space-y-4">
-                      {formData.site.existingConditions && (
-                        <div>
-                          <p className="text-sm font-medium">Existing Conditions:</p>
-                          <p className="text-sm">{formData.site.existingConditions}</p>
-                        </div>
-                      )}
-                      {formData.site.siteFeatures && (
-                        <div>
-                          <p className="text-sm font-medium">Site Features:</p>
-                          <p className="text-sm">{typeof formData.site.siteFeatures === 'string' 
-                              ? formData.site.siteFeatures 
-                              : Array.isArray(formData.site.siteFeatures) 
-                                ? formData.site.siteFeatures.join(', ')
-                                : String(formData.site.siteFeatures)}</p>
-                        </div>
-                      )}
-                      {formData.site.viewsOrientations && (
-                        <div>
-                          <p className="text-sm font-medium">Views/Orientations:</p>
-                          <p className="text-sm">{formData.site.viewsOrientations}</p>
-                        </div>
-                      )}
-                      {formData.site.accessConstraints && (
-                        <div>
-                          <p className="text-sm font-medium">Access/Constraints:</p>
-                          <p className="text-sm">{formData.site.accessConstraints}</p>
-                        </div>
-                      )}
-                      {formData.site.neighboringProperties && (
-                        <div>
-                          <p className="text-sm font-medium">Neighboring Properties:</p>
-                          <p className="text-sm">{formData.site.neighboringProperties}</p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                  {/* Site Information */}
+                  <SiteInfoDisplay site={formData.site} />
                   
-                  {formData.spaces.rooms.length > 0 && (
-                    <div className="pb-6 border-b">
-                      <h4 className="text-lg font-bold mb-4">Spaces</h4>
-                      {formatSpacesData()}
-                      
-                      {formData.spaces.additionalNotes && (
-                        <div className="mt-4">
-                          <p className="text-sm font-medium">Additional Notes:</p>
-                          <p className="text-sm">{formData.spaces.additionalNotes}</p>
-                        </div>
-                      )}
-                    </div>
-                  )}
+                  {/* Spaces */}
+                  <SpacesInfoDisplay 
+                    spaces={formData.spaces} 
+                    formatSpacesData={formatSpacesData} 
+                  />
                   
-                  <div className="pb-6 border-b">
-                    <h4 className="text-lg font-bold mb-4">Architectural Preferences</h4>
-                    <div className="space-y-4">
-                      {formData.architecture.stylePrefences && (
-                        <div>
-                          <p className="text-sm font-medium">Style Preferences:</p>
-                          <p className="text-sm">{formData.architecture.stylePrefences}</p>
-                        </div>
-                      )}
-                      {formData.architecture.externalMaterials && (
-                        <div>
-                          <p className="text-sm font-medium">External Materials:</p>
-                          <p className="text-sm">{formData.architecture.externalMaterials}</p>
-                        </div>
-                      )}
-                      {formData.architecture.internalFinishes && (
-                        <div>
-                          <p className="text-sm font-medium">Internal Finishes:</p>
-                          <p className="text-sm">{formData.architecture.internalFinishes}</p>
-                        </div>
-                      )}
-                      {formData.architecture.sustainabilityGoals && (
-                        <div>
-                          <p className="text-sm font-medium">Sustainability Goals:</p>
-                          <p className="text-sm">{formData.architecture.sustainabilityGoals}</p>
-                        </div>
-                      )}
-                      {formData.architecture.specialFeatures && (
-                        <div>
-                          <p className="text-sm font-medium">Special Features:</p>
-                          <p className="text-sm">{formData.architecture.specialFeatures}</p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                  {/* Architectural Preferences */}
+                  <ArchitectureInfoDisplay architecture={formData.architecture} />
                   
-                  {formData.contractors.professionals.length > 0 && (
-                    <div className="pb-6 border-b">
-                      <h4 className="text-lg font-bold mb-4">Project Team</h4>
-                      <div className="space-y-4">
-                        {formData.contractors.preferredBuilder && (
-                          <div>
-                            <p className="text-sm font-medium">Preferred Builder:</p>
-                            <p className="text-sm">{formData.contractors.preferredBuilder}</p>
-                          </div>
-                        )}
-                        
-                        <div>
-                          <p className="text-sm font-medium">Go to Tender:</p>
-                          <p className="text-sm">{formData.contractors.goToTender ? "Yes" : "No"}</p>
-                        </div>
-                        
-                        <div>
-                          <p className="text-sm font-medium">Professionals:</p>
-                          <div className="ml-4">
-                            {formData.contractors.professionals.map((professional, index) => (
-                              <div key={professional.id || index} className="mb-2">
-                                <p className="text-sm">
-                                  <span className="font-medium">{professional.type}:</span> {professional.name}
-                                  {professional.contact && ` (${professional.contact})`}
-                                  {professional.notes && ` - ${professional.notes}`}
-                                </p>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                        
-                        {formData.contractors.additionalNotes && (
-                          <div>
-                            <p className="text-sm font-medium">Additional Notes:</p>
-                            <p className="text-sm">{formData.contractors.additionalNotes}</p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
+                  {/* Project Team */}
+                  <ContractorsInfoDisplay contractors={formData.contractors} />
                   
-                  {files.uploadedFiles.length > 0 && (
-                    <div className="pb-6 border-b">
-                      <h4 className="text-lg font-bold mb-4">Uploaded Files</h4>
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                        {files.uploadedFiles.map((file, index) => (
-                          <div key={`upload-${index}`} className="text-sm">
-                            {file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                  {/* Uploaded Files */}
+                  <FilesDisplay 
+                    uploadedFiles={files.uploadedFiles} 
+                    title="Uploaded Files" 
+                  />
                   
-                  {files.siteDocuments && files.siteDocuments.length > 0 && (
-                    <div className="pb-6 border-b">
-                      <h4 className="text-lg font-bold mb-4">Site Documents</h4>
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                        {files.siteDocuments.map((file, index) => (
-                          <div key={`site-doc-${index}`} className="text-sm">
-                            {file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                  {/* Site Documents */}
+                  <FilesDisplay 
+                    uploadedFiles={[]} 
+                    siteDocuments={files.siteDocuments} 
+                    title="Site Documents" 
+                  />
                   
-                  {files.inspirationSelections.length > 0 && (
-                    <div>
-                      <h4 className="text-lg font-bold mb-4">Inspiration Selections</h4>
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                        {files.inspirationSelections.map((id) => {
-                          const image = inspirationImages.find(img => img.id === id);
-                          return image ? (
-                            <div key={id} className="aspect-w-4 aspect-h-3 h-24">
-                              <img
-                                src={image.src}
-                                alt={image.alt}
-                                className="w-full h-full object-cover rounded-md"
-                              />
-                              <p className="text-xs mt-1">{image.alt}</p>
-                            </div>
-                          ) : null;
-                        })}
-                      </div>
-                    </div>
-                  )}
+                  {/* Inspiration Selections */}
+                  <InspirationDisplay 
+                    inspirationSelections={files.inspirationSelections} 
+                    inspirationImages={inspirationImages} 
+                  />
 
-                  {(formData.communication.preferredMethods?.length > 0 || 
-                    formData.communication.bestTimes?.length > 0 ||
-                    formData.communication.availableDays?.length > 0 ||
-                    formData.communication.frequency ||
-                    formData.communication.urgentContact ||
-                    formData.communication.responseTime) && (
-                    <div className="pb-6 border-b">
-                      <h4 className="text-lg font-bold mb-4">Communication Preferences</h4>
-                      <div className="space-y-4">
-                        {formData.communication.preferredMethods?.length > 0 && (
-                          <div>
-                            <p className="text-sm font-medium">Preferred Methods:</p>
-                            <p className="text-sm">{formData.communication.preferredMethods.join(', ')}</p>
-                          </div>
-                        )}
-                        {formData.communication.bestTimes?.length > 0 && (
-                          <div>
-                            <p className="text-sm font-medium">Best Times:</p>
-                            <p className="text-sm">{formData.communication.bestTimes.join(', ')}</p>
-                          </div>
-                        )}
-                        {formData.communication.availableDays?.length > 0 && (
-                          <div>
-                            <p className="text-sm font-medium">Available Days:</p>
-                            <p className="text-sm">{formData.communication.availableDays.join(', ')}</p>
-                          </div>
-                        )}
-                        {formData.communication.frequency && (
-                          <div>
-                            <p className="text-sm font-medium">Update Frequency:</p>
-                            <p className="text-sm">{formData.communication.frequency}</p>
-                          </div>
-                        )}
-                        {formData.communication.urgentContact && (
-                          <div>
-                            <p className="text-sm font-medium">Urgent Contact:</p>
-                            <p className="text-sm">{formData.communication.urgentContact}</p>
-                          </div>
-                        )}
-                        {formData.communication.responseTime && (
-                          <div>
-                            <p className="text-sm font-medium">Expected Response Time:</p>
-                            <p className="text-sm">{formData.communication.responseTime}</p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
+                  {/* Communication Preferences */}
+                  <CommunicationInfoDisplay communication={formData.communication} />
                   
-                  {(files.uploadedFiles.length > 0 || (files.siteDocuments && files.siteDocuments.length > 0)) && (
-                    <div className="pb-6 border-b">
-                      <h4 className="text-lg font-bold mb-4">Supporting Files</h4>
-                      <div className="space-y-4">
-                        <p className="text-sm">
-                          The following files have been included with this design brief. 
-                          All documents can be accessed from the project portal.
-                        </p>
-                        <ul className="list-disc pl-5 text-sm space-y-1">
-                          {files.uploadedFiles.map((file, index) => (
-                            <li key={`download-${index}`}>
-                              {file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)
-                            </li>
-                          ))}
-                          {files.siteDocuments && files.siteDocuments.map((file, index) => (
-                            <li key={`site-download-${index}`}>
-                              {file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    </div>
-                  )}
+                  {/* Supporting Files */}
+                  <SupportingFilesDisplay 
+                    uploadedFiles={files.uploadedFiles}
+                    siteDocuments={files.siteDocuments}
+                  />
                 </div>
               </CardContent>
             </Card>
             
-            <div className="mt-8 space-y-6">
-              <h3 className="text-xl font-bold">Finalize Your Brief</h3>
-              
-              <Card>
-                <CardContent className="p-6 space-y-4">
-                  <div>
-                    <h4 className="font-medium mb-2">Export as PDF</h4>
-                    <div className="flex items-start gap-4">
-                      <div className="flex-1">
-                        <p className="text-sm text-muted-foreground mb-2">
-                          Download your complete design brief as a PDF document with the title: 
-                          <span className="font-semibold block">
-                            "Northstar_Brief_{formData.projectInfo.clientName || "[Client Name]"}_{new Date().toISOString().split('T')[0]}"
-                          </span>
-                        </p>
-                      </div>
-                      <Button 
-                        onClick={handleExportPDF} 
-                        disabled={isExporting}
-                        className="min-w-[140px]"
-                      >
-                        <Download className={`h-4 w-4 mr-2 ${isExporting ? 'animate-spin' : ''}`} />
-                        <span>Export PDF</span>
-                      </Button>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <h4 className="font-medium mb-2">Send by Email</h4>
-                    <div className="flex items-start gap-4">
-                      <div className="flex-1">
-                        <Label htmlFor="recipientEmail">Email Address</Label>
-                        <Input
-                          id="recipientEmail"
-                          type="email"
-                          value={recipientEmail}
-                          onChange={(e) => setRecipientEmail(e.target.value)}
-                          placeholder="Enter email address"
-                          className="mt-1"
-                        />
-                      </div>
-                      <div className="pt-6">
-                        <Button 
-                          onClick={handleSendEmail} 
-                          disabled={isEmailSending}
-                          className="min-w-[140px]"
-                        >
-                          <Mail className={`h-4 w-4 mr-2 ${isEmailSending ? 'animate-spin' : ''}`} />
-                          <span>Send Email</span>
-                        </Button>
-                      </div>
-                    </div>
-                    <p className="text-sm text-muted-foreground mt-2">
-                      Receive a copy of your design brief by email. We'll also send a copy to our team for reference.
-                    </p>
-                    {!formData.projectInfo.contactEmail && (
-                      <p className="text-sm text-yellow-500 mt-2">
-                        Tip: Add your email to the Project Information section to pre-fill this field.
-                      </p>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+            {/* Email and Export Section */}
+            <EmailExportSection 
+              defaultEmail={formData.projectInfo.contactEmail || ''}
+              onSendEmail={sendByEmail}
+              onExportPDF={handleExportPDF}
+              clientName={formData.projectInfo.clientName}
+            />
           </TabsContent>
         </Tabs>
         
