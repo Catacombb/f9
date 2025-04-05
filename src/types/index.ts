@@ -1,3 +1,4 @@
+
 export interface FormData {
   // Project Info
   projectInfo: {
@@ -61,6 +62,9 @@ export interface FormData {
   spaces: {
     rooms: SpaceRoom[];
     additionalNotes: string;
+    eliminableSpaces?: string;
+    homeSize?: string;
+    roomArrangement?: string;
     roomTypes?: string[];
     specialSpaces?: string[];
     storageNeeds?: string;

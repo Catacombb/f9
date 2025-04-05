@@ -6,28 +6,90 @@ import { Label } from '@/components/ui/label';
 
 interface GeneralQuestionsTabProps {
   additionalNotes: string;
+  eliminableSpaces: string | undefined;
+  homeSize: string | undefined;
+  roomArrangement: string | undefined;
   onAdditionalNotesChange: (notes: string) => void;
+  onEliminableSpacesChange: (notes: string) => void;
+  onHomeSizeChange: (notes: string) => void;
+  onRoomArrangementChange: (notes: string) => void;
 }
 
 export const GeneralQuestionsTab = ({
   additionalNotes,
-  onAdditionalNotesChange
+  eliminableSpaces,
+  homeSize,
+  roomArrangement,
+  onAdditionalNotesChange,
+  onEliminableSpacesChange,
+  onHomeSizeChange,
+  onRoomArrangementChange
 }: GeneralQuestionsTabProps) => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Additional Information</CardTitle>
+        <CardTitle>General Questions About Your Spaces</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
+        <div className="space-y-6">
           <div>
-            <Label htmlFor="additionalNotes">Is there anything specific about your space needs that you'd like to share?</Label>
+            <Label htmlFor="additionalNotes" className="text-base">
+              What rooms and spaces do you want in your home?
+            </Label>
+            <p className="text-sm text-muted-foreground mb-2">
+              Include must-have features (e.g., vaulted ceilings, large windows, built-in storage, specific lighting preferences).
+            </p>
             <Textarea
               id="additionalNotes"
               value={additionalNotes || ''}
               onChange={(e) => onAdditionalNotesChange(e.target.value)}
-              placeholder="E.g., specific workflow requirements, accessibility needs, or unique considerations"
-              className="mt-2 h-40"
+              placeholder="Describe your must-have spaces and features..."
+              className="mt-1 h-28"
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="eliminableSpaces" className="text-base">
+              Are there any of these spaces that you would deem less important or could eliminate if budget were an issue?
+            </Label>
+            <Textarea
+              id="eliminableSpaces"
+              value={eliminableSpaces || ''}
+              onChange={(e) => onEliminableSpacesChange(e.target.value)}
+              placeholder="List any spaces that could be eliminated if needed..."
+              className="mt-1 h-28"
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="homeSize" className="text-base">
+              Do you have an idea of the final size of the home?
+            </Label>
+            <p className="text-sm text-muted-foreground mb-2">
+              Square meters, number of floors
+            </p>
+            <Textarea
+              id="homeSize"
+              value={homeSize || ''}
+              onChange={(e) => onHomeSizeChange(e.target.value)}
+              placeholder="e.g., Approximately 200 square meters, 2 floors..."
+              className="mt-1 h-24"
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="roomArrangement" className="text-base">
+              Do you have any preferences for how rooms should be arranged?
+            </Label>
+            <p className="text-sm text-muted-foreground mb-2">
+              For example, should the kitchen be separate from bedrooms, or should a home office be in a quiet area?
+            </p>
+            <Textarea
+              id="roomArrangement"
+              value={roomArrangement || ''}
+              onChange={(e) => onRoomArrangementChange(e.target.value)}
+              placeholder="Describe your preferences for room arrangements..."
+              className="mt-1 h-28"
             />
           </div>
         </div>

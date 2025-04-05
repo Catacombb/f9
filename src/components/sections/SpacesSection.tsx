@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { useDesignBrief } from '@/context/DesignBriefContext';
@@ -11,7 +11,8 @@ import { LevelPreferenceTab } from '@/components/spaces/LevelPreferenceTab';
 import { SpaceRoom } from '@/types';
 
 export function SpacesSection() {
-  const [activeTab, setActiveTab] = useState('room-selection');
+  // Start with level-preference as the default active tab
+  const [activeTab, setActiveTab] = useState('level-preference');
   const { formData, updateFormData, setCurrentSection, addRoom, updateRoom, removeRoom } = useDesignBrief();
   const [newRoomType, setNewRoomType] = useState('');
   const [customRoomType, setCustomRoomType] = useState('');
@@ -80,6 +81,18 @@ export function SpacesSection() {
   const handleAdditionalNotesChange = (notes: string) => {
     updateFormData('spaces', { additionalNotes: notes });
   };
+
+  const handleEliminableSpacesChange = (notes: string) => {
+    updateFormData('spaces', { eliminableSpaces: notes });
+  };
+
+  const handleHomeSizeChange = (notes: string) => {
+    updateFormData('spaces', { homeSize: notes });
+  };
+
+  const handleRoomArrangementChange = (notes: string) => {
+    updateFormData('spaces', { roomArrangement: notes });
+  };
   
   const handleHomeLevelTypeChange = (value: string) => {
     updateFormData('spaces', { homeLevelType: value });
@@ -129,17 +142,29 @@ export function SpacesSection() {
         
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid grid-cols-3 mb-8">
-            <TabsTrigger value="room-selection">
-              Room Selection
-            </TabsTrigger>
             <TabsTrigger value="level-preference">
               Level Preferences
+            </TabsTrigger>
+            <TabsTrigger value="room-selection">
+              Room Selection
             </TabsTrigger>
             <TabsTrigger value="general-questions">
               General Questions
             </TabsTrigger>
           </TabsList>
           
+          <TabsContent value="level-preference" className="mt-0">
+            <LevelPreferenceTab
+              homeLevelType={formData.spaces.homeLevelType}
+              levelAssignments={formData.spaces.levelAssignments}
+              levelAssignmentNotes={formData.spaces.levelAssignmentNotes}
+              roomsWithQuantities={roomsWithQuantities}
+              onHomeLevelTypeChange={handleHomeLevelTypeChange}
+              onLevelAssignmentChange={handleLevelAssignmentChange}
+              onLevelAssignmentNotesChange={handleLevelAssignmentNotesChange}
+            />
+          </TabsContent>
+
           <TabsContent value="room-selection" className="mt-0">
             <RoomSelectionTab
               rooms={formData.spaces.rooms}
@@ -160,22 +185,16 @@ export function SpacesSection() {
             />
           </TabsContent>
           
-          <TabsContent value="level-preference" className="mt-0">
-            <LevelPreferenceTab
-              homeLevelType={formData.spaces.homeLevelType}
-              levelAssignments={formData.spaces.levelAssignments}
-              levelAssignmentNotes={formData.spaces.levelAssignmentNotes}
-              roomsWithQuantities={roomsWithQuantities}
-              onHomeLevelTypeChange={handleHomeLevelTypeChange}
-              onLevelAssignmentChange={handleLevelAssignmentChange}
-              onLevelAssignmentNotesChange={handleLevelAssignmentNotesChange}
-            />
-          </TabsContent>
-          
           <TabsContent value="general-questions" className="mt-0">
             <GeneralQuestionsTab
               additionalNotes={formData.spaces.additionalNotes}
+              eliminableSpaces={formData.spaces.eliminableSpaces}
+              homeSize={formData.spaces.homeSize}
+              roomArrangement={formData.spaces.roomArrangement}
               onAdditionalNotesChange={handleAdditionalNotesChange}
+              onEliminableSpacesChange={handleEliminableSpacesChange}
+              onHomeSizeChange={handleHomeSizeChange}
+              onRoomArrangementChange={handleRoomArrangementChange}
             />
           </TabsContent>
         </Tabs>
