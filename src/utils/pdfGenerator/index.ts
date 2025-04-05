@@ -86,8 +86,8 @@ export const generatePDF = async (projectData: ProjectData): Promise<Blob> => {
     renderSummaryInfo(ctx, projectData);
     
     // Return the PDF as a Blob for download or sending via email
-    const pdfBlob = pdf.output('blob');
-    return pdfBlob;
+    // Explicitly return a Blob
+    return pdf.output('blob');
   } catch (error) {
     console.error("Error generating PDF:", error);
     // Return a simple error PDF as fallback

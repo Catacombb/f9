@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -144,21 +143,10 @@ export function SummarySection() {
   };
 
   // Handle PDF export with proper return type
-  const handleExportPDF = async (): Promise<void> => {
+  const handleExportPDF = async (): Promise<Blob> => {
     try {
-      const pdfBlob = await exportAsPDF();
-      
-      if (pdfBlob) {
-        // Create a download link and trigger it
-        const url = URL.createObjectURL(pdfBlob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `Northstar_Brief_${formData.projectInfo.clientName || "Client"}_${new Date().toISOString().split('T')[0]}.pdf`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-      }
+      // Now we correctly return the Blob from exportAsPDF
+      return await exportAsPDF();
     } catch (error) {
       console.error("PDF export error:", error);
       throw error;

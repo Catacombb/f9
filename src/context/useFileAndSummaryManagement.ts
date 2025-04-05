@@ -2,7 +2,6 @@
 import { useCallback } from 'react';
 import { ProjectData } from '@/types';
 import { generatePDF } from '@/utils/pdfGenerator';
-import { jsPDF } from 'jspdf';
 
 export const useFileAndSummaryManagement = (
   projectData: ProjectData,
@@ -100,11 +99,13 @@ export const useFileAndSummaryManagement = (
 
   const exportAsPDF = useCallback(async (): Promise<Blob> => {
     try {
+      // Using the updated generatePDF function that properly returns a Blob
       const pdfBlob = await generatePDF(projectData);
       return pdfBlob;
     } catch (error) {
       console.error("Error generating PDF:", error);
-      // Create an empty PDF blob as a fallback
+      // Create a simple error PDF as fallback that returns a Blob
+      const { jsPDF } = await import('jspdf');
       const errorPdf = new jsPDF();
       errorPdf.text("Error generating PDF. Please try again.", 10, 10);
       return errorPdf.output('blob');
