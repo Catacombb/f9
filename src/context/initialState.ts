@@ -10,6 +10,7 @@ export const initialProjectData: ProjectData = {
       contactPhone: '',
       projectType: '',
       projectDescription: '',
+      moveInPreference: 'as_soon_as_possible',
     },
     budget: {
       budgetRange: '',
@@ -19,7 +20,6 @@ export const initialProjectData: ProjectData = {
     },
     lifestyle: {
       occupants: '',
-      projectTimeframe: '',
       occupationDetails: '',
       dailyRoutine: '',
       entertainmentStyle: '',
@@ -47,6 +47,7 @@ export const initialProjectData: ProjectData = {
       internalFinishes: '',
       sustainabilityGoals: '',
       specialFeatures: '',
+      inspirationNotes: '',
     },
     contractors: {
       preferredBuilder: '',

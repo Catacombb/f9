@@ -24,7 +24,6 @@ const sections = [
   { id: 'site', title: 'Site', icon: <MapPin className="h-5 w-5" /> },
   { id: 'spaces', title: 'Spaces', icon: <Layout className="h-5 w-5" /> },
   { id: 'architecture', title: 'Architecture', icon: <Building className="h-5 w-5" /> },
-  { id: 'inspiration', title: 'Inspiration', icon: <Image className="h-5 w-5" /> },
   { id: 'uploads', title: 'Uploads', icon: <Upload className="h-5 w-5" /> },
   { id: 'communication', title: 'Communication', icon: <MessageSquare className="h-5 w-5" /> },
   { id: 'summary', title: 'Summary', icon: <FileText className="h-5 w-5" /> },

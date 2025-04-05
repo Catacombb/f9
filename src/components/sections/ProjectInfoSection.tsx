@@ -4,15 +4,24 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useDesignBrief } from '@/context/DesignBriefContext';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Calendar } from 'lucide-react';
 import { SectionHeader } from './SectionHeader';
 import { PredictiveAddressFinder } from '@/components/PredictiveAddressFinder';
+import { format } from 'date-fns';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar as CalendarComponent } from '@/components/ui/calendar';
+import { cn } from '@/lib/utils';
 
 export function ProjectInfoSection() {
   const { formData, updateFormData, setCurrentSection } = useDesignBrief();
   const [coordinates, setCoordinates] = useState<[number, number] | null>(
     formData.projectInfo.coordinates || null
+  );
+  
+  const [moveInDate, setMoveInDate] = useState<Date | undefined>(
+    formData.projectInfo.moveInDate ? new Date(formData.projectInfo.moveInDate) : undefined
   );
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -27,6 +36,25 @@ export function ProjectInfoSection() {
   const handleCoordinatesChange = (coords: [number, number]) => {
     setCoordinates(coords);
     updateFormData('projectInfo', { coordinates: coords });
+  };
+  
+  const handleMoveInPreferenceChange = (value: string) => {
+    updateFormData('projectInfo', { moveInPreference: value });
+    // Clear the moveInDate if "as soon as possible" is selected
+    if (value === 'as_soon_as_possible') {
+      setMoveInDate(undefined);
+      updateFormData('projectInfo', { moveInDate: undefined });
+    }
+  };
+  
+  const handleMoveInDateChange = (date: Date | undefined) => {
+    setMoveInDate(date);
+    if (date) {
+      updateFormData('projectInfo', { 
+        moveInDate: date.toISOString(),
+        moveInPreference: 'specific_date'
+      });
+    }
   };
   
   const handleNext = () => {
@@ -81,22 +109,50 @@ export function ProjectInfoSection() {
           </div>
           
           <div className="mb-6">
-            <Label htmlFor="timeframe">Project Timeframe</Label>
-            <Select 
-              value={formData.budget.timeframe} 
-              onValueChange={(value) => updateFormData('budget', { timeframe: value })}
+            <Label className="block mb-2">When would you like to move into your new home?</Label>
+            <RadioGroup 
+              value={formData.projectInfo.moveInPreference || 'as_soon_as_possible'}
+              onValueChange={handleMoveInPreferenceChange}
+              className="space-y-3 mt-2"
             >
-              <SelectTrigger id="timeframe" className="mt-1">
-                <SelectValue placeholder="Select your preferred timeframe" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="flexible">Flexible / No specific timeline</SelectItem>
-                <SelectItem value="under_6months">Less than 6 months</SelectItem>
-                <SelectItem value="6months_1year">6 months to 1 year</SelectItem>
-                <SelectItem value="1year_2years">1-2 years</SelectItem>
-                <SelectItem value="over_2years">More than 2 years</SelectItem>
-              </SelectContent>
-            </Select>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="as_soon_as_possible" id="as_soon_as_possible" />
+                <Label htmlFor="as_soon_as_possible">As soon as possible</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="specific_date" id="specific_date" />
+                <Label htmlFor="specific_date">On or around a specific date</Label>
+              </div>
+            </RadioGroup>
+            
+            {formData.projectInfo.moveInPreference === 'specific_date' && (
+              <div className="mt-3 ml-6">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !moveInDate && "text-muted-foreground"
+                      )}
+                    >
+                      <Calendar className="mr-2 h-4 w-4" />
+                      {moveInDate ? format(moveInDate, "PPP") : <span>Pick a target move-in date</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <CalendarComponent
+                      mode="single"
+                      selected={moveInDate}
+                      onSelect={handleMoveInDateChange}
+                      initialFocus
+                      className="p-3 pointer-events-auto"
+                      disabled={(date) => date < new Date()}
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+            )}
           </div>
           
           <div className="grid gap-6 md:grid-cols-2">

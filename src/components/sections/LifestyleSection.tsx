@@ -8,10 +8,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { ArrowLeft, ArrowRight, Users, Cat, Dog } from 'lucide-react';
 import { SectionHeader } from './SectionHeader';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar } from '@/components/ui/calendar';
-import { format } from 'date-fns';
-import { cn } from '@/lib/utils';
 
 // Custom icon for adult (since it's not in lucide-react by default)
 const AdultIcon = () => (
@@ -62,11 +58,6 @@ export function LifestyleSection() {
   const [dogs, setDogs] = useState<number>(0);
   const [cats, setCats] = useState<number>(0);
   
-  // States for project timeframe
-  const [startDate, setStartDate] = useState<Date | undefined>(undefined);
-  const [endDate, setEndDate] = useState<Date | undefined>(undefined);
-  const [timeConstraints, setTimeConstraints] = useState<string>('');
-  
   // Initialize values from formData
   useEffect(() => {
     if (formData.lifestyle.occupants) {
@@ -82,19 +73,6 @@ export function LifestyleSection() {
         // If not valid JSON, initialize with zeros
       }
     }
-    
-    if (formData.lifestyle.projectTimeframe) {
-      try {
-        const timeframeData = JSON.parse(formData.lifestyle.projectTimeframe);
-        if (timeframeData) {
-          if (timeframeData.startDate) setStartDate(new Date(timeframeData.startDate));
-          if (timeframeData.endDate) setEndDate(new Date(timeframeData.endDate));
-          setTimeConstraints(timeframeData.timeConstraints || '');
-        }
-      } catch (e) {
-        // If not valid JSON, initialize with defaults
-      }
-    }
   }, [formData.lifestyle]);
   
   // Update formData when values change
@@ -103,23 +81,9 @@ export function LifestyleSection() {
     updateFormData('lifestyle', { occupants: occupantsData });
   }, [adults, children, dogs, cats, updateFormData]);
   
-  // Update formData when timeframe values change
-  useEffect(() => {
-    const timeframeData = JSON.stringify({
-      startDate: startDate?.toISOString(),
-      endDate: endDate?.toISOString(),
-      timeConstraints
-    });
-    updateFormData('lifestyle', { projectTimeframe: timeframeData });
-  }, [startDate, endDate, timeConstraints, updateFormData]);
-  
   const handleTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     updateFormData('lifestyle', { [name]: value });
-  };
-  
-  const handleTimeConstraintsChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setTimeConstraints(e.target.value);
   };
   
   const handlePrevious = () => {
@@ -273,79 +237,6 @@ export function LifestyleSection() {
                     </Button>
                   </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle>Project Timeframe</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="startDate" className="block mb-2">Expected Start Date</Label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className={cn(
-                          "w-full justify-start text-left font-normal",
-                          !startDate && "text-muted-foreground"
-                        )}
-                      >
-                        {startDate ? format(startDate, "PPP") : <span>Pick a start date</span>}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={startDate}
-                        onSelect={setStartDate}
-                        initialFocus
-                        className="p-3 pointer-events-auto"
-                      />
-                    </PopoverContent>
-                  </Popover>
-                </div>
-                
-                <div>
-                  <Label htmlFor="endDate" className="block mb-2">Expected Finish Date</Label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className={cn(
-                          "w-full justify-start text-left font-normal",
-                          !endDate && "text-muted-foreground"
-                        )}
-                      >
-                        {endDate ? format(endDate, "PPP") : <span>Pick a finish date</span>}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={endDate}
-                        onSelect={setEndDate}
-                        disabled={(date) => startDate ? date < startDate : false}
-                        initialFocus
-                        className="p-3 pointer-events-auto"
-                      />
-                    </PopoverContent>
-                  </Popover>
-                </div>
-              </div>
-              
-              <div>
-                <Label htmlFor="timeConstraints" className="block mb-2">Time Constraints or Preferences</Label>
-                <Textarea
-                  id="timeConstraints"
-                  placeholder="Describe any specific timing requirements, seasonal considerations, or deadline constraints..."
-                  value={timeConstraints}
-                  onChange={handleTimeConstraintsChange}
-                  rows={3}
-                />
               </div>
             </CardContent>
           </Card>

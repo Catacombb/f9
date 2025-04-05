@@ -10,6 +10,8 @@ export interface FormData {
     projectDescription: string;
     projectGoals?: string;
     coordinates?: [number, number]; // Longitude, Latitude
+    moveInPreference?: string; // "as_soon_as_possible" or "specific_date"
+    moveInDate?: string; // ISO date string when specific date is selected
   };
   
   // Budget
@@ -26,7 +28,6 @@ export interface FormData {
   // Lifestyle
   lifestyle: {
     occupants: string; // JSON string containing family members and pets
-    projectTimeframe: string; // JSON string containing timeframe details
     occupationDetails: string;
     dailyRoutine: string;
     entertainmentStyle: string;
@@ -88,6 +89,7 @@ export interface FormData {
     sustainabilityFeatures?: string[];
     technologyRequirements?: string[];
     architectureNotes?: string;
+    inspirationNotes?: string; // Added from Inspiration section
   };
 
   // Contractors
