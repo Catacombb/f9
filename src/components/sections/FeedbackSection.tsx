@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { SectionHeader } from './SectionHeader';
@@ -6,7 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
 import { Label } from '@/components/ui/label';
-import { Star, TestTube, User, Mail } from 'lucide-react';
+import { Star, TestTube, User, Mail, MessageSquare } from 'lucide-react';
 import { toast } from 'sonner';
 import { 
   Select, 
