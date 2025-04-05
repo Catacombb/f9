@@ -12,6 +12,7 @@ const DesignBriefContext = createContext<DesignBriefContextType | undefined>(und
 const LOCAL_STORAGE_KEY = 'design_brief_data';
 
 export const DesignBriefProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  // Initialize with default empty state
   const [projectData, setProjectData] = useState<ProjectData>(initialProjectData);
   
   const [currentSection, setCurrentSection] = useState<SectionKey>('intro');
@@ -20,9 +21,12 @@ export const DesignBriefProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const updateFormData: DesignBriefContextType['updateFormData'] = useCallback((section, updates) => {
     setProjectData(draft => {
       const updatedDraft = { ...draft };
-      updatedDraft.formData[section] = { 
-        ...updatedDraft.formData[section], 
-        ...updates 
+      updatedDraft.formData = {
+        ...updatedDraft.formData,
+        [section]: { 
+          ...updatedDraft.formData[section], 
+          ...updates 
+        }
       };
       updatedDraft.lastSaved = new Date().toISOString();
       return updatedDraft;
