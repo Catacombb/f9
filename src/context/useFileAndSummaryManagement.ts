@@ -2,6 +2,7 @@
 import { useCallback } from 'react';
 import { ProjectData } from '@/types';
 import { generatePDF } from '@/utils/pdfGenerator';
+import { jsPDF } from 'jspdf';
 
 export const useFileAndSummaryManagement = (
   projectData: ProjectData,
@@ -103,8 +104,7 @@ export const useFileAndSummaryManagement = (
       return pdfBlob;
     } catch (error) {
       console.error("Error generating PDF:", error);
-      // Instead of rethrowing the error, create an empty PDF blob as a fallback
-      // This ensures we always return a Blob to match the return type
+      // Create an empty PDF blob as a fallback
       const errorPdf = new jsPDF();
       errorPdf.text("Error generating PDF. Please try again.", 10, 10);
       return errorPdf.output('blob');

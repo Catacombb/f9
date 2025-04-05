@@ -1,25 +1,13 @@
-import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useDesignBrief } from '@/context/DesignBriefContext';
-import { ArrowLeft } from 'lucide-react';
-import { SectionHeader } from './SectionHeader';
 
-// Import all our new components
-import { ProjectInfoDisplay } from './summary/ProjectInfoDisplay';
-import { BudgetInfoDisplay } from './summary/BudgetInfoDisplay';
-import { LifestyleInfoDisplay } from './summary/LifestyleInfoDisplay';
-import { SiteInfoDisplay } from './summary/SiteInfoDisplay';
-import { SpacesInfoDisplay } from './summary/SpacesInfoDisplay';
-import { ArchitectureInfoDisplay } from './summary/ArchitectureInfoDisplay';
-import { ContractorsInfoDisplay } from './summary/ContractorsInfoDisplay';
-import { FilesDisplay } from './summary/FilesDisplay';
-import { InspirationDisplay } from './summary/InspirationDisplay';
-import { CommunicationInfoDisplay } from './summary/CommunicationInfoDisplay';
-import { SupportingFilesDisplay } from './summary/SupportingFilesDisplay';
+import React from 'react';
+import { useDesignBrief } from '@/context/DesignBriefContext';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { SectionHeader } from './SectionHeader';
+import { SummarySectionActions } from './summary/SummarySectionActions';
+import { SummaryTabContent } from './summary/SummaryTabContent';
 import { EmailExportSection } from './summary/EmailExportSection';
 
+// Define inspiration images array
 const inspirationImages = [
   { id: '1', src: 'https://images.unsplash.com/photo-1571055107559-3e67626fa8be?w=800&auto=format&fit=crop', alt: 'Modern New Zealand house with glass facade' },
   { id: '2', src: 'https://images.unsplash.com/photo-1600607688969-a5bfcd646154?w=800&auto=format&fit=crop', alt: 'Contemporary coastal New Zealand home' },
@@ -140,68 +128,13 @@ export function SummarySection() {
           </TabsList>
           
           <TabsContent value="preview">
-            <Card>
-              <CardContent className="p-6">
-                <h3 className="text-xl font-bold mb-4">Design Brief Overview</h3>
-                
-                <div className="border rounded-lg p-6 space-y-8">
-                  {/* Project Info */}
-                  <ProjectInfoDisplay projectInfo={formData.projectInfo} />
-                  
-                  {/* Budget Info */}
-                  <BudgetInfoDisplay budget={formData.budget} />
-                  
-                  {/* Lifestyle */}
-                  <LifestyleInfoDisplay 
-                    lifestyle={formData.lifestyle} 
-                    formatOccupantsData={formatOccupantsData} 
-                  />
-                  
-                  {/* Site Information */}
-                  <SiteInfoDisplay site={formData.site} />
-                  
-                  {/* Spaces */}
-                  <SpacesInfoDisplay 
-                    spaces={formData.spaces} 
-                    formatSpacesData={formatSpacesData} 
-                  />
-                  
-                  {/* Architectural Preferences */}
-                  <ArchitectureInfoDisplay architecture={formData.architecture} />
-                  
-                  {/* Project Team */}
-                  <ContractorsInfoDisplay contractors={formData.contractors} />
-                  
-                  {/* Uploaded Files */}
-                  <FilesDisplay 
-                    uploadedFiles={files.uploadedFiles} 
-                    title="Uploaded Files" 
-                  />
-                  
-                  {/* Site Documents */}
-                  <FilesDisplay 
-                    uploadedFiles={[]} 
-                    siteDocuments={files.siteDocuments} 
-                    title="Site Documents" 
-                  />
-                  
-                  {/* Inspiration Selections */}
-                  <InspirationDisplay 
-                    inspirationSelections={files.inspirationSelections} 
-                    inspirationImages={inspirationImages} 
-                  />
-
-                  {/* Communication Preferences */}
-                  <CommunicationInfoDisplay communication={formData.communication} />
-                  
-                  {/* Supporting Files */}
-                  <SupportingFilesDisplay 
-                    uploadedFiles={files.uploadedFiles}
-                    siteDocuments={files.siteDocuments}
-                  />
-                </div>
-              </CardContent>
-            </Card>
+            <SummaryTabContent 
+              formData={formData}
+              files={files}
+              formatSpacesData={formatSpacesData}
+              formatOccupantsData={formatOccupantsData}
+              inspirationImages={inspirationImages}
+            />
             
             {/* Email and Export Section */}
             <EmailExportSection 
@@ -213,12 +146,7 @@ export function SummarySection() {
           </TabsContent>
         </Tabs>
         
-        <div className="flex justify-between mt-6">
-          <Button variant="outline" onClick={handlePrevious} className="group">
-            <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-            <span>Previous: Communication</span>
-          </Button>
-        </div>
+        <SummarySectionActions onPrevious={handlePrevious} />
       </div>
     </div>
   );
