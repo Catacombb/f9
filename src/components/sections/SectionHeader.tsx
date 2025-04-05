@@ -1,15 +1,17 @@
 
 import React from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { Progress } from '@/components/ui/progress';
 
 interface SectionHeaderProps {
   title: string;
   description?: string;
   isBold?: boolean;
   icon?: React.ReactNode;
+  progress?: number;
 }
 
-export function SectionHeader({ title, description, isBold = true, icon }: SectionHeaderProps) {
+export function SectionHeader({ title, description, isBold = true, icon, progress }: SectionHeaderProps) {
   const isMobile = useIsMobile();
   
   return (
@@ -23,6 +25,16 @@ export function SectionHeader({ title, description, isBold = true, icon }: Secti
       
       {description && (
         <p className="text-muted-foreground mt-2">{description}</p>
+      )}
+      
+      {progress !== undefined && (
+        <div className="mt-4">
+          <div className="flex justify-between items-center mb-2 text-sm">
+            <span>Completion</span>
+            <span>{progress}%</span>
+          </div>
+          <Progress value={progress} className="h-2" />
+        </div>
       )}
     </div>
   );
