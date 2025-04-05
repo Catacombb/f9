@@ -2,6 +2,7 @@
 import { ProjectData } from '@/types';
 import { PDFContext } from '../types';
 import { addSectionTitle, addText, addMultiLineText, addBulletPoints, addSpace } from '../layout';
+import { groupRoomsByLevel, getOrderedLevels } from '../helpers';
 
 export const renderSpacesInfo = (ctx: PDFContext, projectData: ProjectData): void => {
   addSectionTitle(ctx, 'Spaces Required');
@@ -26,46 +27,10 @@ export const renderSpacesInfo = (ctx: PDFContext, projectData: ProjectData): voi
     addBulletPoints(ctx, roomList);
     
     // Group rooms by level for detailed descriptions
-    const roomsByLevel: Record<string, typeof projectData.formData.spaces.rooms> = {};
+    const roomsByLevel = groupRoomsByLevel(projectData.formData.spaces.rooms, 'Unspecified');
     
-    projectData.formData.spaces.rooms.forEach(room => {
-      try {
-        const descObj = JSON.parse(room.description);
-        const level = descObj.level || 'Unspecified';
-        
-        if (!roomsByLevel[level]) {
-          roomsByLevel[level] = [];
-        }
-        
-        roomsByLevel[level].push(room);
-      } catch (e) {
-        // If parsing fails, add to unspecified level
-        if (!roomsByLevel['Unspecified']) {
-          roomsByLevel['Unspecified'] = [];
-        }
-        roomsByLevel['Unspecified'].push(room);
-      }
-    });
-    
-    // Sort levels in a logical order
-    const levelOrder = {
-      'Basement': 0,
-      'Ground': 1,
-      'Ground Floor': 1,
-      'First': 2,
-      'First Floor': 2,
-      'Second': 3,
-      'Second Floor': 3,
-      'Third': 4,
-      'Third Floor': 4,
-      'Unspecified': 999,
-    };
-    
-    const orderedLevels = Object.keys(roomsByLevel).sort((a, b) => {
-      const orderA = levelOrder[a] !== undefined ? levelOrder[a] : a.toLowerCase().includes('basement') ? 0 : 998;
-      const orderB = levelOrder[b] !== undefined ? levelOrder[b] : b.toLowerCase().includes('basement') ? 0 : 998;
-      return orderA - orderB;
-    });
+    // Get ordered levels
+    const orderedLevels = getOrderedLevels(Object.keys(roomsByLevel));
     
     // Add detailed descriptions for each room by level
     addSpace(ctx, 4);
@@ -74,14 +39,14 @@ export const renderSpacesInfo = (ctx: PDFContext, projectData: ProjectData): voi
     
     orderedLevels.forEach(level => {
       // Add level header
-      pdf.setFont('helvetica', 'bold');
-      pdf.setFontSize(11);
-      pdf.setTextColor(ctx.colors.primary);
-      pdf.text(`${level}`, ctx.margin, ctx.yPosition);
+      ctx.pdf.setFont('helvetica', 'bold');
+      ctx.pdf.setFontSize(11);
+      ctx.pdf.setTextColor(ctx.colors.primary);
+      ctx.pdf.text(`${level}`, ctx.margin, ctx.yPosition);
       ctx.yPosition += 5;
-      pdf.setFont('helvetica', 'normal');
-      pdf.setFontSize(10);
-      pdf.setTextColor(ctx.colors.secondary);
+      ctx.pdf.setFont('helvetica', 'normal');
+      ctx.pdf.setFontSize(10);
+      ctx.pdf.setTextColor(ctx.colors.secondary);
       
       roomsByLevel[level].forEach(room => {
         if (room.description) {
