@@ -16,19 +16,21 @@ export function InspirationDisplay({ inspirationSelections, inspirationImages }:
   if (inspirationSelections.length === 0) return null;
   
   return (
-    <div>
+    <div className="pb-6 border-b">
       <h4 className="text-lg font-bold mb-4">Inspiration Selections</h4>
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         {inspirationSelections.map((id) => {
           const image = inspirationImages.find(img => img.id === id);
           return image ? (
-            <div key={id} className="aspect-w-4 aspect-h-3 h-24">
+            <div key={id} className="aspect-video relative">
               <img
                 src={image.src}
                 alt={image.alt}
                 className="w-full h-full object-cover rounded-md"
               />
-              <p className="text-xs mt-1">{image.alt}</p>
+              <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-xs p-1 rounded-b-md">
+                {image.alt}
+              </div>
             </div>
           ) : null;
         })}

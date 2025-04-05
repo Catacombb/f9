@@ -56,7 +56,8 @@ export function CommunicationSection() {
     { value: 'morning', label: 'Morning (9am-12pm)' },
     { value: 'afternoon', label: 'Afternoon (12-5pm)' },
     { value: 'evening', label: 'Evening (5-8pm)' },
-    { value: 'night', label: 'Night (8pm+)' }
+    { value: 'night', label: 'Night (8pm+)' },
+    { value: 'anytime', label: 'Anytime' }
   ];
 
   const dayOptions = [

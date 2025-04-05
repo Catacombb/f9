@@ -9,6 +9,6 @@ export const renderSummaryInfo = (ctx: PDFContext, projectData: ProjectData): vo
   }
   
   addSectionTitle(ctx, 'Project Summary');
-  // Apply removeMarkdown to the summary text
+  // Apply formatting to the summary text
   addMultiLineText(ctx, projectData.summary.editedSummary);
 };

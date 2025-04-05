@@ -13,7 +13,7 @@ export function SummarySectionActions({ onPrevious }: SummarySectionActionsProps
   const { setCurrentSection } = useDesignBrief();
   
   const handleContinue = () => {
-    toast.info("Opening feedback form...");
+    toast.info("Design brief completed successfully!");
     setCurrentSection('feedback');
   };
   

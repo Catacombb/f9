@@ -93,6 +93,11 @@ export const renderSpacesInfo = (ctx: PDFContext, projectData: ProjectData): voi
               }
             }
             
+            // Level details (always include)
+            if (descObj.level) {
+              descriptionItems.push(`Located on ${descObj.level}`);
+            }
+            
             // Notes - always include if available
             if (descObj.notes) {
               descriptionItems.push(descObj.notes);
@@ -106,10 +111,10 @@ export const renderSpacesInfo = (ctx: PDFContext, projectData: ProjectData): voi
               formattedDescription = "No specific details";
             }
             
-            addText(ctx, `${room.type} (${room.quantity})`, formattedDescription, true);
+            addText(ctx, `${room.isCustom && room.customName ? room.customName : room.type} (${room.quantity})`, formattedDescription, true);
           } catch (e) {
             // If JSON parsing fails, use the original description
-            addText(ctx, `${room.type} (${room.quantity})`, room.description, true);
+            addText(ctx, `${room.isCustom && room.customName ? room.customName : room.type} (${room.quantity})`, room.description, true);
           }
         }
       });
@@ -130,6 +135,18 @@ export const renderSpacesInfo = (ctx: PDFContext, projectData: ProjectData): voi
         ? 'Multi-level home' 
         : 'No specific preference';
     addText(ctx, '', levelPreference);
+  }
+  
+  // Add home size if specified
+  if (projectData.formData.spaces.homeSize) {
+    addSpace(ctx);
+    addText(ctx, 'Home Size', projectData.formData.spaces.homeSize);
+  }
+  
+  // Add eliminable spaces if specified
+  if (projectData.formData.spaces.eliminableSpaces) {
+    addSpace(ctx);
+    addText(ctx, 'Spaces that could be eliminated', projectData.formData.spaces.eliminableSpaces);
   }
   
   if (projectData.formData.spaces.additionalNotes) {

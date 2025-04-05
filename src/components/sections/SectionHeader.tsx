@@ -6,11 +6,10 @@ interface SectionHeaderProps {
   title: string;
   description?: string;
   isBold?: boolean;
-  progress?: number;
   icon?: React.ReactNode;
 }
 
-export function SectionHeader({ title, description, isBold = true, progress, icon }: SectionHeaderProps) {
+export function SectionHeader({ title, description, isBold = true, icon }: SectionHeaderProps) {
   const isMobile = useIsMobile();
   
   return (
@@ -20,11 +19,6 @@ export function SectionHeader({ title, description, isBold = true, progress, ico
           {icon && icon}
           {title}
         </h1>
-        {progress !== undefined && (
-          <div className="text-sm font-medium text-muted-foreground">
-            {progress}% Complete
-          </div>
-        )}
       </div>
       
       {description && (
