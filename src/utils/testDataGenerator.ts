@@ -1,3 +1,4 @@
+
 import { FormData } from '@/types';
 
 // Function to generate a random string of a specified length
