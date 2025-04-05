@@ -1,7 +1,7 @@
 
 import { useCallback } from 'react';
 import { ProjectData } from '@/types';
-import { generatePDF } from '@/utils/pdfGenerator';
+import { generatePDF } from '@/utils/pdfGenerator/index';
 
 export const useFileAndSummaryManagement = (
   projectData: ProjectData,
