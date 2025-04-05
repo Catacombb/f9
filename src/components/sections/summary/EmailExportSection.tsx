@@ -53,27 +53,27 @@ export function EmailExportSection({
     
     setIsEmailSending(true);
     toast({
-      title: "Preparing Email",
-      description: "Generating PDF and preparing to send email...",
+      title: "Preparing Download and Email",
+      description: "Generating PDF and preparing your email client...",
     });
     
     try {
       const success = await onSendEmail(recipientEmail);
       if (success) {
         toast({
-          title: "Email Sent",
-          description: "Your design brief has been sent to " + recipientEmail,
+          title: "Email Prepared",
+          description: "Your design brief has been downloaded and an email draft has been created.",
         });
         setEmailError(null);
       } else {
-        throw new Error("Failed to send email");
+        throw new Error("Failed to prepare email");
       }
     } catch (error) {
-      console.error("Email sending error:", error);
-      setEmailError("We couldn't send your email. This could be due to temporary service issues. You can try again later or download the PDF instead.");
+      console.error("Email preparation error:", error);
+      setEmailError("We couldn't prepare your email. This could be due to browser restrictions. You can try downloading the PDF instead.");
       toast({
-        title: "Email Delivery Failed",
-        description: "We couldn't send your email. Please try again later or download the PDF instead.",
+        title: "Email Preparation Failed",
+        description: "We couldn't open your email client. Please try downloading the PDF instead.",
         variant: "destructive",
       });
     } finally {
@@ -167,12 +167,12 @@ export function EmailExportSection({
                 className="min-w-[140px]"
               >
                 <Mail className={`h-4 w-4 mr-2 ${isEmailSending ? 'animate-spin' : ''}`} />
-                <span>{isEmailSending ? 'Sending...' : 'Send Email'}</span>
+                <span>{isEmailSending ? 'Preparing...' : 'Email PDF'}</span>
               </Button>
             </div>
           </div>
           <p className="text-sm text-muted-foreground mt-2">
-            Receive a copy of your design brief by email. We'll also send a copy to our team for reference.
+            Download your design brief and create an email draft. A copy will also be sent to the Northstar team.
           </p>
           {!defaultEmail && (
             <p className="text-sm text-yellow-500 mt-2">

@@ -42,65 +42,68 @@ export const useFileAndSummaryManagement = (
       // Generate the PDF first
       const pdfBlob = await generatePDF(projectData);
       
-      // Use emailjs-com directly instead of the form API
-      const { init, send } = await import('emailjs-com');
+      // Create a temporary URL for the PDF
+      const pdfUrl = URL.createObjectURL(pdfBlob);
       
-      // Initialize EmailJS with your user ID (public key)
-      init("UTp_oJDgVq3AxICn0"); // Updated with the correct public key
+      // Format the client name for the file name
+      const clientName = projectData.formData.projectInfo.clientName || "Client";
+      const projectAddress = projectData.formData.projectInfo.projectAddress || "Project Address";
+      const dateStamp = new Date().toISOString().split('T')[0];
       
-      // Convert the PDF blob to base64 for sending via EmailJS
-      const reader = new FileReader();
-      reader.readAsDataURL(pdfBlob);
+      // Create an email subject
+      const emailSubject = `Northstar Design Brief - ${clientName} - ${dateStamp}`;
       
-      // Create a promise that resolves when the file is read
-      const base64File = await new Promise<string>((resolve, reject) => {
-        reader.onload = () => {
-          if (typeof reader.result === 'string') {
-            resolve(reader.result);
-          } else {
-            reject(new Error('Failed to convert file to base64'));
-          }
-        };
-        reader.onerror = () => reject(reader.error);
-      });
+      // Create the email body with download instructions
+      const emailBody = `Dear ${clientName},
+
+Thank you for using Northstar to create your design brief for ${projectAddress}.
+
+To view your design brief, please click on the link below to download the PDF:
+
+${window.location.origin}/download/${encodeURIComponent(clientName)}_${dateStamp}.pdf
+
+This link is temporary and will expire once you close your browser.
+
+Best regards,
+The Northstar Team`;
       
-      // Send the email using EmailJS
-      const response = await send(
-        "service_opdkitc", // Service ID
-        "template_r3dcgye", // Template ID
-        {
-          email: email,
-          client_name: projectData.formData.projectInfo.clientName || 'Client',
-          project_address: projectData.formData.projectInfo.projectAddress || 'Project Address',
-          attachment: base64File
-        }
-      );
+      // Encode the subject and body for mailto
+      const encodedSubject = encodeURIComponent(emailSubject);
+      const encodedBody = encodeURIComponent(emailBody);
       
-      if (response.status !== 200) {
-        throw new Error(`Email API responded with status ${response.status}`);
-      }
+      // Create a mailto link with CC to nick@nickharrison.co
+      const mailtoLink = `mailto:${email}?cc=nick@nickharrison.co&subject=${encodedSubject}&body=${encodedBody}`;
       
-      // Log successful email attempt
-      console.log(`Successfully sent design brief to ${email}`);
+      // Create a hidden anchor element for the mailto link
+      const mailtoAnchor = document.createElement('a');
+      mailtoAnchor.href = mailtoLink;
+      
+      // Create a hidden anchor element for the PDF download
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.href = pdfUrl;
+      downloadAnchor.download = `Northstar_Brief_${clientName}_${dateStamp}.pdf`;
+      
+      // Append to document, trigger clicks, and remove
+      document.body.appendChild(mailtoAnchor);
+      document.body.appendChild(downloadAnchor);
+      
+      // First trigger the download
+      downloadAnchor.click();
+      
+      // Wait a short delay then open the email client
+      setTimeout(() => {
+        mailtoAnchor.click();
+        
+        // Clean up
+        document.body.removeChild(mailtoAnchor);
+        document.body.removeChild(downloadAnchor);
+        URL.revokeObjectURL(pdfUrl);
+      }, 500); // Short delay to ensure download starts first
       
       return true;
     } catch (error) {
       // Log the error for debugging purposes
       console.error("Failed to send email:", error);
-      
-      // Implement fallback mechanism if needed
-      try {
-        const failedEmails = JSON.parse(localStorage.getItem('failedEmails') || '[]');
-        failedEmails.push({
-          email,
-          timestamp: new Date().toISOString(),
-          projectData: projectData.formData.projectInfo.clientName || 'Unknown Project'
-        });
-        localStorage.setItem('failedEmails', JSON.stringify(failedEmails));
-        console.log('Email delivery failed, saved to retry queue');
-      } catch (storageError) {
-        console.error("Failed to save failed email to local storage:", storageError);
-      }
       
       return false;
     }
