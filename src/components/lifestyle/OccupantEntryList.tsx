@@ -68,6 +68,22 @@ export function OccupantEntryList({ entries = [], onChange }: OccupantEntryListP
     }
   };
 
+  const getOccupantDisplayName = (entry: OccupantEntry, index: number): string => {
+    if (entry.name && entry.name.trim() !== '') {
+      return entry.name;
+    }
+    
+    const typeLabels = {
+      'adult': 'Adult',
+      'child': 'Child',
+      'dog': 'Dog',
+      'cat': 'Cat',
+      'other': 'Pet'
+    };
+    
+    return `${typeLabels[entry.type as keyof typeof typeLabels] || 'Occupant'} ${index + 1}`;
+  };
+
   const getRandomPlaceholder = (type: string): string => {
     const adultPlaceholders = ["Works from home", "Enjoys quiet reading spaces", "Needs home office", "Early riser", "Night owl"];
     const childPlaceholders = ["Loves playing outside", "Needs study area", "Enjoys music", "Very active", "Has many toys"];
@@ -108,7 +124,7 @@ export function OccupantEntryList({ entries = [], onChange }: OccupantEntryListP
               <div className={cn("flex items-center gap-2 transition-all", animations.slideIn)}>
                 {getOccupantIcon(entry.type)}
                 <h4 className="text-sm font-medium">
-                  {entry.type.charAt(0).toUpperCase() + entry.type.slice(1)} {index + 1}
+                  {getOccupantDisplayName(entry, index)}
                 </h4>
               </div>
               <Button 

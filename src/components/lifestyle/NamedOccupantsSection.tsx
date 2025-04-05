@@ -41,7 +41,7 @@ export function NamedOccupantsSection({
         <CardTitle className="text-xl">People & Pets</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="sticky top-4 z-10 bg-card rounded-lg shadow-md p-4 mb-6 border border-muted flex flex-col md:flex-row items-center justify-between gap-4 transition-all duration-300">
+        <div className="sticky top-0 z-10 bg-card rounded-lg shadow-md p-4 mb-6 border border-muted flex flex-col md:flex-row items-center justify-between gap-4 transition-all duration-300">
           <div className="flex items-center gap-2">
             <Users className="h-5 w-5 text-primary" />
             <span className="font-medium">Total Occupants: {totalOccupants}</span>
