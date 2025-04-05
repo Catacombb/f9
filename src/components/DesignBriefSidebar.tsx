@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -34,7 +34,7 @@ const sections = [
 ];
 
 export function DesignBriefSidebar({ showLastSaved = false, lastSavedFormatted = '' }: DesignBriefSidebarProps) {
-  const { currentSection, setCurrentSection, projectData } = useDesignBrief();
+  const { currentSection, setCurrentSection } = useDesignBrief();
   const isMobile = useIsMobile();
 
   const navigateToSection = (sectionId: SectionKey) => {

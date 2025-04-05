@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -62,27 +61,12 @@ export function ProjectInfoSection() {
     window.scrollTo(0, 0);
   };
   
-  // Calculate completion percentage based on required fields
-  const calculateCompletion = () => {
-    const requiredFields = ['clientName', 'projectAddress', 'contactEmail', 'contactPhone'];
-    let filledCount = 0;
-    
-    requiredFields.forEach(field => {
-      if (formData.projectInfo[field]) filledCount++;
-    });
-    
-    return Math.round((filledCount / requiredFields.length) * 100);
-  };
-  
-  const completionPercentage = calculateCompletion();
-  
   return (
     <div className="design-brief-section-wrapper">
       <div className="design-brief-section-container">
         <SectionHeader 
           title="Project Information" 
           description="Tell us about yourself and your project. This information helps us understand the basics of what you're looking to achieve."
-          progress={completionPercentage}
         />
         
         <div className="design-brief-form-group">
