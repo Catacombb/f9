@@ -1,3 +1,4 @@
+
 export interface SpaceRoom {
   id: string;
   type: string;
@@ -64,6 +65,7 @@ export interface FormData {
     entertaining?: string;
     workFromHome?: string;
     lifestyleNotes?: string;
+    homeFeeling?: string; // Added missing property
   };
   site: {
     existingConditions: string;
@@ -111,6 +113,8 @@ export interface FormData {
     architectureNotes?: string;
     externalMaterialsSelected?: string[];
     internalMaterialsSelected?: string[];
+    inspirationLinks?: string; // Added missing property
+    inspirationComments?: string; // Added missing property
   };
   contractors: {
     preferredBuilder: string;
