@@ -1,14 +1,15 @@
+
 import React, { useState } from 'react';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, ArrowRight, Upload, Image } from 'lucide-react';
 import { SectionHeader } from './SectionHeader';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { MultiSelectButtons } from '@/components/MultiSelectButtons';
 import { Card } from '@/components/ui/card';
 import { toast } from 'sonner';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 export function ArchitectureSection() {
   const { setCurrentSection, updateFormData, formData, files, updateFiles } = useDesignBrief();
@@ -42,17 +43,34 @@ export function ArchitectureSection() {
     { value: 'Scandinavian', label: 'Scandinavian' },
   ];
 
-  const materialOptions = [
-    { value: 'Wood', label: 'Wood' },
-    { value: 'Concrete', label: 'Concrete' },
+  const externalMaterialOptions = [
     { value: 'Brick', label: 'Brick' },
+    { value: 'Weatherboard', label: 'Weatherboard' },
+    { value: 'Linea', label: 'Linea' },
+    { value: 'Cedar', label: 'Cedar' },
     { value: 'Stone', label: 'Stone' },
-    { value: 'Glass', label: 'Glass' },
-    { value: 'Steel', label: 'Steel' },
-    { value: 'Aluminum', label: 'Aluminum' },
-    { value: 'Ceramic', label: 'Ceramic' },
+    { value: 'Corten Steel', label: 'Corten Steel' },
+    { value: 'Aluminum Composite Panel', label: 'Aluminum Composite Panel' },
+    { value: 'Concrete', label: 'Concrete' },
     { value: 'Stucco', label: 'Stucco' },
+    { value: 'Fiber Cement', label: 'Fiber Cement' },
+    { value: 'Metal Cladding', label: 'Metal Cladding' },
+    { value: 'ColorSteel', label: 'ColorSteel' },
+  ];
+
+  const internalMaterialOptions = [
+    { value: 'Timber Flooring', label: 'Timber Flooring' },
+    { value: 'Engineered Wood', label: 'Engineered Wood' },
+    { value: 'Carpet', label: 'Carpet' },
+    { value: 'Tile', label: 'Tile' },
     { value: 'Vinyl', label: 'Vinyl' },
+    { value: 'Concrete', label: 'Concrete' },
+    { value: 'Natural Stone', label: 'Natural Stone' },
+    { value: 'Plasterboard', label: 'Plasterboard' },
+    { value: 'Timber Paneling', label: 'Timber Paneling' },
+    { value: 'Marble', label: 'Marble' },
+    { value: 'Granite', label: 'Granite' },
+    { value: 'Quartz', label: 'Quartz' },
   ];
 
   const sustainabilityOptions = [
@@ -81,10 +99,10 @@ export function ArchitectureSection() {
     { value: 'Automated Irrigation', label: 'Automated Irrigation' },
   ];
 
-  // Sample inspiration images
+  // Architecture inspiration images from ArchiPro (using placeholder URLs)
   const inspirationImages = [
-    { id: 'modern-1', url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c', label: 'Modern Interior' },
-    { id: 'scandinavian-1', url: 'https://images.unsplash.com/photo-1513694203232-719a280e022f', label: 'Scandinavian Style' },
+    { id: 'modern-1', url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c', label: 'Modern Villa' },
+    { id: 'scandinavian-1', url: 'https://images.unsplash.com/photo-1513694203232-719a280e022f', label: 'Scandinavian Home' },
     { id: 'industrial-1', url: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267', label: 'Industrial Loft' },
     { id: 'minimalist-1', url: 'https://images.unsplash.com/photo-1540518614846-7eded433c457', label: 'Minimalist Design' },
     { id: 'traditional-1', url: 'https://images.unsplash.com/photo-1560185007-cde436f6a4d0', label: 'Traditional Home' },
@@ -97,8 +115,12 @@ export function ArchitectureSection() {
     updateFormData('architecture', { preferredStyles: values });
   };
 
-  const handleMaterialsChange = (values: string[]) => {
-    updateFormData('architecture', { materialPreferences: values });
+  const handleExternalMaterialsChange = (values: string[]) => {
+    updateFormData('architecture', { externalMaterialPreferences: values });
+  };
+
+  const handleInternalMaterialsChange = (values: string[]) => {
+    updateFormData('architecture', { internalMaterialPreferences: values });
   };
 
   const handleSustainabilityChange = (values: string[]) => {
@@ -253,18 +275,18 @@ export function ArchitectureSection() {
               </div>
             )}
 
-            {/* Upload your own images */}
+            {/* Upload your own images with consistent styling */}
             <div className="mt-6">
-              <Card className="p-6">
+              <Card className="p-6 border border-primary/20 bg-primary/5">
                 <div className="text-center">
-                  <Upload className="h-10 w-10 mx-auto mb-4 text-muted-foreground" />
+                  <Upload className="h-10 w-10 mx-auto mb-4 text-primary" />
                   <h4 className="text-md font-medium mb-2">Upload Your Own Inspiration</h4>
                   <p className="text-sm text-muted-foreground mb-4">
                     Upload your own inspiration images, mood boards, or sketches (JPG, PNG, PDF accepted, max 5MB)
                   </p>
                   <div className="flex justify-center">
                     <div className="relative">
-                      <Input 
+                      <input 
                         type="file" 
                         id="inspirationUpload" 
                         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
@@ -272,7 +294,7 @@ export function ArchitectureSection() {
                         multiple
                         onChange={handleFileUpload}
                       />
-                      <Button type="button" variant="outline" className="relative">
+                      <Button type="button" variant="outline" className="relative bg-primary text-primary-foreground hover:bg-primary/90">
                         <Upload className="mr-2 h-4 w-4" />
                         Browse Files
                       </Button>
@@ -286,29 +308,39 @@ export function ArchitectureSection() {
 
         <div className="design-brief-form-group">
           <div className="grid gap-6">
-            <MultiSelectButtons
-              label="Material Preferences"
-              description="Select your preferred building materials."
-              options={materialOptions}
-              selectedValues={architectureData.materialPreferences || []}
-              onChange={handleMaterialsChange}
-            />
-
             <div className="space-y-2">
               <Label htmlFor="externalMaterials" className="design-brief-question-title">External Materials</Label>
+              <p className="text-sm text-muted-foreground mb-2">
+                Select your preferred external cladding and finishes.
+              </p>
+              <MultiSelectButtons
+                options={externalMaterialOptions}
+                selectedValues={architectureData.externalMaterialPreferences || []}
+                onChange={handleExternalMaterialsChange}
+              />
               <Textarea 
                 id="externalMaterials" 
-                placeholder="Describe your preferences for external materials and finishes..."
+                className="mt-4"
+                placeholder="Any additional details about external materials and finishes..."
                 value={architectureData.externalMaterials || ''}
                 onChange={(e) => handleInputChange('externalMaterials', e.target.value)}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="internalFinishes" className="design-brief-question-title">Internal Finishes</Label>
+              <Label htmlFor="internalFinishes" className="design-brief-question-title">Internal Materials</Label>
+              <p className="text-sm text-muted-foreground mb-2">
+                Select your preferred internal materials and finishes.
+              </p>
+              <MultiSelectButtons
+                options={internalMaterialOptions}
+                selectedValues={architectureData.internalMaterialPreferences || []}
+                onChange={handleInternalMaterialsChange}
+              />
               <Textarea 
                 id="internalFinishes" 
-                placeholder="Describe your preferences for internal finishes, colors, and textures..."
+                className="mt-4"
+                placeholder="Any additional details about internal finishes, colors, and textures..."
                 value={architectureData.internalFinishes || ''}
                 onChange={(e) => handleInputChange('internalFinishes', e.target.value)}
               />

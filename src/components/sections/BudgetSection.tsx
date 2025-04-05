@@ -4,10 +4,10 @@ import { useDesignBrief } from '@/context/DesignBriefContext';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { SectionHeader } from './SectionHeader';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { MultiSelectButtons } from '@/components/MultiSelectButtons';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 export function BudgetSection() {
   const { setCurrentSection, updateFormData, formData } = useDesignBrief();
@@ -56,22 +56,22 @@ export function BudgetSection() {
           <div className="grid gap-6">
             <div className="space-y-2">
               <Label htmlFor="budgetRange" className="design-brief-question-title">Budget Range</Label>
-              <Input 
-                id="budgetRange" 
-                placeholder="e.g. $100,000 - $200,000"
+              <Select
                 value={budgetData.budgetRange || ''}
-                onChange={(e) => handleInputChange('budgetRange', e.target.value)}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="budgetFlexibility" className="design-brief-question-title">Budget Flexibility</Label>
-              <Input 
-                id="budgetFlexibility" 
-                placeholder="e.g. 5%, 10%, etc."
-                value={budgetData.budgetFlexibility || ''}
-                onChange={(e) => handleInputChange('budgetFlexibility', e.target.value)}
-              />
+                onValueChange={(value) => handleInputChange('budgetRange', value)}
+              >
+                <SelectTrigger id="budgetRange">
+                  <SelectValue placeholder="Select a budget range" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="$500k–$750k">$500k–$750k</SelectItem>
+                  <SelectItem value="$750k–$1M">$750k–$1M</SelectItem>
+                  <SelectItem value="$1M–$1.5M">$1M–$1.5M</SelectItem>
+                  <SelectItem value="$1.5M–$2M">$1.5M–$2M</SelectItem>
+                  <SelectItem value="$2M–$3M">$2M–$3M</SelectItem>
+                  <SelectItem value="$3M+">$3M+</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <MultiSelectButtons
@@ -89,16 +89,6 @@ export function BudgetSection() {
                 placeholder="Describe which areas of your project are the highest priority for your budget..."
                 value={budgetData.priorityAreas || ''}
                 onChange={(e) => handleInputChange('priorityAreas', e.target.value)}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="timeframe" className="design-brief-question-title">Project Timeframe</Label>
-              <Input 
-                id="timeframe" 
-                placeholder="e.g. 6 months, 1 year, etc."
-                value={budgetData.timeframe || ''}
-                onChange={(e) => handleInputChange('timeframe', e.target.value)}
               />
             </div>
 

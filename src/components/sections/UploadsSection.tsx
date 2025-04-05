@@ -60,11 +60,11 @@ export function UploadsSection() {
           description="Upload any relevant documents for your project, such as site plans, floor plans, or architectural drawings. These will help us understand the technical aspects of your project."
         />
         
-        <div className="design-brief-card p-8">
+        <div className="design-brief-card p-8 border border-primary/20 bg-primary/5 rounded-lg">
           <div className="mb-8 text-center">
-            <div className="border-2 border-dashed border-muted rounded-lg p-8 mb-4">
+            <div className="border-2 border-dashed border-primary/40 rounded-lg p-8 mb-4">
               <div className="flex flex-col items-center">
-                <Upload className="h-10 w-10 text-muted-foreground mb-4" />
+                <Upload className="h-10 w-10 text-primary mb-4" />
                 <h3 className="font-medium text-lg mb-2">Upload your plans and documents</h3>
                 <p className="text-sm text-muted-foreground mb-4">
                   Drag and drop files here or click to browse
@@ -73,7 +73,7 @@ export function UploadsSection() {
                   Accepted file types: PDFs, DWG, images of plans, and other technical documents (Max 10MB per file)
                 </p>
                 <label htmlFor="file-upload">
-                  <Button asChild>
+                  <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90">
                     <span>
                       <Upload className="h-4 w-4 mr-2" />
                       Browse Files
