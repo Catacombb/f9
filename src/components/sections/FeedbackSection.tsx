@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { SectionHeader } from './SectionHeader';
@@ -236,7 +235,7 @@ export function FeedbackSection() {
               </div>
 
               <div className="space-y-4">
-                <h3 className="text-lg font-medium text-purple-800">Your Role</h3>
+                <h3 className="text-sm font-medium">Your Role</h3>
                 
                 <div className="pt-2">
                   <Label className="font-medium mb-2 block">What is your role in the architecture/design process?*</Label>
