@@ -228,7 +228,7 @@ export function FeedbackSection() {
                 Please Rate Your Experience (1-5 stars)
               </h3>
               
-              <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="flex flex-col gap-2">
                   <Label htmlFor="usabilityRating" className="font-medium">Usability Rating*</Label>
                   <RatingStars 
