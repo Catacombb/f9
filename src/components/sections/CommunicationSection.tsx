@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -31,6 +32,13 @@ export function CommunicationSection() {
 
   const handleAvailableDaysChange = (values: string[]) => {
     updateFormData('communication', { 'availableDays': values });
+  };
+  
+  const handleFrequencyChange = (values: string[]) => {
+    // Since this is a radio button converted to MultiSelectButtons, we only take the first selected value
+    if (values.length > 0) {
+      updateFormData('communication', { 'frequency': values[0] });
+    }
   };
 
   const handlePrevious = () => {
@@ -68,6 +76,14 @@ export function CommunicationSection() {
     { value: 'friday', label: 'Friday' },
     { value: 'saturday', label: 'Saturday' },
     { value: 'sunday', label: 'Sunday' }
+  ];
+  
+  const frequencyOptions = [
+    { value: 'daily', label: 'Daily' },
+    { value: 'weekly', label: 'Weekly' },
+    { value: 'biweekly', label: 'Every Two Weeks' },
+    { value: 'monthly', label: 'Monthly' },
+    { value: 'milestones', label: 'Only at Key Milestones' }
   ];
 
   return (
@@ -116,32 +132,12 @@ export function CommunicationSection() {
             <p className="design-brief-question-description">
               How often would you like to receive project updates?
             </p>
-            <RadioGroup
-              value={formData.communication.frequency}
-              onValueChange={(value) => handleSelectChange('frequency', value)}
-              className="mt-2 space-y-2"
-            >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="daily" id="frequency_daily" />
-                <Label htmlFor="frequency_daily" className="font-normal">Daily</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="weekly" id="frequency_weekly" />
-                <Label htmlFor="frequency_weekly" className="font-normal">Weekly</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="biweekly" id="frequency_biweekly" />
-                <Label htmlFor="frequency_biweekly" className="font-normal">Every Two Weeks</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="monthly" id="frequency_monthly" />
-                <Label htmlFor="frequency_monthly" className="font-normal">Monthly</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="milestones" id="frequency_milestones" />
-                <Label htmlFor="frequency_milestones" className="font-normal">Only at Key Milestones</Label>
-              </div>
-            </RadioGroup>
+            <MultiSelectButtons
+              options={frequencyOptions}
+              selectedValues={formData.communication.frequency ? [formData.communication.frequency] : []}
+              onChange={handleFrequencyChange}
+              singleSelect={true}
+            />
           </div>
 
           <div className="mb-6">

@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 interface Option {
   value: string;
@@ -9,12 +9,12 @@ interface Option {
 }
 
 interface MultiSelectButtonsProps {
-  label: string;
+  label?: string;
   description?: string;
   options: Option[];
   selectedValues: string[];
   onChange: (values: string[]) => void;
-  optional?: boolean;
+  singleSelect?: boolean;
 }
 
 export function MultiSelectButtons({
@@ -23,43 +23,48 @@ export function MultiSelectButtons({
   options,
   selectedValues,
   onChange,
-  optional = false
+  singleSelect = false
 }: MultiSelectButtonsProps) {
-  // Handle toggle selection
-  const handleValueChange = (values: string[]) => {
-    onChange(values);
+  const handleSelect = (value: string) => {
+    if (singleSelect) {
+      // For radio-button like behavior (single select only)
+      onChange([value]);
+    } else {
+      // For multi-select behavior
+      const newSelected = selectedValues.includes(value)
+        ? selectedValues.filter((v) => v !== value)
+        : [...selectedValues, value];
+      onChange(newSelected);
+    }
   };
 
   return (
-    <div className="space-y-3 w-full">
-      <Label className="design-brief-question-title">
-        {label}
-        {optional && <span className="text-muted-foreground text-sm ml-2">(optional)</span>}
-      </Label>
-      
+    <div className="space-y-2">
+      {label && (
+        <div className="design-brief-question-title">{label}</div>
+      )}
       {description && (
-        <p className="design-brief-question-description mb-2">
+        <p className="design-brief-question-description">
           {description}
         </p>
       )}
-      
-      <ToggleGroup 
-        type="multiple" 
-        variant="outline"
-        className="flex flex-wrap gap-2 w-full max-w-full"
-        value={selectedValues}
-        onValueChange={handleValueChange}
-      >
+      <div className="flex flex-wrap gap-2 mt-2">
         {options.map((option) => (
-          <ToggleGroupItem 
-            key={option.value} 
-            value={option.value}
-            className="px-4 py-2 rounded-md border border-input data-[state=on]:bg-primary data-[state=on]:text-primary-foreground data-[state=on]:border-primary break-words max-w-full"
+          <Button
+            key={option.value}
+            type="button"
+            variant="outline"
+            className={cn(
+              "rounded-full",
+              selectedValues.includes(option.value) &&
+                "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground"
+            )}
+            onClick={() => handleSelect(option.value)}
           >
             {option.label}
-          </ToggleGroupItem>
+          </Button>
         ))}
-      </ToggleGroup>
+      </div>
     </div>
   );
 }

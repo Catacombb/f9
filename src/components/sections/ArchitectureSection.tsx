@@ -1,13 +1,17 @@
+
 import React, { useState } from 'react';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { SectionHeader } from './SectionHeader';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
+import { Card, CardContent } from '@/components/ui/card';
 
-// Import the new components
+// Import the necessary components
 import { StylePreferences } from '@/components/architecture/StylePreferences';
-import { InspirationImages } from '@/components/architecture/InspirationImages';
 import { MaterialsSection } from '@/components/architecture/MaterialsSection';
 import { SustainabilitySection } from '@/components/architecture/SustainabilitySection';
 import { TechnologySection } from '@/components/architecture/TechnologySection';
@@ -16,7 +20,6 @@ import { TechnologySection } from '@/components/architecture/TechnologySection';
 import { 
   getExternalMaterials, 
   getInternalMaterials,
-  handleFileUpload 
 } from '@/components/architecture/helpers';
 
 // Material options for the helper functions
@@ -51,9 +54,8 @@ const internalMaterialOptions = [
 ];
 
 export function ArchitectureSection() {
-  const { setCurrentSection, updateFormData, formData, files, updateFiles } = useDesignBrief();
+  const { setCurrentSection, updateFormData, formData } = useDesignBrief();
   const architectureData = formData.architecture;
-  const [selectedImages, setSelectedImages] = useState<string[]>(files?.inspirationSelections || []);
   
   const handlePrevious = () => {
     setCurrentSection('spaces');
@@ -112,38 +114,7 @@ export function ArchitectureSection() {
   const handleTechnologyChange = (values: string[]) => {
     updateFormData('architecture', { technologyRequirements: values });
   };
-
-  const handleImageSelect = (imageId: string) => {
-    setSelectedImages(prev => {
-      const newSelection = prev.includes(imageId)
-        ? prev.filter(id => id !== imageId)
-        : [...prev, imageId];
-      
-      updateFiles({ inspirationSelections: newSelection });
-      return newSelection;
-    });
-  };
-
-  const handleImageUpload = (fileList: FileList | null) => {
-    const currentUploaded = files?.uploadedInspirationImages || [];
-    
-    const result = handleFileUpload(
-      fileList, 
-      currentUploaded,
-      (newImages) => {
-        updateFiles({ uploadedInspirationImages: newImages });
-      }
-    );
-    
-    if (result && result.message) {
-      if (result.success) {
-        toast.success(result.message);
-      } else {
-        toast.error(result.message);
-      }
-    }
-  };
-
+  
   const externalMaterialsSelected = getExternalMaterials(
     architectureData.materialPreferences, 
     externalMaterialOptions
@@ -169,12 +140,49 @@ export function ArchitectureSection() {
           onInputChange={handleInputChange}
         />
         
-        <InspirationImages 
-          selectedImages={selectedImages}
-          files={files}
-          onImageSelect={handleImageSelect}
-          onFileUpload={handleImageUpload}
-        />
+        {/* New Inspiration Section - replacing image selection */}
+        <div className="design-brief-form-group mt-8">
+          <Card>
+            <CardContent className="pt-6 pb-6">
+              <h3 className="text-lg font-semibold mb-4">Inspiration References</h3>
+              
+              <div className="space-y-6">
+                <div>
+                  <Label htmlFor="inspirationLinks" className="text-base font-medium mb-2 block">
+                    Link to a project or home you like
+                  </Label>
+                  <p className="text-sm text-muted-foreground mb-2">
+                    Add URLs to websites, articles, or social media posts that showcase homes or projects you admire.
+                    Separate multiple links with commas.
+                  </p>
+                  <Textarea
+                    id="inspirationLinks"
+                    value={architectureData.inspirationLinks || ''}
+                    onChange={(e) => handleInputChange('inspirationLinks', e.target.value)}
+                    placeholder="e.g., https://www.example.com/beautiful-home, https://pinterest.com/pin/12345"
+                    className="min-h-[80px]"
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="inspirationComments" className="text-base font-medium mb-2 block">
+                    What do you like about these projects?
+                  </Label>
+                  <p className="text-sm text-muted-foreground mb-2">
+                    Describe what specifically appeals to you about these designs or projects.
+                  </p>
+                  <Textarea
+                    id="inspirationComments"
+                    value={architectureData.inspirationComments || ''}
+                    onChange={(e) => handleInputChange('inspirationComments', e.target.value)}
+                    placeholder="e.g., I love how the living spaces flow together in the first example, and the use of natural light in the second."
+                    className="min-h-[120px]"
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
         
         <MaterialsSection 
           externalMaterials={architectureData.externalMaterials || ''}

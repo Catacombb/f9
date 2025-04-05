@@ -1,32 +1,47 @@
 
 import React from 'react';
-import { ProjectData, SpaceRoom } from '@/types';
+import { FormData } from '@/types';
 
 interface SpacesInfoDisplayProps {
-  spaces: ProjectData['formData']['spaces'];
+  spaces: FormData['spaces'];
   formatSpacesData: () => React.ReactNode;
 }
 
 export function SpacesInfoDisplay({ spaces, formatSpacesData }: SpacesInfoDisplayProps) {
-  if (spaces.rooms.length === 0) return null;
-  
   return (
-    <div className="pb-6 border-b">
-      <h4 className="text-lg font-bold mb-4">Spaces</h4>
-      {formatSpacesData()}
+    <div className="space-y-4">
+      <h4 className="text-lg font-semibold">Spaces</h4>
       
-      {spaces.additionalNotes && (
-        <div className="mt-4">
-          <p className="text-sm font-medium">Additional Notes:</p>
-          <p className="text-sm">{spaces.additionalNotes}</p>
+      <div>
+        <h5 className="font-medium">Home Level Type</h5>
+        <p className="text-sm">{spaces.homeLevelType || 'Not specified'}</p>
+      </div>
+      
+      <div>
+        <h5 className="font-medium">Spaces</h5>
+        <div className="space-y-2 text-sm">
+          {formatSpacesData()}
+        </div>
+      </div>
+      
+      {spaces.homeSize && (
+        <div>
+          <h5 className="font-medium">Home Size</h5>
+          <p className="text-sm">{spaces.homeSize}</p>
         </div>
       )}
       
-      {spaces.homeLevelType && (
-        <div className="mt-4">
-          <p className="text-sm font-medium">Level Preference:</p>
-          <p className="text-sm">{spaces.homeLevelType === 'single-level' ? 'Single-level home' : 
-            spaces.homeLevelType === 'multi-level' ? 'Multi-level home' : 'No specific preference'}</p>
+      {spaces.eliminableSpaces && (
+        <div>
+          <h5 className="font-medium">Eliminable Spaces</h5>
+          <p className="text-sm">{spaces.eliminableSpaces}</p>
+        </div>
+      )}
+      
+      {spaces.additionalNotes && (
+        <div>
+          <h5 className="font-medium">Additional Notes</h5>
+          <p className="text-sm">{spaces.additionalNotes}</p>
         </div>
       )}
     </div>

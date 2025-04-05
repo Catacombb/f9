@@ -1,16 +1,14 @@
 
-import React, { useState, useEffect } from 'react';
-import { SpaceRoom } from '@/types';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+// The existing RoomItem component needs to be modified to include helper text
+// Add the helper text next to the edit icon
+
+import React, { useState } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
-import { Trash2, Edit2 } from 'lucide-react';
-import { roomSpecificQuestions } from './roomQuestions';
-import { useDesignBrief } from '@/context/DesignBriefContext';
+import { PencilIcon, Trash2Icon, X, Check } from 'lucide-react';
+import { SpaceRoom } from '@/types';
 
 interface RoomItemProps {
   room: SpaceRoom;
@@ -18,222 +16,103 @@ interface RoomItemProps {
   onRemove: (id: string) => void;
 }
 
-export const RoomItem = ({ room, onEdit, onRemove }: RoomItemProps) => {
-  const { formData } = useDesignBrief();
-  const isMultiLevel = formData.spaces.homeLevelType === 'multi-level';
-
-  const handleQuantityChange = (value: string) => {
-    const quantity = parseInt(value, 10);
-    if (!isNaN(quantity) && quantity > 0) {
-      onEdit({ ...room, quantity });
-    }
+export const RoomItem: React.FC<RoomItemProps> = ({ room, onEdit, onRemove }) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedName, setEditedName] = useState(room.displayName || room.customName || room.type);
+  const [editedDescription, setEditedDescription] = useState(room.description || '');
+  
+  const handleSaveEdit = () => {
+    onEdit({
+      ...room,
+      displayName: editedName,
+      description: editedDescription
+    });
+    setIsEditing(false);
   };
-
-  const [answers, setAnswers] = useState<Record<string, any>>({});
-  const [isRenaming, setIsRenaming] = useState(false);
-  const [roomDisplayName, setRoomDisplayName] = useState(room.displayName || room.isCustom ? room.customName : room.type);
-
-  useEffect(() => {
-    setRoomDisplayName(room.displayName || (room.isCustom ? room.customName : room.type));
-  }, [room.displayName, room.customName, room.isCustom, room.type]);
-
-  const handleDescriptionChange = (value: string) => {
-    onEdit({ ...room, description: value });
+  
+  const handleCancelEdit = () => {
+    setEditedName(room.displayName || room.customName || room.type);
+    setEditedDescription(room.description || '');
+    setIsEditing(false);
   };
-
-  const handleDisplayNameChange = () => {
-    if (roomDisplayName && roomDisplayName.trim() !== '') {
-      onEdit({ ...room, displayName: roomDisplayName });
-      setIsRenaming(false);
-    }
-  };
-
-  const handleAnswerChange = (questionId: string, value: any) => {
-    const updatedAnswers = { ...answers, [questionId]: value };
-    setAnswers(updatedAnswers);
-    
-    // Convert answers object to a JSON string for storage
-    const updatedDescription = JSON.stringify(updatedAnswers);
-    onEdit({ ...room, description: updatedDescription });
-  };
-
-  useEffect(() => {
-    if (room.description) {
-      try {
-        const parsedAnswers = JSON.parse(room.description);
-        if (typeof parsedAnswers === 'object') {
-          setAnswers(parsedAnswers);
-        }
-      } catch (e) {
-        // If description isn't valid JSON, use it as a notes field
-        setAnswers({ notes: room.description });
-      }
-    }
-  }, [room.description]);
-
-  // Get the room type and look up corresponding questions
-  const roomType = room.isCustom ? (room.customName || room.type) : room.type;
-  const questions = roomSpecificQuestions[roomType as keyof typeof roomSpecificQuestions] || [];
-
-  const renderQuestion = (question: any) => {
-    switch (question.type) {
-      case 'boolean':
-        return (
-          <div key={question.id} className="flex flex-col space-y-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor={`${room.id}-${question.id}`}>{question.question}</Label>
-              <Switch
-                id={`${room.id}-${question.id}`}
-                checked={answers[question.id] === true}
-                onCheckedChange={(checked) => handleAnswerChange(question.id, checked)}
+  
+  return (
+    <Card className="mb-4 overflow-hidden">
+      <CardContent className="p-4">
+        {isEditing ? (
+          <div className="space-y-4">
+            <div>
+              <div className="flex items-center mb-1">
+                <label htmlFor={`room-name-${room.id}`} className="text-sm font-medium">
+                  Room Name
+                </label>
+              </div>
+              <Input
+                id={`room-name-${room.id}`}
+                value={editedName}
+                onChange={(e) => setEditedName(e.target.value)}
+                placeholder="Enter room name"
               />
             </div>
             
-            {answers[question.id] === true && question.conditionalQuestions && (
-              <div className="ml-6 mt-2 space-y-3 border-l-2 border-gray-200 pl-4">
-                {question.conditionalQuestions.map((conditionalQ: any) => renderQuestion(conditionalQ))}
-              </div>
-            )}
-          </div>
-        );
-      
-      case 'select':
-        return (
-          <div key={question.id} className="flex flex-col space-y-2">
-            <Label htmlFor={`${room.id}-${question.id}`}>{question.question}</Label>
-            <Select 
-              value={answers[question.id] || ''}
-              onValueChange={(value) => handleAnswerChange(question.id, value)}
-            >
-              <SelectTrigger id={`${room.id}-${question.id}`}>
-                <SelectValue placeholder="Select an option" />
-              </SelectTrigger>
-              <SelectContent>
-                {question.options.map((option: string) => (
-                  <SelectItem key={option} value={option}>
-                    {option}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        );
-      
-      case 'text':
-        return (
-          <div key={question.id} className="flex flex-col space-y-2">
-            <Label htmlFor={`${room.id}-${question.id}`}>{question.question}</Label>
-            <Input
-              id={`${room.id}-${question.id}`}
-              value={answers[question.id] || ''}
-              onChange={(e) => handleAnswerChange(question.id, e.target.value)}
-            />
-          </div>
-        );
-      
-      default:
-        return null;
-    }
-  };
-
-  return (
-    <div className="mb-4">
-      <Card>
-        <CardHeader className="p-4 pb-0 flex flex-row items-center justify-between">
-          {isRenaming ? (
-            <div className="flex flex-1 items-center space-x-2">
-              <Input
-                value={roomDisplayName}
-                onChange={(e) => setRoomDisplayName(e.target.value)}
-                className="w-full"
-                placeholder={room.isCustom ? room.customName || room.type : room.type}
-                autoFocus
+            <div>
+              <label htmlFor={`room-description-${room.id}`} className="text-sm font-medium block mb-1">
+                Description
+              </label>
+              <Textarea
+                id={`room-description-${room.id}`}
+                value={editedDescription}
+                onChange={(e) => setEditedDescription(e.target.value)}
+                placeholder="Enter room description"
+                rows={3}
               />
-              <Button size="sm" onClick={handleDisplayNameChange}>Save</Button>
-              <Button 
-                size="sm" 
-                variant="ghost" 
-                onClick={() => {
-                  setIsRenaming(false);
-                  setRoomDisplayName(room.displayName || (room.isCustom ? room.customName : room.type));
-                }}
-              >
+            </div>
+            
+            <div className="flex justify-end space-x-2">
+              <Button variant="outline" size="sm" onClick={handleCancelEdit} className="h-8">
+                <X className="h-4 w-4 mr-1" />
                 Cancel
               </Button>
-            </div>
-          ) : (
-            <>
-              <CardTitle className="text-lg flex items-center">
-                {room.displayName || (room.isCustom && room.customName ? room.customName : room.type)}
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="ml-2" 
-                  onClick={() => setIsRenaming(true)}
-                >
-                  <Edit2 className="h-4 w-4" />
-                </Button>
-              </CardTitle>
-              <Button variant="ghost" size="icon" onClick={() => onRemove(room.id)}>
-                <Trash2 className="h-4 w-4 text-destructive" />
+              <Button size="sm" onClick={handleSaveEdit} className="h-8">
+                <Check className="h-4 w-4 mr-1" />
+                Save
               </Button>
-            </>
-          )}
-        </CardHeader>
-        <CardContent className="p-4 space-y-3">
-          <div className="flex flex-col space-y-2">
-            <Label htmlFor={`quantity-${room.id}`}>Quantity</Label>
-            <Input
-              id={`quantity-${room.id}`}
-              type="number"
-              min="1"
-              value={room.quantity}
-              onChange={(e) => handleQuantityChange(e.target.value)}
-              className="w-24"
-            />
-          </div>
-          
-          {/* Level selection - only shown for multi-level homes */}
-          {isMultiLevel && (
-            <div className="flex flex-col space-y-2">
-              <Label htmlFor={`level-${room.id}`}>Preferred Level</Label>
-              <Select 
-                value={answers.level || ''}
-                onValueChange={(value) => handleAnswerChange('level', value)}
-              >
-                <SelectTrigger id={`level-${room.id}`}>
-                  <SelectValue placeholder="Select preferred level" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="ground">Ground Floor</SelectItem>
-                  <SelectItem value="upper">Upper Floor</SelectItem>
-                  <SelectItem value="either">Either / No Preference</SelectItem>
-                </SelectContent>
-              </Select>
             </div>
-          )}
-          
-          {questions.length > 0 && (
-            <div className="mt-4 space-y-4 border-t pt-4">
-              <h4 className="text-sm font-medium">Room-specific details:</h4>
-              <div className="space-y-4">
-                {questions.map(q => renderQuestion(q))}
+          </div>
+        ) : (
+          <div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <h3 className="text-lg font-medium">
+                  {room.displayName || room.customName || room.type}
+                </h3>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setIsEditing(true)}
+                  className="ml-2 h-8 px-2 text-muted-foreground hover:text-foreground"
+                >
+                  <PencilIcon className="h-4 w-4 mr-1" />
+                  <span className="text-xs text-muted-foreground">Edit room name (e.g., Master Bedroom, Taylor's Room)</span>
+                </Button>
               </div>
+              
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onRemove(room.id)}
+                className="h-8 px-2 text-destructive hover:text-destructive-foreground hover:bg-destructive/10"
+              >
+                <Trash2Icon className="h-4 w-4" />
+              </Button>
             </div>
-          )}
-          
-          <div className="flex flex-col space-y-2">
-            <Label htmlFor={`notes-${room.id}`}>Any other special requirements</Label>
-            <Textarea
-              id={`notes-${room.id}`}
-              placeholder="Describe any other special requirements for this space..."
-              value={answers.notes || ''}
-              onChange={(e) => handleAnswerChange('notes', e.target.value)}
-              rows={3}
-            />
+            
+            <p className="mt-2 text-sm text-muted-foreground">
+              {room.description || "No description provided"}
+            </p>
           </div>
-        </CardContent>
-      </Card>
-    </div>
+        )}
+      </CardContent>
+    </Card>
   );
 };

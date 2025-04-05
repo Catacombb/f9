@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -48,6 +49,7 @@ export function SummarySection() {
       return <p className="text-sm text-muted-foreground">No spaces defined</p>;
     }
     
+    // Group rooms by type
     const roomsByType = formData.spaces.rooms.reduce((acc, room) => {
       const type = room.isCustom && room.customName ? room.customName : room.type;
       
@@ -59,6 +61,51 @@ export function SummarySection() {
       return acc;
     }, {} as Record<string, typeof formData.spaces.rooms>);
     
+    // Count rooms by type for the summary
+    const roomTypeCounts: Record<string, number> = {};
+    let totalSpaces = 0;
+    const keyLivingSpaces = ['Living Room', 'Kitchen', 'Dining'];
+    let keyLivingSpacesCount = 0;
+    
+    Object.entries(roomsByType).forEach(([type, rooms]) => {
+      roomTypeCounts[type] = rooms.length;
+      totalSpaces += rooms.length;
+      
+      if (keyLivingSpaces.includes(type)) {
+        keyLivingSpacesCount++;
+      }
+    });
+    
+    // Create summary line
+    let summaryLine = `Total Spaces: ${totalSpaces}`;
+    
+    // Highlight bedrooms and bathrooms
+    const bedroomCount = roomTypeCounts['Bedroom'] || 0;
+    const bathroomCount = roomTypeCounts['Bathroom'] || 0;
+    
+    if (bedroomCount > 0 || bathroomCount > 0) {
+      summaryLine += ' — including ';
+      
+      if (bedroomCount > 0) {
+        summaryLine += `${bedroomCount} Bedroom${bedroomCount !== 1 ? 's' : ''}`;
+      }
+      
+      if (bedroomCount > 0 && bathroomCount > 0) {
+        summaryLine += ', ';
+      }
+      
+      if (bathroomCount > 0) {
+        summaryLine += `${bathroomCount} Bathroom${bathroomCount !== 1 ? 's' : ''}`;
+      }
+      
+      if (keyLivingSpacesCount > 0) {
+        summaryLine += `, and ${keyLivingSpacesCount} of each key living space`;
+      }
+      
+      summaryLine += '.';
+    }
+    
+    // Format individual room descriptions
     const formatRoomDescription = (room, index) => {
       try {
         const descriptionObj = JSON.parse(room.description);
@@ -124,6 +171,12 @@ export function SummarySection() {
     
     return (
       <div className="space-y-6">
+        {/* Space summary line */}
+        <div className="text-sm font-medium border-b pb-2">
+          {summaryLine}
+        </div>
+        
+        {/* Individual spaces by type */}
         {Object.entries(roomsByType).map(([type, rooms]) => (
           <div key={type} className="space-y-2">
             <h5 className="font-medium text-base">
@@ -164,9 +217,7 @@ export function SummarySection() {
         parts.push(`${occupantsData.cats} cat${occupantsData.cats !== 1 ? 's' : ''}`);
       }
       
-      const totalSpaces = formData.spaces.rooms.length;
-      
-      return `${totalOccupants} occupant${totalOccupants !== 1 ? 's' : ''} / ${totalSpaces} space${totalSpaces !== 1 ? 's' : ''} selected (${parts.join(', ')})`;
+      return `${totalOccupants} occupant${totalOccupants !== 1 ? 's' : ''} (${parts.join(', ')})`;
     } catch (e) {
       return "Data format error";
     }
@@ -190,7 +241,7 @@ export function SummarySection() {
       <div className="design-brief-section-container">
         <SectionHeader
           title="Design Brief Summary"
-          description="Review your design brief information before finalizing."
+          description="We'll generate a summary of your brief, which you can review and edit."
         />
         
         <Tabs defaultValue="preview">

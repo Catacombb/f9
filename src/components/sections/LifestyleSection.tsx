@@ -310,7 +310,7 @@ export function LifestyleSection() {
             />
           </div>
           
-          <div>
+          <div className="mb-6">
             <Label htmlFor="specialRequirements" className="design-brief-question-title">
               Special Requirements
               <span className="text-muted-foreground text-sm ml-2">(optional)</span>
@@ -323,6 +323,23 @@ export function LifestyleSection() {
               name="specialRequirements"
               placeholder="Note any special needs or future considerations for your home..."
               value={formData.lifestyle.specialRequirements}
+              onChange={handleTextAreaChange}
+              className="mt-1"
+            />
+          </div>
+          
+          <div>
+            <Label htmlFor="homeFeeling" className="design-brief-question-title">
+              How do you want to feel when you come home?
+            </Label>
+            <p className="design-brief-question-description">
+              Describe the emotions, sensations, or feelings you want your home to evoke when you enter it.
+            </p>
+            <Textarea
+              id="homeFeeling"
+              name="homeFeeling"
+              placeholder="e.g., I want to feel calm and relaxed, with a sense of warmth and security..."
+              value={formData.lifestyle.homeFeeling || ''}
               onChange={handleTextAreaChange}
               className="mt-1"
             />

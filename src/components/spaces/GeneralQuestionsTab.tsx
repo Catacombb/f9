@@ -1,80 +1,79 @@
 
 import React from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface GeneralQuestionsTabProps {
   additionalNotes: string;
   eliminableSpaces: string | undefined;
   homeSize: string | undefined;
-  onAdditionalNotesChange: (value: string) => void;
-  onEliminableSpacesChange: (value: string) => void;
-  onHomeSizeChange: (value: string) => void;
+  onAdditionalNotesChange: (notes: string) => void;
+  onEliminableSpacesChange: (notes: string) => void;
+  onHomeSizeChange: (notes: string) => void;
 }
 
-export const GeneralQuestionsTab: React.FC<GeneralQuestionsTabProps> = ({
+export const GeneralQuestionsTab = ({
   additionalNotes,
   eliminableSpaces,
   homeSize,
   onAdditionalNotesChange,
   onEliminableSpacesChange,
   onHomeSizeChange
-}) => {
+}: GeneralQuestionsTabProps) => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>General Space Questions</CardTitle>
+        <CardTitle>General Questions about Spaces</CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-6">
-          <div className="space-y-3">
-            <Label htmlFor="homeSize" className="text-base font-medium">
-              Approximately how large do you envision your home being?
-            </Label>
-            <p className="text-sm text-muted-foreground">
-              You can provide this in square meters or number of bedrooms/bathrooms.
-            </p>
-            <Textarea
-              id="homeSize"
-              placeholder="e.g., 200-250m², 3 bedrooms/2 bathrooms, etc."
-              value={homeSize || ''}
-              onChange={(e) => onHomeSizeChange(e.target.value)}
-              rows={3}
-            />
-          </div>
+      <CardContent className="space-y-6">
+        <div>
+          <Label htmlFor="homeSize" className="text-base font-medium mb-2 block">
+            Do you have an idea of the final size of the home?
+          </Label>
+          <p className="text-sm text-muted-foreground mb-2">
+            Please provide the approximate size in square meters or number of floors you envision for your home.
+          </p>
+          <Textarea
+            id="homeSize"
+            value={homeSize || ''}
+            onChange={(e) => onHomeSizeChange(e.target.value)}
+            placeholder="e.g., Approximately 250 square meters across 2 floors"
+            className="min-h-[100px]"
+          />
+        </div>
 
-          <div className="space-y-3">
-            <Label htmlFor="eliminableSpaces" className="text-base font-medium">
-              Are there any spaces you're willing to eliminate if necessary?
-            </Label>
-            <p className="text-sm text-muted-foreground">
-              This helps with prioritization during design trade-offs.
-            </p>
-            <Textarea
-              id="eliminableSpaces"
-              placeholder="e.g., formal dining room, guest bedroom, etc."
-              value={eliminableSpaces || ''}
-              onChange={(e) => onEliminableSpacesChange(e.target.value)}
-              rows={3}
-            />
-          </div>
-          
-          <div className="space-y-3">
-            <Label htmlFor="additionalNotes" className="text-base font-medium">
-              Any additional information about spaces we should know?
-            </Label>
-            <p className="text-sm text-muted-foreground">
-              Include any other preferences, requirements, or ideas about spaces in your home.
-            </p>
-            <Textarea
-              id="additionalNotes"
-              placeholder="Share any other space-related requirements or preferences..."
-              value={additionalNotes}
-              onChange={(e) => onAdditionalNotesChange(e.target.value)}
-              rows={5}
-            />
-          </div>
+        <div>
+          <Label htmlFor="eliminableSpaces" className="text-base font-medium mb-2 block">
+            Are there any spaces that could be eliminated if necessary?
+          </Label>
+          <p className="text-sm text-muted-foreground mb-2">
+            If budget constraints arise, which spaces could be removed or combined?
+          </p>
+          <Textarea
+            id="eliminableSpaces"
+            value={eliminableSpaces || ''}
+            onChange={(e) => onEliminableSpacesChange(e.target.value)}
+            placeholder="e.g., The home gym could be combined with the office if needed"
+            className="min-h-[100px]"
+          />
+        </div>
+
+        <div>
+          <Label htmlFor="additionalNotes" className="text-base font-medium mb-2 block">
+            Additional notes about spaces
+          </Label>
+          <p className="text-sm text-muted-foreground mb-2">
+            Any other information about the spaces in your home that you'd like to share?
+          </p>
+          <Textarea
+            id="additionalNotes"
+            value={additionalNotes}
+            onChange={(e) => onAdditionalNotesChange(e.target.value)}
+            placeholder="e.g., We'd like the kitchen to be open to the living area"
+            className="min-h-[100px]"
+          />
         </div>
       </CardContent>
     </Card>
