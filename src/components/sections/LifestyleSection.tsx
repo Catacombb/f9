@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -9,7 +8,6 @@ import { useDesignBrief } from '@/context/DesignBriefContext';
 import { ArrowLeft, ArrowRight, Users, Cat, Dog } from 'lucide-react';
 import { SectionHeader } from './SectionHeader';
 
-// Custom icon for adult (since it's not in lucide-react by default)
 const AdultIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -28,7 +26,6 @@ const AdultIcon = () => (
   </svg>
 );
 
-// Custom icon for child (since it's not in lucide-react by default)
 const ChildIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -52,13 +49,11 @@ const ChildIcon = () => (
 export function LifestyleSection() {
   const { formData, updateFormData, setCurrentSection } = useDesignBrief();
   
-  // States for family members and pets
   const [adults, setAdults] = useState<number>(0);
   const [children, setChildren] = useState<number>(0);
   const [dogs, setDogs] = useState<number>(0);
   const [cats, setCats] = useState<number>(0);
   
-  // Initialize values from formData
   useEffect(() => {
     if (formData.lifestyle.occupants) {
       try {
@@ -70,12 +65,10 @@ export function LifestyleSection() {
           setCats(occupantsData.cats || 0);
         }
       } catch (e) {
-        // If not valid JSON, initialize with zeros
       }
     }
   }, [formData.lifestyle]);
   
-  // Update formData when values change
   useEffect(() => {
     const occupantsData = JSON.stringify({ adults, children, dogs, cats });
     updateFormData('lifestyle', { occupants: occupantsData });
@@ -87,16 +80,15 @@ export function LifestyleSection() {
   };
   
   const handlePrevious = () => {
-    setCurrentSection('site');
+    setCurrentSection('projectInfo');
     window.scrollTo(0, 0);
   };
   
   const handleNext = () => {
-    setCurrentSection('spaces');
+    setCurrentSection('site');
     window.scrollTo(0, 0);
   };
   
-  // Handle direct number input changes (fixed to prevent glitches)
   const handleNumberInputChange = (setter: React.Dispatch<React.SetStateAction<number>>) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value === '' ? 0 : parseInt(e.target.value, 10);
     if (!isNaN(value) && value >= 0) {
@@ -339,11 +331,11 @@ export function LifestyleSection() {
         <div className="flex justify-between mt-6">
           <Button variant="outline" onClick={handlePrevious} className="group">
             <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-            <span>Previous: Site</span>
+            <span>Previous: Project Info</span>
           </Button>
           
           <Button onClick={handleNext} className="group">
-            <span>Next: Spaces</span>
+            <span>Next: Site</span>
             <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
           </Button>
         </div>
