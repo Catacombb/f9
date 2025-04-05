@@ -102,10 +102,10 @@ Can contact: ${formData.feedback.canContact || 'No'}
 
       // Send email using your EmailJS credentials
       await emailjs.send(
-        'YOUR_SERVICE_ID', // Replace with your EmailJS service ID
-        'YOUR_TEMPLATE_ID', // Replace with your EmailJS template ID
+        'service_94y36iq', // Your EmailJS service ID needed here
+        'template_l4lrz4g', // Your provided template ID
         templateParams,
-        'YOUR_USER_ID' // Replace with your EmailJS user ID
+        'UTp_oJDgVq3AxICn0' // Your public key
       );
       
       return true;
