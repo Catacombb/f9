@@ -31,15 +31,19 @@ export const renderArchitectureInfo = (ctx: PDFContext, projectData: ProjectData
     addMultiLineText(ctx, projectData.formData.architecture.specialFeatures);
   }
   
-  // Add the inspiration links and comments to the PDF
-  if (projectData.formData.architecture.inspirationLinks) {
-    addText(ctx, 'Inspiration Links', '');
-    addMultiLineText(ctx, projectData.formData.architecture.inspirationLinks);
-  }
-  
-  if (projectData.formData.architecture.inspirationComments) {
-    addText(ctx, 'Inspiration Comments', '');
-    addMultiLineText(ctx, projectData.formData.architecture.inspirationComments);
+  // Render inspiration link entries if they exist
+  if (projectData.formData.architecture.inspirationEntries && 
+      projectData.formData.architecture.inspirationEntries.length > 0) {
+    
+    addText(ctx, 'Inspiration References', '');
+    
+    projectData.formData.architecture.inspirationEntries.forEach((entry, index) => {
+      addText(ctx, `Reference ${index + 1}`, entry.link || '');
+      if (entry.description) {
+        addMultiLineText(ctx, entry.description);
+      }
+      addSpace(ctx, 2);
+    });
   }
   
   addSpace(ctx, 8);

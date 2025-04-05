@@ -75,19 +75,22 @@ export function ArchitectureInfoDisplay({ architecture }: ArchitectureInfoDispla
         </div>
       )}
       
-      {/* Display inspiration links */}
-      {architecture.inspirationLinks && (
+      {/* Display inspiration entries */}
+      {architecture.inspirationEntries && architecture.inspirationEntries.length > 0 && (
         <div className="mb-4">
           <h5 className="font-semibold mb-1">Inspiration References</h5>
-          <p className="text-gray-700 whitespace-pre-line">{architecture.inspirationLinks}</p>
-        </div>
-      )}
-      
-      {/* Display inspiration comments */}
-      {architecture.inspirationComments && (
-        <div className="mb-4">
-          <h5 className="font-semibold mb-1">Comments on Inspiration</h5>
-          <p className="text-gray-700 whitespace-pre-line">{architecture.inspirationComments}</p>
+          <div className="space-y-3">
+            {architecture.inspirationEntries.map((entry, index) => (
+              <div key={index} className="bg-muted/50 p-3 rounded-md">
+                <a href={entry.link} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline break-all">
+                  {entry.link}
+                </a>
+                {entry.description && (
+                  <p className="text-gray-700 mt-1 whitespace-pre-line">{entry.description}</p>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       )}
       

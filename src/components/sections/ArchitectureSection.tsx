@@ -15,6 +15,7 @@ import { StylePreferences } from '@/components/architecture/StylePreferences';
 import { MaterialsSection } from '@/components/architecture/MaterialsSection';
 import { SustainabilitySection } from '@/components/architecture/SustainabilitySection';
 import { TechnologySection } from '@/components/architecture/TechnologySection';
+import { InspirationEntryList, InspirationEntry } from '@/components/architecture/InspirationEntryList';
 
 // Import helper functions
 import { 
@@ -115,6 +116,10 @@ export function ArchitectureSection() {
     updateFormData('architecture', { technologyRequirements: values });
   };
   
+  const handleInspirationEntriesChange = (entries: InspirationEntry[]) => {
+    updateFormData('architecture', { inspirationEntries: entries });
+  };
+  
   const externalMaterialsSelected = getExternalMaterials(
     architectureData.materialPreferences, 
     externalMaterialOptions
@@ -148,35 +153,33 @@ export function ArchitectureSection() {
               
               <div className="space-y-6">
                 <div>
-                  <Label htmlFor="inspirationLinks" className="text-base font-medium mb-2 block">
-                    Link to a project or home you like
+                  <Label className="text-base font-medium mb-2 block">
+                    Add Inspiration References
                   </Label>
-                  <p className="text-sm text-muted-foreground mb-2">
+                  <p className="text-sm text-muted-foreground mb-4">
                     Add URLs to websites, articles, or social media posts that showcase homes or projects you admire.
-                    Separate multiple links with commas.
+                    For each reference, describe what you like about it.
                   </p>
-                  <Textarea
-                    id="inspirationLinks"
-                    value={architectureData.inspirationLinks || ''}
-                    onChange={(e) => handleInputChange('inspirationLinks', e.target.value)}
-                    placeholder="e.g., https://www.example.com/beautiful-home, https://pinterest.com/pin/12345"
-                    className="min-h-[80px]"
+                  
+                  <InspirationEntryList 
+                    entries={architectureData.inspirationEntries || []}
+                    onChange={handleInspirationEntriesChange}
                   />
                 </div>
                 
                 <div>
-                  <Label htmlFor="inspirationComments" className="text-base font-medium mb-2 block">
-                    What do you like about these projects?
+                  <Label htmlFor="inspirationNotes" className="text-base font-medium mb-2 block">
+                    Additional Notes
                   </Label>
                   <p className="text-sm text-muted-foreground mb-2">
-                    Describe what specifically appeals to you about these designs or projects.
+                    Any other inspiration or design preferences you'd like to mention.
                   </p>
                   <Textarea
-                    id="inspirationComments"
-                    value={architectureData.inspirationComments || ''}
-                    onChange={(e) => handleInputChange('inspirationComments', e.target.value)}
-                    placeholder="e.g., I love how the living spaces flow together in the first example, and the use of natural light in the second."
-                    className="min-h-[120px]"
+                    id="inspirationNotes"
+                    value={architectureData.inspirationNotes || ''}
+                    onChange={(e) => handleInputChange('inspirationNotes', e.target.value)}
+                    placeholder="Any other design inspiration or preferences..."
+                    className="min-h-[80px]"
                   />
                 </div>
               </div>
