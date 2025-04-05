@@ -1,83 +1,82 @@
 
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 
 interface GeneralQuestionsTabProps {
   additionalNotes: string;
   eliminableSpaces: string | undefined;
   homeSize: string | undefined;
-  roomArrangement: string | undefined;
-  onAdditionalNotesChange: (notes: string) => void;
-  onEliminableSpacesChange: (notes: string) => void;
-  onHomeSizeChange: (notes: string) => void;
-  onRoomArrangementChange: (notes: string) => void;
+  onAdditionalNotesChange: (value: string) => void;
+  onEliminableSpacesChange: (value: string) => void;
+  onHomeSizeChange: (value: string) => void;
 }
 
-export const GeneralQuestionsTab = ({
+export const GeneralQuestionsTab: React.FC<GeneralQuestionsTabProps> = ({
   additionalNotes,
   eliminableSpaces,
   homeSize,
-  roomArrangement,
   onAdditionalNotesChange,
   onEliminableSpacesChange,
-  onHomeSizeChange,
-  onRoomArrangementChange
-}: GeneralQuestionsTabProps) => {
+  onHomeSizeChange
+}) => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>General Questions About Your Spaces</CardTitle>
+        <CardTitle>General Space Questions</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-6">
-          <div>
-            <Label htmlFor="eliminableSpaces" className="text-base">
-              Are there any of these spaces that you would deem less important or could eliminate if budget were an issue?
+          <div className="space-y-3">
+            <Label htmlFor="homeSize" className="text-base font-medium">
+              Approximately how large do you envision your home being?
             </Label>
-            <Textarea
-              id="eliminableSpaces"
-              value={eliminableSpaces || ''}
-              onChange={(e) => onEliminableSpacesChange(e.target.value)}
-              placeholder="List any spaces that could be eliminated if needed..."
-              className="mt-1 h-28"
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="homeSize" className="text-base">
-              Do you have an idea of the final size of the home?
-            </Label>
-            <p className="text-sm text-muted-foreground mb-2">
-              Square meters, number of floors
+            <p className="text-sm text-muted-foreground">
+              You can provide this in square meters or number of bedrooms/bathrooms.
             </p>
             <Textarea
               id="homeSize"
+              placeholder="e.g., 200-250m², 3 bedrooms/2 bathrooms, etc."
               value={homeSize || ''}
               onChange={(e) => onHomeSizeChange(e.target.value)}
-              placeholder="e.g., Approximately 200 square meters, 2 floors..."
-              className="mt-1 h-24"
+              rows={3}
             />
           </div>
 
-          <div>
-            <Label htmlFor="roomArrangement" className="text-base">
-              Do you have any preferences for how rooms should be arranged?
+          <div className="space-y-3">
+            <Label htmlFor="eliminableSpaces" className="text-base font-medium">
+              Are there any spaces you're willing to eliminate if necessary?
             </Label>
-            <p className="text-sm text-muted-foreground mb-2">
-              For example, should the kitchen be separate from bedrooms, or should a home office be in a quiet area?
+            <p className="text-sm text-muted-foreground">
+              This helps with prioritization during design trade-offs.
             </p>
             <Textarea
-              id="roomArrangement"
-              value={roomArrangement || ''}
-              onChange={(e) => onRoomArrangementChange(e.target.value)}
-              placeholder="Describe your preferences for room arrangements..."
-              className="mt-1 h-28"
+              id="eliminableSpaces"
+              placeholder="e.g., formal dining room, guest bedroom, etc."
+              value={eliminableSpaces || ''}
+              onChange={(e) => onEliminableSpacesChange(e.target.value)}
+              rows={3}
+            />
+          </div>
+          
+          <div className="space-y-3">
+            <Label htmlFor="additionalNotes" className="text-base font-medium">
+              Any additional information about spaces we should know?
+            </Label>
+            <p className="text-sm text-muted-foreground">
+              Include any other preferences, requirements, or ideas about spaces in your home.
+            </p>
+            <Textarea
+              id="additionalNotes"
+              placeholder="Share any other space-related requirements or preferences..."
+              value={additionalNotes}
+              onChange={(e) => onAdditionalNotesChange(e.target.value)}
+              rows={5}
             />
           </div>
         </div>
       </CardContent>
     </Card>
   );
-}
+};

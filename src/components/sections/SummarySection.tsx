@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -80,6 +79,40 @@ export function SummarySection() {
   
   const handlePrevious = () => {
     setCurrentSection('uploads');
+  };
+  
+  const formatOccupantsData = () => {
+    try {
+      if (!formData.lifestyle.occupants) return "None specified";
+      
+      const occupantsData = JSON.parse(formData.lifestyle.occupants);
+      let totalOccupants = 0;
+      const parts = [];
+      
+      if (occupantsData.adults && occupantsData.adults > 0) {
+        totalOccupants += occupantsData.adults;
+        parts.push(`${occupantsData.adults} adult${occupantsData.adults !== 1 ? 's' : ''}`);
+      }
+      
+      if (occupantsData.children && occupantsData.children > 0) {
+        totalOccupants += occupantsData.children;
+        parts.push(`${occupantsData.children} child${occupantsData.children !== 1 ? 'ren' : ''}`);
+      }
+      
+      if (occupantsData.dogs && occupantsData.dogs > 0) {
+        parts.push(`${occupantsData.dogs} dog${occupantsData.dogs !== 1 ? 's' : ''}`);
+      }
+      
+      if (occupantsData.cats && occupantsData.cats > 0) {
+        parts.push(`${occupantsData.cats} cat${occupantsData.cats !== 1 ? 's' : ''}`);
+      }
+      
+      const totalSpaces = formData.spaces.rooms.length;
+      
+      return `${totalOccupants} occupant${totalOccupants !== 1 ? 's' : ''} / ${totalSpaces} space${totalSpaces !== 1 ? 's' : ''} selected (${parts.join(', ')})`;
+    } catch (e) {
+      return "Data format error";
+    }
   };
   
   return (
@@ -169,8 +202,8 @@ export function SummarySection() {
                     <div className="space-y-4">
                       {formData.lifestyle.occupants && (
                         <div>
-                          <p className="text-sm font-medium">Occupants:</p>
-                          <p className="text-sm">{formData.lifestyle.occupants}</p>
+                          <p className="text-sm font-medium">Occupants and Spaces:</p>
+                          <p className="text-sm">{formatOccupantsData()}</p>
                         </div>
                       )}
                       {formData.lifestyle.occupationDetails && (

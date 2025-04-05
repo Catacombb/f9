@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -95,6 +96,14 @@ export function LifestyleSection() {
     window.scrollTo(0, 0);
   };
   
+  // Handle direct number input changes (fixed to prevent glitches)
+  const handleNumberInputChange = (setter: React.Dispatch<React.SetStateAction<number>>) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value === '' ? 0 : parseInt(e.target.value, 10);
+    if (!isNaN(value) && value >= 0) {
+      setter(value);
+    }
+  };
+  
   return (
     <div className="design-brief-section-wrapper">
       <div className="design-brief-section-container">
@@ -126,20 +135,23 @@ export function LifestyleSection() {
                       size="icon" 
                       onClick={() => setAdults(Math.max(0, adults - 1))}
                       disabled={adults <= 0}
+                      type="button"
                     >
                       -
                     </Button>
                     <Input 
                       type="number" 
-                      min="0" 
+                      min="0"
                       value={adults} 
-                      onChange={(e) => setAdults(parseInt(e.target.value) || 0)}
+                      onChange={handleNumberInputChange(setAdults)}
                       className="w-16 mx-2 text-center"
+                      onWheel={(e) => e.currentTarget.blur()}
                     />
                     <Button 
                       variant="outline" 
                       size="icon" 
                       onClick={() => setAdults(adults + 1)}
+                      type="button"
                     >
                       +
                     </Button>
@@ -157,6 +169,7 @@ export function LifestyleSection() {
                       size="icon" 
                       onClick={() => setChildren(Math.max(0, children - 1))}
                       disabled={children <= 0}
+                      type="button"
                     >
                       -
                     </Button>
@@ -164,13 +177,15 @@ export function LifestyleSection() {
                       type="number" 
                       min="0" 
                       value={children} 
-                      onChange={(e) => setChildren(parseInt(e.target.value) || 0)}
+                      onChange={handleNumberInputChange(setChildren)}
                       className="w-16 mx-2 text-center"
+                      onWheel={(e) => e.currentTarget.blur()}
                     />
                     <Button 
                       variant="outline" 
                       size="icon" 
                       onClick={() => setChildren(children + 1)}
+                      type="button"
                     >
                       +
                     </Button>
@@ -188,20 +203,23 @@ export function LifestyleSection() {
                       size="icon" 
                       onClick={() => setDogs(Math.max(0, dogs - 1))}
                       disabled={dogs <= 0}
+                      type="button"
                     >
                       -
                     </Button>
                     <Input 
                       type="number" 
                       min="0" 
-                      value={dogs} 
-                      onChange={(e) => setDogs(parseInt(e.target.value) || 0)}
+                      value={dogs}
+                      onChange={handleNumberInputChange(setDogs)}
                       className="w-16 mx-2 text-center"
+                      onWheel={(e) => e.currentTarget.blur()}
                     />
                     <Button 
                       variant="outline" 
                       size="icon" 
                       onClick={() => setDogs(dogs + 1)}
+                      type="button"
                     >
                       +
                     </Button>
@@ -219,20 +237,23 @@ export function LifestyleSection() {
                       size="icon" 
                       onClick={() => setCats(Math.max(0, cats - 1))}
                       disabled={cats <= 0}
+                      type="button"
                     >
                       -
                     </Button>
                     <Input 
                       type="number" 
                       min="0" 
-                      value={cats} 
-                      onChange={(e) => setCats(parseInt(e.target.value) || 0)}
+                      value={cats}
+                      onChange={handleNumberInputChange(setCats)}
                       className="w-16 mx-2 text-center"
+                      onWheel={(e) => e.currentTarget.blur()}
                     />
                     <Button 
                       variant="outline" 
                       size="icon" 
                       onClick={() => setCats(cats + 1)}
+                      type="button"
                     >
                       +
                     </Button>

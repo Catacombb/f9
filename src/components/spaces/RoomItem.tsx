@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { Trash2 } from 'lucide-react';
+import { Trash2, Edit2 } from 'lucide-react';
 import { roomSpecificQuestions } from './roomQuestions';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 
@@ -30,9 +30,22 @@ export const RoomItem = ({ room, onEdit, onRemove }: RoomItemProps) => {
   };
 
   const [answers, setAnswers] = useState<Record<string, any>>({});
+  const [isRenaming, setIsRenaming] = useState(false);
+  const [roomDisplayName, setRoomDisplayName] = useState(room.displayName || room.isCustom ? room.customName : room.type);
+
+  useEffect(() => {
+    setRoomDisplayName(room.displayName || (room.isCustom ? room.customName : room.type));
+  }, [room.displayName, room.customName, room.isCustom, room.type]);
 
   const handleDescriptionChange = (value: string) => {
     onEdit({ ...room, description: value });
+  };
+
+  const handleDisplayNameChange = () => {
+    if (roomDisplayName && roomDisplayName.trim() !== '') {
+      onEdit({ ...room, displayName: roomDisplayName });
+      setIsRenaming(false);
+    }
   };
 
   const handleAnswerChange = (questionId: string, value: any) => {
@@ -127,12 +140,45 @@ export const RoomItem = ({ room, onEdit, onRemove }: RoomItemProps) => {
     <div className="mb-4">
       <Card>
         <CardHeader className="p-4 pb-0 flex flex-row items-center justify-between">
-          <CardTitle className="text-lg">
-            {room.isCustom && room.customName ? room.customName : room.type}
-          </CardTitle>
-          <Button variant="ghost" size="icon" onClick={() => onRemove(room.id)}>
-            <Trash2 className="h-4 w-4 text-destructive" />
-          </Button>
+          {isRenaming ? (
+            <div className="flex flex-1 items-center space-x-2">
+              <Input
+                value={roomDisplayName}
+                onChange={(e) => setRoomDisplayName(e.target.value)}
+                className="w-full"
+                placeholder={room.isCustom ? room.customName || room.type : room.type}
+                autoFocus
+              />
+              <Button size="sm" onClick={handleDisplayNameChange}>Save</Button>
+              <Button 
+                size="sm" 
+                variant="ghost" 
+                onClick={() => {
+                  setIsRenaming(false);
+                  setRoomDisplayName(room.displayName || (room.isCustom ? room.customName : room.type));
+                }}
+              >
+                Cancel
+              </Button>
+            </div>
+          ) : (
+            <>
+              <CardTitle className="text-lg flex items-center">
+                {room.displayName || (room.isCustom && room.customName ? room.customName : room.type)}
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="ml-2" 
+                  onClick={() => setIsRenaming(true)}
+                >
+                  <Edit2 className="h-4 w-4" />
+                </Button>
+              </CardTitle>
+              <Button variant="ghost" size="icon" onClick={() => onRemove(room.id)}>
+                <Trash2 className="h-4 w-4 text-destructive" />
+              </Button>
+            </>
+          )}
         </CardHeader>
         <CardContent className="p-4 space-y-3">
           <div className="flex flex-col space-y-2">

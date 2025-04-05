@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -143,17 +144,13 @@ export function SpacesSection() {
   const handleHomeSizeChange = (notes: string) => {
     updateFormData('spaces', { homeSize: notes });
   };
-
-  const handleRoomArrangementChange = (notes: string) => {
-    updateFormData('spaces', { roomArrangement: notes });
-  };
   
   const handleHomeLevelTypeChange = (value: string) => {
     updateFormData('spaces', { homeLevelType: value });
   };
   
   const handlePrevious = () => {
-    setCurrentSection('site');
+    setCurrentSection('lifestyle');
     window.scrollTo(0, 0);
   };
   
@@ -227,11 +224,9 @@ export function SpacesSection() {
               additionalNotes={formData.spaces.additionalNotes || ''}
               eliminableSpaces={formData.spaces.eliminableSpaces}
               homeSize={formData.spaces.homeSize}
-              roomArrangement={formData.spaces.roomArrangement}
               onAdditionalNotesChange={handleAdditionalNotesChange}
               onEliminableSpacesChange={handleEliminableSpacesChange}
               onHomeSizeChange={handleHomeSizeChange}
-              onRoomArrangementChange={handleRoomArrangementChange}
             />
           </TabsContent>
         </Tabs>
@@ -239,7 +234,7 @@ export function SpacesSection() {
         <div className="flex justify-between mt-6">
           <Button variant="outline" onClick={handlePrevious} className="group">
             <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-            <span>Previous: Site</span>
+            <span>Previous: Lifestyle</span>
           </Button>
           
           <Button onClick={handleNext} className="group">
