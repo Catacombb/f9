@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -153,10 +152,6 @@ export function SpacesSection() {
     updateFormData('spaces', { homeLevelType: value });
   };
   
-  const handleLevelAssignmentNotesChange = (notes: string) => {
-    updateFormData('spaces', { levelAssignmentNotes: notes });
-  };
-  
   const handlePrevious = () => {
     setCurrentSection('site');
     window.scrollTo(0, 0);
@@ -203,9 +198,7 @@ export function SpacesSection() {
           <TabsContent value="level-preference" className="mt-0">
             <LevelPreferenceTab
               homeLevelType={formData.spaces.homeLevelType}
-              levelAssignmentNotes={formData.spaces.levelAssignmentNotes}
               onHomeLevelTypeChange={handleHomeLevelTypeChange}
-              onLevelAssignmentNotesChange={handleLevelAssignmentNotesChange}
             />
           </TabsContent>
 
