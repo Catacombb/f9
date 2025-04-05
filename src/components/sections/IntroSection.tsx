@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -21,23 +20,18 @@ export function IntroSection() {
           <div className="absolute inset-0 bg-gradient-to-r from-amber-50/50 to-yellow-100/30 dark:from-amber-900/20 dark:to-yellow-900/10 rounded-2xl -z-10 transform -skew-y-1"></div>
           
           <div className="py-8 px-4 rounded-xl">
-            <h1 className="text-3xl md:text-4xl font-bold mb-6 font-heading relative inline-block">
-              <span className="bg-gradient-to-r from-amber-600 to-yellow-500 bg-clip-text text-transparent">Welcome</span>
-              <span className="absolute -bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 to-yellow-300 rounded-full"></span>
+            <h1 className="text-2xl md:text-3xl font-bold mb-6 font-heading relative inline-block text-gray-800 dark:text-gray-200">
+              Design Brief
             </h1>
             
             <div className="text-base text-muted-foreground max-w-2xl mx-auto space-y-4 animate-fade-in">
               <p className="text-lg font-medium">The design process always begins with an idea.</p>
               
-              <p>To help me understand more about you, your needs for this project, and to explore its potential, I've developed the following list of questions. This questionnaire helps explore ideas for your project.</p>
+              <p>To help me understand more about you, your needs for this project, and to explore its potential, I've developed the following list of questions.</p>
               
-              <p>Feel free to skip any questions that don't apply, and add any insights you think are important.</p>
+              <p>This questionnaire helps explore ideas for your project. Feel free to skip any questions that don't apply, and add any insights you think are important.</p>
               
-              <div className="mt-6 p-4 border border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-900/20 rounded-lg shadow-sm">
-                <p className="italic">Hi there — I've put this together to help you share your thoughts about your new home. It's a quick and simple way for me to understand what matters most to you — how you live, what kind of spaces you need, and what's important to your lifestyle.</p>
-                
-                <p className="font-medium mt-2">Once you've filled it out, I'll receive everything I need to guide the design of your home.</p>
-              </div>
+              <p>Let's get started…</p>
             </div>
           </div>
         </div>
