@@ -10,6 +10,6 @@ export function generateTestFiles() {
     uploadedInspirationImages: [],
     inspirationSelections: [],
     siteDocuments: [],
-    sitePhotos: [],
+    sitePhotos: [], // Added sitePhotos array
   };
 }

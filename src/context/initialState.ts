@@ -127,6 +127,7 @@ export const initialProjectData: ProjectData = {
     uploadedInspirationImages: [],
     inspirationSelections: [],
     siteDocuments: [],
+    sitePhotos: [], // Added missing sitePhotos property
     designFiles: [],
     inspirationFiles: []
   },
