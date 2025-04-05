@@ -138,15 +138,8 @@ export function ArchitectureSection() {
           description="Provide details about your design preferences, materials, and special architectural features."
         />
         
-        <StylePreferences 
-          preferredStyles={architectureData.preferredStyles || []}
-          stylePrefences={architectureData.stylePrefences || ''}
-          onStylesChange={handleStylesChange}
-          onInputChange={handleInputChange}
-        />
-        
-        {/* Inspiration References Section */}
-        <div className="design-brief-form-group mt-8">
+        {/* Moved Inspiration References Section to the top */}
+        <div className="design-brief-form-group">
           <Card>
             <CardContent className="pt-6 pb-6">
               <h3 className="text-lg font-semibold mb-4">Inspiration References</h3>
@@ -186,6 +179,13 @@ export function ArchitectureSection() {
             </CardContent>
           </Card>
         </div>
+        
+        <StylePreferences 
+          preferredStyles={architectureData.preferredStyles || []}
+          stylePrefences={architectureData.stylePrefences || ''}
+          onStylesChange={handleStylesChange}
+          onInputChange={handleInputChange}
+        />
         
         <MaterialsSection 
           externalMaterials={architectureData.externalMaterials || ''}

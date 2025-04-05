@@ -1,12 +1,17 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { PencilIcon, Trash2Icon, X, Check } from 'lucide-react';
-import { SpaceRoom } from '@/types';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Check, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
+import { toast } from 'sonner';
+import { SpaceRoom, OccupantEntry } from '@/types';
+import { getRoomQuestions } from './roomQuestions';
+import { PrimaryUsersSelect } from './PrimaryUsersSelect'; // Import the new component
+import { useDesignBrief } from '@/context/DesignBriefContext'; // Import context to get occupants
 
 interface RoomItemProps {
   room: SpaceRoom;
@@ -14,120 +19,248 @@ interface RoomItemProps {
   onRemove: (id: string) => void;
 }
 
-export const RoomItem: React.FC<RoomItemProps> = ({ room, onEdit, onRemove }) => {
-  const [isEditing, setIsEditing] = useState(false);
-  const [editedName, setEditedName] = useState(room.displayName || room.customName || room.type);
-  const [editedDescription, setEditedDescription] = useState(room.description || '');
+export const RoomItem = ({ room, onEdit, onRemove }: RoomItemProps) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [displayName, setDisplayName] = useState(room.displayName || '');
+  const [selectedLevel, setSelectedLevel] = useState<string>('');
+  const { formData } = useDesignBrief(); // Access context to get occupants
+  const occupants = formData.lifestyle.occupantEntries || [];
+
+  // Parse description if it exists and is a valid JSON string
+  const descriptionData = useMemo(() => {
+    try {
+      if (room.description) {
+        return JSON.parse(room.description);
+      }
+    } catch (e) {}
+    return {}; // Default empty object if parse fails
+  }, [room.description]);
   
-  const handleSaveEdit = () => {
+  // Get primaryUsers from description data or use empty array
+  const primaryUsers = useMemo(() => {
+    return room.primaryUsers || [];
+  }, [room.primaryUsers]);
+
+  // Handle level change
+  const handleLevelChange = (value: string) => {
+    setSelectedLevel(value);
+    updateRoomDescription('level', value);
+  };
+  
+  // Handle room type specific property changes
+  const handlePropertyChange = (key: string, value: string | boolean) => {
+    updateRoomDescription(key, value);
+  };
+  
+  const handlePrimaryUsersChange = (selectedIds: string[]) => {
     onEdit({
       ...room,
-      displayName: editedName,
-      description: editedDescription
+      primaryUsers: selectedIds
     });
-    setIsEditing(false);
+  };
+
+  // Update description JSON
+  const updateRoomDescription = (key: string, value: any) => {
+    try {
+      let currentData = {};
+      
+      if (room.description) {
+        try {
+          currentData = JSON.parse(room.description);
+        } catch (e) {
+          // If parse fails, start fresh
+          currentData = {};
+        }
+      }
+      
+      // Update the specified key
+      currentData = {
+        ...currentData,
+        [key]: value
+      };
+      
+      // Update the room with new description JSON
+      onEdit({
+        ...room,
+        description: JSON.stringify(currentData)
+      });
+      
+    } catch (e) {
+      console.error("Error updating room description:", e);
+      toast.error("Could not update room details");
+    }
   };
   
-  const handleCancelEdit = () => {
-    setEditedName(room.displayName || room.customName || room.type);
-    setEditedDescription(room.description || '');
-    setIsEditing(false);
+  // Get any custom questions for this room type
+  const questions = getRoomQuestions(room.type);
+
+  // Handle display name change
+  const handleDisplayNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setDisplayName(e.target.value);
   };
   
+  const handleDisplayNameSave = () => {
+    onEdit({
+      ...room,
+      displayName
+    });
+    toast.success("Room name updated");
+  };
+  
+  const handleNotesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    updateRoomDescription('notes', e.target.value);
+  };
+  
+  // Toggle expanded state
+  const toggleExpanded = () => {
+    setIsExpanded(!isExpanded);
+  };
+  
+  // Get custom or default room name for display
+  const roomName = room.displayName || room.customName || `${room.type}`;
+
   return (
-    <Card className={`mb-4 overflow-hidden transition-all duration-300 ${isEditing ? 'shadow-md' : 'hover:shadow-sm'}`}>
+    <Card className="mb-4 border">
       <CardContent className="p-4">
-        {isEditing ? (
-          <div className="space-y-4 animate-fade-in">
-            <div>
-              <div className="flex items-center mb-1">
-                <label htmlFor={`room-name-${room.id}`} className="text-sm font-medium">
-                  Room Name
-                </label>
+        <div className="flex justify-between items-center">
+          <div className="flex-1">
+            <div className="font-medium text-lg">{roomName}</div>
+            {descriptionData.level && (
+              <div className="text-xs text-muted-foreground mt-1">
+                Level: {descriptionData.level.toUpperCase()}
               </div>
-              <Input
-                id={`room-name-${room.id}`}
-                value={editedName}
-                onChange={(e) => setEditedName(e.target.value)}
-                placeholder="Enter room name"
-                className="focus:ring-2 focus:ring-primary/20 transition-shadow"
-              />
-            </div>
-            
-            <div>
-              <label htmlFor={`room-description-${room.id}`} className="text-sm font-medium block mb-1">
-                Description
-              </label>
-              <Textarea
-                id={`room-description-${room.id}`}
-                value={editedDescription}
-                onChange={(e) => setEditedDescription(e.target.value)}
-                placeholder="Enter room description"
-                rows={3}
-                className="focus:ring-2 focus:ring-primary/20 transition-shadow"
-              />
-            </div>
-            
-            <div className="flex justify-end space-x-2">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={handleCancelEdit} 
-                className="h-8 transition-all duration-200 active:scale-95"
-              >
-                <X className="h-4 w-4 mr-1" />
-                Cancel
-              </Button>
-              <Button 
-                size="sm" 
-                onClick={handleSaveEdit} 
-                className="h-8 transition-all duration-200 active:scale-95"
-              >
-                <Check className="h-4 w-4 mr-1" />
-                Save
-              </Button>
-            </div>
+            )}
+            {primaryUsers && primaryUsers.length > 0 && (
+              <div className="text-xs text-muted-foreground mt-1">
+                Intended for: {primaryUsers.map(id => {
+                  const user = occupants.find(o => o.id === id);
+                  return user?.name || 'Unknown';
+                }).join(", ")}
+              </div>
+            )}
           </div>
-        ) : (
-          <div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <h3 className="text-lg font-medium">
-                  {room.displayName || room.customName || room.type}
-                </h3>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setIsEditing(true)}
-                        className="ml-2 h-8 px-2 text-muted-foreground hover:text-foreground transition-colors group"
-                      >
-                        <PencilIcon className="h-4 w-4 mr-1 group-hover:text-primary transition-colors" />
-                        <span className="text-xs text-muted-foreground">Edit room name (e.g., Master Bedroom, Taylor's Room)</span>
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent side="top">
-                      Edit to provide a more specific name
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+          <div className="flex gap-2">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={toggleExpanded} 
+              aria-label="Expand room details"
+            >
+              {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => onRemove(room.id)} 
+              className="text-destructive hover:text-destructive hover:bg-destructive/10"
+              aria-label="Remove room"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+        
+        {isExpanded && (
+          <div className="mt-4 space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor={`room-name-${room.id}`}>Room Name</Label>
+                <div className="flex gap-2 mt-1">
+                  <Input 
+                    id={`room-name-${room.id}`}
+                    value={displayName} 
+                    onChange={handleDisplayNameChange} 
+                    placeholder={`${room.type} Name`} 
+                    className="flex-1"
+                  />
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={handleDisplayNameSave}
+                    className="shrink-0"
+                  >
+                    <Check className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
               
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => onRemove(room.id)}
-                className="h-8 px-2 text-destructive hover:text-destructive-foreground hover:bg-destructive/10 transition-colors"
-              >
-                <Trash2Icon className="h-4 w-4" />
-              </Button>
+              <div>
+                <Label htmlFor={`room-level-${room.id}`}>Level</Label>
+                <Select 
+                  value={descriptionData.level || ''} 
+                  onValueChange={handleLevelChange}
+                >
+                  <SelectTrigger id={`room-level-${room.id}`} className="mt-1">
+                    <SelectValue placeholder="Select level" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ground">Ground Floor</SelectItem>
+                    <SelectItem value="upper">Upper Floor</SelectItem>
+                    <SelectItem value="lower">Lower Floor/Basement</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
             
-            <p className="mt-2 text-sm text-muted-foreground">
-              {room.description || "No description provided"}
-            </p>
+            {/* Room-specific questions */}
+            {questions.map((question) => (
+              <div key={question.id}>
+                <Label htmlFor={`room-${question.id}-${room.id}`}>{question.label}</Label>
+                {question.type === 'select' && (
+                  <Select 
+                    value={descriptionData[question.id] || ''} 
+                    onValueChange={value => handlePropertyChange(question.id, value)}
+                  >
+                    <SelectTrigger id={`room-${question.id}-${room.id}`} className="mt-1">
+                      <SelectValue placeholder={question.placeholder || `Select ${question.label.toLowerCase()}`} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {question.options?.map(option => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+                
+                {question.type === 'checkbox' && (
+                  <div className="flex items-center space-x-2 mt-1">
+                    <input 
+                      type="checkbox" 
+                      id={`room-${question.id}-${room.id}`}
+                      checked={!!descriptionData[question.id]} 
+                      onChange={e => handlePropertyChange(question.id, e.target.checked)}
+                      className="h-4 w-4"
+                    />
+                    <Label 
+                      htmlFor={`room-${question.id}-${room.id}`}
+                      className="text-sm text-muted-foreground"
+                    >
+                      {question.checkboxLabel || question.label}
+                    </Label>
+                  </div>
+                )}
+              </div>
+            ))}
+            
+            {/* Primary Users Select */}
+            <PrimaryUsersSelect 
+              occupants={occupants}
+              selectedUsers={primaryUsers}
+              onChange={handlePrimaryUsersChange}
+            />
+            
+            <div>
+              <Label htmlFor={`room-notes-${room.id}`}>Notes</Label>
+              <Textarea 
+                id={`room-notes-${room.id}`}
+                value={descriptionData.notes || ''} 
+                onChange={handleNotesChange}
+                placeholder="Any additional notes about this room..."
+                className="mt-1"
+              />
+            </div>
           </div>
         )}
       </CardContent>

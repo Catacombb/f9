@@ -20,6 +20,9 @@ export const renderSpacesInfo = (ctx: PDFContext, projectData: ProjectData): voi
     
     addSpace(ctx, 4);
     
+    // Get all occupants to reference
+    const occupants = projectData.formData.lifestyle.occupantEntries || [];
+    
     // Display each room type
     Object.entries(roomsByType).forEach(([type, rooms]) => {
       // Add room type header with count
@@ -110,20 +113,17 @@ export const renderSpacesInfo = (ctx: PDFContext, projectData: ProjectData): voi
           // Add the description after an en dash
           ctx.pdf.setFont('helvetica', 'normal');
           
-          // Add description with appropriate wrapping
-          const descStart = ctx.margin + fullPrefixWidth;
-          const maxWidth = ctx.contentWidth - fullPrefixWidth;
-          
           // First line with the level info and start of description
           ctx.pdf.text(`– ${levelInfo}`, ctx.margin + roomNameWidth + ctx.pdf.getTextWidth(roomName), ctx.yPosition);
           
           // Split the description to fit within available width
+          const maxWidth = ctx.contentWidth - fullPrefixWidth;
           const splitDescription = ctx.pdf.splitTextToSize(formattedDescription, maxWidth);
           
           // If the description is more than one line
           if (splitDescription.length > 1) {
             // First line is already positioned after the room name
-            ctx.pdf.text(splitDescription[0], descStart, ctx.yPosition);
+            ctx.pdf.text(splitDescription[0], ctx.margin + fullPrefixWidth, ctx.yPosition);
             ctx.yPosition += 4; // Move down for the next lines
             
             // Add subsequent lines with proper indentation
@@ -133,8 +133,28 @@ export const renderSpacesInfo = (ctx: PDFContext, projectData: ProjectData): voi
             }
           } else {
             // Single line description
-            ctx.pdf.text(formattedDescription, descStart, ctx.yPosition);
+            ctx.pdf.text(formattedDescription, ctx.margin + fullPrefixWidth, ctx.yPosition);
             ctx.yPosition += 4;
+          }
+          
+          // Add primary users if available
+          if (room.primaryUsers && room.primaryUsers.length > 0) {
+            const userNames = room.primaryUsers
+              .map(id => occupants.find(o => o.id === id)?.name || '')
+              .filter(name => !!name);
+              
+            if (userNames.length > 0) {
+              ctx.pdf.text("  Intended for: ", ctx.margin + 4, ctx.yPosition);
+              
+              // Get the width of the prefix text
+              const prefixWidth = ctx.pdf.getTextWidth("  Intended for: ");
+              
+              // Add user names
+              const usersText = userNames.join(", ");
+              ctx.pdf.text(usersText, ctx.margin + 4 + prefixWidth, ctx.yPosition);
+              
+              ctx.yPosition += 4;
+            }
           }
           
           // Add spacing between bullet points
@@ -151,6 +171,18 @@ export const renderSpacesInfo = (ctx: PDFContext, projectData: ProjectData): voi
             ctx.margin + ctx.pdf.getTextWidth("• " + roomName), 
             ctx.yPosition);
           ctx.yPosition += 6;
+          
+          // Add primary users if available
+          if (room.primaryUsers && room.primaryUsers.length > 0) {
+            const userNames = room.primaryUsers
+              .map(id => occupants.find(o => o.id === id)?.name || '')
+              .filter(name => !!name);
+              
+            if (userNames.length > 0) {
+              ctx.pdf.text("  Intended for: " + userNames.join(", "), ctx.margin + 4, ctx.yPosition);
+              ctx.yPosition += 4;
+            }
+          }
         }
       });
       

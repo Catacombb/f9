@@ -7,6 +7,7 @@ export interface SpaceRoom {
   isCustom: boolean;
   customName?: string;
   displayName?: string; // Added for naming individual rooms
+  primaryUsers?: string[]; // Added for tracking who uses this room
 }
 
 export interface Professional {
@@ -21,6 +22,13 @@ export interface Professional {
 export interface InspirationEntry {
   link: string;
   description: string;
+}
+
+export interface OccupantEntry {
+  id: string;
+  type: string; // 'adult', 'child', 'dog', 'cat', 'other'
+  name: string;
+  notes?: string;
 }
 
 export interface ProjectFiles {
@@ -74,6 +82,7 @@ export interface FormData {
     workFromHome?: string;
     lifestyleNotes?: string;
     homeFeeling?: string; // Added missing property
+    occupantEntries?: OccupantEntry[]; // New field for occupants with names and notes
   };
   site: {
     existingConditions: string;

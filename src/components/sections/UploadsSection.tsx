@@ -1,388 +1,304 @@
-
-import React, { useCallback, useState } from 'react';
-import { Button } from '@/components/ui/button';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useDesignBrief } from '@/context/DesignBriefContext';
-import { ArrowLeft, ArrowRight, Upload, X, File, Image as ImageIcon, FileArchive, FileText, Camera } from 'lucide-react';
-import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft, ArrowRight, Upload, X, FileText, Image, FileArchive } from 'lucide-react';
 import { SectionHeader } from './SectionHeader';
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { toast } from 'sonner';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Label } from '@/components/ui/label';
+import { Progress } from '@/components/ui/progress';
+import { InspirationGallery } from '@/components/uploads/InspirationGallery';
 
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
-const MAX_FILES_PER_CATEGORY = 10; // Limit to 10 files per category
-
-interface FileItemProps {
-  file: File;
-  onRemove: () => void;
-}
-
-const FileItem = ({ file, onRemove }: FileItemProps) => {
-  // Helper function to determine file type icon
-  const getFileIcon = (file: File) => {
-    if (file.type.startsWith('image/')) return <ImageIcon className="h-5 w-5" />;
-    if (file.type.includes('pdf')) return <FileText className="h-5 w-5" />;
-    if (file.type.includes('zip') || file.type.includes('rar')) return <FileArchive className="h-5 w-5" />;
-    return <File className="h-5 w-5" />;
-  };
-
-  return (
-    <div className="flex items-center justify-between p-3 bg-background rounded-lg border">
-      <div className="flex items-center">
-        <div className="mr-3 p-2 bg-primary/10 rounded">
-          {getFileIcon(file)}
-        </div>
-        <div>
-          <p className="font-medium text-sm truncate max-w-xs">{file.name}</p>
-          <p className="text-xs text-muted-foreground">
-            {(file.size / 1024 / 1024).toFixed(2)} MB
-            <Badge variant="outline" className="ml-2 text-xs bg-primary/10 text-primary">
-              ✓ Uploaded
-            </Badge>
-          </p>
-        </div>
-      </div>
-      <Button 
-        variant="ghost" 
-        size="icon" 
-        onClick={onRemove}
-        aria-label={`Remove ${file.name}`}
-      >
-        <X className="h-4 w-4" />
-      </Button>
-    </div>
-  );
+// Maximum file size in bytes (10MB)
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
+// Allowed file types
+const ALLOWED_FILE_TYPES = {
+  documents: [
+    'application/pdf', 
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'application/vnd.ms-excel',
+    'text/plain',
+    'application/zip',
+    'application/x-zip-compressed'
+  ],
+  images: [
+    'image/jpeg',
+    'image/png',
+    'image/gif',
+    'image/webp',
+    'image/heic'
+  ]
 };
 
-interface FileUploadSectionProps {
-  title: string;
-  description: string;
-  files: File[];
-  onFileUpload: (files: FileList) => void;
-  onRemoveFile: (index: number) => void;
-  icon: React.ReactNode;
-  acceptTypes: string;
-  id: string;
-}
-
-const FileUploadSection = ({
-  title,
-  description,
-  files,
-  onFileUpload,
-  onRemoveFile,
-  icon,
-  acceptTypes,
-  id
-}: FileUploadSectionProps) => {
-  const [isDragging, setIsDragging] = useState(false);
-  
-  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const fileList = e.target.files;
-    if (fileList && fileList.length > 0) {
-      onFileUpload(fileList);
-      // Reset the input value to allow uploading the same file again
-      e.target.value = '';
-    }
-  };
-  
-  const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(true);
-  };
-  
-  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(false);
-  };
-  
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(true);
-  };
-  
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(false);
-    
-    const dt = e.dataTransfer;
-    const fileList = dt.files;
-    
-    if (fileList.length > 0) {
-      onFileUpload(fileList);
-    }
-  };
-  
-  return (
-    <Card className="mb-8">
-      <div className="p-6">
-        <div className="mb-4">
-          <h3 className="text-lg font-medium">{title}</h3>
-          <p className="text-sm text-muted-foreground mt-1">{description}</p>
-        </div>
-        
-        <div 
-          className={`border-2 border-dashed rounded-lg p-8 mb-4 transition-colors ${
-            isDragging ? 'border-primary bg-primary/5' : 'border-primary/40'
-          }`}
-          onDragEnter={handleDragEnter}
-          onDragLeave={handleDragLeave}
-          onDragOver={handleDragOver}
-          onDrop={handleDrop}
-        >
-          <div className="flex flex-col items-center">
-            {icon}
-            <h3 className="font-medium text-lg mb-2">Upload {title}</h3>
-            <p className="text-sm text-muted-foreground mb-2">
-              {isDragging ? 'Drop files here to upload' : 'Drag and drop files here or click to browse'}
-            </p>
-            <p className="text-xs text-muted-foreground mb-6">
-              Accepted file types: {acceptTypes} (Max 10MB per file)
-            </p>
-            <label htmlFor={`file-upload-${id}`}>
-              <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90">
-                <span>
-                  <Upload className="h-4 w-4 mr-2" />
-                  Browse Files
-                </span>
-              </Button>
-            </label>
-            <input
-              id={`file-upload-${id}`}
-              type="file"
-              multiple
-              className="hidden"
-              onChange={handleFileInputChange}
-              accept={acceptTypes}
-            />
-          </div>
-        </div>
-        
-        <p className="text-sm text-muted-foreground mb-4">
-          {files.length} of {MAX_FILES_PER_CATEGORY} files uploaded
-        </p>
-        
-        {files.length > 0 && (
-          <div className="space-y-3">
-            {files.map((file, index) => (
-              <FileItem 
-                key={`${file.name}-${index}`} 
-                file={file} 
-                onRemove={() => onRemoveFile(index)} 
-              />
-            ))}
-          </div>
-        )}
-      </div>
-    </Card>
-  );
-};
+// File categories
+const FILE_CATEGORIES = [
+  { 
+    id: 'siteDocuments', 
+    label: 'Site Documents', 
+    description: 'Upload Certificate of Title, LIM Report, Resource Consent Documents',
+    accept: '.pdf,.doc,.docx,.xls,.xlsx,.txt,.zip'
+  },
+  { 
+    id: 'sitePhotos', 
+    label: 'Site Photos', 
+    description: 'Upload photos of your site, existing buildings, views',
+    accept: '.jpg,.jpeg,.png,.gif,.webp,.heic'
+  },
+  { 
+    id: 'designFiles', 
+    label: 'Design Files', 
+    description: 'Upload floor plans, concept drawings, site survey or topo files',
+    accept: '.pdf,.doc,.docx,.xls,.xlsx,.zip'
+  },
+  { 
+    id: 'inspirationFiles', 
+    label: 'Inspiration & Visuals', 
+    description: 'Upload moodboards, exterior/interior example images, materials',
+    accept: '.jpg,.jpeg,.png,.gif,.webp,.pdf'
+  }
+];
 
 export function UploadsSection() {
-  const { files, updateFiles, setCurrentSection } = useDesignBrief();
-  
-  const validateAndProcessFiles = (fileList: FileList, maxFiles: number): File[] => {
-    const validFiles: File[] = [];
-    
-    for (let i = 0; i < fileList.length; i++) {
-      const file = fileList[i];
-      
-      // Check file size
-      if (file.size > MAX_FILE_SIZE) {
-        toast({
-          title: "File too large",
-          description: `${file.name} is larger than 10MB.`,
-        });
-        continue;
-      }
-      
-      validFiles.push(file);
-      
-      // Check if we've hit the max files limit
-      if (validFiles.length >= maxFiles) {
-        break;
-      }
-    }
-    
-    return validFiles;
-  };
-  
-  const handleSiteDocumentUpload = (fileList: FileList) => {
-    const remainingSlots = MAX_FILES_PER_CATEGORY - (files.siteDocuments?.length || 0);
-    
-    if (remainingSlots <= 0) {
-      toast({
-        title: "Upload limit reached",
-        description: `You can upload a maximum of ${MAX_FILES_PER_CATEGORY} site documents.`,
-      });
-      return;
-    }
-    
-    const maxFilesToAdd = Math.min(fileList.length, remainingSlots);
-    const validFiles = validateAndProcessFiles(fileList, maxFilesToAdd);
-    
-    if (validFiles.length > 0) {
-      updateFiles({ 
-        siteDocuments: [...(files.siteDocuments || []), ...validFiles]
-      });
-    }
-  };
-  
-  const handleSitePhotosUpload = (fileList: FileList) => {
-    const remainingSlots = MAX_FILES_PER_CATEGORY - (files.sitePhotos?.length || 0);
-    
-    if (remainingSlots <= 0) {
-      toast({
-        title: "Upload limit reached",
-        description: `You can upload a maximum of ${MAX_FILES_PER_CATEGORY} site photos.`,
-      });
-      return;
-    }
-    
-    const maxFilesToAdd = Math.min(fileList.length, remainingSlots);
-    const validFiles = validateAndProcessFiles(fileList, maxFilesToAdd);
-    
-    if (validFiles.length > 0) {
-      updateFiles({ 
-        sitePhotos: [...(files.sitePhotos || []), ...validFiles]
-      });
-    }
-  };
-  
-  const handleDesignFilesUpload = (fileList: FileList) => {
-    const remainingSlots = MAX_FILES_PER_CATEGORY - (files.designFiles?.length || 0);
-    
-    if (remainingSlots <= 0) {
-      toast({
-        title: "Upload limit reached",
-        description: `You can upload a maximum of ${MAX_FILES_PER_CATEGORY} design files.`,
-      });
-      return;
-    }
-    
-    const maxFilesToAdd = Math.min(fileList.length, remainingSlots);
-    const validFiles = validateAndProcessFiles(fileList, maxFilesToAdd);
-    
-    if (validFiles.length > 0) {
-      updateFiles({ 
-        designFiles: [...(files.designFiles || []), ...validFiles]
-      });
-    }
-  };
-  
-  const handleInspirationFilesUpload = (fileList: FileList) => {
-    const remainingSlots = MAX_FILES_PER_CATEGORY - (files.inspirationFiles?.length || 0);
-    
-    if (remainingSlots <= 0) {
-      toast({
-        title: "Upload limit reached",
-        description: `You can upload a maximum of ${MAX_FILES_PER_CATEGORY} inspiration files.`,
-      });
-      return;
-    }
-    
-    const maxFilesToAdd = Math.min(fileList.length, remainingSlots);
-    const validFiles = validateAndProcessFiles(fileList, maxFilesToAdd);
-    
-    if (validFiles.length > 0) {
-      updateFiles({ 
-        inspirationFiles: [...(files.inspirationFiles || []), ...validFiles]
-      });
-    }
-  };
-  
-  const handleRemoveSiteDocument = (index: number) => {
-    const updatedFiles = [...(files.siteDocuments || [])];
-    updatedFiles.splice(index, 1);
-    updateFiles({ siteDocuments: updatedFiles });
-  };
-  
-  const handleRemoveSitePhoto = (index: number) => {
-    const updatedFiles = [...(files.sitePhotos || [])];
-    updatedFiles.splice(index, 1);
-    updateFiles({ sitePhotos: updatedFiles });
-  };
-  
-  const handleRemoveDesignFile = (index: number) => {
-    const updatedFiles = [...(files.designFiles || [])];
-    updatedFiles.splice(index, 1);
-    updateFiles({ designFiles: updatedFiles });
-  };
-  
-  const handleRemoveInspirationFile = (index: number) => {
-    const updatedFiles = [...(files.inspirationFiles || [])];
-    updatedFiles.splice(index, 1);
-    updateFiles({ inspirationFiles: updatedFiles });
-  };
+  const { setCurrentSection, files, updateFiles } = useDesignBrief();
+  const [activeTab, setActiveTab] = useState('files');
+  const [uploadProgress, setUploadProgress] = useState<{[key: string]: number}>({});
+  const [dragOver, setDragOver] = useState<string | null>(null);
   
   const handlePrevious = () => {
     setCurrentSection('architecture');
     window.scrollTo(0, 0);
   };
-  
+
   const handleNext = () => {
-    setCurrentSection('communication');
+    setCurrentSection('contractors');
     window.scrollTo(0, 0);
   };
   
+  const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>, categoryId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragOver(categoryId);
+  }, []);
+  
+  const handleDragLeave = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragOver(null);
+  }, []);
+  
+  const handleDrop = useCallback((e: React.DragEvent<HTMLDivElement>, categoryId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragOver(null);
+    
+    const droppedFiles = Array.from(e.dataTransfer.files);
+    handleFileUpload(droppedFiles, categoryId);
+  }, []);
+  
+  const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>, categoryId: string) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const selectedFiles = Array.from(e.target.files);
+      handleFileUpload(selectedFiles, categoryId);
+      // Reset the input value so the same file can be uploaded again if needed
+      e.target.value = '';
+    }
+  }, []);
+  
+  const handleFileUpload = useCallback((selectedFiles: File[], categoryId: string) => {
+    // Filter files by type based on category
+    const isImageCategory = ['sitePhotos', 'inspirationFiles'].includes(categoryId);
+    const allowedTypes = isImageCategory ? ALLOWED_FILE_TYPES.images : ALLOWED_FILE_TYPES.documents;
+    
+    const validFiles = selectedFiles.filter(file => {
+      // Check file size
+      if (file.size > MAX_FILE_SIZE) {
+        toast.error(`File ${file.name} is too large. Maximum size is 10MB.`);
+        return false;
+      }
+      
+      // Check file type
+      if (!allowedTypes.includes(file.type)) {
+        toast.error(`File ${file.name} is not a valid file type for this category.`);
+        return false;
+      }
+      
+      return true;
+    });
+    
+    if (validFiles.length === 0) {
+      return;
+    }
+    
+    // Simulate upload progress
+    validFiles.forEach(file => {
+      const fileId = `${file.name}-${Date.now()}`;
+      setUploadProgress(prev => ({ ...prev, [fileId]: 0 }));
+      
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress += Math.random() * 10;
+        if (progress >= 100) {
+          progress = 100;
+          clearInterval(interval);
+          
+          // Remove progress indicator after a delay
+          setTimeout(() => {
+            setUploadProgress(prev => {
+              const newProgress = { ...prev };
+              delete newProgress[fileId];
+              return newProgress;
+            });
+          }, 500);
+        }
+        
+        setUploadProgress(prev => ({ ...prev, [fileId]: progress }));
+      }, 200);
+    });
+    
+    // Update files in context
+    updateFiles({
+      [categoryId]: [...(files[categoryId as keyof typeof files] || []), ...validFiles]
+    });
+    
+    toast.success(`${validFiles.length} file${validFiles.length !== 1 ? 's' : ''} uploaded successfully.`);
+  }, [files, updateFiles]);
+  
+  const handleRemoveFile = useCallback((fileIndex: number, categoryId: string) => {
+    const categoryFiles = files[categoryId as keyof typeof files] || [];
+    const updatedFiles = [...categoryFiles];
+    updatedFiles.splice(fileIndex, 1);
+    
+    updateFiles({
+      [categoryId]: updatedFiles
+    });
+    
+    toast.success('File removed successfully.');
+  }, [files, updateFiles]);
+  
+  const getFileIcon = (file: File) => {
+    if (file.type.startsWith('image/')) {
+      return <Image className="h-5 w-5" />;
+    } else if (file.type === 'application/pdf') {
+      return <FileText className="h-5 w-5" />;
+    } else {
+      return <FileArchive className="h-5 w-5" />;
+    }
+  };
+  
+  const renderFileUploadCard = (category: typeof FILE_CATEGORIES[0]) => {
+    const categoryFiles = files[category.id as keyof typeof files] || [];
+    const hasFiles = categoryFiles.length > 0;
+    
+    return (
+      <Card key={category.id} className="mb-6">
+        <CardHeader>
+          <CardTitle>{category.label}</CardTitle>
+          <CardDescription>{category.description}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div 
+            className={`border-2 border-dashed rounded-lg p-6 text-center ${
+              dragOver === category.id ? 'border-primary bg-primary/5' : 'border-muted-foreground/25'
+            }`}
+            onDragOver={(e) => handleDragOver(e, category.id)}
+            onDragLeave={handleDragLeave}
+            onDrop={(e) => handleDrop(e, category.id)}
+          >
+            <div className="flex flex-col items-center justify-center space-y-2">
+              <div className="rounded-full bg-background p-2 border">
+                <Upload className="h-6 w-6" />
+              </div>
+              <div className="text-sm font-medium">
+                Drag files here or click to upload
+              </div>
+              <div className="text-xs text-muted-foreground">
+                Maximum file size: 10MB
+              </div>
+              <Label htmlFor={`file-upload-${category.id}`} className="cursor-pointer">
+                <div className="bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-md text-sm font-medium">
+                  Select Files
+                </div>
+                <input
+                  id={`file-upload-${category.id}`}
+                  type="file"
+                  multiple
+                  accept={category.accept}
+                  className="sr-only"
+                  onChange={(e) => handleFileChange(e, category.id)}
+                />
+              </Label>
+            </div>
+          </div>
+          
+          {/* File list */}
+          {hasFiles && (
+            <div className="mt-4">
+              <h4 className="text-sm font-medium mb-2">Uploaded Files</h4>
+              <div className="space-y-2">
+                {categoryFiles.map((file, index) => (
+                  <div key={`${file.name}-${index}`} className="flex items-center justify-between bg-muted/50 p-2 rounded-md">
+                    <div className="flex items-center space-x-2 overflow-hidden">
+                      {getFileIcon(file)}
+                      <span className="text-sm truncate max-w-[200px]">{file.name}</span>
+                      <span className="text-xs text-muted-foreground">
+                        ({(file.size / 1024 / 1024).toFixed(2)} MB)
+                      </span>
+                    </div>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => handleRemoveFile(index, category.id)}
+                      className="h-8 w-8 p-0"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          
+          {/* Upload progress indicators */}
+          {Object.keys(uploadProgress).length > 0 && (
+            <div className="mt-4 space-y-2">
+              {Object.entries(uploadProgress).map(([fileId, progress]) => (
+                <div key={fileId} className="space-y-1">
+                  <div className="text-xs">{fileId.split('-')[0]}</div>
+                  <Progress value={progress} className="h-2" />
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    );
+  };
+
   return (
     <div className="design-brief-section-wrapper">
       <div className="design-brief-section-container">
         <SectionHeader 
-          title="Upload Files" 
-          description="Upload any relevant documents for your project by category. These files will help us understand your project requirements and references."
+          title="File Uploads" 
+          description="Upload relevant files for your project, such as site documents, photos, and inspiration."
         />
         
-        {/* Site Documents Upload Section */}
-        <FileUploadSection
-          title="Site Documents"
-          description="Upload Certificate of Title, LIM Report, Resource Consent Documents, and other site-related documents."
-          files={files.siteDocuments || []}
-          onFileUpload={handleSiteDocumentUpload}
-          onRemoveFile={handleRemoveSiteDocument}
-          icon={<FileText className="h-10 w-10 text-primary mb-4" />}
-          acceptTypes=".pdf,.doc,.docx,.xls,.xlsx,image/*"
-          id="site-docs"
-        />
-        
-        {/* Site Photos Upload Section */}
-        <FileUploadSection
-          title="Site Photos"
-          description="Upload recent photos of your site from different angles or key features you'd like us to see."
-          files={files.sitePhotos || []}
-          onFileUpload={handleSitePhotosUpload}
-          onRemoveFile={handleRemoveSitePhoto}
-          icon={<Camera className="h-10 w-10 text-primary mb-4" />}
-          acceptTypes=".jpg,.jpeg,.png,.heic,.pdf"
-          id="site-photos"
-        />
-        
-        {/* Design Files Upload Section */}
-        <FileUploadSection
-          title="Design Files"
-          description="Upload Floor Plans, Concept Drawings, Site Survey or Topo Files, and other design-related documents."
-          files={files.designFiles || []}
-          onFileUpload={handleDesignFilesUpload}
-          onRemoveFile={handleRemoveDesignFile}
-          icon={<File className="h-10 w-10 text-primary mb-4" />}
-          acceptTypes=".pdf,.dwg,.dxf,.skp,.doc,.docx,.xls,.xlsx,image/*"
-          id="design-files"
-        />
-        
-        {/* Inspiration Files Upload Section */}
-        <FileUploadSection
-          title="Inspiration & Visuals"
-          description="Upload Moodboards, Exterior/Interior Example Images, Product or Material References."
-          files={files.inspirationFiles || []}
-          onFileUpload={handleInspirationFilesUpload}
-          onRemoveFile={handleRemoveInspirationFile}
-          icon={<ImageIcon className="h-10 w-10 text-primary mb-4" />}
-          acceptTypes="image/*,.pdf"
-          id="inspiration-files"
-        />
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="mb-6">
+            <TabsTrigger value="files">Document Uploads</TabsTrigger>
+            <TabsTrigger value="inspiration">Inspiration Gallery</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="files" className="space-y-6">
+            {FILE_CATEGORIES.map(renderFileUploadCard)}
+          </TabsContent>
+          
+          <TabsContent value="inspiration">
+            <InspirationGallery />
+          </TabsContent>
+        </Tabs>
         
         <div className="flex justify-between mt-6">
           <Button variant="outline" onClick={handlePrevious} className="group">
@@ -391,7 +307,7 @@ export function UploadsSection() {
           </Button>
           
           <Button onClick={handleNext} className="group">
-            <span>Next: Communication</span>
+            <span>Next: Project Team</span>
             <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
           </Button>
         </div>

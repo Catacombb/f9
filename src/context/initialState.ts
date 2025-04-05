@@ -35,7 +35,8 @@ export const initialProjectData: ProjectData = {
       entertaining: '',
       workFromHome: '',
       lifestyleNotes: '',
-      homeFeeling: '' // Added missing property
+      homeFeeling: '', // Added missing property
+      occupantEntries: [] // New field for named occupants
     },
     site: {
       existingConditions: '',
