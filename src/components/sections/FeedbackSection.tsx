@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { SectionHeader } from './SectionHeader';
@@ -16,12 +15,6 @@ import {
   SelectTrigger, 
   SelectValue 
 } from '@/components/ui/select';
-import { 
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger
-} from '@/components/ui/tooltip';
 import { Input } from '@/components/ui/input';
 import { 
   RadioGroup, 
@@ -32,7 +25,6 @@ import emailjs from 'emailjs-com';
 
 export function FeedbackSection() {
   const { formData, updateFormData, setCurrentSection, projectData } = useDesignBrief();
-  const [showContactFields, setShowContactFields] = useState(formData.feedback.canContact === 'yes');
   const [otherRole, setOtherRole] = useState(
     formData.feedback.userRole?.includes('Other') 
       ? formData.feedback.otherRoleSpecify || '' 
@@ -63,11 +55,6 @@ export function FeedbackSection() {
     updateFormData('feedback', { userRole: newRoles });
   };
   
-  const handleCanContactChange = (value: string) => {
-    updateFormData('feedback', { canContact: value });
-    setShowContactFields(value === 'yes');
-  };
-  
   const sendFeedbackEmail = async () => {
     try {
       // Get client info from project data or use tester provided values
@@ -79,11 +66,11 @@ export function FeedbackSection() {
       const templateParams = {
         to_email: 'nick@nickharrison.co',
         from_name: testerName || clientInfo.clientName || 'Anonymous Tester',
-        from_email: testerEmail || clientInfo.contactEmail || formData.feedback.contactInfo || 'No Email Provided',
+        from_email: testerEmail || clientInfo.contactEmail || 'No Email Provided',
         subject: 'Northstar Design Brief - Tester Feedback',
         message: `
 — Tester Feedback —
-Submitted by: ${testerName || clientInfo.clientName || 'Anonymous'} (${testerEmail || clientInfo.contactEmail || formData.feedback.contactInfo || 'No Email'})
+Submitted by: ${testerName || clientInfo.clientName || 'Anonymous'} (${testerEmail || clientInfo.contactEmail || 'No Email'})
 
 RATINGS:
 Usability: ${formData.feedback.usabilityRating}/5
@@ -109,7 +96,6 @@ Team size: ${formData.feedback.teamSize || 'Not specified'}
 FOLLOW-UP:
 Would recommend: ${formData.feedback.wouldRecommend || 'Not specified'}
 Can contact: ${formData.feedback.canContact || 'No'}
-${formData.feedback.canContact === 'yes' ? `Contact info: ${formData.feedback.contactInfo}` : ''}
         `
       };
 
@@ -151,12 +137,6 @@ ${formData.feedback.canContact === 'yes' ? `Contact info: ${formData.feedback.co
     // If "Other" role is selected but not specified
     if (formData.feedback.userRole.includes('Other') && !otherRole) {
       toast.error("Please specify your role");
-      return;
-    }
-    
-    // If "Yes" to contact but no contact info
-    if (formData.feedback.canContact === 'yes' && !formData.feedback.contactInfo) {
-      toast.error("Please provide your contact information");
       return;
     }
     
@@ -472,37 +452,6 @@ ${formData.feedback.canContact === 'yes' ? `Contact info: ${formData.feedback.co
                     <Label htmlFor="recommend-no">No</Label>
                   </div>
                 </RadioGroup>
-              </div>
-              
-              <div className="pt-2">
-                <Label className="font-medium">Can we contact you to chat more about your feedback?*</Label>
-                <RadioGroup
-                  value={formData.feedback.canContact || ''}
-                  onValueChange={handleCanContactChange}
-                  className="flex flex-row space-x-4 mt-2"
-                >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="yes" id="contact-yes" />
-                    <Label htmlFor="contact-yes">Yes</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="no" id="contact-no" />
-                    <Label htmlFor="contact-no">No</Label>
-                  </div>
-                </RadioGroup>
-                
-                {showContactFields && (
-                  <div className="mt-4">
-                    <Label htmlFor="contactInfo" className="text-sm">Best way to reach you:</Label>
-                    <Input
-                      id="contactInfo"
-                      value={formData.feedback.contactInfo || ''}
-                      onChange={(e) => handleTextChange('contactInfo', e.target.value)}
-                      className="mt-1"
-                      placeholder="Email or phone number"
-                    />
-                  </div>
-                )}
               </div>
             </div>
           </CardContent>
