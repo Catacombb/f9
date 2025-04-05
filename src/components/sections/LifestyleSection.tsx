@@ -1,85 +1,22 @@
-
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import { useDesignBrief } from '@/context/DesignBriefContext';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useDesignBrief } from '@/context/DesignBriefContext';
-import { ArrowLeft, ArrowRight, Users, Cat, Dog } from 'lucide-react';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { SectionHeader } from './SectionHeader';
-
-const AdultIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <circle cx="12" cy="5" r="3" />
-    <path d="M12 8v14" />
-    <path d="M8 16h8" />
-  </svg>
-);
-
-const ChildIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <circle cx="12" cy="5" r="2.5" />
-    <path d="M12 8v6" />
-    <path d="M10 14h4" />
-    <path d="M9 22v-6.5" />
-    <path d="M15 22v-6.5" />
-  </svg>
-);
+import { cn } from '@/lib/utils';
+import { animations, useReducedMotion } from '@/lib/animation';
 
 export function LifestyleSection() {
   const { formData, updateFormData, setCurrentSection } = useDesignBrief();
+  const prefersReducedMotion = useReducedMotion();
   
-  const [adults, setAdults] = useState<number>(0);
-  const [children, setChildren] = useState<number>(0);
-  const [dogs, setDogs] = useState<number>(0);
-  const [cats, setCats] = useState<number>(0);
-  
-  useEffect(() => {
-    if (formData.lifestyle.occupants) {
-      try {
-        const occupantsData = JSON.parse(formData.lifestyle.occupants);
-        if (occupantsData) {
-          setAdults(occupantsData.adults || 0);
-          setChildren(occupantsData.children || 0);
-          setDogs(occupantsData.dogs || 0);
-          setCats(occupantsData.cats || 0);
-        }
-      } catch (e) {
-      }
-    }
-  }, [formData.lifestyle]);
-  
-  useEffect(() => {
-    const occupantsData = JSON.stringify({ adults, children, dogs, cats });
-    updateFormData('lifestyle', { occupants: occupantsData });
-  }, [adults, children, dogs, cats, updateFormData]);
-  
-  const handleTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     updateFormData('lifestyle', { [name]: value });
   };
-  
+
   const handlePrevious = () => {
     setCurrentSection('budget');
     window.scrollTo(0, 0);
@@ -89,270 +26,137 @@ export function LifestyleSection() {
     setCurrentSection('site');
     window.scrollTo(0, 0);
   };
-  
-  const handleNumberInputChange = (setter: React.Dispatch<React.SetStateAction<number>>) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value === '' ? 0 : parseInt(e.target.value, 10);
-    if (!isNaN(value) && value >= 0) {
-      setter(value);
-    }
-  };
+
+  const animationClasses = !prefersReducedMotion ? {
+    section: "transition-all duration-300 ease-in-out",
+    button: "transition-all duration-200 active:scale-95",
+  } : {};
   
   return (
-    <div className="design-brief-section-wrapper">
+    <div className={cn("design-brief-section-wrapper", animationClasses.section)}>
       <div className="design-brief-section-container">
         <SectionHeader 
-          title="Lifestyle" 
-          description="Your lifestyle shapes how you'll use your home. This information helps us design spaces that support your daily activities and long-term needs."
-          isBold={true}
+          title="Lifestyle Information" 
+          description="Tell us about your lifestyle and how it will influence your home design."
         />
         
         <div className="design-brief-form-group">
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle>Who will be living in this home?</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground mb-4">
-                Select the number of people and pets who will be living in or regularly using this home.
-              </p>
-              
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="flex flex-col items-center">
-                  <div className="mb-2 p-3 rounded-full bg-primary/10 text-primary">
-                    <AdultIcon />
-                  </div>
-                  <Label className="mb-1">Adults</Label>
-                  <div className="flex items-center">
-                    <Button 
-                      variant="outline" 
-                      size="icon" 
-                      onClick={() => setAdults(Math.max(0, adults - 1))}
-                      disabled={adults <= 0}
-                      type="button"
-                    >
-                      -
-                    </Button>
-                    <Input 
-                      type="number" 
-                      min="0"
-                      value={adults} 
-                      onChange={handleNumberInputChange(setAdults)}
-                      className="w-16 mx-2 text-center"
-                      onWheel={(e) => e.currentTarget.blur()}
-                    />
-                    <Button 
-                      variant="outline" 
-                      size="icon" 
-                      onClick={() => setAdults(adults + 1)}
-                      type="button"
-                    >
-                      +
-                    </Button>
-                  </div>
-                </div>
-                
-                <div className="flex flex-col items-center">
-                  <div className="mb-2 p-3 rounded-full bg-primary/10 text-primary">
-                    <ChildIcon />
-                  </div>
-                  <Label className="mb-1">Children</Label>
-                  <div className="flex items-center">
-                    <Button 
-                      variant="outline" 
-                      size="icon" 
-                      onClick={() => setChildren(Math.max(0, children - 1))}
-                      disabled={children <= 0}
-                      type="button"
-                    >
-                      -
-                    </Button>
-                    <Input 
-                      type="number" 
-                      min="0" 
-                      value={children} 
-                      onChange={handleNumberInputChange(setChildren)}
-                      className="w-16 mx-2 text-center"
-                      onWheel={(e) => e.currentTarget.blur()}
-                    />
-                    <Button 
-                      variant="outline" 
-                      size="icon" 
-                      onClick={() => setChildren(children + 1)}
-                      type="button"
-                    >
-                      +
-                    </Button>
-                  </div>
-                </div>
-                
-                <div className="flex flex-col items-center">
-                  <div className="mb-2 p-3 rounded-full bg-primary/10 text-primary">
-                    <Dog />
-                  </div>
-                  <Label className="mb-1">Dogs</Label>
-                  <div className="flex items-center">
-                    <Button 
-                      variant="outline" 
-                      size="icon" 
-                      onClick={() => setDogs(Math.max(0, dogs - 1))}
-                      disabled={dogs <= 0}
-                      type="button"
-                    >
-                      -
-                    </Button>
-                    <Input 
-                      type="number" 
-                      min="0" 
-                      value={dogs}
-                      onChange={handleNumberInputChange(setDogs)}
-                      className="w-16 mx-2 text-center"
-                      onWheel={(e) => e.currentTarget.blur()}
-                    />
-                    <Button 
-                      variant="outline" 
-                      size="icon" 
-                      onClick={() => setDogs(dogs + 1)}
-                      type="button"
-                    >
-                      +
-                    </Button>
-                  </div>
-                </div>
-                
-                <div className="flex flex-col items-center">
-                  <div className="mb-2 p-3 rounded-full bg-primary/10 text-primary">
-                    <Cat />
-                  </div>
-                  <Label className="mb-1">Cats</Label>
-                  <div className="flex items-center">
-                    <Button 
-                      variant="outline" 
-                      size="icon" 
-                      onClick={() => setCats(Math.max(0, cats - 1))}
-                      disabled={cats <= 0}
-                      type="button"
-                    >
-                      -
-                    </Button>
-                    <Input 
-                      type="number" 
-                      min="0" 
-                      value={cats}
-                      onChange={handleNumberInputChange(setCats)}
-                      className="w-16 mx-2 text-center"
-                      onWheel={(e) => e.currentTarget.blur()}
-                    />
-                    <Button 
-                      variant="outline" 
-                      size="icon" 
-                      onClick={() => setCats(cats + 1)}
-                      type="button"
-                    >
-                      +
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
           <div className="mb-6">
-            <Label htmlFor="occupationDetails" className="design-brief-question-title">
-              Occupations and Work Needs
-              <span className="text-muted-foreground text-sm ml-2">(optional)</span>
+            <Label htmlFor="occupants" className="design-brief-question-title">
+              Who will be living in this home?
             </Label>
             <p className="design-brief-question-description">
-              Do you work from home? Need a home office? Have specific work-related requirements?
+              Please specify the number of adults, children, and any other occupants.
+            </p>
+            <Textarea
+              id="occupants"
+              name="occupants"
+              placeholder="2 adults, 1 child, and a grandparent"
+              value={formData.lifestyle.occupants}
+              onChange={handleChange}
+              className="mt-1"
+            />
+          </div>
+
+          <div className="mb-6">
+            <Label htmlFor="occupationDetails" className="design-brief-question-title">
+              Occupations
+            </Label>
+            <p className="design-brief-question-description">
+              What are the primary occupations or daily activities of the occupants?
             </p>
             <Textarea
               id="occupationDetails"
               name="occupationDetails"
-              placeholder="Describe your work situation and any home workspace needs..."
+              placeholder="Software Engineer, Teacher, Student"
               value={formData.lifestyle.occupationDetails}
-              onChange={handleTextAreaChange}
+              onChange={handleChange}
               className="mt-1"
             />
           </div>
-          
+
           <div className="mb-6">
             <Label htmlFor="dailyRoutine" className="design-brief-question-title">
-              Daily Routines
-              <span className="text-muted-foreground text-sm ml-2">(optional)</span>
+              Daily Routine
             </Label>
             <p className="design-brief-question-description">
-              Describe your typical day and how you use different spaces throughout the day.
+              Describe a typical day in your household.
             </p>
             <Textarea
               id="dailyRoutine"
               name="dailyRoutine"
-              placeholder="Outline how you typically move through your day at home..."
+              placeholder="Wake up early, work/school, evening family time, etc."
               value={formData.lifestyle.dailyRoutine}
-              onChange={handleTextAreaChange}
+              onChange={handleChange}
               className="mt-1"
             />
           </div>
-          
+
           <div className="mb-6">
             <Label htmlFor="entertainmentStyle" className="design-brief-question-title">
-              Entertainment and Social Activities
-              <span className="text-muted-foreground text-sm ml-2">(optional)</span>
+              Entertainment Style
             </Label>
             <p className="design-brief-question-description">
-              How do you entertain? Frequent dinner parties? Outdoor gatherings? Movie nights?
+              How do you typically entertain guests? Formal dinners, casual get-togethers, etc.?
             </p>
             <Textarea
               id="entertainmentStyle"
               name="entertainmentStyle"
-              placeholder="Describe how you like to entertain guests and use social spaces..."
+              placeholder="Casual backyard BBQs, formal dinner parties, etc."
               value={formData.lifestyle.entertainmentStyle}
-              onChange={handleTextAreaChange}
+              onChange={handleChange}
               className="mt-1"
             />
           </div>
-          
+
           <div className="mb-6">
             <Label htmlFor="specialRequirements" className="design-brief-question-title">
               Special Requirements
-              <span className="text-muted-foreground text-sm ml-2">(optional)</span>
             </Label>
             <p className="design-brief-question-description">
-              Any accessibility needs, future planning considerations, or specific lifestyle requirements?
+              Any specific needs or requirements for the home? Accessibility, allergies, etc.?
             </p>
             <Textarea
               id="specialRequirements"
               name="specialRequirements"
-              placeholder="Note any special needs or future considerations for your home..."
+              placeholder="Wheelchair access, hypoallergenic materials, etc."
               value={formData.lifestyle.specialRequirements}
-              onChange={handleTextAreaChange}
+              onChange={handleChange}
               className="mt-1"
             />
           </div>
           
-          <div>
+          {/* Add homeFeeling field at the end */}
+          <div className="mb-6">
             <Label htmlFor="homeFeeling" className="design-brief-question-title">
               How do you want to feel when you come home?
+              <span className="text-muted-foreground text-sm ml-2">(optional)</span>
             </Label>
-            <p className="design-brief-question-description">
-              Describe the emotions, sensations, or feelings you want your home to evoke when you enter it.
-            </p>
             <Textarea
               id="homeFeeling"
               name="homeFeeling"
-              placeholder="e.g., I want to feel calm and relaxed, with a sense of warmth and security..."
+              placeholder="Describe the feelings you want to experience in your home..."
               value={formData.lifestyle.homeFeeling || ''}
-              onChange={handleTextAreaChange}
+              onChange={handleChange}
               className="mt-1"
             />
           </div>
         </div>
         
         <div className="flex justify-between mt-6">
-          <Button variant="outline" onClick={handlePrevious} className="group">
+          <Button 
+            variant="outline" 
+            onClick={handlePrevious} 
+            className={cn("group", animationClasses.button)}
+          >
             <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
             <span>Previous: Budget</span>
           </Button>
-          
-          <Button onClick={handleNext} className="group">
+
+          <Button 
+            onClick={handleNext} 
+            className={cn("group", animationClasses.button)}
+          >
             <span>Next: Site</span>
             <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
           </Button>

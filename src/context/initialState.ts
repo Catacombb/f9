@@ -34,7 +34,8 @@ export const initialProjectData: ProjectData = {
       hobbies: [],
       entertaining: '',
       workFromHome: '',
-      lifestyleNotes: ''
+      lifestyleNotes: '',
+      homeFeeling: ''
     },
     site: {
       existingConditions: '',
@@ -81,7 +82,9 @@ export const initialProjectData: ProjectData = {
       technologyRequirements: [],
       architectureNotes: '',
       externalMaterialsSelected: [],
-      internalMaterialsSelected: []
+      internalMaterialsSelected: [],
+      inspirationLinks: '',
+      inspirationComments: ''
     },
     contractors: {
       preferredBuilder: '',
