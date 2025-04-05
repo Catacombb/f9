@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { SectionHeader } from './SectionHeader';
@@ -33,6 +34,10 @@ export function FeedbackSection() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [testerName, setTesterName] = useState('');
   const [testerEmail, setTesterEmail] = useState('');
+  const [isInterestedInCustomVersion, setIsInterestedInCustomVersion] = useState(
+    formData.feedback.customVersionInterest ? 'yes' : 'no'
+  );
+  const [referralInfo, setReferralInfo] = useState('');
   
   const handleRatingChange = (field: string, value: number) => {
     updateFormData('feedback', { [field]: value });
@@ -53,6 +58,19 @@ export function FeedbackSection() {
     }
     
     updateFormData('feedback', { userRole: newRoles });
+  };
+
+  const handleCustomVersionInterestChange = (value: string) => {
+    setIsInterestedInCustomVersion(value);
+    if (value === 'yes') {
+      setIsInterestedInCustomVersionDetails('');
+    } else {
+      updateFormData('feedback', { customVersionInterest: '' });
+    }
+  };
+
+  const setIsInterestedInCustomVersionDetails = (details: string) => {
+    updateFormData('feedback', { customVersionInterest: details });
   };
   
   const sendFeedbackEmail = async () => {
@@ -75,13 +93,14 @@ export function FeedbackSection() {
         improvements: formData.feedback.improvements || 'No response',
         next_feature: formData.feedback.nextFeature || 'No response',
         additional_feedback: formData.feedback.additionalFeedback || 'No response',
-        custom_interest: formData.feedback.customVersionInterest ? 'Yes' : 'No',
+        custom_interest: isInterestedInCustomVersion === 'yes' ? 'Yes' : 'No',
         custom_details: formData.feedback.customVersionInterest || 'None provided',
         user_role: formData.feedback.userRole?.join(', ') || 'Not specified',
         other_role: formData.feedback.userRole?.includes('Other') ? formData.feedback.otherRoleSpecify || 'Not specified' : 'N/A',
         team_size: formData.feedback.teamSize || 'Not specified',
         would_recommend: formData.feedback.wouldRecommend || 'Not specified',
-        can_contact: formData.feedback.canContact ? 'Yes' : 'No'
+        can_contact: formData.feedback.canContact ? 'Yes' : 'No',
+        referral_info: referralInfo || 'No referral information provided'
       };
 
       await emailjs.send(
@@ -111,7 +130,8 @@ export function FeedbackSection() {
       !formData.feedback.userRole ||
       formData.feedback.userRole.length === 0 ||
       !formData.feedback.teamSize ||
-      !formData.feedback.wouldRecommend
+      !formData.feedback.wouldRecommend ||
+      (formData.feedback.wouldRecommend === 'yes' && !referralInfo)
     ) {
       toast.error("Please complete all required fields before proceeding");
       return;
@@ -272,15 +292,12 @@ export function FeedbackSection() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="pt-2">
                 <Label htmlFor="likeMost" className="font-medium">What did you like most about this tool?*</Label>
-                <div className="text-sm text-muted-foreground mt-1 mb-2">
-                  Please share your thoughts about the design brief tool.
-                </div>
                 <Textarea
                   id="likeMost"
                   value={formData.feedback.likeMost || ''}
                   onChange={(e) => handleTextChange('likeMost', e.target.value)}
                   placeholder="I really liked..."
-                  className="min-h-[100px]"
+                  className="min-h-[100px] mt-2"
                 />
               </div>
               
@@ -324,27 +341,47 @@ export function FeedbackSection() {
               <h3 className="text-lg font-medium text-purple-800">Interested in a Custom Version of Northstar?</h3>
               
               <div className="text-sm text-muted-foreground">
-                Would you like a tailored version of this tool for your firm or workflow?
+                We can create a tailored version of this tool specifically for your firm - customized to match your workflow, branded with your logo and colors, and optimized for how you work.
               </div>
               
-              <div>
-                <Label htmlFor="customVersionInterest" className="font-medium">
-                  What would you want to customize or build?
-                </Label>
-                <Textarea
-                  id="customVersionInterest"
-                  value={formData.feedback.customVersionInterest || ''}
-                  onChange={(e) => handleTextChange('customVersionInterest', e.target.value)}
-                  placeholder="Describe your customization interests..."
-                  className="min-h-[100px] mt-2"
-                />
+              <div className="pt-2">
+                <Label className="font-medium">Would you like us to create a custom version for you?*</Label>
+                <RadioGroup
+                  value={isInterestedInCustomVersion}
+                  onValueChange={handleCustomVersionInterestChange}
+                  className="flex flex-row space-x-4 mt-2"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="yes" id="custom-yes" />
+                    <Label htmlFor="custom-yes">Yes</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="no" id="custom-no" />
+                    <Label htmlFor="custom-no">No</Label>
+                  </div>
+                </RadioGroup>
               </div>
+              
+              {isInterestedInCustomVersion === 'yes' && (
+                <div>
+                  <Label htmlFor="customVersionInterest" className="font-medium">
+                    Tell us what you'd like to customize:
+                  </Label>
+                  <Textarea
+                    id="customVersionInterest"
+                    value={formData.feedback.customVersionInterest || ''}
+                    onChange={(e) => setIsInterestedInCustomVersionDetails(e.target.value)}
+                    placeholder="I'd like to customize..."
+                    className="min-h-[100px] mt-2"
+                  />
+                </div>
+              )}
             </div>
             
             <Separator className="bg-purple-100" />
             
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-purple-800">User Context</h3>
+              <h3 className="text-lg font-medium text-purple-800">Your Role</h3>
               
               <div className="pt-2">
                 <Label className="font-medium mb-2 block">What is your role in the architecture/design process?*</Label>
@@ -405,7 +442,7 @@ export function FeedbackSection() {
             <Separator className="bg-purple-100" />
             
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-purple-800">Referral + Follow-Up Interest</h3>
+              <h3 className="text-lg font-medium text-purple-800">Referral</h3>
               
               <div className="pt-2">
                 <Label htmlFor="wouldRecommend" className="font-medium">Would you recommend this tool to others in your industry?*</Label>
@@ -429,6 +466,19 @@ export function FeedbackSection() {
                   </div>
                 </RadioGroup>
               </div>
+              
+              {formData.feedback.wouldRecommend === 'yes' && (
+                <div className="pt-2">
+                  <Label htmlFor="referralInfo" className="font-medium">Please share information about who we should contact:</Label>
+                  <Textarea
+                    id="referralInfo"
+                    value={referralInfo}
+                    onChange={(e) => setReferralInfo(e.target.value)}
+                    placeholder="Name, email, and any other relevant information about the person you're referring"
+                    className="min-h-[100px] mt-2"
+                  />
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -454,3 +504,4 @@ export function FeedbackSection() {
     </div>
   );
 }
+
