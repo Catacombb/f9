@@ -5,16 +5,15 @@ import { NamedOccupantsSection } from './NamedOccupantsSection';
 import { animations } from '@/lib/animation';
 import { cn } from '@/lib/utils';
 
-// This component is now simplified as the tabbed structure is handled at a higher level
-interface LifestyleOccupantsSectionProps {
+interface LifestylePeopleTabProps {
   occupantEntries: OccupantEntry[];
   onOccupantEntriesChange: (entries: OccupantEntry[]) => void;
 }
 
-export function LifestyleOccupantsSection({
+export function LifestylePeopleTab({
   occupantEntries,
   onOccupantEntriesChange
-}: LifestyleOccupantsSectionProps) {
+}: LifestylePeopleTabProps) {
   return (
     <div className={cn("space-y-6", animations.fadeIn)}>
       <NamedOccupantsSection 
