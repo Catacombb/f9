@@ -3,6 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { toast } from 'sonner';
+import { ArrowLeft } from 'lucide-react';
 
 interface SummarySectionActionsProps {
   onPrevious: () => void;
@@ -21,16 +22,17 @@ export function SummarySectionActions({ onPrevious }: SummarySectionActionsProps
       <Button
         variant="outline"
         onClick={onPrevious}
-        className="w-[120px]"
+        className="group"
       >
-        Previous
+        <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
+        <span>Previous</span>
       </Button>
       
       <Button
         onClick={handleContinue}
-        className="w-[120px] bg-yellow-500 hover:bg-yellow-600 text-black"
+        className="bg-yellow-500 hover:bg-yellow-600 text-black"
       >
-        Continue to Feedback
+        Continue to Feedback Form
       </Button>
     </div>
   );

@@ -11,7 +11,6 @@ import { LevelPreferenceTab } from '@/components/spaces/LevelPreferenceTab';
 import { SpaceRoom } from '@/types';
 
 export function SpacesSection() {
-  // Start with level-preference as the default active tab
   const [activeTab, setActiveTab] = useState('level-preference');
   const { formData, updateFormData, setCurrentSection, addRoom, updateRoom, removeRoom } = useDesignBrief();
   const [newRoomType, setNewRoomType] = useState('');
@@ -147,6 +146,18 @@ export function SpacesSection() {
   
   const handleHomeLevelTypeChange = (value: string) => {
     updateFormData('spaces', { homeLevelType: value });
+    
+    // Automatically move to the next tab when level preference is selected
+    if (value && activeTab === 'level-preference') {
+      setTimeout(() => {
+        setActiveTab('room-selection');
+      }, 500); // Half-second delay for better UX
+    }
+  };
+  
+  // Handle tab change
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
   };
   
   const handlePrevious = () => {
@@ -179,7 +190,7 @@ export function SpacesSection() {
           isBold={true}
         />
         
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
           <TabsList className="grid grid-cols-3 mb-8">
             <TabsTrigger value="level-preference">
               Level Preferences
@@ -197,6 +208,17 @@ export function SpacesSection() {
               homeLevelType={formData.spaces.homeLevelType}
               onHomeLevelTypeChange={handleHomeLevelTypeChange}
             />
+            
+            {/* Add a "Continue to Room Selection" button at the bottom of this tab */}
+            <div className="flex justify-end mt-6">
+              <Button
+                onClick={() => setActiveTab('room-selection')}
+                className="group"
+              >
+                <span>Continue to Room Selection</span>
+                <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+              </Button>
+            </div>
           </TabsContent>
 
           <TabsContent value="room-selection" className="mt-0">
@@ -217,6 +239,26 @@ export function SpacesSection() {
               updateRoom={updateRoom}
               handleRemoveRoom={handleRemoveRoom}
             />
+            
+            {/* Add navigation buttons between tabs */}
+            <div className="flex justify-between mt-6">
+              <Button
+                variant="outline"
+                onClick={() => setActiveTab('level-preference')}
+                className="group"
+              >
+                <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
+                <span>Back to Level Preferences</span>
+              </Button>
+              
+              <Button
+                onClick={() => setActiveTab('general-questions')}
+                className="group"
+              >
+                <span>Continue to General Questions</span>
+                <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+              </Button>
+            </div>
           </TabsContent>
           
           <TabsContent value="general-questions" className="mt-0">
@@ -228,6 +270,18 @@ export function SpacesSection() {
               onEliminableSpacesChange={handleEliminableSpacesChange}
               onHomeSizeChange={handleHomeSizeChange}
             />
+            
+            {/* Add a back button to Room Selection */}
+            <div className="flex justify-between mt-6">
+              <Button
+                variant="outline"
+                onClick={() => setActiveTab('room-selection')}
+                className="group"
+              >
+                <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
+                <span>Back to Room Selection</span>
+              </Button>
+            </div>
           </TabsContent>
         </Tabs>
         
