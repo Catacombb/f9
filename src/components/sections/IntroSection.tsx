@@ -1,29 +1,28 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { ArrowRight, Clipboard, PenLine, Share, AlertTriangle } from 'lucide-react';
-
 export function IntroSection() {
-  const { setCurrentSection } = useDesignBrief();
-  
+  const {
+    setCurrentSection
+  } = useDesignBrief();
   const handleStart = () => {
     setCurrentSection('projectInfo');
   };
-  
-  return (
-    <div className="design-brief-section-wrapper">
+  return <div className="design-brief-section-wrapper">
       <div className="design-brief-section-container">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold mb-4 font-heading">
             <strong>Welcome to Northstar!</strong>
           </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            This tool helps you get clear on your vision for your new home.
-            You'll walk through a few easy sections to share what matters most — from your lifestyle to the spaces you want and how you want to feel when you walk in the door.
-            At the end, you'll receive a summary you can review, download, and share with your architect or designer.
-          </p>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">Northstar helps you get clear on your vision for your new home. 
+
+
+You'll walk through a few easy sections to share what matters most,  from your lifestyle to the spaces you want and how you want to feel when you walk in the door. 
+
+
+At the end, you'll receive a summary you can review, download, and share with your architect or designer.</p>
         </div>
         
         <Card className="mb-8">
@@ -76,16 +75,11 @@ export function IntroSection() {
         </Card>
         
         <div className="text-center">
-          <Button 
-            size="lg" 
-            onClick={handleStart}
-            className="group"
-          >
+          <Button size="lg" onClick={handleStart} className="group">
             <span>Start Your Design Brief</span>
             <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
           </Button>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 }
