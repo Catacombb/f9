@@ -1,5 +1,5 @@
 
-// Test data generation is currently disabled
+// Test data generation is completely disabled
 export const generateTestData = () => {
   return {};
 };
