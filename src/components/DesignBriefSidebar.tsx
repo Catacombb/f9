@@ -10,12 +10,14 @@ import { ChevronRight, Info, Home, PiggyBank, Users, MapPin, Layout, Building, I
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Link } from 'react-router-dom';
 import { AppLogo } from '@/components/AppLogo';
+import { Badge } from '@/components/ui/badge';
 
 interface DesignBriefSidebarProps {
   showLastSaved?: boolean;
   lastSavedFormatted?: string;
 }
 
+// Reorder to make "feedback" come after "summary"
 const sections = [
   { id: 'intro', title: 'Introduction', icon: <Info className="h-5 w-5" /> },
   { id: 'projectInfo', title: 'Project Info', icon: <Home className="h-5 w-5" /> },
@@ -27,8 +29,8 @@ const sections = [
   { id: 'architecture', title: 'Architecture', icon: <Building className="h-5 w-5" /> },
   { id: 'uploads', title: 'Uploads', icon: <Upload className="h-5 w-5" /> },
   { id: 'communication', title: 'Communication', icon: <MessageSquare className="h-5 w-5" /> },
-  { id: 'feedback', title: 'Feedback', icon: <Star className="h-5 w-5" /> },
   { id: 'summary', title: 'Summary', icon: <FileText className="h-5 w-5" /> },
+  { id: 'feedback', title: 'Feedback', icon: <Star className="h-5 w-5 text-purple-500" />, isTesterOnly: true },
 ];
 
 export function DesignBriefSidebar({ showLastSaved = false, lastSavedFormatted = '' }: DesignBriefSidebarProps) {
@@ -235,6 +237,7 @@ export function DesignBriefSidebar({ showLastSaved = false, lastSavedFormatted =
                   className={cn(
                     "w-full justify-start mb-1 relative",
                     currentSection === section.id ? "bg-sidebar-accent text-sidebar-accent-foreground" : "",
+                    section.isTesterOnly ? "border-purple-300 hover:border-purple-400" : "",
                     isMobile ? "text-sm py-2" : ""
                   )}
                   onClick={() => navigateToSection(section.id as SectionKey)}
@@ -243,7 +246,13 @@ export function DesignBriefSidebar({ showLastSaved = false, lastSavedFormatted =
                     <span className="mr-2">{section.icon}</span>
                     <span className="truncate">{section.title}</span>
                     
-                    {!(section.id === 'intro' || section.id === 'summary') && (
+                    {section.isTesterOnly && (
+                      <Badge variant="outline" className="ml-2 text-[0.6rem] py-0 px-1.5 bg-purple-100 text-purple-800 border-purple-300">
+                        Testers
+                      </Badge>
+                    )}
+                    
+                    {!(section.id === 'intro' || section.id === 'summary' || section.id === 'feedback') && (
                       <div className="ml-auto">
                         <span className="text-xs text-sidebar-foreground/70">
                           {progress}%

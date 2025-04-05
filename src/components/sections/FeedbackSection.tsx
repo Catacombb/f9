@@ -28,15 +28,17 @@ import {
   RadioGroupItem 
 } from '@/components/ui/radio-group';
 import { Checkbox } from '@/components/ui/checkbox';
+import emailjs from 'emailjs-com';
 
 export function FeedbackSection() {
-  const { formData, updateFormData, setCurrentSection } = useDesignBrief();
+  const { formData, updateFormData, setCurrentSection, projectData } = useDesignBrief();
   const [showContactFields, setShowContactFields] = useState(formData.feedback.canContact === 'yes');
   const [otherRole, setOtherRole] = useState(
     formData.feedback.userRole?.includes('Other') 
       ? formData.feedback.otherRoleSpecify || '' 
       : ''
   );
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const handleRatingChange = (field: string, value: number) => {
     updateFormData('feedback', { [field]: value });
@@ -64,7 +66,64 @@ export function FeedbackSection() {
     setShowContactFields(value === 'yes');
   };
   
-  const handleNext = () => {
+  const sendFeedbackEmail = async () => {
+    try {
+      // Create a formatted email body
+      const clientInfo = projectData?.formData?.projectInfo || {};
+      
+      const templateParams = {
+        to_email: 'nick@nickharrison.co',
+        from_name: clientInfo.clientName || 'Anonymous Tester',
+        from_email: clientInfo.contactEmail || formData.feedback.contactInfo || 'No Email Provided',
+        subject: 'Northstar Design Brief - Tester Feedback',
+        message: `
+— Tester Feedback —
+Submitted by: ${clientInfo.clientName || 'Anonymous'} (${clientInfo.contactEmail || formData.feedback.contactInfo || 'No Email'})
+
+RATINGS:
+Usability: ${formData.feedback.usabilityRating}/5
+Performance: ${formData.feedback.performanceRating}/5
+Functionality: ${formData.feedback.functionalityRating}/5
+Design: ${formData.feedback.designRating}/5
+
+FEEDBACK:
+What they liked most: "${formData.feedback.likeMost}"
+Frustrations/Unclear aspects: "${formData.feedback.improvements}"
+Requested features: "${formData.feedback.nextFeature}"
+Additional feedback: "${formData.feedback.additionalFeedback}"
+
+CUSTOM VERSION INTEREST:
+Interested in custom version: ${formData.feedback.customVersionInterest ? 'Yes' : 'No'}
+Details: "${formData.feedback.customVersionInterest}"
+
+USER CONTEXT:
+Role: ${formData.feedback.userRole?.join(', ') || 'Not specified'}
+${formData.feedback.userRole?.includes('Other') ? `Other role: ${formData.feedback.otherRoleSpecify}` : ''}
+Team size: ${formData.feedback.teamSize || 'Not specified'}
+
+FOLLOW-UP:
+Would recommend: ${formData.feedback.wouldRecommend || 'Not specified'}
+Can contact: ${formData.feedback.canContact || 'No'}
+${formData.feedback.canContact === 'yes' ? `Contact info: ${formData.feedback.contactInfo}` : ''}
+        `
+      };
+
+      // Send email - replace with your actual EmailJS service, template and user IDs
+      await emailjs.send(
+        'service_id', // Replace with your EmailJS service ID
+        'template_id', // Replace with your EmailJS template ID
+        templateParams,
+        'user_id' // Replace with your EmailJS user ID
+      );
+      
+      return true;
+    } catch (error) {
+      console.error('Email sending failed:', error);
+      return false;
+    }
+  };
+  
+  const handleNext = async () => {
     // Validate required fields
     if (
       !formData.feedback.usabilityRating ||
@@ -96,8 +155,21 @@ export function FeedbackSection() {
       return;
     }
     
+    setIsSubmitting(true);
+    
+    // Try to send the feedback email
+    const emailSuccess = await sendFeedbackEmail();
+    
+    setIsSubmitting(false);
+    
+    if (emailSuccess) {
+      toast.success("Thank you for your feedback! It has been submitted successfully.");
+    } else {
+      toast.warning("Your feedback was saved but we couldn't send the notification email. The team will still receive your feedback.");
+    }
+    
+    // Navigate back to summary
     setCurrentSection('summary');
-    toast.success("Thank you for your feedback!");
   };
   
   const handlePrevious = () => {
@@ -405,8 +477,9 @@ export function FeedbackSection() {
           <Button
             onClick={handleNext}
             className="w-[100px] bg-purple-500 hover:bg-purple-600 text-white"
+            disabled={isSubmitting}
           >
-            Submit
+            {isSubmitting ? "Submitting..." : "Submit"}
           </Button>
         </div>
       </div>

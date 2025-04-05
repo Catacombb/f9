@@ -21,9 +21,10 @@ import {
   MapIcon,
   Star,
 } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import { SectionKey } from '@/types';
 
-const sectionData: Record<SectionKey, { icon: React.ReactNode, label: string }> = {
+const sectionData: Record<SectionKey, { icon: React.ReactNode, label: string, isTesterOnly?: boolean }> = {
   intro: { icon: <InfoIcon className="h-5 w-5" />, label: 'Introduction' },
   projectInfo: { icon: <BuildingIcon className="h-5 w-5" />, label: 'Project Information' },
   site: { icon: <MapIcon className="h-5 w-5" />, label: 'Site' },
@@ -34,8 +35,8 @@ const sectionData: Record<SectionKey, { icon: React.ReactNode, label: string }> 
   budget: { icon: <DollarSignIcon className="h-5 w-5" />, label: 'Budget' },
   communication: { icon: <MessageSquareIcon className="h-5 w-5" />, label: 'Communication' },
   uploads: { icon: <CameraIcon className="h-5 w-5" />, label: 'Uploads' },
-  feedback: { icon: <Star className="h-5 w-5" />, label: 'Feedback' },
-  summary: { icon: <CheckCircleIcon className="h-5 w-5" />, label: 'Summary' }
+  summary: { icon: <CheckCircleIcon className="h-5 w-5" />, label: 'Summary' },
+  feedback: { icon: <Star className="h-5 w-5 text-purple-500" />, label: 'Feedback', isTesterOnly: true }
 };
 
 const sectionOrder: SectionKey[] = [
@@ -49,8 +50,8 @@ const sectionOrder: SectionKey[] = [
   'budget', 
   'communication', 
   'uploads', 
-  'feedback',
-  'summary'
+  'summary',
+  'feedback'
 ];
 
 export function DesignBriefSidebar() {
@@ -97,7 +98,8 @@ export function DesignBriefSidebar() {
                 variant={isActive ? "default" : "ghost"}
                 className={cn(
                   "w-full justify-start text-left font-normal relative h-auto py-2",
-                  isActive ? "bg-primary text-primary-foreground" : ""
+                  isActive ? "bg-primary text-primary-foreground" : "",
+                  section.isTesterOnly ? "border-purple-300 hover:border-purple-400" : ""
                 )}
                 onClick={() => handleSectionClick(sectionKey)}
               >
@@ -105,34 +107,42 @@ export function DesignBriefSidebar() {
                   <div className="mr-2 h-5 w-5 shrink-0">{section.icon}</div>
                   <span>{section.label}</span>
                   
+                  {section.isTesterOnly && (
+                    <Badge variant="outline" className="ml-2 text-[0.6rem] py-0 px-1.5 bg-purple-100 text-purple-800 border-purple-300">
+                      Testers
+                    </Badge>
+                  )}
+                  
                   <div className="ml-auto flex items-center">
-                    <div className="relative h-5 w-5 ml-2">
-                      <svg className="h-5 w-5" viewBox="0 0 24 24">
-                        <circle 
-                          className="text-slate-200 dark:text-slate-700" 
-                          cx="12" 
-                          cy="12" 
-                          r="10" 
-                          fill="none" 
-                          strokeWidth="2" 
-                        />
-                        <circle 
-                          className="text-primary" 
-                          cx="12" 
-                          cy="12" 
-                          r="10" 
-                          fill="none"
-                          strokeWidth="2" 
-                          strokeDasharray={`${completion * 62.831853 / 100} 62.831853`} 
-                          strokeDashoffset="0" 
-                          strokeLinecap="round" 
-                          transform="rotate(-90, 12, 12)" 
-                        />
-                      </svg>
-                      <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-[9px] font-medium">
-                        {completion}%
-                      </span>
-                    </div>
+                    {!(sectionKey === 'intro' || sectionKey === 'summary' || sectionKey === 'feedback') && (
+                      <div className="relative h-5 w-5 ml-2">
+                        <svg className="h-5 w-5" viewBox="0 0 24 24">
+                          <circle 
+                            className="text-slate-200 dark:text-slate-700" 
+                            cx="12" 
+                            cy="12" 
+                            r="10" 
+                            fill="none" 
+                            strokeWidth="2" 
+                          />
+                          <circle 
+                            className="text-primary" 
+                            cx="12" 
+                            cy="12" 
+                            r="10" 
+                            fill="none"
+                            strokeWidth="2" 
+                            strokeDasharray={`${completion * 62.831853 / 100} 62.831853`} 
+                            strokeDashoffset="0" 
+                            strokeLinecap="round" 
+                            transform="rotate(-90, 12, 12)" 
+                          />
+                        </svg>
+                        <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-[9px] font-medium">
+                          {completion}%
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </div>
               </Button>

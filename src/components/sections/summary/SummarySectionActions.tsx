@@ -28,7 +28,7 @@ export function SummarySectionActions({ onPrevious }: SummarySectionActionsProps
         onClick={handleContinue}
         className="w-[120px] bg-yellow-500 hover:bg-yellow-600 text-black"
       >
-        Continue
+        Continue to Feedback
       </Button>
     </div>
   );
