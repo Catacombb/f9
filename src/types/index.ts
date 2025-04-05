@@ -1,4 +1,3 @@
-
 export interface SpaceRoom {
   id: string;
   type: string;

@@ -2,14 +2,6 @@
 import React from 'react';
 import { Label } from '@/components/ui/label';
 import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from '@/components/ui/select';
-import { OccupantEntry } from '@/types';
-import { 
   Command, 
   CommandEmpty, 
   CommandGroup, 
@@ -22,10 +14,11 @@ import {
   PopoverContent, 
   PopoverTrigger 
 } from '@/components/ui/popover';
-import { Check, ChevronsUpDown, User, Baby, Dog, Cat, HelpCircle } from 'lucide-react';
+import { Check, ChevronsUpDown, User, Baby } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { OccupantEntry } from '@/types';
 
 interface PrimaryUsersSelectProps {
   occupants: OccupantEntry[];
@@ -40,14 +33,13 @@ export function PrimaryUsersSelect({
 }: PrimaryUsersSelectProps) {
   const [open, setOpen] = React.useState(false);
   
+  // Filter out pets (dogs, cats, other)
+  const humanOccupants = occupants.filter(
+    occupant => occupant.type === 'adult' || occupant.type === 'child'
+  );
+  
   const getOccupantIcon = (type: string) => {
-    switch (type) {
-      case 'adult': return <User className="h-4 w-4" />;
-      case 'child': return <Baby className="h-4 w-4" />;
-      case 'dog': return <Dog className="h-4 w-4" />;
-      case 'cat': return <Cat className="h-4 w-4" />;
-      default: return <HelpCircle className="h-4 w-4" />;
-    }
+    return type === 'adult' ? <User className="h-4 w-4" /> : <Baby className="h-4 w-4" />;
   };
 
   // Toggle selection of a user
@@ -61,11 +53,11 @@ export function PrimaryUsersSelect({
   
   return (
     <div className="space-y-2">
-      <Label>Who will primarily use this space?</Label>
+      <Label>Primary Users</Label>
       
-      {occupants.length === 0 ? (
+      {humanOccupants.length === 0 ? (
         <p className="text-sm text-muted-foreground">
-          No people or pets added yet. You can add them in the Lifestyle section.
+          No people added yet. You can add them in the Lifestyle section.
         </p>
       ) : (
         <>
@@ -79,17 +71,17 @@ export function PrimaryUsersSelect({
               >
                 {selectedUsers.length > 0
                   ? `${selectedUsers.length} selected`
-                  : "Select people/pets..."}
+                  : "Select people..."}
                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-full p-0">
               <Command>
-                <CommandInput placeholder="Search people/pets..." />
+                <CommandInput placeholder="Search people..." />
                 <CommandList>
                   <CommandEmpty>No results found.</CommandEmpty>
                   <CommandGroup>
-                    {occupants.map((occupant) => (
+                    {humanOccupants.map((occupant) => (
                       <CommandItem
                         key={occupant.id}
                         value={occupant.name}
@@ -120,7 +112,7 @@ export function PrimaryUsersSelect({
           {selectedUsers.length > 0 && (
             <div className="flex flex-wrap gap-1 mt-2">
               {selectedUsers.map((userId) => {
-                const occupant = occupants.find(o => o.id === userId);
+                const occupant = humanOccupants.find(o => o.id === userId);
                 if (!occupant) return null;
                 
                 return (
