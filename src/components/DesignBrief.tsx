@@ -20,7 +20,15 @@ import { toast } from 'sonner';
 import { Beaker } from 'lucide-react';
 
 export function DesignBrief() {
-  const { currentSection, updateFormData, updateFiles, updateSummary, setCurrentSection, projectData } = useDesignBrief();
+  const { 
+    currentSection, 
+    updateFormData, 
+    updateFiles, 
+    updateSummary, 
+    setCurrentSection, 
+    projectData,
+    markAsTestData 
+  } = useDesignBrief();
   
   // Scroll to top when section changes
   useEffect(() => {
@@ -32,6 +40,9 @@ export function DesignBrief() {
     
     setTimeout(() => {
       try {
+        // Mark this as test data so it will be cleared on refresh
+        markAsTestData();
+        
         // Generate comprehensive test data for all sections
         const testData = generateTestData();
         

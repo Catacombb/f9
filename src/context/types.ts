@@ -1,29 +1,22 @@
-
-import { ProjectData, SectionKey, SpaceRoom } from '@/types';
-
-export interface UpdateFormData {
-  <K extends keyof ProjectData['formData']>(
-    section: K,
-    updates: Partial<ProjectData['formData'][K]>
-  ): void;
-}
+import { ProjectData, SectionKey, SpaceRoom, Professional, FormData } from '@/types';
 
 export interface DesignBriefContextType {
   projectData: ProjectData;
-  formData: ProjectData['formData'];
+  formData: FormData;
   files: ProjectData['files'];
   summary: ProjectData['summary'];
-  updateFormData: UpdateFormData;
-  addRoom: (room: Omit<SpaceRoom, 'id'>) => void;
-  updateRoom: (room: ProjectData['formData']['spaces']['rooms'][0]) => void;
-  removeRoom: (id: string) => void;
-  addProfessional: (professional: ProjectData['formData']['contractors']['professionals'][0]) => void;
-  updateProfessional: (professional: ProjectData['formData']['contractors']['professionals'][0]) => void;
-  removeProfessional: (id: string) => void;
-  currentSection: SectionKey;
-  setCurrentSection: (section: SectionKey) => void;
-  saveProjectData: () => void;
+  updateFormData: (section: keyof FormData, updates: Partial<FormData[keyof FormData]>) => void;
   updateFiles: (updates: Partial<ProjectData['files']>) => void;
   updateSummary: (updates: Partial<ProjectData['summary']>) => void;
-  exportAsPDF: () => Promise<Blob>;
+  addRoom: (room: Omit<SpaceRoom, 'id'>) => void;
+  updateRoom: (room: SpaceRoom) => void;
+  removeRoom: (roomId: string) => void;
+  addProfessional: (professional: Omit<Professional, 'id'>) => void;
+  updateProfessional: (professional: Professional) => void; 
+  removeProfessional: (professionalId: string) => void;
+  currentSection: SectionKey;
+  setCurrentSection: React.Dispatch<React.SetStateAction<SectionKey>>;
+  saveProjectData: () => void;
+  exportAsPDF: () => Promise<void>;
+  markAsTestData: () => void;
 }
