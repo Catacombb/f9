@@ -1,3 +1,4 @@
+
 import { ProjectData } from '@/types';
 
 export const initialProjectData: ProjectData = {
@@ -103,8 +104,18 @@ export const initialProjectData: ProjectData = {
       performanceRating: 0,
       functionalityRating: 0,
       designRating: 0,
-      feedbackComments: '',
+      likeMost: '',
+      improvements: '',
+      nextFeature: '',
+      additionalFeedback: '',
       customVersionInterest: '',
+      userRole: [],
+      otherRoleSpecify: '',
+      teamSize: '',
+      wouldRecommend: '',
+      canContact: '',
+      contactInfo: '',
+      feedbackComments: '' // Keep for backward compatibility
     }
   },
   files: {

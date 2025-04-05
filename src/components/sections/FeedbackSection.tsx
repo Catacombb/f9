@@ -140,25 +140,9 @@ export function FeedbackSection() {
     <div className="design-brief-section-wrapper">
       <div className="design-brief-section-container">
         <SectionHeader
-          title={
-            <div className="flex items-center gap-2">
-              <TestTube className="h-6 w-6 text-purple-600" />
-              <span>Feedback for Testers</span> 
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div className="ml-2 bg-purple-200 text-purple-800 text-xs px-2 py-0.5 rounded-full">
-                      TESTERS ONLY
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>This section is only for testers and will be removed before client rollout</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
-          }
+          title="Feedback for Testers"
           description="Help us improve the design brief tool by providing your feedback. This section is for testers only and won't be included in the final version."
+          icon={<TestTube className="h-6 w-6 text-purple-600" />}
         />
         
         <Card className="bg-gradient-to-b from-purple-50 to-white border-purple-200">
