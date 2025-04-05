@@ -10,5 +10,6 @@ export function generateTestFiles() {
     uploadedInspirationImages: [],
     inspirationSelections: [],
     siteDocuments: [],
+    sitePhotos: [],
   };
 }

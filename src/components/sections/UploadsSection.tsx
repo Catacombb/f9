@@ -1,15 +1,15 @@
 
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useDesignBrief } from '@/context/DesignBriefContext';
-import { ArrowLeft, ArrowRight, Upload, X, File, Image as ImageIcon, FileArchive, FileText } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Upload, X, File, Image as ImageIcon, FileArchive, FileText, Camera } from 'lucide-react';
 import { toast } from 'sonner';
 import { SectionHeader } from './SectionHeader';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
-const MAX_FILES_PER_CATEGORY = 20;
+const MAX_FILES_PER_CATEGORY = 10; // Limit to 10 files per category
 
 interface FileItemProps {
   file: File;
@@ -74,12 +74,45 @@ const FileUploadSection = ({
   acceptTypes,
   id
 }: FileUploadSectionProps) => {
+  const [isDragging, setIsDragging] = useState(false);
+  
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const fileList = e.target.files;
     if (fileList && fileList.length > 0) {
       onFileUpload(fileList);
       // Reset the input value to allow uploading the same file again
       e.target.value = '';
+    }
+  };
+  
+  const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+  
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+  
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+  
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    
+    const dt = e.dataTransfer;
+    const fileList = dt.files;
+    
+    if (fileList.length > 0) {
+      onFileUpload(fileList);
     }
   };
   
@@ -91,12 +124,20 @@ const FileUploadSection = ({
           <p className="text-sm text-muted-foreground mt-1">{description}</p>
         </div>
         
-        <div className="border-2 border-dashed border-primary/40 rounded-lg p-8 mb-4">
+        <div 
+          className={`border-2 border-dashed rounded-lg p-8 mb-4 transition-colors ${
+            isDragging ? 'border-primary bg-primary/5' : 'border-primary/40'
+          }`}
+          onDragEnter={handleDragEnter}
+          onDragLeave={handleDragLeave}
+          onDragOver={handleDragOver}
+          onDrop={handleDrop}
+        >
           <div className="flex flex-col items-center">
             {icon}
             <h3 className="font-medium text-lg mb-2">Upload {title}</h3>
-            <p className="text-sm text-muted-foreground mb-4">
-              Drag and drop files here or click to browse
+            <p className="text-sm text-muted-foreground mb-2">
+              {isDragging ? 'Drop files here to upload' : 'Drag and drop files here or click to browse'}
             </p>
             <p className="text-xs text-muted-foreground mb-6">
               Accepted file types: {acceptTypes} (Max 10MB per file)
@@ -175,7 +216,7 @@ export function UploadsSection() {
     if (remainingSlots <= 0) {
       toast({
         title: "Upload limit reached",
-        description: "You can upload a maximum of 20 site documents.",
+        description: `You can upload a maximum of ${MAX_FILES_PER_CATEGORY} site documents.`,
       });
       return;
     }
@@ -190,13 +231,34 @@ export function UploadsSection() {
     }
   };
   
+  const handleSitePhotosUpload = (fileList: FileList) => {
+    const remainingSlots = MAX_FILES_PER_CATEGORY - (files.sitePhotos?.length || 0);
+    
+    if (remainingSlots <= 0) {
+      toast({
+        title: "Upload limit reached",
+        description: `You can upload a maximum of ${MAX_FILES_PER_CATEGORY} site photos.`,
+      });
+      return;
+    }
+    
+    const maxFilesToAdd = Math.min(fileList.length, remainingSlots);
+    const validFiles = validateAndProcessFiles(fileList, maxFilesToAdd);
+    
+    if (validFiles.length > 0) {
+      updateFiles({ 
+        sitePhotos: [...(files.sitePhotos || []), ...validFiles]
+      });
+    }
+  };
+  
   const handleDesignFilesUpload = (fileList: FileList) => {
     const remainingSlots = MAX_FILES_PER_CATEGORY - (files.designFiles?.length || 0);
     
     if (remainingSlots <= 0) {
       toast({
         title: "Upload limit reached",
-        description: "You can upload a maximum of 20 design files.",
+        description: `You can upload a maximum of ${MAX_FILES_PER_CATEGORY} design files.`,
       });
       return;
     }
@@ -217,7 +279,7 @@ export function UploadsSection() {
     if (remainingSlots <= 0) {
       toast({
         title: "Upload limit reached",
-        description: "You can upload a maximum of 20 inspiration files.",
+        description: `You can upload a maximum of ${MAX_FILES_PER_CATEGORY} inspiration files.`,
       });
       return;
     }
@@ -236,6 +298,12 @@ export function UploadsSection() {
     const updatedFiles = [...(files.siteDocuments || [])];
     updatedFiles.splice(index, 1);
     updateFiles({ siteDocuments: updatedFiles });
+  };
+  
+  const handleRemoveSitePhoto = (index: number) => {
+    const updatedFiles = [...(files.sitePhotos || [])];
+    updatedFiles.splice(index, 1);
+    updateFiles({ sitePhotos: updatedFiles });
   };
   
   const handleRemoveDesignFile = (index: number) => {
@@ -278,6 +346,18 @@ export function UploadsSection() {
           icon={<FileText className="h-10 w-10 text-primary mb-4" />}
           acceptTypes=".pdf,.doc,.docx,.xls,.xlsx,image/*"
           id="site-docs"
+        />
+        
+        {/* Site Photos Upload Section */}
+        <FileUploadSection
+          title="Site Photos"
+          description="Upload recent photos of your site from different angles or key features you'd like us to see."
+          files={files.sitePhotos || []}
+          onFileUpload={handleSitePhotosUpload}
+          onRemoveFile={handleRemoveSitePhoto}
+          icon={<Camera className="h-10 w-10 text-primary mb-4" />}
+          acceptTypes=".jpg,.jpeg,.png,.heic,.pdf"
+          id="site-photos"
         />
         
         {/* Design Files Upload Section */}

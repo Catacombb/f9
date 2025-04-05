@@ -28,6 +28,7 @@ export interface ProjectFiles {
   uploadedInspirationImages: File[];
   inspirationSelections: string[];
   siteDocuments: File[]; 
+  sitePhotos: File[]; // Added site photos
   designFiles: File[];
   inspirationFiles: File[];
 }
@@ -120,9 +121,9 @@ export interface FormData {
     architectureNotes?: string;
     externalMaterialsSelected?: string[];
     internalMaterialsSelected?: string[];
-    inspirationLinks?: string; // Added missing property
-    inspirationComments?: string; // Added missing property
-    inspirationEntries?: InspirationEntry[]; // Add the new property for inspiration entries
+    inspirationLinks?: string; 
+    inspirationComments?: string; 
+    inspirationEntries?: InspirationEntry[];
   };
   contractors: {
     preferredBuilder: string;
@@ -156,7 +157,7 @@ export interface FormData {
     wouldRecommend: string;
     canContact: string;
     contactInfo?: string;
-    feedbackComments?: string; // Keep for backward compatibility
+    feedbackComments?: string;
   };
 }
 

@@ -10,6 +10,7 @@ export function SupportingFilesDisplay({ files }: SupportingFilesDisplayProps) {
   const allFiles = [
     ...(files.uploadedFiles || []),
     ...(files.siteDocuments || []),
+    ...(files.sitePhotos || []),
     ...(files.designFiles || []),
     ...(files.inspirationFiles || [])
   ];
@@ -30,6 +31,11 @@ export function SupportingFilesDisplay({ files }: SupportingFilesDisplayProps) {
           {files.siteDocuments?.map((file, index) => (
             <li key={`site-doc-${index}`}>
               <span className="font-medium">Site Document:</span> {file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)
+            </li>
+          ))}
+          {files.sitePhotos?.map((file, index) => (
+            <li key={`site-photo-${index}`}>
+              <span className="font-medium">Site Photo:</span> {file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)
             </li>
           ))}
           {files.designFiles?.map((file, index) => (
