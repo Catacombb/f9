@@ -4,11 +4,13 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { SectionHeader } from './SectionHeader';
 import { useDesignBrief } from '@/context/DesignBriefContext';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { OccupantEntry } from '@/types';
 import { Toaster } from '@/components/ui/toaster';
 import { LifestylePeopleTab } from '../lifestyle/LifestylePeopleTab';
 import { LifestyleGeneralTab } from '../lifestyle/LifestyleGeneralTab';
+import { cn } from '@/lib/utils';
+import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuLink } from '@/components/ui/navigation-menu';
 
 export function LifestyleSection() {
   const { formData, updateFormData, setCurrentSection } = useDesignBrief();
@@ -20,8 +22,16 @@ export function LifestyleSection() {
   };
   
   const handleNext = () => {
-    setCurrentSection('site');
-    window.scrollTo(0, 0);
+    if (activeTab === "people") {
+      setActiveTab("general");
+    } else {
+      setCurrentSection('site');
+      window.scrollTo(0, 0);
+    }
+  };
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
   };
   
   // Handle occupant entries change
@@ -38,6 +48,10 @@ export function LifestyleSection() {
     updateFormData('lifestyle', { occupants: JSON.stringify(counts) });
   };
   
+  const getButtonLabel = () => {
+    return activeTab === "people" ? "Next: Daily Life" : "Next: Site";
+  };
+  
   return (
     <div className="design-brief-section-wrapper">
       <div className="design-brief-section-container">
@@ -47,16 +61,34 @@ export function LifestyleSection() {
           isBold={true}
         />
         
-        <Tabs defaultValue="people" className="w-full" value={activeTab} onValueChange={setActiveTab}>
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
           <div className="flex justify-center mb-6">
-            <TabsList className="grid grid-cols-2 w-full max-w-md">
-              <TabsTrigger value="people" className="relative text-base font-medium">
-                People & Pets
-              </TabsTrigger>
-              <TabsTrigger value="general" className="relative text-base font-medium">
-                Daily Life
-              </TabsTrigger>
-            </TabsList>
+            <NavigationMenu>
+              <NavigationMenuList className="flex gap-2">
+                <NavigationMenuItem>
+                  <NavigationMenuLink 
+                    className={cn(
+                      "px-4 py-2 rounded-md transition-all hover:bg-accent text-base font-medium",
+                      activeTab === "people" ? "bg-primary text-primary-foreground" : "bg-muted"
+                    )}
+                    onClick={() => setActiveTab("people")}
+                  >
+                    People & Pets
+                  </NavigationMenuLink>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <NavigationMenuLink 
+                    className={cn(
+                      "px-4 py-2 rounded-md transition-all hover:bg-accent text-base font-medium",
+                      activeTab === "general" ? "bg-primary text-primary-foreground" : "bg-muted"
+                    )}
+                    onClick={() => setActiveTab("general")}
+                  >
+                    Daily Life
+                  </NavigationMenuLink>
+                </NavigationMenuItem>
+              </NavigationMenuList>
+            </NavigationMenu>
           </div>
           
           <TabsContent value="people" className="space-y-6 min-h-[400px]">
@@ -88,7 +120,7 @@ export function LifestyleSection() {
             onClick={handleNext} 
             className="group transition-all duration-200"
           >
-            <span>Next: Site</span>
+            <span>{getButtonLabel()}</span>
             <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
           </Button>
         </div>
