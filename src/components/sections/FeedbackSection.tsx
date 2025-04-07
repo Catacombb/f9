@@ -99,14 +99,16 @@ export function FeedbackSection() {
         improvements: formData.feedback.improvements || 'No response',
         next_feature: formData.feedback.nextFeature || 'No response',
         additional_feedback: formData.feedback.additionalFeedback || 'No response',
-        custom_interest: isInterestedInCustomVersion === 'yes' ? 'Yes' : 'No',
-        custom_details: formData.feedback.customVersionInterest || 'None provided',
         user_role: formData.feedback.userRole?.join(', ') || 'Not specified',
         other_role: formData.feedback.userRole?.includes('Other') ? formData.feedback.otherRoleSpecify || 'Not specified' : 'N/A',
         team_size: formData.feedback.teamSize || 'Not specified',
         would_recommend: formData.feedback.wouldRecommend || 'Not specified',
-        can_contact: formData.feedback.canContact ? 'Yes' : 'No',
-        call_availability: formData.feedback.callAvailability || 'Not specified'
+        call_availability: formData.feedback.callAvailability || 'Not specified',
+        creation_date: new Date().toLocaleDateString('en-US', {
+          year: 'numeric', 
+          month: 'long', 
+          day: 'numeric'
+        })
       };
 
       await emailjs.send(
