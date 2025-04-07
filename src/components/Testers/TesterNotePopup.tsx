@@ -10,7 +10,7 @@ import {
   DialogFooter
 } from "@/components/ui/dialog";
 import { Button } from '@/components/ui/button';
-import { X } from 'lucide-react';
+import { X, Computer } from 'lucide-react';
 
 export function TesterNotePopup() {
   const [isOpen, setIsOpen] = useState(false);
@@ -61,6 +61,13 @@ export function TesterNotePopup() {
             At the end, you'll find a space to share your thoughts.</p>
             
             <p>Your input helps shape where this goes next.</p>
+            
+            <div className="flex items-center bg-purple-100 dark:bg-purple-900/50 p-3 rounded-lg mt-4 border border-purple-200 dark:border-purple-700">
+              <Computer className="h-6 w-6 mr-3 text-purple-700 dark:text-purple-400" />
+              <p className="text-sm text-purple-800 dark:text-purple-300">
+                <strong>Note:</strong> Please use a desktop computer for this initial testing.
+              </p>
+            </div>
           </DialogDescription>
         </div>
         
