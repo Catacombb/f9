@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { 
   Bed, 
@@ -12,7 +13,7 @@ import {
   Monitor,
   UtensilsCrossed,
   Toilet,
-  Clothes
+  Shirt
 } from 'lucide-react';
 
 export const predefinedRoomTypes = [
@@ -54,7 +55,7 @@ export const predefinedRoomTypes = [
   { 
     value: 'Walk-in Robe', 
     label: 'Walk-in Robe',
-    icon: <Clothes className="h-6 w-6" />
+    icon: <Shirt className="h-6 w-6" />
   },
   { 
     value: 'Gym', 
