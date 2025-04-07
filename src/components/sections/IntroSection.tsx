@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useDesignBrief } from '@/context/DesignBriefContext';
@@ -7,16 +7,24 @@ import { ArrowRight, Clipboard, PenLine, Share, AlertTriangle, MessageCircle } f
 import { TesterNotePopup } from '@/components/Testers/TesterNotePopup';
 
 export function IntroSection() {
-  const {
-    setCurrentSection
-  } = useDesignBrief();
+  const { setCurrentSection } = useDesignBrief();
+  const [showTesterPopup, setShowTesterPopup] = useState(true);
+  
+  // Effect to ensure popup shows every time this component mounts
+  useEffect(() => {
+    setShowTesterPopup(true);
+  }, []);
   
   const handleStart = () => {
     setCurrentSection('projectInfo');
   };
   
+  const handleClosePopup = () => {
+    setShowTesterPopup(false);
+  };
+  
   return <div className="design-brief-section-wrapper">
-      <TesterNotePopup />
+      <TesterNotePopup isOpen={showTesterPopup} onClose={handleClosePopup} />
       <div className="design-brief-section-container">
         {/* Hero Section with Gradient Background */}
         <div className="text-center mb-12 relative">

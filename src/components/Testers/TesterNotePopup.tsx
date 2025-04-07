@@ -12,27 +12,26 @@ import {
 import { Button } from '@/components/ui/button';
 import { Computer } from 'lucide-react';
 
-export function TesterNotePopup() {
-  const [isOpen, setIsOpen] = useState(false);
+interface TesterNotePopupProps {
+  isOpen?: boolean;
+  onClose?: () => void;
+}
+
+export function TesterNotePopup({ isOpen = true, onClose }: TesterNotePopupProps) {
+  const [open, setOpen] = useState(isOpen);
   
+  // Update internal state when prop changes
   useEffect(() => {
-    // Check if this is the first visit
-    const hasSeenTesterNote = localStorage.getItem('hasSeenTesterNote');
-    
-    if (!hasSeenTesterNote) {
-      // If first visit, show the popup
-      setIsOpen(true);
-      // Mark as seen for future visits
-      localStorage.setItem('hasSeenTesterNote', 'true');
-    }
-  }, []);
+    setOpen(isOpen);
+  }, [isOpen]);
   
   const handleClose = () => {
-    setIsOpen(false);
+    setOpen(false);
+    if (onClose) onClose();
   };
   
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="max-w-md border-purple-300 dark:border-purple-700">
         <DialogHeader>
           <DialogTitle className="text-lg font-medium text-purple-700 dark:text-purple-400">
@@ -75,4 +74,3 @@ export function TesterNotePopup() {
     </Dialog>
   );
 }
-
