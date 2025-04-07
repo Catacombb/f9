@@ -14,11 +14,12 @@ export function useSupabase() {
     async function getInitialSession() {
       setLoading(true);
       
-      const { data: { session } } = await supabase.auth.getSession();
-      setSession(session);
+      const { data } = await supabase.auth.getSession();
+      setSession(data.session);
 
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
+      if (data.session?.user) {
+        setUser(data.session.user);
+      }
       
       setLoading(false);
     }

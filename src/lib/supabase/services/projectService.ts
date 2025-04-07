@@ -1,66 +1,212 @@
+import { supabase } from '@/lib/supabase/schema';
+import { FormData, ProjectData, SectionKey, SpaceRoom, Professional, InspirationEntry, OccupantEntry } from '@/types';
+import { v4 as uuidv4 } from 'uuid';
 
-import { supabase } from '../schema';
-import { ProjectData } from '@/types';
+// Define type for project settings to match the database schema
+interface ProjectSettings {
+  budget_flexibility?: string | null;
+  budget_priorities?: string[] | null;
+  budget_notes?: string | null;
+  lifestyle_notes?: string | null;
+  home_feeling?: string | null;
+  site_constraints?: string[] | null;
+  site_access?: string | null;
+  site_views?: string | null;
+  outdoor_spaces?: string[] | null;
+  site_notes?: string | null;
+  home_level_type?: string | null;
+  level_assignment_notes?: string | null;
+  home_size?: string | null;
+  eliminable_spaces?: string | null;
+  room_arrangement?: string | null;
+  preferred_styles?: string[] | null;
+  material_preferences?: string[] | null;
+  external_materials_selected?: string[] | null;
+  internal_materials_selected?: string[] | null;
+  sustainability_features?: string[] | null;
+  technology_requirements?: string | null;
+  architecture_notes?: string | null;
+  communication_notes?: string | null;
+}
 
-export const projectService = {
-  /**
-   * Create a new project in the database
-   */
-  async createProject(projectData: ProjectData, userId: string) {
-    // First create the base project record
-    const { data: project, error: projectError } = await supabase
-      .from('projects')
-      .insert({
-        client_name: projectData.formData.projectInfo.clientName,
-        project_address: projectData.formData.projectInfo.projectAddress,
-        contact_email: projectData.formData.projectInfo.contactEmail,
-        contact_phone: projectData.formData.projectInfo.contactPhone,
-        project_type: projectData.formData.projectInfo.projectType,
-        project_description: projectData.formData.projectInfo.projectDescription,
-        budget_range: projectData.formData.budget.budgetRange,
-        move_in_preference: projectData.formData.projectInfo.moveInPreference,
-        move_in_date: projectData.formData.projectInfo.moveInDate,
-        project_goals: projectData.formData.projectInfo.projectGoals,
-        coordinates: projectData.formData.projectInfo.coordinates,
-        user_id: userId
-      })
+export async function saveProject(projectData: ProjectData, userId: string) {
+  try {
+    // First, check if the project exists to determine if we're creating or updating
+    let projectId = '';
+    let isNewProject = true;
+    
+    // Try to get the project ID from local storage or some other source
+    const storedProjectId = localStorage.getItem('current_project_id');
+    
+    if (storedProjectId) {
+      // Check if this project exists and belongs to the current user
+      const { data: existingProject } = await supabase
+        .from('projects')
+        .select('id')
+        .eq('id', storedProjectId)
+        .eq('user_id', userId)
+        .single();
+      
+      if (existingProject) {
+        projectId = existingProject.id;
+        isNewProject = false;
+      }
+    }
+    
+    // If it's a new project, create the project record
+    if (isNewProject) {
+      projectId = uuidv4();
+      
+      const { error: projectError } = await supabase
+        .from('projects')
+        .insert({
+          id: projectId,
+          user_id: userId,
+          client_name: projectData.formData.projectInfo.clientName,
+          project_address: projectData.formData.projectInfo.projectAddress,
+          contact_email: projectData.formData.projectInfo.contactEmail,
+          contact_phone: projectData.formData.projectInfo.contactPhone,
+          project_type: projectData.formData.projectInfo.projectType,
+          project_description: projectData.formData.projectInfo.projectDescription,
+          budget_range: projectData.formData.budget.budgetRange,
+          move_in_preference: projectData.formData.projectInfo.moveInPreference,
+          move_in_date: projectData.formData.projectInfo.moveInDate,
+          project_goals: projectData.formData.projectInfo.projectGoals,
+          coordinates: projectData.formData.projectInfo.coordinates
+        });
+      
+      if (projectError) {
+        throw new Error(`Error creating project: ${projectError.message}`);
+      }
+      
+      // Store the project ID in local storage
+      localStorage.setItem('current_project_id', projectId);
+    } else {
+      // Update the existing project
+      const { error: projectError } = await supabase
+        .from('projects')
+        .update({
+          client_name: projectData.formData.projectInfo.clientName,
+          project_address: projectData.formData.projectInfo.projectAddress,
+          contact_email: projectData.formData.projectInfo.contactEmail,
+          contact_phone: projectData.formData.projectInfo.contactPhone,
+          project_type: projectData.formData.projectInfo.projectType,
+          project_description: projectData.formData.projectInfo.projectDescription,
+          budget_range: projectData.formData.budget.budgetRange,
+          move_in_preference: projectData.formData.projectInfo.moveInPreference,
+          move_in_date: projectData.formData.projectInfo.moveInDate,
+          project_goals: projectData.formData.projectInfo.projectGoals,
+          coordinates: projectData.formData.projectInfo.coordinates,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', projectId);
+      
+      if (projectError) {
+        throw new Error(`Error updating project: ${projectError.message}`);
+      }
+    }
+    
+    // Now handle all the related tables
+    
+    // Save project settings
+    const settings: ProjectSettings = {
+      // Budget settings
+      budget_flexibility: projectData.formData.budget.budgetFlexibility || null,
+      budget_priorities: projectData.formData.budget.budgetPriorities || null,
+      budget_notes: projectData.formData.budget.budgetNotes || null,
+      
+      // Lifestyle settings
+      lifestyle_notes: projectData.formData.lifestyle.lifestyleNotes || null,
+      home_feeling: projectData.formData.lifestyle.homeFeeling || null,
+      
+      // Site settings
+      site_constraints: Array.isArray(projectData.formData.site.siteConstraints) 
+        ? projectData.formData.site.siteConstraints 
+        : null,
+      site_access: projectData.formData.site.siteAccess || null,
+      site_views: projectData.formData.site.siteViews || null,
+      outdoor_spaces: Array.isArray(projectData.formData.site.outdoorSpaces) 
+        ? projectData.formData.site.outdoorSpaces 
+        : null,
+      site_notes: projectData.formData.site.siteNotes || null,
+      
+      // Space settings
+      home_level_type: projectData.formData.spaces.homeLevelType || null,
+      level_assignment_notes: projectData.formData.spaces.levelAssignmentNotes || null,
+      home_size: projectData.formData.spaces.homeSize || null,
+      eliminable_spaces: projectData.formData.spaces.eliminableSpaces || null,
+      room_arrangement: projectData.formData.spaces.roomArrangement || null,
+      
+      // Architecture settings
+      preferred_styles: Array.isArray(projectData.formData.architecture.preferredStyles) 
+        ? projectData.formData.architecture.preferredStyles 
+        : null,
+      material_preferences: Array.isArray(projectData.formData.architecture.materialPreferences) 
+        ? projectData.formData.architecture.materialPreferences 
+        : null,
+      sustainability_features: Array.isArray(projectData.formData.architecture.sustainabilityFeatures) 
+        ? projectData.formData.architecture.sustainabilityFeatures 
+        : null,
+      technology_requirements: Array.isArray(projectData.formData.architecture.technologyRequirements) 
+        ? projectData.formData.architecture.technologyRequirements 
+        : null,
+      architecture_notes: projectData.formData.architecture.architectureNotes || null,
+      external_materials_selected: Array.isArray(projectData.formData.architecture.externalMaterialsSelected) 
+        ? projectData.formData.architecture.externalMaterialsSelected 
+        : null,
+      internal_materials_selected: Array.isArray(projectData.formData.architecture.internalMaterialsSelected) 
+        ? projectData.formData.architecture.internalMaterialsSelected 
+        : null,
+      
+      // Communication settings
+      communication_notes: projectData.formData.communication.communicationNotes || null
+    };
+    
+    // Check if settings exist and update or insert accordingly
+    const { data: existingSettings } = await supabase
+      .from('project_settings')
       .select('id')
+      .eq('project_id', projectId)
       .single();
     
-    if (projectError) throw projectError;
-    const projectId = project.id;
+    if (existingSettings) {
+      // Update existing settings
+      const { error: settingsError } = await supabase
+        .from('project_settings')
+        .update(settings)
+        .eq('project_id', projectId);
+      
+      if (settingsError) {
+        console.error('Error updating project settings:', settingsError);
+      }
+    } else {
+      // Insert new settings
+      const { error: settingsError } = await supabase
+        .from('project_settings')
+        .insert({
+          project_id: projectId,
+          ...settings
+        });
+      
+      if (settingsError) {
+        console.error('Error inserting project settings:', settingsError);
+      }
+    }
     
-    // Insert project settings
-    await supabase.from('project_settings').insert({
-      project_id: projectId,
-      budget_flexibility: projectData.formData.budget.budgetFlexibility,
-      budget_priorities: projectData.formData.budget.budgetPriorities,
-      budget_notes: projectData.formData.budget.budgetNotes,
-      lifestyle_notes: projectData.formData.lifestyle.lifestyleNotes,
-      home_feeling: projectData.formData.lifestyle.homeFeeling,
-      site_constraints: projectData.formData.site.siteConstraints,
-      site_access: projectData.formData.site.siteAccess,
-      site_views: projectData.formData.site.siteViews,
-      outdoor_spaces: projectData.formData.site.outdoorSpaces,
-      site_notes: projectData.formData.site.siteNotes,
-      home_level_type: projectData.formData.spaces.homeLevelType,
-      level_assignment_notes: projectData.formData.spaces.levelAssignmentNotes,
-      home_size: projectData.formData.spaces.homeSize,
-      eliminable_spaces: projectData.formData.spaces.eliminableSpaces,
-      room_arrangement: projectData.formData.spaces.roomArrangement,
-      preferred_styles: projectData.formData.architecture.preferredStyles,
-      material_preferences: projectData.formData.architecture.materialPreferences,
-      external_materials_selected: projectData.formData.architecture.externalMaterialsSelected,
-      internal_materials_selected: projectData.formData.architecture.internalMaterialsSelected,
-      sustainability_features: projectData.formData.architecture.sustainabilityFeatures,
-      technology_requirements: projectData.formData.architecture.technologyRequirements,
-      architecture_notes: projectData.formData.architecture.architectureNotes,
-      communication_notes: projectData.formData.communication.communicationNotes
-    });
+    // Save rooms - first delete any existing rooms
+    const { error: deleteRoomsError } = await supabase
+      .from('rooms')
+      .delete()
+      .eq('project_id', projectId);
     
-    // Insert rooms
+    if (deleteRoomsError) {
+      console.error('Error deleting rooms:', deleteRoomsError);
+    }
+    
+    // Then insert the new rooms
     if (projectData.formData.spaces.rooms && projectData.formData.spaces.rooms.length > 0) {
-      const rooms = projectData.formData.spaces.rooms.map(room => ({
+      const roomsToInsert = projectData.formData.spaces.rooms.map(room => ({
+        id: room.id,
         project_id: projectId,
         type: room.type,
         quantity: room.quantity,
@@ -71,24 +217,58 @@ export const projectService = {
         primary_users: room.primaryUsers
       }));
       
-      await supabase.from('rooms').insert(rooms);
+      const { error: roomsError } = await supabase
+        .from('rooms')
+        .insert(roomsToInsert);
+      
+      if (roomsError) {
+        console.error('Error inserting rooms:', roomsError);
+      }
     }
     
-    // Insert occupants
+    // Save occupants - first delete any existing occupants
+    const { error: deleteOccupantsError } = await supabase
+      .from('occupants')
+      .delete()
+      .eq('project_id', projectId);
+    
+    if (deleteOccupantsError) {
+      console.error('Error deleting occupants:', deleteOccupantsError);
+    }
+    
+    // Then insert the new occupants
     if (projectData.formData.lifestyle.occupantEntries && projectData.formData.lifestyle.occupantEntries.length > 0) {
-      const occupants = projectData.formData.lifestyle.occupantEntries.map(occupant => ({
+      const occupantsToInsert = projectData.formData.lifestyle.occupantEntries.map(occupant => ({
+        id: occupant.id,
         project_id: projectId,
         type: occupant.type,
         name: occupant.name,
         notes: occupant.notes
       }));
       
-      await supabase.from('occupants').insert(occupants);
+      const { error: occupantsError } = await supabase
+        .from('occupants')
+        .insert(occupantsToInsert);
+      
+      if (occupantsError) {
+        console.error('Error inserting occupants:', occupantsError);
+      }
     }
     
-    // Insert professionals
+    // Save professionals - first delete any existing professionals
+    const { error: deleteProfessionalsError } = await supabase
+      .from('professionals')
+      .delete()
+      .eq('project_id', projectId);
+    
+    if (deleteProfessionalsError) {
+      console.error('Error deleting professionals:', deleteProfessionalsError);
+    }
+    
+    // Then insert the new professionals
     if (projectData.formData.contractors.professionals && projectData.formData.contractors.professionals.length > 0) {
-      const professionals = projectData.formData.contractors.professionals.map(professional => ({
+      const professionalsToInsert = projectData.formData.contractors.professionals.map(professional => ({
+        id: professional.id,
         project_id: projectId,
         type: professional.type,
         name: professional.name,
@@ -97,399 +277,105 @@ export const projectService = {
         is_custom: professional.isCustom || false
       }));
       
-      await supabase.from('professionals').insert(professionals);
+      const { error: professionalsError } = await supabase
+        .from('professionals')
+        .insert(professionalsToInsert);
+      
+      if (professionalsError) {
+        console.error('Error inserting professionals:', professionalsError);
+      }
     }
     
-    // Insert inspiration entries
+    // Save inspiration entries - first delete any existing entries
+    const { error: deleteInspirationError } = await supabase
+      .from('inspiration_entries')
+      .delete()
+      .eq('project_id', projectId);
+    
+    if (deleteInspirationError) {
+      console.error('Error deleting inspiration entries:', deleteInspirationError);
+    }
+    
+    // Then insert the new inspiration entries
     if (projectData.formData.architecture.inspirationEntries && projectData.formData.architecture.inspirationEntries.length > 0) {
-      const inspirationEntries = projectData.formData.architecture.inspirationEntries.map(entry => ({
+      const inspirationToInsert = projectData.formData.architecture.inspirationEntries.map(entry => ({
         project_id: projectId,
         link: entry.link,
         description: entry.description
       }));
       
-      await supabase.from('inspiration_entries').insert(inspirationEntries);
+      const { error: inspirationError } = await supabase
+        .from('inspiration_entries')
+        .insert(inspirationToInsert);
+      
+      if (inspirationError) {
+        console.error('Error inserting inspiration entries:', inspirationError);
+      }
     }
     
-    // Insert summary
-    await supabase.from('summaries').insert({
-      project_id: projectId,
-      generated_summary: projectData.summary.generatedSummary,
-      edited_summary: projectData.summary.editedSummary
-    });
+    // Save summary if it exists
+    if (projectData.summary.generatedSummary || projectData.summary.editedSummary) {
+      // Check if summary exists and update or insert accordingly
+      const { data: existingSummary } = await supabase
+        .from('summaries')
+        .select('id')
+        .eq('project_id', projectId)
+        .single();
+      
+      if (existingSummary) {
+        // Update existing summary
+        const { error: summaryError } = await supabase
+          .from('summaries')
+          .update({
+            generated_summary: projectData.summary.generatedSummary,
+            edited_summary: projectData.summary.editedSummary
+          })
+          .eq('project_id', projectId);
+        
+        if (summaryError) {
+          console.error('Error updating summary:', summaryError);
+        }
+      } else {
+        // Insert new summary
+        const { error: summaryError } = await supabase
+          .from('summaries')
+          .insert({
+            project_id: projectId,
+            generated_summary: projectData.summary.generatedSummary,
+            edited_summary: projectData.summary.editedSummary
+          });
+        
+        if (summaryError) {
+          console.error('Error inserting summary:', summaryError);
+        }
+      }
+    }
     
-    return { projectId };
-  },
-  
-  /**
-   * Get a project by its ID
-   */
-  async getProject(projectId: string): Promise<ProjectData | null> {
-    // Get the base project data
-    const { data: projectData, error: projectError } = await supabase
-      .from('projects')
-      .select('*')
-      .eq('id', projectId)
-      .single();
-    
-    if (projectError) throw projectError;
-    if (!projectData) return null;
-    
-    // Get the project settings
-    const { data: settingsData } = await supabase
-      .from('project_settings')
-      .select('*')
-      .eq('project_id', projectId)
-      .single();
-    
-    // Get the rooms
-    const { data: roomsData } = await supabase
-      .from('rooms')
-      .select('*')
-      .eq('project_id', projectId);
-    
-    // Get the occupants
-    const { data: occupantsData } = await supabase
-      .from('occupants')
-      .select('*')
-      .eq('project_id', projectId);
-    
-    // Get the professionals
-    const { data: professionalsData } = await supabase
-      .from('professionals')
-      .select('*')
-      .eq('project_id', projectId);
-    
-    // Get the inspiration entries
-    const { data: inspirationData } = await supabase
-      .from('inspiration_entries')
-      .select('*')
-      .eq('project_id', projectId);
-    
-    // Get the summary
-    const { data: summaryData } = await supabase
-      .from('summaries')
-      .select('*')
-      .eq('project_id', projectId)
-      .single();
-    
-    // Initialize settings with default empty object and handle potential null values
-    const settings = settingsData || {};
-    
-    const projectFormData = {
-      projectInfo: {
-        clientName: projectData.client_name,
-        projectAddress: projectData.project_address || '',
-        contactEmail: projectData.contact_email || '',
-        contactPhone: projectData.contact_phone || '',
-        projectType: projectData.project_type || '',
-        projectDescription: projectData.project_description || '',
-        moveInPreference: projectData.move_in_preference || '',
-        projectGoals: projectData.project_goals || '',
-        moveInDate: projectData.move_in_date || '',
-        coordinates: projectData.coordinates || undefined,
-      },
-      budget: {
-        budgetRange: projectData.budget_range || '',
-        flexibilityNotes: '',
-        priorityAreas: '',
-        timeframe: '',
-        budgetFlexibility: settings?.budget_flexibility || '',
-        budgetPriorities: settings?.budget_priorities || [],
-        budgetNotes: settings?.budget_notes || '',
-      },
-      lifestyle: {
-        occupants: '',
-        occupationDetails: '',
-        dailyRoutine: '',
-        entertainmentStyle: '',
-        specialRequirements: '',
-        pets: '',
-        specialNeeds: '',
-        hobbies: [],
-        entertaining: '',
-        workFromHome: '',
-        lifestyleNotes: settings?.lifestyle_notes || '',
-        homeFeeling: settings?.home_feeling || '',
-        occupantEntries: occupantsData ? occupantsData.map(o => ({
-          id: o.id,
-          type: o.type,
-          name: o.name,
-          notes: o.notes || ''
-        })) : [],
-      },
-      site: {
-        existingConditions: '',
-        siteFeatures: [],
-        viewsOrientations: '',
-        accessConstraints: '',
-        neighboringProperties: '',
-        topographicSurvey: '',
-        existingHouseDrawings: '',
-        septicDesign: '',
-        certificateOfTitle: '',
-        covenants: '',
-        siteConstraints: settings?.site_constraints || [],
-        siteAccess: settings?.site_access || '',
-        siteViews: settings?.site_views || '',
-        outdoorSpaces: settings?.outdoor_spaces || [],
-        siteNotes: settings?.site_notes || '',
-      },
-      spaces: {
-        rooms: roomsData ? roomsData.map(r => ({
-          id: r.id,
-          type: r.type,
-          quantity: r.quantity,
-          description: r.description || '',
-          isCustom: r.is_custom,
-          customName: r.custom_name || undefined,
-          displayName: r.display_name || undefined,
-          primaryUsers: r.primary_users || undefined
-        })) : [],
-        additionalNotes: '',
-        roomTypes: [],
-        specialSpaces: [],
-        storageNeeds: '',
-        spatialRelationships: '',
-        accessibilityNeeds: '',
-        spacesNotes: '',
-        homeLevelType: settings?.home_level_type || '',
-        levelAssignmentNotes: settings?.level_assignment_notes || '',
-        homeSize: settings?.home_size || '',
-        eliminableSpaces: settings?.eliminable_spaces || '',
-        roomArrangement: settings?.room_arrangement || '',
-      },
-      architecture: {
-        stylePrefences: '',
-        externalMaterials: '',
-        internalFinishes: '',
-        sustainabilityGoals: '',
-        specialFeatures: '',
-        inspirationNotes: '',
-        preferredStyles: settings?.preferred_styles || [],
-        materialPreferences: settings?.material_preferences || [],
-        sustainabilityFeatures: settings?.sustainability_features || [],
-        technologyRequirements: settings?.technology_requirements || [],
-        architectureNotes: settings?.architecture_notes || '',
-        externalMaterialsSelected: settings?.external_materials_selected || [],
-        internalMaterialsSelected: settings?.internal_materials_selected || [],
-        inspirationLinks: '',
-        inspirationComments: '',
-        inspirationEntries: inspirationData ? inspirationData.map(i => ({
-          link: i.link,
-          description: i.description || ''
-        })) : [],
-      },
-      contractors: {
-        preferredBuilder: '',
-        goToTender: false,
-        professionals: professionalsData ? professionalsData.map(p => ({
-          id: p.id,
-          type: p.type,
-          name: p.name,
-          contact: p.contact || '',
-          notes: p.notes || '',
-          isCustom: p.is_custom
-        })) : [],
-        additionalNotes: '',
-      },
-      communication: {
-        preferredMethods: [],
-        bestTimes: [],
-        availableDays: [],
-        frequency: '',
-        urgentContact: '',
-        responseTime: '',
-        additionalNotes: '',
-        communicationNotes: settings?.communication_notes || '',
-      },
-      feedback: {
-        usabilityRating: 0,
-        performanceRating: 0,
-        functionalityRating: 0,
-        designRating: 0,
-        likeMost: '',
-        improvements: '',
-        nextFeature: '',
-        additionalFeedback: '',
-        customVersionInterest: '',
-        userRole: [],
-        teamSize: '',
-        wouldRecommend: '',
-        canContact: '',
-        contactInfo: '',
-        feedbackComments: '',
-      },
-    };
+    // Handle file uploads
+    // Note: This would typically involve uploading to Supabase storage
+    // and then recording the file metadata in the project_files table
+    // This is more complex and would require additional code
     
     return {
-      formData: projectFormData,
-      files: {
-        uploadedFiles: [],
-        uploadedInspirationImages: [],
-        inspirationSelections: [],
-        siteDocuments: [],
-        sitePhotos: [],
-        designFiles: [],
-        inspirationFiles: []
-      },
-      summary: {
-        generatedSummary: summaryData?.generated_summary || '',
-        editedSummary: summaryData?.edited_summary || '',
-      },
-      lastSaved: projectData.updated_at,
+      success: true,
+      projectId
     };
-  },
-  
-  /**
-   * Update an existing project
-   */
-  async updateProject(projectId: string, projectData: ProjectData) {
-    // Update base project info
-    await supabase
-      .from('projects')
-      .update({
-        client_name: projectData.formData.projectInfo.clientName,
-        project_address: projectData.formData.projectInfo.projectAddress,
-        contact_email: projectData.formData.projectInfo.contactEmail,
-        contact_phone: projectData.formData.projectInfo.contactPhone,
-        project_type: projectData.formData.projectInfo.projectType,
-        project_description: projectData.formData.projectInfo.projectDescription,
-        budget_range: projectData.formData.budget.budgetRange,
-        move_in_preference: projectData.formData.projectInfo.moveInPreference,
-        move_in_date: projectData.formData.projectInfo.moveInDate,
-        project_goals: projectData.formData.projectInfo.projectGoals,
-        coordinates: projectData.formData.projectInfo.coordinates,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', projectId);
-      
-    // Update or create project settings
-    const { count } = await supabase
-      .from('project_settings')
-      .select('*', { count: 'exact', head: true })
-      .eq('project_id', projectId);
-    
-    if (count && count > 0) {
-      await supabase
-        .from('project_settings')
-        .update({
-          budget_flexibility: projectData.formData.budget.budgetFlexibility,
-          budget_priorities: projectData.formData.budget.budgetPriorities,
-          budget_notes: projectData.formData.budget.budgetNotes,
-          lifestyle_notes: projectData.formData.lifestyle.lifestyleNotes,
-          home_feeling: projectData.formData.lifestyle.homeFeeling,
-          site_constraints: projectData.formData.site.siteConstraints,
-          site_access: projectData.formData.site.siteAccess,
-          site_views: projectData.formData.site.siteViews,
-          outdoor_spaces: projectData.formData.site.outdoorSpaces,
-          site_notes: projectData.formData.site.siteNotes,
-          home_level_type: projectData.formData.spaces.homeLevelType,
-          level_assignment_notes: projectData.formData.spaces.levelAssignmentNotes,
-          home_size: projectData.formData.spaces.homeSize,
-          eliminable_spaces: projectData.formData.spaces.eliminableSpaces,
-          room_arrangement: projectData.formData.spaces.roomArrangement,
-          preferred_styles: projectData.formData.architecture.preferredStyles,
-          material_preferences: projectData.formData.architecture.materialPreferences,
-          external_materials_selected: projectData.formData.architecture.externalMaterialsSelected,
-          internal_materials_selected: projectData.formData.architecture.internalMaterialsSelected,
-          sustainability_features: projectData.formData.architecture.sustainabilityFeatures,
-          technology_requirements: projectData.formData.architecture.technologyRequirements,
-          architecture_notes: projectData.formData.architecture.architectureNotes,
-          communication_notes: projectData.formData.communication.communicationNotes,
-        })
-        .eq('project_id', projectId);
-    } else {
-      await supabase
-        .from('project_settings')
-        .insert({
-          project_id: projectId,
-          budget_flexibility: projectData.formData.budget.budgetFlexibility,
-          budget_priorities: projectData.formData.budget.budgetPriorities,
-          budget_notes: projectData.formData.budget.budgetNotes,
-          lifestyle_notes: projectData.formData.lifestyle.lifestyleNotes,
-          home_feeling: projectData.formData.lifestyle.homeFeeling,
-          site_constraints: projectData.formData.site.siteConstraints,
-          site_access: projectData.formData.site.siteAccess,
-          site_views: projectData.formData.site.siteViews,
-          outdoor_spaces: projectData.formData.site.outdoorSpaces,
-          site_notes: projectData.formData.site.siteNotes,
-          home_level_type: projectData.formData.spaces.homeLevelType,
-          level_assignment_notes: projectData.formData.spaces.levelAssignmentNotes,
-          home_size: projectData.formData.spaces.homeSize,
-          eliminable_spaces: projectData.formData.spaces.eliminableSpaces,
-          room_arrangement: projectData.formData.spaces.roomArrangement,
-          preferred_styles: projectData.formData.architecture.preferredStyles,
-          material_preferences: projectData.formData.architecture.materialPreferences,
-          external_materials_selected: projectData.formData.architecture.externalMaterialsSelected,
-          internal_materials_selected: projectData.formData.architecture.internalMaterialsSelected,
-          sustainability_features: projectData.formData.architecture.sustainabilityFeatures,
-          technology_requirements: projectData.formData.architecture.technologyRequirements,
-          architecture_notes: projectData.formData.architecture.architectureNotes,
-          communication_notes: projectData.formData.communication.communicationNotes,
-        });
-    }
-    
-    // Update summary
-    const { count: summaryCount } = await supabase
-      .from('summaries')
-      .select('*', { count: 'exact', head: true })
-      .eq('project_id', projectId);
-      
-    if (summaryCount && summaryCount > 0) {
-      await supabase
-        .from('summaries')
-        .update({
-          generated_summary: projectData.summary.generatedSummary,
-          edited_summary: projectData.summary.editedSummary,
-        })
-        .eq('project_id', projectId);
-    } else {
-      await supabase
-        .from('summaries')
-        .insert({
-          project_id: projectId,
-          generated_summary: projectData.summary.generatedSummary,
-          edited_summary: projectData.summary.editedSummary,
-        });
-    }
-    
-    return { success: true };
-  },
-  
-  /**
-   * Delete a project by its ID
-   */
-  async deleteProject(projectId: string) {
-    // Delete all related data first (foreign key relationships)
-    await Promise.all([
-      supabase.from('rooms').delete().eq('project_id', projectId),
-      supabase.from('occupants').delete().eq('project_id', projectId),
-      supabase.from('professionals').delete().eq('project_id', projectId),
-      supabase.from('inspiration_entries').delete().eq('project_id', projectId),
-      supabase.from('project_files').delete().eq('project_id', projectId),
-      supabase.from('project_settings').delete().eq('project_id', projectId),
-      supabase.from('summaries').delete().eq('project_id', projectId),
-    ]);
-    
-    // Then delete the project itself
-    await supabase.from('projects').delete().eq('id', projectId);
-    
-    return { success: true };
-  },
-  
-  /**
-   * List all projects for a user
-   */
-  async listProjects(userId: string) {
-    const { data, error } = await supabase
-      .from('projects')
-      .select('id, client_name, project_address, created_at, updated_at')
-      .eq('user_id', userId)
-      .order('updated_at', { ascending: false });
-      
-    if (error) throw error;
-    
-    return data;
+  } catch (error) {
+    console.error('Error in saveProject:', error);
+    return {
+      success: false,
+      error
+    };
   }
-};
+}
+
+export async function loadProject(projectId: string) {
+  // This function would load a project and all related data from Supabase
+  // It would have similar but inverse logic to saveProject
+  
+  // For now, we'll return a placeholder
+  return {
+    success: false,
+    error: new Error('Not implemented yet')
+  };
+}
