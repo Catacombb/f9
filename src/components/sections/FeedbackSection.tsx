@@ -38,6 +38,7 @@ export function FeedbackSection() {
     formData.feedback.customVersionInterest ? 'yes' : 'no'
   );
   const [referralInfo, setReferralInfo] = useState('');
+  const [formErrors, setFormErrors] = useState<string[]>([]);
   
   const handleRatingChange = (field: string, value: number) => {
     updateFormData('feedback', { [field]: value });
@@ -117,28 +118,33 @@ export function FeedbackSection() {
     }
   };
   
-  const handleNext = async () => {
-    if (
-      !formData.feedback.usabilityRating ||
-      !formData.feedback.performanceRating ||
-      !formData.feedback.functionalityRating ||
-      !formData.feedback.designRating ||
-      !formData.feedback.likeMost ||
-      !formData.feedback.improvements ||
-      !formData.feedback.nextFeature ||
-      !formData.feedback.additionalFeedback ||
-      !formData.feedback.userRole ||
-      formData.feedback.userRole.length === 0 ||
-      !formData.feedback.teamSize ||
-      !formData.feedback.wouldRecommend ||
-      (formData.feedback.wouldRecommend === 'yes' && !referralInfo)
-    ) {
-      toast.error("Please complete all required fields before proceeding");
-      return;
-    }
+  const validateForm = () => {
+    const errors = [];
+
+    // Check required fields
+    if (!formData.feedback.usabilityRating) errors.push('Usability rating');
+    if (!formData.feedback.performanceRating) errors.push('Performance rating');
+    if (!formData.feedback.functionalityRating) errors.push('Functionality rating');
+    if (!formData.feedback.designRating) errors.push('Design rating');
+    if (!formData.feedback.likeMost) errors.push('What you liked most');
+    if (!formData.feedback.improvements) errors.push('Improvements section');
+    if (!formData.feedback.additionalFeedback) errors.push('Additional feedback');
+    if (!formData.feedback.userRole || formData.feedback.userRole.length === 0) errors.push('Your role');
+    if (formData.feedback.userRole?.includes('Other') && !otherRole) errors.push('Other role specification');
+    if (!formData.feedback.teamSize) errors.push('Team size');
+    if (!formData.feedback.wouldRecommend) errors.push('Would recommend question');
     
-    if (formData.feedback.userRole.includes('Other') && !otherRole) {
-      toast.error("Please specify your role");
+    // Only check for referral info if user selected 'yes' for recommendations
+    if (formData.feedback.wouldRecommend === 'yes' && !referralInfo) errors.push('Referral information');
+
+    setFormErrors(errors);
+    return errors.length === 0;
+  };
+  
+  const handleNext = async () => {
+    if (!validateForm()) {
+      const missingFields = formErrors.join(', ');
+      toast.error(`Please complete all required fields: ${missingFields}`);
       return;
     }
     

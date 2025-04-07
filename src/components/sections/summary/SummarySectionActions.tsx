@@ -52,7 +52,6 @@ export function SummarySectionActions({ onPrevious }: SummarySectionActionsProps
         ) : (
           <>
             <span>Continue to Feedback Form</span>
-            {/* Add a success icon that appears for a moment after successful action */}
             <span className="absolute right-2 opacity-0 group-active:opacity-100 transition-opacity">
               <CheckCircle className="h-4 w-4 text-green-500" />
             </span>
