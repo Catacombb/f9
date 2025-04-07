@@ -173,7 +173,7 @@ export const projectService = {
       .eq('project_id', projectId)
       .single();
     
-    // Map the database data to the ProjectData structure
+    // Initialize settings with default empty object and handle potential null values
     const settings = settingsData || {};
     
     const projectFormData = {
@@ -194,9 +194,9 @@ export const projectService = {
         flexibilityNotes: '',
         priorityAreas: '',
         timeframe: '',
-        budgetFlexibility: settings.budget_flexibility || '',
-        budgetPriorities: settings.budget_priorities || [],
-        budgetNotes: settings.budget_notes || '',
+        budgetFlexibility: settings?.budget_flexibility || '',
+        budgetPriorities: settings?.budget_priorities || [],
+        budgetNotes: settings?.budget_notes || '',
       },
       lifestyle: {
         occupants: '',
@@ -209,8 +209,8 @@ export const projectService = {
         hobbies: [],
         entertaining: '',
         workFromHome: '',
-        lifestyleNotes: settings.lifestyle_notes || '',
-        homeFeeling: settings.home_feeling || '',
+        lifestyleNotes: settings?.lifestyle_notes || '',
+        homeFeeling: settings?.home_feeling || '',
         occupantEntries: occupantsData ? occupantsData.map(o => ({
           id: o.id,
           type: o.type,
@@ -229,11 +229,11 @@ export const projectService = {
         septicDesign: '',
         certificateOfTitle: '',
         covenants: '',
-        siteConstraints: settings.site_constraints || [],
-        siteAccess: settings.site_access || '',
-        siteViews: settings.site_views || '',
-        outdoorSpaces: settings.outdoor_spaces || [],
-        siteNotes: settings.site_notes || '',
+        siteConstraints: settings?.site_constraints || [],
+        siteAccess: settings?.site_access || '',
+        siteViews: settings?.site_views || '',
+        outdoorSpaces: settings?.outdoor_spaces || [],
+        siteNotes: settings?.site_notes || '',
       },
       spaces: {
         rooms: roomsData ? roomsData.map(r => ({
@@ -253,11 +253,11 @@ export const projectService = {
         spatialRelationships: '',
         accessibilityNeeds: '',
         spacesNotes: '',
-        homeLevelType: settings.home_level_type || '',
-        levelAssignmentNotes: settings.level_assignment_notes || '',
-        homeSize: settings.home_size || '',
-        eliminableSpaces: settings.eliminable_spaces || '',
-        roomArrangement: settings.room_arrangement || '',
+        homeLevelType: settings?.home_level_type || '',
+        levelAssignmentNotes: settings?.level_assignment_notes || '',
+        homeSize: settings?.home_size || '',
+        eliminableSpaces: settings?.eliminable_spaces || '',
+        roomArrangement: settings?.room_arrangement || '',
       },
       architecture: {
         stylePrefences: '',
@@ -266,13 +266,13 @@ export const projectService = {
         sustainabilityGoals: '',
         specialFeatures: '',
         inspirationNotes: '',
-        preferredStyles: settings.preferred_styles || [],
-        materialPreferences: settings.material_preferences || [],
-        sustainabilityFeatures: settings.sustainability_features || [],
-        technologyRequirements: settings.technology_requirements || [],
-        architectureNotes: settings.architecture_notes || '',
-        externalMaterialsSelected: settings.external_materials_selected || [],
-        internalMaterialsSelected: settings.internal_materials_selected || [],
+        preferredStyles: settings?.preferred_styles || [],
+        materialPreferences: settings?.material_preferences || [],
+        sustainabilityFeatures: settings?.sustainability_features || [],
+        technologyRequirements: settings?.technology_requirements || [],
+        architectureNotes: settings?.architecture_notes || '',
+        externalMaterialsSelected: settings?.external_materials_selected || [],
+        internalMaterialsSelected: settings?.internal_materials_selected || [],
         inspirationLinks: '',
         inspirationComments: '',
         inspirationEntries: inspirationData ? inspirationData.map(i => ({
@@ -301,7 +301,7 @@ export const projectService = {
         urgentContact: '',
         responseTime: '',
         additionalNotes: '',
-        communicationNotes: settings.communication_notes || '',
+        communicationNotes: settings?.communication_notes || '',
       },
       feedback: {
         usabilityRating: 0,

@@ -2,10 +2,11 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase/schema';
 import { useNavigate } from 'react-router-dom';
+import { Session, User } from '@supabase/supabase-js';
 
 export function useSupabase() {
-  const [user, setUser] = useState(supabase.auth.getUser());
-  const [session, setSession] = useState(supabase.auth.getSession());
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
