@@ -1,3 +1,4 @@
+
 export interface SpaceRoom {
   id: string;
   type: string;
@@ -158,7 +159,8 @@ export interface FormData {
     improvements: string;
     nextFeature: string;
     additionalFeedback: string;
-    customVersionInterest?: string; // Restore this property
+    customVersionInterest?: string; // Interest in custom version (yes/no)
+    customVersionDetails?: string;  // Added details field for custom version requirements
     userRole: string[];
     otherRoleSpecify?: string;
     teamSize: string;

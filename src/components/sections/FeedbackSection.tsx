@@ -35,7 +35,7 @@ export function FeedbackSection() {
   const [testerName, setTesterName] = useState('');
   const [testerEmail, setTesterEmail] = useState('');
   const [isInterestedInCustomVersion, setIsInterestedInCustomVersion] = useState(
-    formData.feedback.customVersionInterest ? 'yes' : 'no'
+    formData.feedback.customVersionInterest === 'yes' ? 'yes' : 'no'
   );
   const [callAvailability, setCallAvailability] = useState(formData.feedback.callAvailability || '');
   const [formErrors, setFormErrors] = useState<string[]>([]);
@@ -63,10 +63,10 @@ export function FeedbackSection() {
 
   const handleCustomVersionInterestChange = (value: string) => {
     setIsInterestedInCustomVersion(value);
+    updateFormData('feedback', { customVersionInterest: value });
+    
     if (value === 'yes') {
-      setIsInterestedInCustomVersionDetails('');
-    } else {
-      updateFormData('feedback', { customVersionInterest: '' });
+      setIsCustomVersionInterestDetails('');
     }
   };
 
@@ -75,8 +75,10 @@ export function FeedbackSection() {
     updateFormData('feedback', { callAvailability: value });
   };
 
-  const setIsInterestedInCustomVersionDetails = (details: string) => {
-    updateFormData('feedback', { customVersionInterest: details });
+  const setIsCustomVersionInterestDetails = (details: string) => {
+    if (isInterestedInCustomVersion === 'yes') {
+      updateFormData('feedback', { customVersionInterest: 'yes', customVersionDetails: details });
+    }
   };
   
   const sendFeedbackEmail = async () => {
@@ -109,7 +111,9 @@ export function FeedbackSection() {
           month: 'long', 
           day: 'numeric'
         }),
-        custom_version_interest: formData.feedback.customVersionInterest || 'Not specified',
+        custom_version_interest: isInterestedInCustomVersion === 'yes' 
+          ? 'Yes' + (formData.feedback.customVersionDetails ? `: ${formData.feedback.customVersionDetails}` : '') 
+          : 'No',
       };
 
       await emailjs.send(
@@ -213,8 +217,8 @@ export function FeedbackSection() {
     );
   };
 
-  const [isCustomVersionInterestDetails, setIsCustomVersionInterestDetails] = useState(
-    formData.feedback.customVersionInterest || ''
+  const [customVersionDetails, setCustomVersionDetails] = useState(
+    formData.feedback.customVersionDetails || ''
   );
 
   return (
@@ -475,7 +479,7 @@ export function FeedbackSection() {
               <div className="pt-2">
                 <Label className="font-medium">Would you be interested in a custom Northstar version tailored to your specific needs?</Label>
                 <RadioGroup
-                  value={formData.feedback.customVersionInterest || ''}
+                  value={isInterestedInCustomVersion}
                   onValueChange={handleCustomVersionInterestChange}
                   className="flex flex-row space-x-4 mt-2"
                 >
@@ -489,15 +493,16 @@ export function FeedbackSection() {
                   </div>
                 </RadioGroup>
                 
-                {formData.feedback.customVersionInterest === 'yes' && (
+                {isInterestedInCustomVersion === 'yes' && (
                   <div className="mt-3">
                     <Label htmlFor="customVersionDetails">Please share more about your custom version needs:</Label>
                     <Textarea
                       id="customVersionDetails"
-                      value={isCustomVersionInterestDetails}
+                      value={customVersionDetails}
                       onChange={(e) => {
-                        setIsCustomVersionInterestDetails(e.target.value);
-                        updateFormData('feedback', { customVersionInterest: e.target.value });
+                        const newValue = e.target.value;
+                        setCustomVersionDetails(newValue);
+                        updateFormData('feedback', { customVersionDetails: newValue });
                       }}
                       placeholder="Tell us about your specific requirements..."
                       className="mt-1 min-h-[100px]"
