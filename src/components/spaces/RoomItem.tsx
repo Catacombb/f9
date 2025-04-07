@@ -119,6 +119,14 @@ export const RoomItem = ({ room, onEdit, onRemove }: RoomItemProps) => {
   // Get custom or default room name for display
   const roomName = room.displayName || room.customName || `${room.type}`;
 
+  // Create room-specific note placeholder
+  const getNotesPlaceholder = () => {
+    if (room.type === 'Bedroom') {
+      return "Any additional notes about this room, including proximity preferences (e.g., master bedroom away from children's bedrooms)...";
+    }
+    return "Any additional notes about this room...";
+  };
+
   return (
     <Card className="mb-4 border">
       <CardContent className="p-4">
@@ -257,7 +265,7 @@ export const RoomItem = ({ room, onEdit, onRemove }: RoomItemProps) => {
                 id={`room-notes-${room.id}`}
                 value={descriptionData.notes || ''} 
                 onChange={handleNotesChange}
-                placeholder="Any additional notes about this room..."
+                placeholder={getNotesPlaceholder()}
                 className="mt-1"
               />
             </div>

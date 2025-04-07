@@ -2,12 +2,6 @@
 export const roomSpecificQuestions = {
   Bedroom: [
     {
-      id: 'bedroomType',
-      question: 'Who is this bedroom for?',
-      type: 'select',
-      options: ['Primary', 'Guest', 'Child', 'Other']
-    },
-    {
       id: 'furnitureNeeds',
       question: 'Are there specific furniture needs?',
       type: 'select',
