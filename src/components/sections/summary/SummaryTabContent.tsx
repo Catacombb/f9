@@ -34,8 +34,6 @@ export function SummaryTabContent({
   return (
     <Card>
       <CardContent className="p-6">
-        <h3 className="text-xl font-bold mb-4">Design Brief Overview</h3>
-        
         <div className="border rounded-lg p-6 space-y-8">
           {/* Project Info */}
           <ProjectInfoDisplay projectInfo={formData.projectInfo} />

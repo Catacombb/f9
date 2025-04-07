@@ -1,10 +1,10 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Send, Check } from 'lucide-react';
+import { Send, Check, InfoIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
-import { InfoIcon } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface EmailExportSectionProps {
   onExportPDF: () => Promise<Blob>;
@@ -79,20 +79,19 @@ export function EmailExportSection({
         <div>
           <h4 className="font-medium mb-2 flex items-center">
             Send to My Architect
-            <Tooltip>
-              <TooltipTrigger className="ml-2">
-                <InfoIcon className="h-4 w-4 text-muted-foreground" />
-              </TooltipTrigger>
-              <TooltipContent className="bg-yellow-50 border border-yellow-200 text-yellow-800 p-2 max-w-xs">
-                <p className="text-xs font-medium">Tester Note: During testing, this will send to Nick Harrison (nicholasbharrison@gmail.com)</p>
-              </TooltipContent>
-            </Tooltip>
           </h4>
           <div className="flex flex-col md:flex-row md:items-start gap-4">
             <div className="flex-1">
               <p className="text-sm text-muted-foreground mb-2">
                 Automatically send your brief to your architect including all details and attachments.
               </p>
+              
+              <Alert className="mb-4 bg-purple-50 dark:bg-purple-900/30 border border-purple-200 dark:border-purple-800">
+                <InfoIcon className="h-4 w-4 text-purple-700 dark:text-purple-400" />
+                <AlertDescription className="text-xs font-medium text-purple-800 dark:text-purple-300">
+                  Tester Note: During testing, this will send to Nick Harrison (nicholasbharrison@gmail.com)
+                </AlertDescription>
+              </Alert>
             </div>
             <Button 
               onClick={handleSendToArchitect} 
