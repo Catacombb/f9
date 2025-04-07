@@ -1,3 +1,4 @@
+
 import { supabase } from '@/lib/supabase/schema';
 import { FormData, ProjectData, SectionKey, SpaceRoom, Professional, InspirationEntry, OccupantEntry } from '@/types';
 import { v4 as uuidv4 } from 'uuid';
@@ -24,7 +25,7 @@ interface ProjectSettings {
   external_materials_selected?: string[] | null;
   internal_materials_selected?: string[] | null;
   sustainability_features?: string[] | null;
-  technology_requirements?: string | null;
+  technology_requirements?: string[] | null; // Fixed: changed from string to string[]
   architecture_notes?: string | null;
   communication_notes?: string | null;
 }
@@ -147,6 +148,7 @@ export async function saveProject(projectData: ProjectData, userId: string) {
       sustainability_features: Array.isArray(projectData.formData.architecture.sustainabilityFeatures) 
         ? projectData.formData.architecture.sustainabilityFeatures 
         : null,
+      // Fixed: technology_requirements - ensure it's an array
       technology_requirements: Array.isArray(projectData.formData.architecture.technologyRequirements) 
         ? projectData.formData.architecture.technologyRequirements 
         : null,
@@ -180,13 +182,15 @@ export async function saveProject(projectData: ProjectData, userId: string) {
         console.error('Error updating project settings:', settingsError);
       }
     } else {
-      // Insert new settings
+      // Insert new settings with project_id
+      const settingsWithProjectId = {
+        ...settings,
+        project_id: projectId
+      };
+      
       const { error: settingsError } = await supabase
         .from('project_settings')
-        .insert({
-          project_id: projectId,
-          ...settings
-        });
+        .insert(settingsWithProjectId);
       
       if (settingsError) {
         console.error('Error inserting project settings:', settingsError);
