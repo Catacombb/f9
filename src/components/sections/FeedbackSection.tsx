@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { SectionHeader } from './SectionHeader';
@@ -6,7 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
 import { Label } from '@/components/ui/label';
-import { Star, TestTube, User, Mail, MessageSquare } from 'lucide-react';
+import { Star, TestTube, User, Mail, MessageSquare, Calendar } from 'lucide-react';
 import { toast } from 'sonner';
 import { 
   Select, 
@@ -38,6 +39,7 @@ export function FeedbackSection() {
     formData.feedback.customVersionInterest ? 'yes' : 'no'
   );
   const [referralInfo, setReferralInfo] = useState('');
+  const [callAvailability, setCallAvailability] = useState(formData.feedback.callAvailability || '');
   const [formErrors, setFormErrors] = useState<string[]>([]);
   
   const handleRatingChange = (field: string, value: number) => {
@@ -68,6 +70,11 @@ export function FeedbackSection() {
     } else {
       updateFormData('feedback', { customVersionInterest: '' });
     }
+  };
+
+  const handleCallAvailabilityChange = (value: string) => {
+    setCallAvailability(value);
+    updateFormData('feedback', { callAvailability: value });
   };
 
   const setIsInterestedInCustomVersionDetails = (details: string) => {
@@ -101,6 +108,7 @@ export function FeedbackSection() {
         team_size: formData.feedback.teamSize || 'Not specified',
         would_recommend: formData.feedback.wouldRecommend || 'Not specified',
         can_contact: formData.feedback.canContact ? 'Yes' : 'No',
+        call_availability: formData.feedback.callAvailability || 'Not specified',
         referral_info: referralInfo || 'No referral information provided'
       };
 
@@ -133,6 +141,7 @@ export function FeedbackSection() {
     if (formData.feedback.userRole?.includes('Other') && !otherRole) errors.push('Other role specification');
     if (!formData.feedback.teamSize) errors.push('Team size');
     if (!formData.feedback.wouldRecommend) errors.push('Would recommend question');
+    if (!formData.feedback.callAvailability) errors.push('Call availability question');
     
     // Only check for referral info if user selected 'yes' for recommendations
     if (formData.feedback.wouldRecommend === 'yes' && !referralInfo) errors.push('Referral information');
@@ -398,6 +407,37 @@ export function FeedbackSection() {
                   placeholder="Other thoughts..."
                   className="min-h-[150px] mt-2"
                 />
+              </div>
+            </div>
+            
+            <Separator className="bg-purple-100" />
+            
+            {/* New Call Availability Section */}
+            <div className="p-6 space-y-4 border rounded-lg bg-purple-50 dark:bg-purple-900/30 border-purple-200 dark:border-purple-800">
+              <h3 className="text-lg font-medium text-purple-800 flex items-center gap-2">
+                <Calendar className="h-5 w-5" /> 
+                Schedule a 15-Minute Call
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                Would you like to schedule a quick 15-minute call to discuss your feedback and ideas?
+              </p>
+              
+              <div className="pt-2">
+                <Label className="font-medium">Are you available for a 15-minute call?*</Label>
+                <RadioGroup
+                  value={callAvailability}
+                  onValueChange={handleCallAvailabilityChange}
+                  className="flex flex-row space-x-4 mt-2"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="yes" id="call-yes" />
+                    <Label htmlFor="call-yes">Yes</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="no" id="call-no" />
+                    <Label htmlFor="call-no">No</Label>
+                  </div>
+                </RadioGroup>
               </div>
             </div>
             
