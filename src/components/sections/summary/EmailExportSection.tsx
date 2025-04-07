@@ -79,7 +79,14 @@ export function EmailExportSection({
             <Button 
               onClick={handleSendToArchitect} 
               disabled={isSending || isSent}
-              className={`w-full md:w-auto md:min-w-[140px] transition-all duration-200 bg-magenta-500 text-white hover:bg-magenta-600 ${isSent ? 'bg-green-500 hover:bg-green-600' : ''}`}
+              className={`
+                w-full md:w-auto md:min-w-[140px] 
+                transition-all duration-200 
+                bg-purple-600 text-white 
+                hover:bg-purple-700 
+                dark:bg-purple-500 dark:hover:bg-purple-600 
+                ${isSent ? 'bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700' : ''}
+              `}
             >
               {isSending ? (
                 <span className="flex items-center justify-center w-full">
