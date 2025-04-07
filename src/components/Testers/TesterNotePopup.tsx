@@ -10,7 +10,7 @@ import {
   DialogFooter
 } from "@/components/ui/dialog";
 import { Button } from '@/components/ui/button';
-import { X, Computer } from 'lucide-react';
+import { Computer } from 'lucide-react';
 
 export function TesterNotePopup() {
   const [isOpen, setIsOpen] = useState(false);
@@ -34,15 +34,7 @@ export function TesterNotePopup() {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="max-w-md border-purple-300 dark:border-purple-700">
-        <DialogHeader className="relative">
-          <DialogPrimitive.Close 
-            className="absolute right-0 top-0 p-2 hover:bg-accent rounded-full"
-            onClick={handleClose}
-          >
-            <X className="h-5 w-5 text-purple-700 dark:text-purple-400 hover:text-purple-900" />
-            <span className="sr-only">Close</span>
-          </DialogPrimitive.Close>
-          
+        <DialogHeader>
           <DialogTitle className="text-lg font-medium text-purple-700 dark:text-purple-400">
             Tester's Note
           </DialogTitle>
@@ -83,3 +75,4 @@ export function TesterNotePopup() {
     </Dialog>
   );
 }
+
