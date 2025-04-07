@@ -158,7 +158,7 @@ export interface FormData {
     improvements: string;
     nextFeature: string;
     additionalFeedback: string;
-    customVersionInterest: string;
+    customVersionInterest?: string; // Restore this property
     userRole: string[];
     otherRoleSpecify?: string;
     teamSize: string;

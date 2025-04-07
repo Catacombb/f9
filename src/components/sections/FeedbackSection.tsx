@@ -108,7 +108,8 @@ export function FeedbackSection() {
           year: 'numeric', 
           month: 'long', 
           day: 'numeric'
-        })
+        }),
+        custom_version_interest: formData.feedback.customVersionInterest || 'Not specified',
       };
 
       await emailjs.send(
@@ -211,6 +212,10 @@ export function FeedbackSection() {
       </div>
     );
   };
+
+  const [isCustomVersionInterestDetails, setIsCustomVersionInterestDetails] = useState(
+    formData.feedback.customVersionInterest || ''
+  );
 
   return (
     <div className="design-brief-section-wrapper">
@@ -459,6 +464,46 @@ export function FeedbackSection() {
                     <Label htmlFor="recommend-no">No</Label>
                   </div>
                 </RadioGroup>
+              </div>
+            </div>
+
+            <Separator className="bg-purple-100" />
+          
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium text-purple-800">Custom Northstar Version</h3>
+              
+              <div className="pt-2">
+                <Label className="font-medium">Would you be interested in a custom Northstar version tailored to your specific needs?</Label>
+                <RadioGroup
+                  value={formData.feedback.customVersionInterest || ''}
+                  onValueChange={handleCustomVersionInterestChange}
+                  className="flex flex-row space-x-4 mt-2"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="yes" id="custom-version-yes" />
+                    <Label htmlFor="custom-version-yes">Yes</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="no" id="custom-version-no" />
+                    <Label htmlFor="custom-version-no">No</Label>
+                  </div>
+                </RadioGroup>
+                
+                {formData.feedback.customVersionInterest === 'yes' && (
+                  <div className="mt-3">
+                    <Label htmlFor="customVersionDetails">Please share more about your custom version needs:</Label>
+                    <Textarea
+                      id="customVersionDetails"
+                      value={isCustomVersionInterestDetails}
+                      onChange={(e) => {
+                        setIsCustomVersionInterestDetails(e.target.value);
+                        updateFormData('feedback', { customVersionInterest: e.target.value });
+                      }}
+                      placeholder="Tell us about your specific requirements..."
+                      className="mt-1 min-h-[100px]"
+                    />
+                  </div>
+                )}
               </div>
             </div>
           </CardContent>
