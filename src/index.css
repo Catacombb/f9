@@ -1,3 +1,4 @@
+
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
@@ -90,28 +91,46 @@
 
 /* Design Brief Application Styles */
 .design-brief-section-wrapper {
-  @apply flex-1 overflow-auto py-8 px-4 bg-background;
   width: 100%; 
   max-width: 100vw; /* Ensure content doesn't exceed screen width */
+  flex: 1;
+  overflow: auto;
+  padding: 2rem 1rem;
+  background-color: hsl(var(--background));
 }
 
 .design-brief-section-container {
-  @apply max-w-4xl mx-auto space-y-8 w-full;
+  max-width: 64rem;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 2rem;
+  width: 100%;
   padding: 0 1rem; /* Add consistent padding */
 }
 
 .design-brief-form-group {
-  @apply p-6 bg-card rounded-lg border shadow-sm mb-8 w-full;
+  padding: 1.5rem;
+  background-color: hsl(var(--card));
+  border-radius: 0.5rem;
+  border-width: 1px;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  margin-bottom: 2rem;
+  width: 100%;
   max-width: 100%; /* Ensure container respects parent width */
   box-sizing: border-box; /* Include padding in width calculation */
 }
 
 .design-brief-question-title {
-  @apply text-base font-bold mb-2 block;
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  display: block;
 }
 
 .design-brief-question-description {
-  @apply text-sm text-muted-foreground mb-4;
+  font-size: 0.875rem;
+  color: hsl(var(--muted-foreground));
+  margin-bottom: 1rem;
 }
 
 /* Mobile optimizations */
@@ -213,21 +232,8 @@
     height: 1rem;
     flex-shrink: 0;
   }
-
-  /* Consistent navigation button spacing */
-  .flex.justify-between.mt-6 {
-    gap: 0.5rem !important;
-    margin-top: 2rem !important;
-  }
-
-  /* Make sure buttons are not too small on mobile */
-  .flex.justify-between button {
-    font-size: 0.75rem !important;
-    padding-left: 0.75rem !important;
-    padding-right: 0.75rem !important;
-    flex-shrink: 0;
-  }
   
+  /* Button adjustments for better touch targets */
   .h-8.w-8 {
     height: 2.5rem;
     width: 2.5rem;
@@ -307,5 +313,16 @@ input[type="number"]::-webkit-outer-spin-button {
     display: flex !important;
     flex-direction: column !important;
     width: 100% !important;
+  }
+  
+  /* Specific fixes for the EmailExportSection */
+  .animate-fade-in .border.rounded-lg {
+    padding: 1rem !important;
+  }
+  
+  .animate-fade-in button {
+    margin-top: 0.5rem;
+    width: 100%;
+    justify-content: center;
   }
 }

@@ -113,7 +113,7 @@ export function EmailExportSection({
       <div className="p-6 space-y-4 border rounded-lg">
         <div>
           <h4 className="font-medium mb-2">Export as PDF</h4>
-          <div className="flex items-start gap-4">
+          <div className="flex flex-col md:flex-row md:items-start gap-4">
             <div className="flex-1">
               <p className="text-sm text-muted-foreground mb-2">
                 Download your complete design brief as a PDF document with the title: 
@@ -125,10 +125,10 @@ export function EmailExportSection({
             <Button 
               onClick={handleExportPDF} 
               disabled={isExporting}
-              className="min-w-[140px] transition-all duration-200 active:scale-95"
+              className="w-full md:w-auto md:min-w-[140px] transition-all duration-200 active:scale-95"
             >
               {isExporting ? (
-                <span className="flex items-center">
+                <span className="flex items-center justify-center w-full">
                   <span className="animate-spin h-4 w-4 mr-2 border-2 border-primary-foreground border-t-transparent rounded-full" />
                   <span>Exporting...</span>
                 </span>
@@ -144,7 +144,7 @@ export function EmailExportSection({
         
         <div className="border-t pt-4">
           <h4 className="font-medium mb-2">Send to My Architect</h4>
-          <div className="flex items-start gap-4">
+          <div className="flex flex-col md:flex-row md:items-start gap-4">
             <div className="flex-1">
               <p className="text-sm text-muted-foreground mb-2">
                 Automatically send your brief to your architect including all details and attachments.
@@ -153,15 +153,15 @@ export function EmailExportSection({
             <Button 
               onClick={handleSendToArchitect} 
               disabled={isSending || isSent}
-              className={`min-w-[140px] transition-all duration-200 ${isSent ? 'bg-green-500 hover:bg-green-600' : ''}`}
+              className={`w-full md:w-auto md:min-w-[140px] transition-all duration-200 ${isSent ? 'bg-green-500 hover:bg-green-600' : ''}`}
             >
               {isSending ? (
-                <span className="flex items-center">
+                <span className="flex items-center justify-center w-full">
                   <span className="animate-spin h-4 w-4 mr-2 border-2 border-primary-foreground border-t-transparent rounded-full" />
                   <span>Sending...</span>
                 </span>
               ) : isSent ? (
-                <span className="flex items-center">
+                <span className="flex items-center justify-center w-full">
                   <Check className="h-4 w-4 mr-2 animate-pop" />
                   <span>Sent!</span>
                 </span>
