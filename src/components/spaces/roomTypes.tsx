@@ -52,8 +52,8 @@ export const predefinedRoomTypes = [
     icon: <Briefcase className="h-6 w-6" />
   },
   { 
-    value: 'Storage', 
-    label: 'Storage',
+    value: 'Walk-in Robe', 
+    label: 'Walk-in Robe',
     icon: <Warehouse className="h-6 w-6" />
   },
   { 
