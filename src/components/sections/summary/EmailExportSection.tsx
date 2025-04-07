@@ -82,13 +82,17 @@ export function EmailExportSection({
           <div className="flex flex-col md:flex-row md:items-start gap-4">
             <div className="flex-1">
               <p className="text-sm text-muted-foreground mb-2">
-                Automatically send your brief to your architect including all details and attachments.
+                Choose how you want to share your design brief with your architect.
               </p>
               
               <Alert className="mb-4 bg-purple-50 dark:bg-purple-900/30 border border-purple-200 dark:border-purple-800">
                 <InfoIcon className="h-4 w-4 text-purple-700 dark:text-purple-400" />
                 <AlertDescription className="text-xs font-medium text-purple-800 dark:text-purple-300">
-                  Tester Note: During testing, this will send to Nick.
+                  Tester Note: During testing, this will send to Nick. You have two options:
+                  <ul className="list-disc list-inside mt-1">
+                    <li>Email with project brief and attachments</li>
+                    <li>Generate a downloadable PDF report</li>
+                  </ul>
                 </AlertDescription>
               </Alert>
             </div>
