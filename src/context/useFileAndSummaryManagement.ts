@@ -1,3 +1,4 @@
+
 import { useCallback } from 'react';
 import { ProjectData } from '@/types';
 import { generatePDF } from '@/utils/pdfGenerator/index';
@@ -35,7 +36,8 @@ export const useFileAndSummaryManagement = (
   }, [projectData]);
 
   const sendByEmail = useCallback(async (email: string): Promise<boolean> => {
-    console.log(`Sending email to ${email}`);
+    // During testing, this function always sends to Nick Harrison
+    console.log(`Sending email to nicholasbharrison@gmail.com`);
     
     try {
       // Generate the PDF first
@@ -53,11 +55,11 @@ export const useFileAndSummaryManagement = (
       const emailSubject = `Northstar Design Brief - ${clientName} - ${dateStamp}`;
       
       // Create the email body with download instructions
-      const emailBody = `Dear ${clientName},
+      const emailBody = `Dear Nick,
 
-Thank you for using Northstar to create your design brief for ${projectAddress}.
+This is a design brief created by ${clientName} for ${projectAddress}.
 
-To view your design brief, please click on the link below to download the PDF:
+To view the design brief, please click on the link below to download the PDF:
 
 ${window.location.origin}/download/${encodeURIComponent(clientName)}_${dateStamp}.pdf
 
@@ -70,8 +72,8 @@ The Northstar Team`;
       const encodedSubject = encodeURIComponent(emailSubject);
       const encodedBody = encodeURIComponent(emailBody);
       
-      // Create a mailto link with CC to nick@nickharrison.co
-      const mailtoLink = `mailto:${email}?cc=nick@nickharrison.co&subject=${encodedSubject}&body=${encodedBody}`;
+      // Create a mailto link specifically to Nick's email during testing
+      const mailtoLink = `mailto:nicholasbharrison@gmail.com?subject=${encodedSubject}&body=${encodedBody}`;
       
       // Create a hidden anchor element for the mailto link
       const mailtoAnchor = document.createElement('a');

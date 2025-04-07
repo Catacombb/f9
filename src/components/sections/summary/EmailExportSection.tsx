@@ -1,9 +1,10 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Download, Send, Check } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import emailjs from 'emailjs-com';
+import { Send, Check } from 'lucide-react';
+import { toast } from 'sonner';
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
+import { InfoIcon } from 'lucide-react';
 
 interface EmailExportSectionProps {
   onExportPDF: () => Promise<Blob>;
@@ -16,53 +17,18 @@ export function EmailExportSection({
   clientName,
   projectAddress
 }: EmailExportSectionProps) {
-  const [isExporting, setIsExporting] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const [isSent, setIsSent] = useState(false);
-  const { toast } = useToast();
   
-  const handleExportPDF = async () => {
-    setIsExporting(true);
-    try {
-      const pdfBlob = await onExportPDF();
-      // Create a download link for the blob
-      const url = URL.createObjectURL(pdfBlob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `Northstar_Brief_${clientName || "Client"}_${new Date().toISOString().split('T')[0]}.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      
-      // Clean up
-      URL.revokeObjectURL(url);
-      document.body.removeChild(link);
-      
-      toast({
-        title: "PDF Generated",
-        description: "Your design brief has been downloaded as a PDF.",
-      });
-    } catch (error) {
-      console.error("PDF export error:", error);
-      toast({
-        title: "Error",
-        description: "There was a problem exporting your PDF. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsExporting(false);
-    }
-  };
-
   const handleSendToArchitect = async () => {
     setIsSending(true);
     try {
       // Prepare the PDF
       const pdfBlob = await onExportPDF();
       
-      // In a real app, get the architect's email from the project data
-      // For this implementation we use a placeholder that would be replaced by the actual architect
-      const architectEmail = "architect@example.com"; 
-      const architectName = "Your Architect"; 
+      // Use nicholasbharrison@gmail.com as the architect email for testing
+      const architectEmail = "nicholasbharrison@gmail.com"; 
+      const architectName = "Nick Harrison"; 
       
       // Generate a unique filename for the PDF
       const pdfFilename = `Northstar_Brief_${clientName || "Client"}_${new Date().toISOString().split('T')[0]}.pdf`;
@@ -81,9 +47,9 @@ export function EmailExportSection({
       // Simulate sending email (since actual EmailJS would need valid credentials)
       await new Promise(resolve => setTimeout(resolve, 2000));
       
-      toast({
-        title: "Success!",
+      toast.success("Success!", {
         description: "Your architect has received the brief.",
+        duration: 5000
       });
       
       // Show sent state
@@ -96,10 +62,9 @@ export function EmailExportSection({
       
     } catch (error) {
       console.error("Error sending to architect:", error);
-      toast({
-        title: "Error",
+      toast.error("Error", {
         description: "There was a problem sending the brief to your architect. Please try again.",
-        variant: "destructive",
+        duration: 5000
       });
     } finally {
       setIsSending(false);
@@ -112,38 +77,17 @@ export function EmailExportSection({
       
       <div className="p-6 space-y-4 border rounded-lg">
         <div>
-          <h4 className="font-medium mb-2">Export as PDF</h4>
-          <div className="flex flex-col md:flex-row md:items-start gap-4">
-            <div className="flex-1">
-              <p className="text-sm text-muted-foreground mb-2">
-                Download your complete design brief as a PDF document with the title: 
-                <span className="font-semibold block">
-                  "Northstar_Brief_{clientName || "[Client Name]"}_{new Date().toISOString().split('T')[0]}"
-                </span>
-              </p>
-            </div>
-            <Button 
-              onClick={handleExportPDF} 
-              disabled={isExporting}
-              className="w-full md:w-auto md:min-w-[140px] transition-all duration-200 active:scale-95"
-            >
-              {isExporting ? (
-                <span className="flex items-center justify-center w-full">
-                  <span className="animate-spin h-4 w-4 mr-2 border-2 border-primary-foreground border-t-transparent rounded-full" />
-                  <span>Exporting...</span>
-                </span>
-              ) : (
-                <>
-                  <Download className="h-4 w-4 mr-2" />
-                  <span>Export PDF</span>
-                </>
-              )}
-            </Button>
-          </div>
-        </div>
-        
-        <div className="border-t pt-4">
-          <h4 className="font-medium mb-2">Send to My Architect</h4>
+          <h4 className="font-medium mb-2 flex items-center">
+            Send to My Architect
+            <Tooltip>
+              <TooltipTrigger className="ml-2">
+                <InfoIcon className="h-4 w-4 text-muted-foreground" />
+              </TooltipTrigger>
+              <TooltipContent className="bg-yellow-50 border border-yellow-200 text-yellow-800 p-2 max-w-xs">
+                <p className="text-xs font-medium">Tester Note: During testing, this will send to Nick Harrison (nicholasbharrison@gmail.com)</p>
+              </TooltipContent>
+            </Tooltip>
+          </h4>
           <div className="flex flex-col md:flex-row md:items-start gap-4">
             <div className="flex-1">
               <p className="text-sm text-muted-foreground mb-2">
