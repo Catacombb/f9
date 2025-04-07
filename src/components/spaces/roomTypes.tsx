@@ -10,9 +10,9 @@ import {
   Warehouse, 
   Dumbbell, 
   WashingMachine,
-  Television,
-  Spoon,
-  Toilet
+  Monitor,
+  UtensilsCrossed,
+  Bath as BathIcon
 } from 'lucide-react';
 
 export const predefinedRoomTypes = [
@@ -34,7 +34,7 @@ export const predefinedRoomTypes = [
   { 
     value: 'Powder Room', 
     label: 'Powder Room',
-    icon: <Toilet className="h-6 w-6" />
+    icon: <BathIcon className="h-6 w-6" />
   },
   { 
     value: 'Living Room', 
@@ -64,12 +64,12 @@ export const predefinedRoomTypes = [
   { 
     value: 'Media Room', 
     label: 'Media Room',
-    icon: <Television className="h-6 w-6" />
+    icon: <Monitor className="h-6 w-6" />
   },
   { 
     value: 'Scullery', 
     label: 'Scullery',
-    icon: <Spoon className="h-6 w-6" />
+    icon: <UtensilsCrossed className="h-6 w-6" />
   },
   { 
     value: 'Laundry', 
