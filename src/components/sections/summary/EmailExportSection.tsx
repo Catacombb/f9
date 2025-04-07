@@ -67,10 +67,11 @@ export function EmailExportSection({
               <Alert className="mb-4 bg-purple-50 dark:bg-purple-900/30 border border-purple-200 dark:border-purple-800">
                 <InfoIcon className="h-4 w-4 text-purple-700 dark:text-purple-400" />
                 <AlertDescription className="text-xs font-medium text-purple-800 dark:text-purple-300">
-                  Tester Note: This won't actually send anything during testing. You have two options:
+                  Tester Note: This won't actually send anything during testing. You have options like:
                   <ul className="list-disc list-inside mt-1">
                     <li>Email with project brief and attachments</li>
                     <li>Generate a downloadable PDF report</li>
+                    <li>etc.</li>
                   </ul>
                 </AlertDescription>
               </Alert>
