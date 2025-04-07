@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -129,19 +130,20 @@ export const RoomItem = ({ room, onEdit, onRemove }: RoomItemProps) => {
   return (
     <Card className="mb-4 border">
       <CardContent className="p-4">
-        {/* Primary Users Displayed at the Top */}
-        {primaryUsers && primaryUsers.length > 0 && (
-          <div className="mb-2 text-xs text-muted-foreground">
-            Intended for: {primaryUsers.map(id => {
-              const user = occupants.find(o => o.id === id);
-              return user?.name || 'Unknown';
-            }).join(", ")}
-          </div>
-        )}
-
         <div className="flex justify-between items-center">
           <div className="flex-1">
             <div className="font-medium text-lg">{roomName}</div>
+            
+            {/* Primary Users Displayed Below Room Name */}
+            {primaryUsers && primaryUsers.length > 0 && (
+              <div className="text-xs text-muted-foreground mt-1">
+                Intended for: {primaryUsers.map(id => {
+                  const user = occupants.find(o => o.id === id);
+                  return user?.name || 'Unknown';
+                }).join(", ")}
+              </div>
+            )}
+            
             {descriptionData.level && (
               <div className="text-xs text-muted-foreground mt-1">
                 Level: {descriptionData.level.toUpperCase()}
