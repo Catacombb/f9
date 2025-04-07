@@ -9,11 +9,10 @@ import {
   Briefcase, 
   Warehouse, 
   Dumbbell, 
-  Wine, 
-  BookOpen, 
-  TentTree,
-  PlayCircle,
-  WashingMachine
+  WashingMachine,
+  Television,
+  Spoon,
+  Toilet
 } from 'lucide-react';
 
 export const predefinedRoomTypes = [
@@ -31,6 +30,11 @@ export const predefinedRoomTypes = [
     value: 'Kitchen', 
     label: 'Kitchen',
     icon: <Utensils className="h-6 w-6" />
+  },
+  { 
+    value: 'Powder Room', 
+    label: 'Powder Room',
+    icon: <Toilet className="h-6 w-6" />
   },
   { 
     value: 'Living Room', 
@@ -58,24 +62,14 @@ export const predefinedRoomTypes = [
     icon: <Dumbbell className="h-6 w-6" />
   },
   { 
-    value: 'Bar', 
-    label: 'Bar',
-    icon: <Wine className="h-6 w-6" />
+    value: 'Media Room', 
+    label: 'Media Room',
+    icon: <Television className="h-6 w-6" />
   },
   { 
-    value: 'Library', 
-    label: 'Library',
-    icon: <BookOpen className="h-6 w-6" />
-  },
-  { 
-    value: 'Outdoor', 
-    label: 'Outdoor',
-    icon: <TentTree className="h-6 w-6" />
-  },
-  { 
-    value: 'Entertainment', 
-    label: 'Entertainment',
-    icon: <PlayCircle className="h-6 w-6" />
+    value: 'Scullery', 
+    label: 'Scullery',
+    icon: <Spoon className="h-6 w-6" />
   },
   { 
     value: 'Laundry', 
