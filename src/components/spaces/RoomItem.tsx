@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -26,28 +25,24 @@ export const RoomItem = ({ room, onEdit, onRemove }: RoomItemProps) => {
   const { formData } = useDesignBrief();
   const occupants = formData.lifestyle.occupantEntries || [];
 
-  // Parse description if it exists and is a valid JSON string
   const descriptionData = useMemo(() => {
     try {
       if (room.description) {
         return JSON.parse(room.description);
       }
     } catch (e) {}
-    return {}; // Default empty object if parse fails
+    return {};
   }, [room.description]);
   
-  // Get primaryUsers from description data or use empty array
   const primaryUsers = useMemo(() => {
     return room.primaryUsers || [];
   }, [room.primaryUsers]);
 
-  // Handle level change
   const handleLevelChange = (value: string) => {
     setSelectedLevel(value);
     updateRoomDescription('level', value);
   };
   
-  // Handle room type specific property changes
   const handlePropertyChange = (key: string, value: string | boolean) => {
     updateRoomDescription(key, value);
   };
@@ -59,7 +54,6 @@ export const RoomItem = ({ room, onEdit, onRemove }: RoomItemProps) => {
     });
   };
 
-  // Update description JSON
   const updateRoomDescription = (key: string, value: any) => {
     try {
       let currentData = {};
@@ -68,33 +62,27 @@ export const RoomItem = ({ room, onEdit, onRemove }: RoomItemProps) => {
         try {
           currentData = JSON.parse(room.description);
         } catch (e) {
-          // If parse fails, start fresh
           currentData = {};
         }
       }
       
-      // Update the specified key
       currentData = {
         ...currentData,
         [key]: value
       };
       
-      // Update the room with new description JSON
       onEdit({
         ...room,
         description: JSON.stringify(currentData)
       });
-      
     } catch (e) {
       console.error("Error updating room description:", e);
       toast.error("Could not update room details");
     }
   };
   
-  // Get any custom questions for this room type
   const questions = getRoomQuestions(room.type);
 
-  // Handle display name change
   const handleDisplayNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setDisplayName(e.target.value);
   };
@@ -111,15 +99,12 @@ export const RoomItem = ({ room, onEdit, onRemove }: RoomItemProps) => {
     updateRoomDescription('notes', e.target.value);
   };
   
-  // Toggle expanded state
   const toggleExpanded = () => {
     setIsExpanded(!isExpanded);
   };
   
-  // Get custom or default room name for display
   const roomName = room.displayName || room.customName || `${room.type}`;
 
-  // Create room-specific note placeholder
   const getNotesPlaceholder = () => {
     if (room.type === 'Bedroom') {
       return "Any additional notes about this room, including proximity preferences (e.g., master bedroom away from children's bedrooms)...";
@@ -129,12 +114,14 @@ export const RoomItem = ({ room, onEdit, onRemove }: RoomItemProps) => {
 
   return (
     <Card className="mb-4 border">
-      <CardContent className="p-4">
+      <CardContent 
+        className="p-4 cursor-pointer hover:bg-accent/50 transition-colors" 
+        onClick={toggleExpanded}
+      >
         <div className="flex justify-between items-center">
           <div className="flex-1">
             <div className="font-medium text-lg">{roomName}</div>
             
-            {/* Primary Users Displayed Below Room Name */}
             {primaryUsers && primaryUsers.length > 0 && (
               <div className="text-xs text-muted-foreground mt-1">
                 Intended for: {primaryUsers.map(id => {
@@ -154,15 +141,10 @@ export const RoomItem = ({ room, onEdit, onRemove }: RoomItemProps) => {
             <Button 
               variant="ghost" 
               size="sm" 
-              onClick={toggleExpanded} 
-              aria-label="Expand room details"
-            >
-              {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={() => onRemove(room.id)} 
+              onClick={(e) => {
+                e.stopPropagation();
+                onRemove(room.id);
+              }} 
               className="text-destructive hover:text-destructive hover:bg-destructive/10"
               aria-label="Remove room"
             >
@@ -213,7 +195,6 @@ export const RoomItem = ({ room, onEdit, onRemove }: RoomItemProps) => {
               </div>
             </div>
             
-            {/* Room-specific questions */}
             {questions.map((question) => (
               <div key={question.id}>
                 <Label htmlFor={`room-${question.id}-${room.id}`}>{question.label}</Label>
@@ -255,7 +236,6 @@ export const RoomItem = ({ room, onEdit, onRemove }: RoomItemProps) => {
               </div>
             ))}
             
-            {/* Primary Users Select */}
             <PrimaryUsersSelect 
               occupants={occupants}
               selectedUsers={primaryUsers}
