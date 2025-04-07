@@ -36,7 +36,7 @@ export function SummarySectionActions({ onPrevious }: SummarySectionActionsProps
         className="group transition-all duration-200 active:scale-95"
       >
         <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-        <span>Previous</span>
+        <span>Previous: Communication</span>
       </Button>
       
       <Button

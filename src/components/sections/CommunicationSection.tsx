@@ -1,9 +1,7 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
@@ -35,7 +33,6 @@ export function CommunicationSection() {
   };
   
   const handleFrequencyChange = (values: string[]) => {
-    // Since this is a radio button converted to MultiSelectButtons, we only take the first selected value
     if (values.length > 0) {
       updateFormData('communication', { 'frequency': values[0] });
     }

@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback } from 'react';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { Button } from '@/components/ui/button';
@@ -73,7 +74,7 @@ export function UploadsSection() {
   };
 
   const handleNext = () => {
-    setCurrentSection('contractors');
+    setCurrentSection('communication');
     window.scrollTo(0, 0);
   };
   
@@ -287,7 +288,7 @@ export function UploadsSection() {
           </Button>
           
           <Button onClick={handleNext} className="group">
-            <span>Next: Project Team</span>
+            <span>Next: Communication</span>
             <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
           </Button>
         </div>
