@@ -1,7 +1,6 @@
-
 import React from 'react';
 import { useDesignBrief } from '@/context/DesignBriefContext';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { SectionHeader } from './SectionHeader';
 import { SummarySectionActions } from './summary/SummarySectionActions';
 import { SummaryTabContent } from './summary/SummaryTabContent';
@@ -49,7 +48,6 @@ export function SummarySection() {
       return <p className="text-sm text-muted-foreground">No spaces defined</p>;
     }
     
-    // Group rooms by type
     const roomsByType = formData.spaces.rooms.reduce((acc, room) => {
       const type = room.isCustom && room.customName ? room.customName : room.type;
       
@@ -61,7 +59,6 @@ export function SummarySection() {
       return acc;
     }, {} as Record<string, typeof formData.spaces.rooms>);
     
-    // Count rooms by type for the summary
     const roomTypeCounts: Record<string, number> = {};
     let totalSpaces = 0;
     const keyLivingSpaces = ['Living Room', 'Kitchen', 'Dining'];
@@ -76,10 +73,8 @@ export function SummarySection() {
       }
     });
     
-    // Create summary line
     let summaryLine = `Total Spaces: ${totalSpaces}`;
     
-    // Highlight bedrooms and bathrooms
     const bedroomCount = roomTypeCounts['Bedroom'] || 0;
     const bathroomCount = roomTypeCounts['Bathroom'] || 0;
     
@@ -105,7 +100,6 @@ export function SummarySection() {
       summaryLine += '.';
     }
     
-    // Format individual room descriptions
     const formatRoomDescription = (room, index) => {
       try {
         const descriptionObj = JSON.parse(room.description);
@@ -171,12 +165,10 @@ export function SummarySection() {
     
     return (
       <div className="space-y-6">
-        {/* Space summary line */}
         <div className="text-sm font-medium border-b pb-2">
           {summaryLine}
         </div>
         
-        {/* Individual spaces by type */}
         {Object.entries(roomsByType).map(([type, rooms]) => (
           <div key={type} className="space-y-2">
             <h5 className="font-medium text-base">
@@ -245,10 +237,6 @@ export function SummarySection() {
         />
         
         <Tabs defaultValue="preview">
-          <TabsList className="mb-6">
-            <TabsTrigger value="preview">Design Brief Overview</TabsTrigger>
-          </TabsList>
-          
           <TabsContent value="preview">
             <SummaryTabContent 
               formData={formData}

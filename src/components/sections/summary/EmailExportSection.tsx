@@ -1,10 +1,11 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Send, Check, InfoIcon } from 'lucide-react';
+import { Send, Check, InfoIcon, Calendar } from 'lucide-react';
 import { toast } from 'sonner';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Separator } from '@/components/ui/separator'; 
 
 interface EmailExportSectionProps {
   onExportPDF: () => Promise<Blob>;
@@ -19,6 +20,7 @@ export function EmailExportSection({
 }: EmailExportSectionProps) {
   const [isSending, setIsSending] = useState(false);
   const [isSent, setIsSent] = useState(false);
+  const [isScheduling, setIsScheduling] = useState(false);
   
   const handleSendToArchitect = async () => {
     setIsSending(true);
@@ -70,6 +72,18 @@ export function EmailExportSection({
       setIsSending(false);
     }
   };
+
+  const handleScheduleCall = () => {
+    setIsScheduling(true);
+    // Simulate scheduling process
+    setTimeout(() => {
+      toast.success("Call scheduled!", {
+        description: "We'll be in touch to confirm your 15-minute call.",
+        duration: 5000
+      });
+      setIsScheduling(false);
+    }, 1500);
+  };
   
   return (
     <div className="mt-8 space-y-6 animate-fade-in">
@@ -89,7 +103,7 @@ export function EmailExportSection({
               <Alert className="mb-4 bg-purple-50 dark:bg-purple-900/30 border border-purple-200 dark:border-purple-800">
                 <InfoIcon className="h-4 w-4 text-purple-700 dark:text-purple-400" />
                 <AlertDescription className="text-xs font-medium text-purple-800 dark:text-purple-300">
-                  Tester Note: During testing, this will send to Nick Harrison (nicholasbharrison@gmail.com)
+                  Tester Note: During testing, this will send to Nick.
                 </AlertDescription>
               </Alert>
             </div>
@@ -118,6 +132,46 @@ export function EmailExportSection({
           </div>
         </div>
       </div>
+
+      <div className="p-6 space-y-4 border rounded-lg">
+        <div>
+          <h4 className="font-medium mb-2 flex items-center">
+            Schedule a 15-Minute Call
+          </h4>
+          <div className="flex flex-col md:flex-row md:items-start gap-4">
+            <div className="flex-1">
+              <p className="text-sm text-muted-foreground mb-2">
+                Would you like to schedule a quick 15-minute call to discuss your brief and get personalized feedback?
+              </p>
+            </div>
+            <Button 
+              onClick={handleScheduleCall} 
+              variant="outline"
+              disabled={isScheduling}
+              className="w-full md:w-auto md:min-w-[140px]"
+            >
+              {isScheduling ? (
+                <span className="flex items-center justify-center w-full">
+                  <span className="animate-spin h-4 w-4 mr-2 border-2 border-primary border-t-transparent rounded-full" />
+                  <span>Scheduling...</span>
+                </span>
+              ) : (
+                <>
+                  <Calendar className="h-4 w-4 mr-2" />
+                  <span>Schedule Call</span>
+                </>
+              )}
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      <Separator className="my-6" />
+
+      <h3 className="text-xl font-bold">Interested in a Custom Version of Northstar?</h3>
+      <p className="text-muted-foreground">
+        We can build custom design brief tools for architectural firms with your own branding and workflows.
+      </p>
     </div>
   );
 }
