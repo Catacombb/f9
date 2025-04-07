@@ -1,8 +1,10 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { ArrowRight, Clipboard, PenLine, Share, AlertTriangle, MessageCircle } from 'lucide-react';
+import { TesterNotePopup } from '@/components/Testers/TesterNotePopup';
 
 export function IntroSection() {
   const {
@@ -14,6 +16,7 @@ export function IntroSection() {
   };
   
   return <div className="design-brief-section-wrapper">
+      <TesterNotePopup />
       <div className="design-brief-section-container">
         {/* Hero Section with Gradient Background */}
         <div className="text-center mb-12 relative">
