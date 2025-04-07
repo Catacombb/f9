@@ -8,7 +8,7 @@ import { SectionHeader } from './SectionHeader';
 import { RoomSelectionTab } from '@/components/spaces/RoomSelectionTab';
 import { GeneralQuestionsTab } from '@/components/spaces/GeneralQuestionsTab';
 import { LevelPreferenceTab } from '@/components/spaces/LevelPreferenceTab';
-import { SpaceRoom } from '@/types';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 export function SpacesSection() {
   const [activeTab, setActiveTab] = useState('level-preference');
@@ -16,6 +16,7 @@ export function SpacesSection() {
   const [newRoomType, setNewRoomType] = useState('');
   const [customRoomType, setCustomRoomType] = useState('');
   const [showCustomInput, setShowCustomInput] = useState(false);
+  const isMobile = useIsMobile();
   
   // Room quantity management
   const [roomQuantities, setRoomQuantities] = useState<{[key: string]: number}>({});
@@ -191,14 +192,14 @@ export function SpacesSection() {
         />
         
         <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-          <TabsList className="grid grid-cols-3 mb-8">
-            <TabsTrigger value="level-preference">
+          <TabsList className={`grid ${isMobile ? "grid-cols-1 flex-wrap gap-2" : "grid-cols-3"} mb-8`}>
+            <TabsTrigger value="level-preference" className="text-xs md:text-sm whitespace-normal h-auto py-2">
               Level Preferences
             </TabsTrigger>
-            <TabsTrigger value="room-selection">
+            <TabsTrigger value="room-selection" className="text-xs md:text-sm whitespace-normal h-auto py-2">
               Room Selection
             </TabsTrigger>
-            <TabsTrigger value="general-questions">
+            <TabsTrigger value="general-questions" className="text-xs md:text-sm whitespace-normal h-auto py-2">
               General Questions
             </TabsTrigger>
           </TabsList>

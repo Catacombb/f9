@@ -152,6 +152,20 @@
   .space-y-8:last-child {
     @apply pb-16;
   }
+
+  /* Fix for tabs on mobile */
+  [role="tablist"] {
+    @apply flex-wrap !important;
+    gap: 5px !important;
+  }
+
+  [role="tab"] {
+    font-size: 0.75rem !important;
+    padding: 0.5rem !important;
+    white-space: normal !important;
+    height: auto !important;
+    min-height: 2.5rem !important;
+  }
 }
 
 /* Fix for leaflet marker icons */
@@ -223,5 +237,28 @@ input[type="number"]::-webkit-outer-spin-button {
   input.w-14 {
     @apply w-16;
     min-width: 64px;
+  }
+
+  /* Consistent navigation button spacing */
+  .flex.justify-between.mt-6 {
+    @apply gap-2 !important;
+    margin-top: 2rem !important;
+  }
+
+  /* Make sure buttons are not too small on mobile */
+  .flex.justify-between button {
+    @apply text-xs !important;
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+    flex-shrink: 0;
+  }
+}
+
+/* Fix for tab list display on mobile */
+@media (max-width: 480px) {
+  [role="tablist"] {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
   }
 }
