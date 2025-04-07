@@ -117,13 +117,6 @@ export function EmailExportSection({
           </div>
         </div>
       </div>
-
-      <div className="my-6" />
-
-      <h3 className="text-xl font-bold">Interested in a Custom Version of Northstar?</h3>
-      <p className="text-muted-foreground">
-        We can build custom design brief tools for architectural firms with your own branding and workflows.
-      </p>
     </div>
   );
 }

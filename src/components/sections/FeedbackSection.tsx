@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { SectionHeader } from './SectionHeader';
@@ -38,7 +37,6 @@ export function FeedbackSection() {
   const [isInterestedInCustomVersion, setIsInterestedInCustomVersion] = useState(
     formData.feedback.customVersionInterest ? 'yes' : 'no'
   );
-  const [referralInfo, setReferralInfo] = useState('');
   const [callAvailability, setCallAvailability] = useState(formData.feedback.callAvailability || '');
   const [formErrors, setFormErrors] = useState<string[]>([]);
   
@@ -108,8 +106,7 @@ export function FeedbackSection() {
         team_size: formData.feedback.teamSize || 'Not specified',
         would_recommend: formData.feedback.wouldRecommend || 'Not specified',
         can_contact: formData.feedback.canContact ? 'Yes' : 'No',
-        call_availability: formData.feedback.callAvailability || 'Not specified',
-        referral_info: referralInfo || 'No referral information provided'
+        call_availability: formData.feedback.callAvailability || 'Not specified'
       };
 
       await emailjs.send(
@@ -142,9 +139,6 @@ export function FeedbackSection() {
     if (!formData.feedback.teamSize) errors.push('Team size');
     if (!formData.feedback.wouldRecommend) errors.push('Would recommend question');
     if (!formData.feedback.callAvailability) errors.push('Call availability question');
-    
-    // Only check for referral info if user selected 'yes' for recommendations
-    if (formData.feedback.wouldRecommend === 'yes' && !referralInfo) errors.push('Referral information');
 
     setFormErrors(errors);
     return errors.length === 0;
@@ -412,18 +406,14 @@ export function FeedbackSection() {
             
             <Separator className="bg-purple-100" />
             
-            {/* New Call Availability Section */}
-            <div className="p-6 space-y-4 border rounded-lg bg-purple-50 dark:bg-purple-900/30 border-purple-200 dark:border-purple-800">
+            <div className="space-y-4">
               <h3 className="text-lg font-medium text-purple-800 flex items-center gap-2">
                 <Calendar className="h-5 w-5" /> 
-                Schedule a 15-Minute Call
+                15-Minute Call
               </h3>
-              <p className="text-sm text-muted-foreground">
-                Would you like to schedule a quick 15-minute call to discuss your feedback and ideas?
-              </p>
               
               <div className="pt-2">
-                <Label className="font-medium">Are you available for a 15-minute call?*</Label>
+                <Label className="font-medium">Are you available for a 15-minute call to discuss your feedback and ideas?*</Label>
                 <RadioGroup
                   value={callAvailability}
                   onValueChange={handleCallAvailabilityChange}
@@ -439,49 +429,6 @@ export function FeedbackSection() {
                   </div>
                 </RadioGroup>
               </div>
-            </div>
-            
-            <Separator className="bg-purple-100" />
-            
-            <div className="space-y-4">
-              <h3 className="text-lg font-medium text-purple-800">Interested in a Custom Version of Northstar?</h3>
-              
-              <div className="text-sm text-muted-foreground">
-                We can create a tailored version of this tool specifically for your firm - customized to match your workflow, branded with your logo and colors, and optimized for how you work.
-              </div>
-              
-              <div className="pt-2">
-                <Label className="font-medium">Would you like us to create a custom version for you?*</Label>
-                <RadioGroup
-                  value={isInterestedInCustomVersion}
-                  onValueChange={handleCustomVersionInterestChange}
-                  className="flex flex-row space-x-4 mt-2"
-                >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="yes" id="custom-yes" />
-                    <Label htmlFor="custom-yes">Yes</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="no" id="custom-no" />
-                    <Label htmlFor="custom-no">No</Label>
-                  </div>
-                </RadioGroup>
-              </div>
-              
-              {isInterestedInCustomVersion === 'yes' && (
-                <div>
-                  <Label htmlFor="customVersionInterest" className="font-medium">
-                    Tell us what you'd like to customize:
-                  </Label>
-                  <Textarea
-                    id="customVersionInterest"
-                    value={formData.feedback.customVersionInterest || ''}
-                    onChange={(e) => setIsInterestedInCustomVersionDetails(e.target.value)}
-                    placeholder="I'd like to customize..."
-                    className="min-h-[100px] mt-2"
-                  />
-                </div>
-              )}
             </div>
             
             <Separator className="bg-purple-100" />
@@ -511,19 +458,6 @@ export function FeedbackSection() {
                   </div>
                 </RadioGroup>
               </div>
-              
-              {formData.feedback.wouldRecommend === 'yes' && (
-                <div className="pt-2">
-                  <Label htmlFor="referralInfo" className="font-medium">Please share information about who we should contact:</Label>
-                  <Textarea
-                    id="referralInfo"
-                    value={referralInfo}
-                    onChange={(e) => setReferralInfo(e.target.value)}
-                    placeholder="Name, email, and any other relevant information about the person you're referring"
-                    className="min-h-[100px] mt-2"
-                  />
-                </div>
-              )}
             </div>
           </CardContent>
         </Card>

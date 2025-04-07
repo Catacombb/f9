@@ -166,6 +166,7 @@ export interface FormData {
     canContact: string;
     contactInfo?: string;
     feedbackComments?: string;
+    callAvailability?: string; // Added missing property
   };
 }
 
