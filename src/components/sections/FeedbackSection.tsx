@@ -8,17 +8,17 @@ import { Separator } from '@/components/ui/separator';
 import { Label } from '@/components/ui/label';
 import { Star, TestTube, User, Mail, MessageSquare, Calendar } from 'lucide-react';
 import { toast } from 'sonner';
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
 } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
-import { 
-  RadioGroup, 
-  RadioGroupItem 
+import {
+  RadioGroup,
+  RadioGroupItem
 } from '@/components/ui/radio-group';
 import { Checkbox } from '@/components/ui/checkbox';
 import emailjs from 'emailjs-com';
@@ -66,7 +66,7 @@ export function FeedbackSection() {
     updateFormData('feedback', { customVersionInterest: value });
     
     if (value === 'yes') {
-      setIsCustomVersionInterestDetails('');
+      setCustomVersionDetails('');
     }
   };
 
@@ -75,7 +75,7 @@ export function FeedbackSection() {
     updateFormData('feedback', { callAvailability: value });
   };
 
-  const setIsCustomVersionInterestDetails = (details: string) => {
+  const setCustomVersionDetails = (details: string) => {
     if (isInterestedInCustomVersion === 'yes') {
       updateFormData('feedback', { customVersionInterest: 'yes', customVersionDetails: details });
     }
@@ -133,7 +133,6 @@ export function FeedbackSection() {
   const validateForm = () => {
     const errors = [];
 
-    // Check required fields
     if (!formData.feedback.usabilityRating) errors.push('Usability rating');
     if (!formData.feedback.performanceRating) errors.push('Performance rating');
     if (!formData.feedback.functionalityRating) errors.push('Functionality rating');
@@ -477,7 +476,10 @@ export function FeedbackSection() {
               <h3 className="text-lg font-medium text-purple-800">Custom Northstar Version</h3>
               
               <div className="pt-2">
-                <Label className="font-medium">Would you be interested in a custom Northstar version tailored to your specific needs?</Label>
+                <Label className="font-medium text-base">Transform Northstar into Your Perfect Design Brief Companion</Label>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Imagine a design brief tool that's not just a tool, but an extension of your unique workflow and brand identity.
+                </p>
                 <RadioGroup
                   value={isInterestedInCustomVersion}
                   onValueChange={handleCustomVersionInterestChange}
@@ -485,17 +487,22 @@ export function FeedbackSection() {
                 >
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="yes" id="custom-version-yes" />
-                    <Label htmlFor="custom-version-yes">Yes</Label>
+                    <Label htmlFor="custom-version-yes" className="font-semibold">Yes, I'm Interested</Label>
                   </div>
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="no" id="custom-version-no" />
-                    <Label htmlFor="custom-version-no">No</Label>
+                    <Label htmlFor="custom-version-no">No, thank you</Label>
                   </div>
                 </RadioGroup>
                 
                 {isInterestedInCustomVersion === 'yes' && (
-                  <div className="mt-3">
-                    <Label htmlFor="customVersionDetails">Please share more about your custom version needs:</Label>
+                  <div className="mt-3 p-4 bg-purple-50 rounded-lg border border-purple-200">
+                    <Label htmlFor="customVersionDetails" className="font-semibold text-purple-800">
+                      Tell Us About Your Ideal Design Brief Experience
+                    </Label>
+                    <p className="text-sm text-muted-foreground mb-2">
+                      Share your vision. How can Northstar be tailored to streamline your specific design process?
+                    </p>
                     <Textarea
                       id="customVersionDetails"
                       value={customVersionDetails}
@@ -504,9 +511,18 @@ export function FeedbackSection() {
                         setCustomVersionDetails(newValue);
                         updateFormData('feedback', { customVersionDetails: newValue });
                       }}
-                      placeholder="Tell us about your specific requirements..."
-                      className="mt-1 min-h-[100px]"
+                      placeholder="Describe your workflow, branding preferences, unique requirements, or specific features you'd love to see. 
+
+Examples:
+- Integrate with our existing project management software
+- Custom branding and color scheme
+- Specialized sections for [your industry]
+- Unique reporting or export capabilities"
+                      className="mt-1 min-h-[150px] bg-white"
                     />
+                    <p className="text-xs text-muted-foreground mt-2 italic">
+                      Your insights will help us craft a Northstar experience that feels like it was built just for you.
+                    </p>
                   </div>
                 )}
               </div>
