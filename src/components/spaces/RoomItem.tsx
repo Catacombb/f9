@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -5,7 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Check, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
+import { Check, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { SpaceRoom, OccupantEntry } from '@/types';
 import { getRoomQuestions } from './roomQuestions';
@@ -87,7 +88,8 @@ export const RoomItem = ({ room, onEdit, onRemove }: RoomItemProps) => {
     setDisplayName(e.target.value);
   };
   
-  const handleDisplayNameSave = () => {
+  const handleDisplayNameSave = (e: React.MouseEvent) => {
+    e.stopPropagation();
     onEdit({
       ...room,
       displayName
@@ -110,6 +112,11 @@ export const RoomItem = ({ room, onEdit, onRemove }: RoomItemProps) => {
       return "Any additional notes about this room, including proximity preferences (e.g., master bedroom away from children's bedrooms)...";
     }
     return "Any additional notes about this room...";
+  };
+
+  // This handler prevents click events from bubbling up when interacting with form controls
+  const preventPropagation = (e: React.MouseEvent | React.FocusEvent) => {
+    e.stopPropagation();
   };
 
   return (
@@ -154,7 +161,7 @@ export const RoomItem = ({ room, onEdit, onRemove }: RoomItemProps) => {
         </div>
         
         {isExpanded && (
-          <div className="mt-4 space-y-4">
+          <div className="mt-4 space-y-4" onClick={preventPropagation}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Label htmlFor={`room-name-${room.id}`}>Room Name</Label>
@@ -165,6 +172,8 @@ export const RoomItem = ({ room, onEdit, onRemove }: RoomItemProps) => {
                     onChange={handleDisplayNameChange} 
                     placeholder={`${room.type} Name`} 
                     className="flex-1"
+                    onFocus={preventPropagation}
+                    onClick={preventPropagation}
                   />
                   <Button 
                     variant="outline" 
@@ -183,7 +192,11 @@ export const RoomItem = ({ room, onEdit, onRemove }: RoomItemProps) => {
                   value={descriptionData.level || ''} 
                   onValueChange={handleLevelChange}
                 >
-                  <SelectTrigger id={`room-level-${room.id}`} className="mt-1">
+                  <SelectTrigger 
+                    id={`room-level-${room.id}`} 
+                    className="mt-1"
+                    onClick={preventPropagation}
+                  >
                     <SelectValue placeholder="Select level" />
                   </SelectTrigger>
                   <SelectContent>
@@ -203,7 +216,11 @@ export const RoomItem = ({ room, onEdit, onRemove }: RoomItemProps) => {
                     value={descriptionData[question.id] || ''} 
                     onValueChange={value => handlePropertyChange(question.id, value)}
                   >
-                    <SelectTrigger id={`room-${question.id}-${room.id}`} className="mt-1">
+                    <SelectTrigger 
+                      id={`room-${question.id}-${room.id}`} 
+                      className="mt-1"
+                      onClick={preventPropagation}
+                    >
                       <SelectValue placeholder={question.placeholder || `Select ${question.label.toLowerCase()}`} />
                     </SelectTrigger>
                     <SelectContent>
@@ -224,6 +241,7 @@ export const RoomItem = ({ room, onEdit, onRemove }: RoomItemProps) => {
                       checked={!!descriptionData[question.id]} 
                       onChange={e => handlePropertyChange(question.id, e.target.checked)}
                       className="h-4 w-4"
+                      onClick={preventPropagation}
                     />
                     <Label 
                       htmlFor={`room-${question.id}-${room.id}`}
@@ -250,6 +268,8 @@ export const RoomItem = ({ room, onEdit, onRemove }: RoomItemProps) => {
                 onChange={handleNotesChange}
                 placeholder={getNotesPlaceholder()}
                 className="mt-1"
+                onFocus={preventPropagation}
+                onClick={preventPropagation}
               />
             </div>
           </div>
