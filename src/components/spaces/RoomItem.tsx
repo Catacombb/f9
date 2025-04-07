@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,8 +9,8 @@ import { Check, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
 import { toast } from 'sonner';
 import { SpaceRoom, OccupantEntry } from '@/types';
 import { getRoomQuestions } from './roomQuestions';
-import { PrimaryUsersSelect } from './PrimaryUsersSelect'; // Import the new component
-import { useDesignBrief } from '@/context/DesignBriefContext'; // Import context to get occupants
+import { PrimaryUsersSelect } from './PrimaryUsersSelect';
+import { useDesignBrief } from '@/context/DesignBriefContext';
 
 interface RoomItemProps {
   room: SpaceRoom;
@@ -23,7 +22,7 @@ export const RoomItem = ({ room, onEdit, onRemove }: RoomItemProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [displayName, setDisplayName] = useState(room.displayName || '');
   const [selectedLevel, setSelectedLevel] = useState<string>('');
-  const { formData } = useDesignBrief(); // Access context to get occupants
+  const { formData } = useDesignBrief();
   const occupants = formData.lifestyle.occupantEntries || [];
 
   // Parse description if it exists and is a valid JSON string
@@ -130,20 +129,22 @@ export const RoomItem = ({ room, onEdit, onRemove }: RoomItemProps) => {
   return (
     <Card className="mb-4 border">
       <CardContent className="p-4">
+        {/* Primary Users Displayed at the Top */}
+        {primaryUsers && primaryUsers.length > 0 && (
+          <div className="mb-2 text-xs text-muted-foreground">
+            Intended for: {primaryUsers.map(id => {
+              const user = occupants.find(o => o.id === id);
+              return user?.name || 'Unknown';
+            }).join(", ")}
+          </div>
+        )}
+
         <div className="flex justify-between items-center">
           <div className="flex-1">
             <div className="font-medium text-lg">{roomName}</div>
             {descriptionData.level && (
               <div className="text-xs text-muted-foreground mt-1">
                 Level: {descriptionData.level.toUpperCase()}
-              </div>
-            )}
-            {primaryUsers && primaryUsers.length > 0 && (
-              <div className="text-xs text-muted-foreground mt-1">
-                Intended for: {primaryUsers.map(id => {
-                  const user = occupants.find(o => o.id === id);
-                  return user?.name || 'Unknown';
-                }).join(", ")}
               </div>
             )}
           </div>
