@@ -117,21 +117,24 @@
 /* Mobile optimizations */
 @media (max-width: 768px) {
   .design-brief-section-wrapper {
-    @apply py-6 px-3;
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
   }
 
   .design-brief-form-group {
-    @apply p-4;
+    padding: 1rem;
     width: 100%; /* Full width on mobile */
     box-sizing: border-box; /* Include padding in width calculation */
   }
 
   .design-brief-question-title {
-    @apply text-sm;
+    font-size: 0.875rem;
   }
 
   .design-brief-question-description {
-    @apply text-xs;
+    font-size: 0.75rem;
   }
   
   /* Fix for sheet content on mobile */
@@ -143,18 +146,27 @@
   
   /* Improved navigation buttons on mobile */
   .flex.justify-between.pt-4 {
-    @apply fixed bottom-0 left-0 right-0 p-4 bg-background border-t z-50 justify-center gap-4;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 1rem;
+    background-color: hsl(var(--background));
+    border-top-width: 1px;
+    z-index: 50;
+    justify-content: center;
+    gap: 1rem;
     width: 100vw;
   }
   
   /* Adjust spacing for fixed navigation */
   .space-y-8:last-child {
-    @apply pb-16;
+    padding-bottom: 4rem;
   }
 
   /* Fix for tabs on mobile */
   [role="tablist"] {
-    @apply flex-wrap !important;
+    flex-wrap: wrap !important;
     gap: 5px !important;
   }
 
@@ -168,23 +180,72 @@
 
   /* Improved next/previous button styles for mobile */
   .flex.justify-between.mt-6 {
-    @apply flex items-center justify-between gap-2 w-full px-4;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    width: 100%;
+    padding-left: 1rem;
+    padding-right: 1rem;
   }
 
   .flex.justify-between button {
-    @apply flex-1 text-xs truncate max-w-full overflow-hidden whitespace-nowrap;
+    flex: 1;
+    font-size: 0.75rem;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
     padding-left: 0.5rem !important;
     padding-right: 0.5rem !important;
   }
 
   /* Ensure button text is fully visible */
   .flex.justify-between button span {
-    @apply block truncate;
+    display: block;
+    text-overflow: ellipsis;
+    overflow: hidden;
   }
 
   /* Adjust button sizes to fit screen */
   .flex.justify-between button svg {
-    @apply w-4 h-4 shrink-0;
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+  }
+
+  /* Consistent navigation button spacing */
+  .flex.justify-between.mt-6 {
+    gap: 0.5rem !important;
+    margin-top: 2rem !important;
+  }
+
+  /* Make sure buttons are not too small on mobile */
+  .flex.justify-between button {
+    font-size: 0.75rem !important;
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+    flex-shrink: 0;
+  }
+  
+  .h-8.w-8 {
+    height: 2.5rem;
+    width: 2.5rem;
+    min-width: 40px;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .h-8 {
+    height: 2.5rem;
+    min-height: 40px;
+  }
+  
+  input.w-14 {
+    width: 4rem;
+    min-width: 64px;
   }
 }
 
@@ -198,13 +259,15 @@
 
 /* Additional responsive fixes */
 .responsive-container {
-  @apply w-full max-w-full overflow-x-hidden;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
   box-sizing: border-box; /* Include padding in width calculation */
 }
 
 /* Ensure buttons don't overflow */
 button, a {
-  @apply max-w-full;
+  max-width: 100%;
   text-overflow: ellipsis;
   white-space: normal;
   box-sizing: border-box; /* Include padding in width calculation */
@@ -212,7 +275,7 @@ button, a {
 
 /* Ensure all form elements are responsive */
 input, select, textarea {
-  @apply max-w-full;
+  max-width: 100%;
   box-sizing: border-box; /* Include padding in width calculation */
 }
 
@@ -236,42 +299,6 @@ input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
-}
-
-/* Button adjustments for better touch targets */
-@media (max-width: 768px) {
-  .h-8.w-8 {
-    @apply h-10 w-10;
-    min-width: 40px;
-    min-height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .h-8 {
-    @apply h-10;
-    min-height: 40px;
-  }
-  
-  input.w-14 {
-    @apply w-16;
-    min-width: 64px;
-  }
-
-  /* Consistent navigation button spacing */
-  .flex.justify-between.mt-6 {
-    @apply gap-2 !important;
-    margin-top: 2rem !important;
-  }
-
-  /* Make sure buttons are not too small on mobile */
-  .flex.justify-between button {
-    @apply text-xs !important;
-    padding-left: 0.75rem !important;
-    padding-right: 0.75rem !important;
-    flex-shrink: 0;
-  }
 }
 
 /* Fix for tab list display on mobile */
