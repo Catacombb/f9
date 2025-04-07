@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { SectionHeader } from './SectionHeader';
@@ -39,6 +40,9 @@ export function FeedbackSection() {
   );
   const [callAvailability, setCallAvailability] = useState(formData.feedback.callAvailability || '');
   const [formErrors, setFormErrors] = useState<string[]>([]);
+  const [customVersionDetails, setCustomVersionDetails] = useState(
+    formData.feedback.customVersionDetails || ''
+  );
   
   const handleRatingChange = (field: string, value: number) => {
     updateFormData('feedback', { [field]: value });
@@ -67,6 +71,7 @@ export function FeedbackSection() {
     
     if (value === 'yes') {
       setCustomVersionDetails('');
+      updateFormData('feedback', { customVersionDetails: '' });
     }
   };
 
@@ -75,7 +80,8 @@ export function FeedbackSection() {
     updateFormData('feedback', { callAvailability: value });
   };
 
-  const setCustomVersionDetails = (details: string) => {
+  const handleCustomVersionDetailsChange = (details: string) => {
+    setCustomVersionDetails(details);
     if (isInterestedInCustomVersion === 'yes') {
       updateFormData('feedback', { customVersionInterest: 'yes', customVersionDetails: details });
     }
@@ -215,10 +221,6 @@ export function FeedbackSection() {
       </div>
     );
   };
-
-  const [customVersionDetails, setCustomVersionDetails] = useState(
-    formData.feedback.customVersionDetails || ''
-  );
 
   return (
     <div className="design-brief-section-wrapper">
@@ -506,11 +508,7 @@ export function FeedbackSection() {
                     <Textarea
                       id="customVersionDetails"
                       value={customVersionDetails}
-                      onChange={(e) => {
-                        const newValue = e.target.value;
-                        setCustomVersionDetails(newValue);
-                        updateFormData('feedback', { customVersionDetails: newValue });
-                      }}
+                      onChange={(e) => handleCustomVersionDetailsChange(e.target.value)}
                       placeholder="Describe your workflow, branding preferences, unique requirements, or specific features you'd love to see. 
 
 Examples:
