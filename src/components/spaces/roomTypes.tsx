@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { 
   Bed, 
@@ -12,7 +11,8 @@ import {
   WashingMachine,
   Monitor,
   UtensilsCrossed,
-  Bath as BathIcon
+  Toilet,
+  Clothes
 } from 'lucide-react';
 
 export const predefinedRoomTypes = [
@@ -34,7 +34,7 @@ export const predefinedRoomTypes = [
   { 
     value: 'Powder Room', 
     label: 'Powder Room',
-    icon: <BathIcon className="h-6 w-6" />
+    icon: <Toilet className="h-6 w-6" />
   },
   { 
     value: 'Living Room', 
@@ -54,7 +54,7 @@ export const predefinedRoomTypes = [
   { 
     value: 'Walk-in Robe', 
     label: 'Walk-in Robe',
-    icon: <Warehouse className="h-6 w-6" />
+    icon: <Clothes className="h-6 w-6" />
   },
   { 
     value: 'Gym', 
