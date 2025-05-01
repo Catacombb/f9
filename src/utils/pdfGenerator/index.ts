@@ -73,16 +73,16 @@ export const generatePDF = async (projectData: ProjectData): Promise<Blob> => {
     pdf.line(margin, ctx.yPosition, pageWidth - margin, ctx.yPosition);
     ctx.yPosition += 10;
     
-    // Render all sections sequentially
+    // Render all sections sequentially - updating to match the proper section order
     renderProjectInfo(ctx, projectData);
-    renderBudgetInfo(ctx, projectData);
-    renderLifestyleInfo(ctx, projectData);
     renderSiteInfo(ctx, projectData);
+    renderLifestyleInfo(ctx, projectData);
     renderSpacesInfo(ctx, projectData);
     renderArchitectureInfo(ctx, projectData);
     renderContractorsInfo(ctx, projectData);
-    renderCommunicationInfo(ctx, projectData);
+    renderBudgetInfo(ctx, projectData);
     renderInspirationInfo(ctx, projectData);
+    renderCommunicationInfo(ctx, projectData);
     renderSummaryInfo(ctx, projectData);
     
     // Return the PDF as a Blob for download or sending via email

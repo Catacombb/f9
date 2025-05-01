@@ -41,10 +41,10 @@ export function DesignBrief() {
         return <ContractorsSection />;
       case 'budget':
         return <BudgetSection />;
-      case 'communication':
-        return <CommunicationSection />;
       case 'uploads':
         return <UploadsSection />;
+      case 'communication':
+        return <CommunicationSection />;
       case 'feedback':
         return <FeedbackSection />;
       case 'summary':

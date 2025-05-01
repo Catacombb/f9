@@ -1,6 +1,7 @@
 
 import { formatDistanceToNow } from 'date-fns';
 import { PDFContext } from './types';
+import { removeMarkdown } from './helpers';
 
 // Helper function to add a new page
 export const addNewPage = (ctx: PDFContext): PDFContext => {
@@ -42,7 +43,7 @@ export const addHeader = (ctx: PDFContext): void => {
     ctx.pdf.setFont('helvetica', 'bold');
     ctx.pdf.setTextColor(ctx.colors.primary);
     ctx.pdf.setFontSize(18);
-    ctx.pdf.text('NORTHSTAR', ctx.pageWidth / 2, 15, { align: 'center' });
+    ctx.pdf.text('F9 PRODUCTIONS', ctx.pageWidth / 2, 15, { align: 'center' });
     
     // Add the house icon in yellow
     ctx.pdf.setTextColor(ctx.colors.accent);
@@ -75,7 +76,7 @@ export const addFooter = (ctx: PDFContext): void => {
   ctx.pdf.text(dateText, ctx.margin, footerY);
   
   // Add website with link
-  const website = 'northstar.nickharrison.co';
+  const website = 'f9productions.com';
   const websiteX = ctx.pageWidth / 2;
   
   // Calculate text width for link positioning
@@ -91,7 +92,7 @@ export const addFooter = (ctx: PDFContext): void => {
     footerY - 5, // y position (adjust for text height)
     textWidth, // width
     5, // height
-    { url: 'http://northstar.nickharrison.co' }
+    { url: 'https://f9productions.com' }
   );
 };
 
@@ -247,5 +248,3 @@ export const addBulletPoints = (ctx: PDFContext, items: string[]): void => {
 export const addSpace = (ctx: PDFContext, space = 4): void => {
   ctx.yPosition += space;
 };
-
-import { removeMarkdown } from './helpers';

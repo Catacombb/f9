@@ -42,7 +42,7 @@ export function SummarySectionActions({ onPrevious }: SummarySectionActionsProps
       <Button
         onClick={handleContinue}
         disabled={isSending}
-        className="bg-blueprint-600 hover:bg-blueprint-700 text-white transition-all duration-200 active:scale-95"
+        className="bg-yellow-500 hover:bg-yellow-600 text-black transition-all duration-200 active:scale-95"
       >
         {isSending ? (
           <>

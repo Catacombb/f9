@@ -29,7 +29,7 @@ export interface PDFSectionRenderer {
 export const COLORS: PDFColors = {
   primary: '#333333',
   secondary: '#666666',
-  accent: '#f8b500', // Yellow accent
+  accent: '#f8b500', // Yellow accent for F9 Productions
   background: '#ffffff',
   muted: '#f5f5f5',
   border: '#e0e0e0',

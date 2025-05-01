@@ -25,7 +25,7 @@ export function EmailExportSection({
       const pdfBlob = await onExportPDF();
       
       toast.info("Processing", {
-        description: "Your brief is being prepared for submission.",
+        description: "Your brief is being prepared for submission to F9 Productions.",
         duration: 3000
       });
       
@@ -36,6 +36,11 @@ export function EmailExportSection({
       setTimeout(() => {
         setIsSent(false);
       }, 3000);
+      
+      toast.success("Success", {
+        description: "Your design brief has been submitted to F9 Productions.",
+        duration: 5000
+      });
       
     } catch (error) {
       console.error("Error preparing brief:", error);
@@ -94,14 +99,14 @@ export function EmailExportSection({
                 className={`
                   w-full min-w-[200px] 
                   transition-all duration-200 
-                  bg-yellow-500 text-charcoal-800
+                  bg-yellow-500 text-black
                   hover:bg-yellow-600
                   ${isSent ? 'bg-green-500 hover:bg-green-600' : ''}
                 `}
               >
                 {isSending ? (
                   <span className="flex items-center justify-center w-full">
-                    <span className="animate-spin h-4 w-4 mr-2 border-2 border-charcoal-800 border-t-transparent rounded-full" />
+                    <span className="animate-spin h-4 w-4 mr-2 border-2 border-black border-t-transparent rounded-full" />
                     <span>Sending...</span>
                   </span>
                 ) : isSent ? (

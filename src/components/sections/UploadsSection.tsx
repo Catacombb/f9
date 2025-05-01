@@ -15,12 +15,12 @@ export function UploadsSection() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handlePrevious = () => {
-    setCurrentSection('communication');
+    setCurrentSection('budget');
     window.scrollTo(0, 0);
   };
 
   const handleNext = () => {
-    setCurrentSection('summary');
+    setCurrentSection('communication');
     window.scrollTo(0, 0);
   };
 
@@ -53,7 +53,7 @@ export function UploadsSection() {
         <div className="flex justify-between mt-8">
           <Button variant="outline" onClick={handlePrevious} className="group">
             <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-            <span className="font-bold">Previous: Communication</span>
+            <span className="font-bold">Previous: Budget</span>
           </Button>
           
           <Button 
@@ -61,7 +61,7 @@ export function UploadsSection() {
             className="group bg-yellow-500 hover:bg-yellow-600 text-black"
             disabled={isSubmitting}
           >
-            <span className="font-bold">Next: Summary</span>
+            <span className="font-bold">Next: Communication</span>
             <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
           </Button>
         </div>
