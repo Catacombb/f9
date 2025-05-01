@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { 
   Bed, 
@@ -42,7 +43,7 @@ export const predefinedRoomTypes = [
   { 
     value: 'Dining Room', 
     label: 'Dining Room',
-    icon: <Utensils className="h-5 w-5" />
+    icon: <UtensilsCrossed className="h-5 w-5" />
   },
   { 
     value: 'Office', 
@@ -52,11 +53,12 @@ export const predefinedRoomTypes = [
   { 
     value: 'Laundry', 
     label: 'Laundry',
-    icon: <Shirt className="h-5 w-5" />
+    icon: <WashingMachine className="h-5 w-5" />
   },
   { 
     value: 'Garage', 
     label: 'Garage',
+    notes: 'Specify how many cars this garage should fit',
     icon: <Car className="h-5 w-5" />
   },
   { 

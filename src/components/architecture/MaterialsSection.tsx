@@ -59,8 +59,8 @@ export function MaterialsSection({
     <div className="design-brief-form-group">
       <div className="grid gap-6">
         <div className="space-y-2">
-          <Label htmlFor="externalMaterials" className="design-brief-question-title">External Materials</Label>
-          <p className="text-sm text-muted-foreground mb-2">
+          <Label htmlFor="externalMaterials" className="design-brief-question-title text-black font-bold">External Materials</Label>
+          <p className="text-sm text-black mb-2">
             Select your preferred external cladding and finishes.
           </p>
           <MultiSelectButtons
@@ -71,16 +71,16 @@ export function MaterialsSection({
           />
           <Textarea 
             id="externalMaterials" 
-            className="mt-4"
-            placeholder="Any additional details about external materials and finishes..."
+            className="mt-4 text-black"
+            placeholder="e.g. I prefer dark metal panels for the second story and stone accents at the base"
             value={externalMaterials || ''}
             onChange={(e) => onInputChange('externalMaterials', e.target.value)}
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="internalFinishes" className="design-brief-question-title">Internal Materials</Label>
-          <p className="text-sm text-muted-foreground mb-2">
+          <Label htmlFor="internalFinishes" className="design-brief-question-title text-black font-bold">Internal Materials</Label>
+          <p className="text-sm text-black mb-2">
             Select your preferred internal materials and finishes.
           </p>
           <MultiSelectButtons
@@ -91,8 +91,8 @@ export function MaterialsSection({
           />
           <Textarea 
             id="internalFinishes" 
-            className="mt-4"
-            placeholder="Any additional details about internal finishes, colors, and textures..."
+            className="mt-4 text-black"
+            placeholder="e.g. I prefer light oak hardwood floors throughout and white quartz countertops in kitchen"
             value={internalFinishes || ''}
             onChange={(e) => onInputChange('internalFinishes', e.target.value)}
           />

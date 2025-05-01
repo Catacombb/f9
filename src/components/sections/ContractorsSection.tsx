@@ -28,6 +28,7 @@ export function ContractorsSection() {
     notes: '',
   });
   const [professionalPreferences, setProfessionalPreferences] = useState<Record<string, { hasPreferred: string | null, name: string, contact: string }>>({});
+  const [wantF9Build, setWantF9Build] = useState(false);
 
   useEffect(() => {
     const initialPreferences: Record<string, { hasPreferred: string | null, name: string, contact: string }> = {};
@@ -56,6 +57,23 @@ export function ContractorsSection() {
 
   const handleSwitchChange = (checked: boolean) => {
     updateFormData('contractors', { goToTender: checked });
+    
+    // If user wants to go to tender, they can't also have F9 build it
+    if (checked && wantF9Build) {
+      setWantF9Build(false);
+    }
+  };
+  
+  const handleF9BuildChange = (checked: boolean) => {
+    setWantF9Build(checked);
+    
+    // Store in form data
+    updateFormData('contractors', { wantF9Build: checked });
+    
+    // If user wants F9 to build, they can't also go to tender
+    if (checked && formData.contractors.goToTender) {
+      updateFormData('contractors', { goToTender: false });
+    }
   };
 
   const handleAddProfessional = () => {
@@ -164,14 +182,14 @@ export function ContractorsSection() {
         />
         
         <div className="design-brief-form-group">
-          <h3 className="text-lg font-semibold mb-2">Project Professionals</h3>
-          <p className="text-sm text-muted-foreground mb-4">Do you have any preferred professionals for the roles below?</p>
+          <h3 className="text-lg font-bold mb-2 text-black">Project Professionals</h3>
+          <p className="text-sm text-black mb-4">Do you have any preferred professionals for the roles below?</p>
 
           <Card key="builder" className="overflow-hidden mb-6">
             <CardContent className="p-4">
               <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-6 sm:justify-between sm:items-center">
                 <div className="mb-4 sm:mb-0 sm:flex-1">
-                  <h4 className="text-md font-medium mb-2">Builder</h4>
+                  <h4 className="text-md font-bold mb-2 text-black">Builder</h4>
                   
                   <RadioGroup 
                     value={professionalPreferences['builder']?.hasPreferred || ''}
@@ -180,46 +198,59 @@ export function ContractorsSection() {
                   >
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value="yes" id="builder-yes" />
-                      <Label htmlFor="builder-yes">Yes</Label>
+                      <Label htmlFor="builder-yes" className="text-black">Yes</Label>
                     </div>
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value="no" id="builder-no" />
-                      <Label htmlFor="builder-no">No</Label>
+                      <Label htmlFor="builder-no" className="text-black">No</Label>
                     </div>
                   </RadioGroup>
                 </div>
 
-                <div className="flex items-center space-x-2 sm:justify-end sm:flex-1">
-                  <Switch
-                    id="goToTender"
-                    checked={formData.contractors.goToTender}
-                    onCheckedChange={handleSwitchChange}
-                  />
-                  <Label htmlFor="goToTender">I would like to go to tender for a builder</Label>
+                <div className="flex-col space-y-4 sm:justify-end sm:flex-1">
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="goToTender"
+                      checked={formData.contractors.goToTender}
+                      onCheckedChange={handleSwitchChange}
+                      disabled={wantF9Build}
+                    />
+                    <Label htmlFor="goToTender" className="text-black">I would like to go to tender for a builder</Label>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="f9Build"
+                      checked={wantF9Build}
+                      onCheckedChange={handleF9BuildChange}
+                      disabled={formData.contractors.goToTender}
+                    />
+                    <Label htmlFor="f9Build" className="text-black">I want F9 Productions to build my project</Label>
+                  </div>
                 </div>
               </div>
               
               {professionalPreferences['builder']?.hasPreferred === 'yes' && (
                 <div className="grid gap-4 pl-6 border-l-2 border-primary/20 mt-4">
                   <div>
-                    <Label htmlFor="builder-name">Name</Label>
+                    <Label htmlFor="builder-name" className="text-black font-bold">Name</Label>
                     <Input
                       id="builder-name"
                       value={professionalPreferences['builder']?.name || ''}
                       onChange={(e) => handlePreferredProfessionalInfo('builder', 'name', e.target.value)}
-                      className="mt-1"
-                      placeholder="Enter preferred Builder's name"
+                      className="mt-1 text-black"
+                      placeholder="e.g. Acme Builders, Inc."
                     />
                   </div>
                   
                   <div>
-                    <Label htmlFor="builder-contact">Contact Info</Label>
+                    <Label htmlFor="builder-contact" className="text-black font-bold">Contact Info</Label>
                     <Input
                       id="builder-contact"
                       value={professionalPreferences['builder']?.contact || ''}
                       onChange={(e) => handlePreferredProfessionalInfo('builder', 'contact', e.target.value)}
-                      className="mt-1"
-                      placeholder="Email or phone number"
+                      className="mt-1 text-black"
+                      placeholder="e.g. john@acmebuilders.com or (303) 555-1234"
                     />
                   </div>
                 </div>
@@ -232,7 +263,7 @@ export function ContractorsSection() {
               <Card key={professional.value} className="overflow-hidden">
                 <CardContent className="p-4">
                   <div className="mb-4">
-                    <h4 className="text-md font-medium mb-2">{professional.label}</h4>
+                    <h4 className="text-md font-bold mb-2 text-black">{professional.label}</h4>
                     
                     <RadioGroup 
                       value={professionalPreferences[professional.value]?.hasPreferred || ''}
@@ -241,11 +272,11 @@ export function ContractorsSection() {
                     >
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="yes" id={`${professional.value}-yes`} />
-                        <Label htmlFor={`${professional.value}-yes`}>Yes</Label>
+                        <Label htmlFor={`${professional.value}-yes`} className="text-black">Yes</Label>
                       </div>
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="no" id={`${professional.value}-no`} />
-                        <Label htmlFor={`${professional.value}-no`}>No</Label>
+                        <Label htmlFor={`${professional.value}-no`} className="text-black">No</Label>
                       </div>
                     </RadioGroup>
                   </div>
@@ -253,24 +284,24 @@ export function ContractorsSection() {
                   {professionalPreferences[professional.value]?.hasPreferred === 'yes' && (
                     <div className="grid gap-4 pl-6 border-l-2 border-primary/20">
                       <div>
-                        <Label htmlFor={`${professional.value}-name`}>Name</Label>
+                        <Label htmlFor={`${professional.value}-name`} className="text-black font-bold">Name</Label>
                         <Input
                           id={`${professional.value}-name`}
                           value={professionalPreferences[professional.value]?.name || ''}
                           onChange={(e) => handlePreferredProfessionalInfo(professional.value, 'name', e.target.value)}
-                          className="mt-1"
-                          placeholder={`Enter preferred ${professional.label}'s name`}
+                          className="mt-1 text-black"
+                          placeholder={`e.g. ${professional.label === 'Interior Designer' ? 'Jane Smith Interiors' : 'Rocky Mountain Landscapes'}`}
                         />
                       </div>
                       
                       <div>
-                        <Label htmlFor={`${professional.value}-contact`}>Contact Info</Label>
+                        <Label htmlFor={`${professional.value}-contact`} className="text-black font-bold">Contact Info</Label>
                         <Input
                           id={`${professional.value}-contact`}
                           value={professionalPreferences[professional.value]?.contact || ''}
                           onChange={(e) => handlePreferredProfessionalInfo(professional.value, 'contact', e.target.value)}
-                          className="mt-1"
-                          placeholder="Email or phone number"
+                          className="mt-1 text-black"
+                          placeholder="e.g. email@example.com or (303) 555-1234"
                         />
                       </div>
                     </div>
@@ -281,55 +312,55 @@ export function ContractorsSection() {
           </div>
           
           <div className="mt-8">
-            <h3 className="text-md font-semibold mb-4">Add Custom Professional</h3>
+            <h3 className="text-md font-bold mb-4 text-black">Add Custom Professional</h3>
             <Card className="mb-4 border-dashed">
               <CardContent className="p-4">
                 <div className="grid gap-4 mb-4">
                   <div>
-                    <Label htmlFor="new_type">Type of Professional</Label>
+                    <Label htmlFor="new_type" className="text-black font-bold">Type of Professional</Label>
                     <Input
                       id="new_type"
                       name="new_type"
                       value={newProfessional.type}
                       onChange={handleInputChange}
-                      className="mt-1"
-                      placeholder="e.g., Civil Engineer, Sustainability Consultant"
+                      className="mt-1 text-black"
+                      placeholder="e.g. Civil Engineer, Sustainability Consultant"
                     />
                   </div>
                   
                   <div>
-                    <Label htmlFor="new_name">Name</Label>
+                    <Label htmlFor="new_name" className="text-black font-bold">Name</Label>
                     <Input
                       id="new_name"
                       name="new_name"
                       value={newProfessional.name}
                       onChange={handleInputChange}
-                      className="mt-1"
-                      placeholder="Professional's name"
+                      className="mt-1 text-black"
+                      placeholder="e.g. Jane Smith, Smith Engineering"
                     />
                   </div>
                   
                   <div>
-                    <Label htmlFor="new_contact">Contact Info</Label>
+                    <Label htmlFor="new_contact" className="text-black font-bold">Contact Info</Label>
                     <Input
                       id="new_contact"
                       name="new_contact"
                       value={newProfessional.contact}
                       onChange={handleInputChange}
-                      className="mt-1"
-                      placeholder="Email or phone number"
+                      className="mt-1 text-black"
+                      placeholder="e.g. jane@smithengineering.com or (303) 555-9876"
                     />
                   </div>
                   
                   <div>
-                    <Label htmlFor="new_notes">Notes</Label>
+                    <Label htmlFor="new_notes" className="text-black font-bold">Notes</Label>
                     <Textarea
                       id="new_notes"
                       name="new_notes"
                       value={newProfessional.notes}
                       onChange={handleInputChange}
-                      className="mt-1"
-                      placeholder="Any additional information"
+                      className="mt-1 text-black"
+                      placeholder="e.g. Previously worked with them on our lake house project"
                     />
                   </div>
                 </div>
@@ -338,7 +369,7 @@ export function ContractorsSection() {
                   variant="outline"
                   onClick={handleAddProfessional}
                   disabled={!newProfessional.type || !newProfessional.name}
-                  className="w-full"
+                  className="w-full text-black hover:bg-yellow-100"
                 >
                   <Plus className="h-4 w-4 mr-2" />
                   <span>Add Custom Professional</span>
@@ -348,26 +379,33 @@ export function ContractorsSection() {
           </div>
           
           <div className="mt-6">
-            <Label htmlFor="additionalNotes">Additional Notes</Label>
+            <Label htmlFor="additionalNotes" className="text-black font-bold">Additional Notes</Label>
             <Textarea
               id="additionalNotes"
               name="additionalNotes"
-              placeholder="Any other information about your project team..."
+              placeholder="e.g. We've worked with Builder X in the past and had a great experience"
               value={formData.contractors.additionalNotes || ''}
               onChange={handleInputChange}
-              className="mt-1 h-32"
+              className="mt-1 h-32 text-black"
             />
           </div>
         </div>
         
         <div className="flex justify-between mt-6">
-          <Button variant="outline" onClick={handlePrevious} className="group">
+          <Button 
+            variant="outline" 
+            onClick={handlePrevious} 
+            className="group text-black hover:bg-yellow-100"
+          >
             <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
             <span>Previous: Project Info</span>
           </Button>
           
-          <Button onClick={handleNext} className="group">
-            <span>Next: Budget</span>
+          <Button 
+            onClick={handleNext} 
+            className="group bg-yellow-500 hover:bg-yellow-600 text-black transition-all duration-300 hover:scale-105"
+          >
+            <span className="font-bold">Next: Budget</span>
             <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
           </Button>
         </div>

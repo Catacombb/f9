@@ -190,14 +190,18 @@ export function PredictiveAddressFinder({
                 type="text"
                 value={searchInput}
                 onChange={handleInputChange}
-                placeholder="Start typing your address to search"
+                placeholder="Enter your Colorado address"
                 onKeyDown={handleKeyDown}
-                className="flex-1"
+                className="flex-1 text-black"
                 autoComplete="off"
               />
             </div>
           </PopoverTrigger>
-          <Button onClick={handleSearch} type="button">
+          <Button 
+            onClick={handleSearch} 
+            type="button"
+            className="bg-yellow-500 hover:bg-yellow-600 text-black transition-all duration-300"
+          >
             <Search className="h-4 w-4 mr-2" />
             Search
           </Button>
@@ -212,7 +216,7 @@ export function PredictiveAddressFinder({
                     <CommandItem
                       key={suggestion.id}
                       onSelect={() => handleAddressSelect(suggestion)}
-                      className="cursor-pointer"
+                      className="cursor-pointer text-black"
                     >
                       <span className="truncate">{suggestion.place_name}</span>
                     </CommandItem>
@@ -223,10 +227,6 @@ export function PredictiveAddressFinder({
           </PopoverContent>
         )}
       </Popover>
-      
-      <p className="text-sm text-muted-foreground">
-        Start typing to search for your Colorado address
-      </p>
     </div>
   );
 }
