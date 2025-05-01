@@ -3,7 +3,8 @@ import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { MultiSelectButtons } from '@/components/MultiSelectButtons';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, Leaf } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 const sustainabilityOptions = [
   { value: 'Solar Panels', label: 'Solar Panels' },
@@ -42,6 +43,17 @@ export function SustainabilitySection({
               F9 designs for long-term performance. We integrate passive solar, energy-efficient materials, and future-ready systems. Your home should work for you, not against the planet.
             </p>
           </div>
+        </div>
+
+        <div className="text-center mb-4">
+          <Button 
+            variant="outline" 
+            className="border-green-300 hover:bg-green-50 hover:border-green-400 font-medium"
+            onClick={() => window.open("https://f9productions.com/f9-sustainability/", "_blank")}
+          >
+            <Leaf className="mr-2 h-4 w-4 text-green-600" />
+            Learn how F9 builds sustainably
+          </Button>
         </div>
 
         <MultiSelectButtons

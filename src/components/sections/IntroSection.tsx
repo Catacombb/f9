@@ -12,7 +12,8 @@ import {
   FileSearch,
   Gavel, 
   Construction, 
-  AlertTriangle 
+  AlertTriangle,
+  ExternalLink
 } from 'lucide-react';
 
 export function IntroSection() {
@@ -58,8 +59,16 @@ export function IntroSection() {
         <Card className="mb-8 border-blueprint-200 animate-fade-in">
           <div className="h-1 bg-blueprint-500"></div>
           <CardContent className="p-6">
-            <div className="text-center mb-6">
-              <h2 className="text-2xl font-bold mb-2 text-black">Our Design-Build Process</h2>
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-black">Our Design-Build Process</h2>
+              <Button 
+                variant="outline" 
+                className="text-xs sm:text-sm border-blueprint-200 hover:bg-blueprint-50"
+                onClick={() => window.open("https://f9productions.com/how-our-architectural-design-process-works/", "_blank")}
+              >
+                Learn more about our process
+                <ExternalLink className="ml-1 h-3 w-3" />
+              </Button>
             </div>
             
             <div className="bg-blueprint-50 border border-blueprint-200 p-4 mb-6">

@@ -2,19 +2,18 @@
 import React, { useState } from 'react';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ArrowRight, PlusCircle } from 'lucide-react';
+import { ArrowLeft, ArrowRight, PlusCircle, Users } from 'lucide-react';
 import { SectionHeader } from './SectionHeader';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from "sonner";
 import { Professional } from '@/types';
 
 export function ContractorsSection() {
-  const { setCurrentSection, updateFormData, formData, addProfessional, removeProfessional, updateProfessional } = useDesignBrief();
+  const { setCurrentSection, updateFormData, formData, addProfessional, removeProfessional } = useDesignBrief();
   const contractorsData = formData.contractors;
   
   const [newProfessionalType, setNewProfessionalType] = useState('');
@@ -70,7 +69,7 @@ export function ContractorsSection() {
     removeProfessional(id);
     toast.success("Professional removed");
   };
-  
+
   const toggleWantF9Build = () => {
     updateFormData('contractors', { wantF9Build: !contractorsData.wantF9Build });
   };
@@ -88,19 +87,19 @@ export function ContractorsSection() {
           isBold={true}
         />
         
+        <div className="mb-6 flex justify-center">
+          <Button 
+            variant="outline" 
+            className="border-blueprint-200 hover:bg-blueprint-50 font-medium"
+            onClick={() => window.open("https://f9productions.com/about/", "_blank")}
+          >
+            <Users className="mr-2 h-4 w-4" />
+            Meet the F9 Team
+          </Button>
+        </div>
+        
         <div className="design-brief-form-group">
           <div className="grid gap-6">
-            <div className="space-y-2">
-              <Label htmlFor="preferredBuilder" className="design-brief-question-title text-black font-bold">Preferred Builder</Label>
-              <Input 
-                id="preferredBuilder" 
-                placeholder="e.g., Smith Construction, Inc." 
-                value={contractorsData.preferredBuilder || ''} 
-                onChange={(e) => updateFormData('contractors', { preferredBuilder: e.target.value })}
-                className="text-black"
-              />
-            </div>
-            
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
@@ -129,6 +128,17 @@ export function ContractorsSection() {
                   onCheckedChange={toggleGoToTender}
                 />
               </div>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="preferredBuilder" className="design-brief-question-title text-black font-bold">Preferred Builder</Label>
+              <Input 
+                id="preferredBuilder" 
+                placeholder="e.g., Smith Construction, Inc." 
+                value={contractorsData.preferredBuilder || ''} 
+                onChange={(e) => updateFormData('contractors', { preferredBuilder: e.target.value })}
+                className="text-black"
+              />
             </div>
 
             <Card className="border-blueprint-200">
