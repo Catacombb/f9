@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ArrowRight, UploadCloud, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, ArrowRight, AlertTriangle } from 'lucide-react';
 import { SectionHeader } from './SectionHeader';
 
 // Import the FileUploadHandler components

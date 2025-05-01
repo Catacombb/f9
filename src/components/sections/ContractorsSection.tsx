@@ -2,314 +2,178 @@
 import React, { useState } from 'react';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ArrowRight, PlusCircle, Users } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ExternalLink } from 'lucide-react';
 import { SectionHeader } from './SectionHeader';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { toast } from "sonner";
-import { Professional } from '@/types';
 
 export function ContractorsSection() {
-  const { setCurrentSection, updateFormData, formData, addProfessional, removeProfessional } = useDesignBrief();
-  const contractorsData = formData.contractors;
-  
-  const [newProfessionalType, setNewProfessionalType] = useState('');
-  const [newProfessionalName, setNewProfessionalName] = useState('');
-  const [newBusinessName, setNewBusinessName] = useState('');
-  const [newEmail, setNewEmail] = useState('');
-  const [newPhone, setNewPhone] = useState('');
-  const [newWebsite, setNewWebsite] = useState('');
-  const [newProfessionalNotes, setNewProfessionalNotes] = useState('');
-  
+  const { setCurrentSection, updateFormData, formData } = useDesignBrief();
+  const [tabState, setTabState] = useState('general');
+
   const handlePrevious = () => {
-    setCurrentSection('projectInfo');
+    setCurrentSection('architecture');
     window.scrollTo(0, 0);
   };
-  
+
   const handleNext = () => {
     setCurrentSection('budget');
     window.scrollTo(0, 0);
   };
 
-  const handleAddProfessional = () => {
-    if (!newProfessionalType || !newProfessionalName) {
-      toast.error("Please provide at least the professional type and name");
-      return;
-    }
-    
-    const professional = {
-      type: newProfessionalType,
-      name: newProfessionalName,
-      businessName: newBusinessName,
-      email: newEmail,
-      phone: newPhone,
-      website: newWebsite,
-      notes: newProfessionalNotes,
-      isCustom: false,
-    };
-    
-    addProfessional(professional);
-    
-    // Clear form
-    setNewProfessionalType('');
-    setNewProfessionalName('');
-    setNewBusinessName('');
-    setNewEmail('');
-    setNewPhone('');
-    setNewWebsite('');
-    setNewProfessionalNotes('');
-    
-    toast.success("Professional added");
-  };
-  
-  const handleRemoveProfessional = (id: string) => {
-    removeProfessional(id);
-    toast.success("Professional removed");
+  const handleGoToTenderChange = (value: string) => {
+    updateFormData('contractors', { goToTender: value === 'yes' });
   };
 
-  const toggleWantF9Build = () => {
-    updateFormData('contractors', { wantF9Build: !contractorsData.wantF9Build });
+  const handleF9BuildChange = (value: string) => {
+    updateFormData('contractors', { f9Build: value === 'yes' });
   };
 
-  const toggleGoToTender = () => {
-    updateFormData('contractors', { goToTender: !contractorsData.goToTender });
-  };
-  
   return (
     <div className="design-brief-section-wrapper">
       <div className="design-brief-section-container">
-        <SectionHeader 
-          title="Project Team" 
-          description="Tell us about the professionals involved or that you'd like to work with on your project."
+        <SectionHeader
+          title="Project Team"
+          description="Share your preferences regarding builders and contractors for your project."
           isBold={true}
         />
-        
-        <div className="mb-6 flex justify-center">
-          <Button 
-            variant="outline" 
-            className="border-blueprint-200 hover:bg-blueprint-50 font-medium"
-            onClick={() => window.open("https://f9productions.com/about/", "_blank")}
-          >
-            <Users className="mr-2 h-4 w-4" />
-            Meet the F9 Team
-          </Button>
-        </div>
-        
+
         <div className="design-brief-form-group">
-          <div className="grid gap-6">
+          <div className="text-center mb-4">
+            <Button 
+              variant="outline" 
+              className="border-green-300 hover:bg-green-50 hover:border-green-400 font-medium"
+              onClick={() => window.open("https://f9productions.com/about/", "_blank")}
+            >
+              <ExternalLink className="mr-2 h-4 w-4" />
+              Meet the F9 Team
+            </Button>
+          </div>
+
+          <div className="space-y-8">
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="wantF9Build" className="design-brief-question-title text-black font-bold">
-                    I want F9 Productions to build my project
-                  </Label>
-                  <p className="text-sm text-black">Our design-build service provides seamless project delivery</p>
+              <Label className="design-brief-question-title">
+                Would you like F9 Productions to build your project?
+              </Label>
+              <p className="design-brief-question-description mb-2">
+                We offer full design-build services and can manage your project from start to finish.
+              </p>
+              <RadioGroup
+                value={formData.contractors.f9Build ? 'yes' : 'no'}
+                onValueChange={handleF9BuildChange}
+                className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-4"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="yes" id="f9Build-yes" />
+                  <Label htmlFor="f9Build-yes">Yes, I want F9 Productions to build my project</Label>
                 </div>
-                <Switch 
-                  id="wantF9Build"
-                  checked={!!contractorsData.wantF9Build}
-                  onCheckedChange={toggleWantF9Build}
-                />
-              </div>
-              
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="goToTender" className="design-brief-question-title text-black font-bold">
-                    I would like to tender for a builder
-                  </Label>
-                  <p className="text-sm text-black">We can help you find qualified builders</p>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="no" id="f9Build-no" />
+                  <Label htmlFor="f9Build-no">No, I have other plans</Label>
                 </div>
-                <Switch 
-                  id="goToTender"
-                  checked={!!contractorsData.goToTender}
-                  onCheckedChange={toggleGoToTender}
-                />
-              </div>
+              </RadioGroup>
             </div>
-            
+
+            <div className="space-y-4">
+              <Label className="design-brief-question-title">
+                Would you like to tender for a builder?
+              </Label>
+              <p className="design-brief-question-description mb-2">
+                We can help you find and evaluate potential builders.
+              </p>
+              <RadioGroup
+                value={formData.contractors.goToTender ? 'yes' : 'no'}
+                onValueChange={handleGoToTenderChange}
+                className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-4"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="yes" id="goToTender-yes" />
+                  <Label htmlFor="goToTender-yes">Yes, I'd like to tender</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="no" id="goToTender-no" />
+                  <Label htmlFor="goToTender-no">No, I already have a builder</Label>
+                </div>
+              </RadioGroup>
+            </div>
+
+            {formData.contractors.goToTender === false && (
+              <div className="space-y-2">
+                <Label htmlFor="preferredBuilder" className="design-brief-question-title">
+                  Preferred Builder
+                </Label>
+                <p className="design-brief-question-description">
+                  If you already have a preferred builder, please provide their name and contact information.
+                </p>
+                <Input
+                  id="preferredBuilder"
+                  placeholder="Builder name and contact information"
+                  value={formData.contractors.preferredBuilder || ''}
+                  onChange={(e) => updateFormData('contractors', { preferredBuilder: e.target.value })}
+                />
+              </div>
+            )}
+
             <div className="space-y-2">
-              <Label htmlFor="preferredBuilder" className="design-brief-question-title text-black font-bold">Preferred Builder</Label>
-              <Input 
-                id="preferredBuilder" 
-                placeholder="e.g., Smith Construction, Inc." 
-                value={contractorsData.preferredBuilder || ''} 
-                onChange={(e) => updateFormData('contractors', { preferredBuilder: e.target.value })}
-                className="text-black"
+              <Label htmlFor="structuralEngineer" className="design-brief-question-title">
+                Structural Engineer
+                <span className="text-muted-foreground text-sm ml-2">(optional)</span>
+              </Label>
+              <p className="design-brief-question-description">
+                If you have a preferred structural engineer, please specify.
+              </p>
+              <Input
+                id="structuralEngineer"
+                placeholder="Structural engineer name and contact information"
+                value={formData.contractors.structuralEngineer || ''}
+                onChange={(e) => updateFormData('contractors', { structuralEngineer: e.target.value })}
               />
             </div>
 
-            <Card className="border-blueprint-200">
-              <CardHeader>
-                <CardTitle>Project Team</CardTitle>
-                <CardDescription className="text-black">
-                  Add the professionals you're already working with or would like to include
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="professionalType" className="text-black font-medium">Professional Type</Label>
-                    <Select value={newProfessionalType} onValueChange={setNewProfessionalType}>
-                      <SelectTrigger id="professionalType" className="text-black">
-                        <SelectValue placeholder="Select professional type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Architect">Architect</SelectItem>
-                        <SelectItem value="Interior Designer">Interior Designer</SelectItem>
-                        <SelectItem value="Landscape Architect">Landscape Architect</SelectItem>
-                        <SelectItem value="Structural Engineer">Structural Engineer</SelectItem>
-                        <SelectItem value="Civil Engineer">Civil Engineer</SelectItem>
-                        <SelectItem value="MEP Engineer">MEP Engineer</SelectItem>
-                        <SelectItem value="Builder">Builder</SelectItem>
-                        <SelectItem value="Other">Other</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="professionalName" className="text-black font-medium">Contact Person Name</Label>
-                      <Input 
-                        id="professionalName" 
-                        value={newProfessionalName}
-                        onChange={(e) => setNewProfessionalName(e.target.value)}
-                        placeholder="e.g., John Smith"
-                        className="text-black"
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="businessName" className="text-black font-medium">Business Name</Label>
-                      <Input 
-                        id="businessName" 
-                        value={newBusinessName}
-                        onChange={(e) => setNewBusinessName(e.target.value)}
-                        placeholder="e.g., Smith & Associates"
-                        className="text-black"
-                      />
-                    </div>
-                  </div>
+            <div className="space-y-2">
+              <Label htmlFor="civilEngineer" className="design-brief-question-title">
+                Civil Engineer
+                <span className="text-muted-foreground text-sm ml-2">(optional)</span>
+              </Label>
+              <p className="design-brief-question-description">
+                If you have a preferred civil engineer, please specify.
+              </p>
+              <Input
+                id="civilEngineer"
+                placeholder="Civil engineer name and contact information"
+                value={formData.contractors.civilEngineer || ''}
+                onChange={(e) => updateFormData('contractors', { civilEngineer: e.target.value })}
+              />
+            </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="email" className="text-black font-medium">Email Address</Label>
-                      <Input 
-                        id="email" 
-                        type="email"
-                        value={newEmail}
-                        onChange={(e) => setNewEmail(e.target.value)}
-                        placeholder="e.g., john@smithassociates.com"
-                        className="text-black"
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="phone" className="text-black font-medium">Phone Number</Label>
-                      <Input 
-                        id="phone" 
-                        type="tel"
-                        value={newPhone}
-                        onChange={(e) => setNewPhone(e.target.value)}
-                        placeholder="e.g., (303) 555-1234"
-                        className="text-black"
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="website" className="text-black font-medium">Website (Optional)</Label>
-                    <Input 
-                      id="website" 
-                      type="url"
-                      value={newWebsite}
-                      onChange={(e) => setNewWebsite(e.target.value)}
-                      placeholder="e.g., https://www.smithassociates.com"
-                      className="text-black"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="professionalNotes" className="text-black font-medium">Notes</Label>
-                    <Textarea 
-                      id="professionalNotes" 
-                      value={newProfessionalNotes}
-                      onChange={(e) => setNewProfessionalNotes(e.target.value)}
-                      placeholder="e.g., Already working with us on another project"
-                      className="text-black"
-                    />
-                  </div>
-                </div>
-              </CardContent>
-              <CardFooter>
-                <Button 
-                  onClick={handleAddProfessional}
-                  className="bg-yellow-500 hover:bg-yellow-600 text-black"
-                >
-                  <PlusCircle className="mr-2 h-4 w-4" />
-                  <span className="font-bold">Add Professional</span>
-                </Button>
-              </CardFooter>
-            </Card>
-            
-            {contractorsData.professionals.length > 0 && (
-              <Card className="border-blueprint-200">
-                <CardHeader>
-                  <CardTitle>Added Professionals</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {contractorsData.professionals.map((professional) => (
-                      <div key={professional.id} className="p-4 border rounded-lg">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <h4 className="font-bold text-black">{professional.type}</h4>
-                            <p className="text-black">{professional.name}</p>
-                            {professional.businessName && (
-                              <p className="text-black">{professional.businessName}</p>
-                            )}
-                            {(professional.email || professional.phone) && (
-                              <p className="text-black">
-                                {professional.email} {professional.email && professional.phone && '•'} {professional.phone}
-                              </p>
-                            )}
-                            {professional.website && (
-                              <p className="text-black">
-                                <a href={professional.website} target="_blank" rel="noopener noreferrer" className="text-yellow-600 hover:underline">
-                                  {professional.website.replace(/^https?:\/\//, '')}
-                                </a>
-                              </p>
-                            )}
-                            {professional.notes && (
-                              <p className="text-black mt-2 italic">{professional.notes}</p>
-                            )}
-                          </div>
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            className="text-black hover:bg-red-100"
-                            onClick={() => handleRemoveProfessional(professional.id)}
-                          >
-                            Remove
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
+            <div className="space-y-2">
+              <Label htmlFor="otherConsultants" className="design-brief-question-title">
+                Other Consultants
+                <span className="text-muted-foreground text-sm ml-2">(optional)</span>
+              </Label>
+              <p className="design-brief-question-description">
+                Are there other consultants you'd like to work with? Please list them here.
+              </p>
+              <Textarea
+                id="otherConsultants"
+                placeholder="Other consultants you'd like to work with"
+                value={formData.contractors.otherConsultants || ''}
+                onChange={(e) => updateFormData('contractors', { otherConsultants: e.target.value })}
+                className="min-h-20"
+              />
+            </div>
           </div>
         </div>
-        
+
         <div className="flex justify-between mt-6">
-          <Button variant="outline" onClick={handlePrevious} className="group text-black">
+          <Button variant="outline" onClick={handlePrevious} className="group">
             <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-            <span className="font-bold">Previous: Project Info</span>
+            <span className="font-bold">Previous: Architecture</span>
           </Button>
-          
+
           <Button onClick={handleNext} className="group bg-yellow-500 hover:bg-yellow-600 text-black">
             <span className="font-bold">Next: Budget</span>
             <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
