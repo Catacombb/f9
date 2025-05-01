@@ -36,15 +36,15 @@ export const addHeader = (ctx: PDFContext): void => {
   
   try {
     // Add actual image with preserved aspect ratio and transparency
-    // Using the proper format for PNG with transparency
-    ctx.pdf.addImage({
-      url: logoPath,
-      format: 'PNG', // Use PNG format which supports transparency
-      x: logoX,
-      y: logoY,
-      width: logoWidth,
-      height: logoHeight
-    });
+    // Using the proper format for jsPDF's addImage method
+    ctx.pdf.addImage(
+      logoPath,  // First parameter is the image path/data
+      'PNG',     // Second parameter is the format
+      logoX,     // X position
+      logoY,     // Y position
+      logoWidth, // Width
+      logoHeight // Height
+    );
   } catch (error) {
     // Fallback to text if image loading fails
     ctx.pdf.setFont('helvetica', 'bold');
