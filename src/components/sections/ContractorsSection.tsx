@@ -1,186 +1,198 @@
-
-import React, { useState } from 'react';
+import React from 'react';
 import { useDesignBrief } from '@/context/DesignBriefContext';
-import { Button } from '@/components/ui/button';
-import { ArrowLeft, ArrowRight, ExternalLink } from 'lucide-react';
 import { SectionHeader } from './SectionHeader';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent } from '@/components/ui/card';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { ExternalLink } from 'lucide-react';
+import { toast } from 'sonner';
 
 export function ContractorsSection() {
-  const { setCurrentSection, updateFormData, formData } = useDesignBrief();
-  const [tabState, setTabState] = useState('general');
+  const { updateFormData, formData } = useDesignBrief();
+  const contractors = formData.contractors;
 
-  const handlePrevious = () => {
-    setCurrentSection('architecture');
-    window.scrollTo(0, 0);
+  const handleInputChange = (field: string, value: string) => {
+    updateFormData('contractors', { [field]: value });
   };
-
-  const handleNext = () => {
-    setCurrentSection('budget');
-    window.scrollTo(0, 0);
-  };
-
-  const handleGoToTenderChange = (value: string) => {
-    updateFormData('contractors', { goToTender: value === 'yes' });
-  };
-
-  const handleF9BuildChange = (value: string) => {
-    updateFormData('contractors', { 
-      wantF9Build: value === 'yes',
-      f9Build: value === 'yes' // Update both properties for compatibility
-    });
+  
+  // Add this new function to open the F9 team page
+  const openF9TeamPage = () => {
+    window.open('https://f9productions.com/team', '_blank');
   };
 
   return (
     <div className="design-brief-section-wrapper">
       <div className="design-brief-section-container">
-        <SectionHeader
-          title="Project Team"
-          description="Share your preferences regarding builders and contractors for your project."
-          isBold={true}
-        />
-
-        <div className="design-brief-form-group">
-          <div className="text-center mb-4">
-            <Button 
-              variant="outline" 
-              className="border-green-300 hover:bg-green-50 hover:border-green-400 font-medium"
-              onClick={() => window.open("https://f9productions.com/about/", "_blank")}
-            >
-              <ExternalLink className="mr-2 h-4 w-4" />
-              Meet the F9 Team
-            </Button>
-          </div>
-
-          <div className="space-y-8">
+        <div className="flex justify-between items-center mb-4">
+          <SectionHeader 
+            title="Project Team" 
+            description="Provide information about the professionals involved in your project."
+          />
+          <Button
+            onClick={openF9TeamPage}
+            className="bg-yellow-500 hover:bg-yellow-600 text-black"
+          >
+            <ExternalLink className="mr-2 h-4 w-4" />
+            Meet the F9 Team
+          </Button>
+        </div>
+      
+        {/* F9 As Builder Selection */}
+        <Card className="mb-6">
+          <CardContent className="pt-6">
             <div className="space-y-4">
-              <Label className="design-brief-question-title">
-                Would you like F9 Productions to build your project?
-              </Label>
-              <p className="design-brief-question-description mb-2">
-                We offer full design-build services and can manage your project from start to finish.
-              </p>
-              <RadioGroup
-                value={(formData.contractors.wantF9Build || formData.contractors.f9Build) ? 'yes' : 'no'}
-                onValueChange={handleF9BuildChange}
-                className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-4"
-              >
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="yes" id="f9Build-yes" />
-                  <Label htmlFor="f9Build-yes">Yes, I want F9 Productions to build my project</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="no" id="f9Build-no" />
-                  <Label htmlFor="f9Build-no">No, I have other plans</Label>
-                </div>
-              </RadioGroup>
-            </div>
-
-            <div className="space-y-4">
-              <Label className="design-brief-question-title">
-                Would you like to tender for a builder?
-              </Label>
-              <p className="design-brief-question-description mb-2">
-                We can help you find and evaluate potential builders.
-              </p>
-              <RadioGroup
-                value={formData.contractors.goToTender ? 'yes' : 'no'}
-                onValueChange={handleGoToTenderChange}
-                className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-4"
-              >
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="yes" id="goToTender-yes" />
-                  <Label htmlFor="goToTender-yes">Yes, I'd like to tender</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="no" id="goToTender-no" />
-                  <Label htmlFor="goToTender-no">No, I already have a builder</Label>
-                </div>
-              </RadioGroup>
-            </div>
-
-            {formData.contractors.goToTender === false && (
-              <div className="space-y-2">
-                <Label htmlFor="preferredBuilder" className="design-brief-question-title">
-                  Preferred Builder
+              <div>
+                <Label htmlFor="wantF9Build" className="text-base font-medium mb-2 block">
+                  Would you like F9 Productions to build your project?
                 </Label>
-                <p className="design-brief-question-description">
-                  If you already have a preferred builder, please provide their name and contact information.
+                <p className="text-sm text-muted-foreground mb-4">
+                  F9 Productions is a design-build firm that can streamline the entire process from design to construction.
                 </p>
-                <Input
-                  id="preferredBuilder"
-                  placeholder="Builder name and contact information"
-                  value={formData.contractors.preferredBuilder || ''}
-                  onChange={(e) => updateFormData('contractors', { preferredBuilder: e.target.value })}
+                
+                <div className="flex flex-col space-y-2">
+                  <div className="flex items-center">
+                    <RadioGroup
+                      value={contractors.wantF9Build ? 'yes' : 'no'}
+                      onValueChange={(value) => {
+                        updateFormData('contractors', { wantF9Build: value === 'yes' });
+                      }}
+                    >
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="yes" id="f9-yes" />
+                        <Label htmlFor="f9-yes">Yes – I want F9 to build my project</Label>
+                      </div>
+                      <div className="flex items-center space-x-2 mt-2">
+                        <RadioGroupItem value="no" id="f9-no" />
+                        <Label htmlFor="f9-no">No – I'll use another builder or decide later</Label>
+                      </div>
+                    </RadioGroup>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      
+        {/* Only show these sections if F9 is not selected as builder */}
+        {!contractors.wantF9Build && (
+          <>
+            {/* Tender Selection */}
+            <Card className="mb-6">
+              <CardContent className="pt-6">
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="goToTender" className="text-base font-medium mb-2 block">
+                      Would you like the project to go to tender with multiple builders?
+                    </Label>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Going to tender means getting quotes from multiple builders to compare prices and services.
+                    </p>
+                    
+                    <div className="flex flex-col space-y-2">
+                      <div className="flex items-center">
+                        <RadioGroup
+                          value={contractors.goToTender ? 'yes' : 'no'}
+                          onValueChange={(value) => {
+                            updateFormData('contractors', { goToTender: value === 'yes' });
+                          }}
+                        >
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="yes" id="tender-yes" />
+                            <Label htmlFor="tender-yes">Yes</Label>
+                          </div>
+                          <div className="flex items-center space-x-2 mt-2">
+                            <RadioGroupItem value="no" id="tender-no" />
+                            <Label htmlFor="tender-no">No</Label>
+                          </div>
+                        </RadioGroup>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            {/* Preferred Builder */}
+            <Card className="mb-6">
+              <CardContent className="pt-6">
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="preferredBuilder" className="text-base font-medium mb-2 block">
+                      Do you have a preferred builder?
+                    </Label>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      If you already have a builder in mind, please provide their details below.
+                    </p>
+                    <Textarea
+                      id="preferredBuilder"
+                      value={contractors.preferredBuilder || ''}
+                      onChange={(e) => handleInputChange('preferredBuilder', e.target.value)}
+                      placeholder="Builder name and contact information"
+                      className="min-h-[80px]"
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </>
+        )}
+        
+        {/* Consultant Details */}
+        <Card>
+          <CardContent className="pt-6">
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="structuralEngineer" className="text-base font-medium mb-2 block">
+                  Structural Engineer
+                </Label>
+                <p className="text-sm text-muted-foreground mb-4">
+                  If you have a structural engineer in mind, please provide their details below.
+                </p>
+                <Textarea
+                  id="structuralEngineer"
+                  value={contractors.structuralEngineer || ''}
+                  onChange={(e) => handleInputChange('structuralEngineer', e.target.value)}
+                  placeholder="Engineer name and contact information"
+                  className="min-h-[80px]"
                 />
               </div>
-            )}
-
-            <div className="space-y-2">
-              <Label htmlFor="structuralEngineer" className="design-brief-question-title">
-                Structural Engineer
-                <span className="text-muted-foreground text-sm ml-2">(optional)</span>
-              </Label>
-              <p className="design-brief-question-description">
-                If you have a preferred structural engineer, please specify.
-              </p>
-              <Input
-                id="structuralEngineer"
-                placeholder="Structural engineer name and contact information"
-                value={formData.contractors.structuralEngineer || ''}
-                onChange={(e) => updateFormData('contractors', { structuralEngineer: e.target.value })}
-              />
+              
+              <div>
+                <Label htmlFor="civilEngineer" className="text-base font-medium mb-2 block">
+                  Civil Engineer
+                </Label>
+                <p className="text-sm text-muted-foreground mb-4">
+                  If you have a civil engineer in mind, please provide their details below.
+                </p>
+                <Textarea
+                  id="civilEngineer"
+                  value={contractors.civilEngineer || ''}
+                  onChange={(e) => handleInputChange('civilEngineer', e.target.value)}
+                  placeholder="Engineer name and contact information"
+                  className="min-h-[80px]"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="otherConsultants" className="text-base font-medium mb-2 block">
+                  Other Consultants
+                </Label>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Please provide details of any other consultants involved in the project.
+                </p>
+                <Textarea
+                  id="otherConsultants"
+                  value={contractors.otherConsultants || ''}
+                  onChange={(e) => handleInputChange('otherConsultants', e.target.value)}
+                  placeholder="Consultant name and contact information"
+                  className="min-h-[80px]"
+                />
+              </div>
             </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="civilEngineer" className="design-brief-question-title">
-                Civil Engineer
-                <span className="text-muted-foreground text-sm ml-2">(optional)</span>
-              </Label>
-              <p className="design-brief-question-description">
-                If you have a preferred civil engineer, please specify.
-              </p>
-              <Input
-                id="civilEngineer"
-                placeholder="Civil engineer name and contact information"
-                value={formData.contractors.civilEngineer || ''}
-                onChange={(e) => updateFormData('contractors', { civilEngineer: e.target.value })}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="otherConsultants" className="design-brief-question-title">
-                Other Consultants
-                <span className="text-muted-foreground text-sm ml-2">(optional)</span>
-              </Label>
-              <p className="design-brief-question-description">
-                Are there other consultants you'd like to work with? Please list them here.
-              </p>
-              <Textarea
-                id="otherConsultants"
-                placeholder="Other consultants you'd like to work with"
-                value={formData.contractors.otherConsultants || ''}
-                onChange={(e) => updateFormData('contractors', { otherConsultants: e.target.value })}
-                className="min-h-20"
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="flex justify-between mt-6">
-          <Button variant="outline" onClick={handlePrevious} className="group">
-            <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-            <span className="font-bold">Previous: Architecture</span>
-          </Button>
-
-          <Button onClick={handleNext} className="group bg-yellow-500 hover:bg-yellow-600 text-black">
-            <span className="font-bold">Next: Budget</span>
-            <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-          </Button>
-        </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

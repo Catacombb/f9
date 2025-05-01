@@ -4,26 +4,25 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { MultiSelectButtons } from '@/components/MultiSelectButtons';
 
-// Material options with Colorado-specific materials prioritized
+// Updated material options with US-specific terms
 const externalMaterialOptions = [
   { value: 'Fiber Cement', label: 'Fiber Cement' },
   { value: 'Stucco', label: 'Stucco' },
-  { value: 'Brick', label: 'Brick' },
-  { value: 'Stone', label: 'Natural Stone' },
-  { value: 'Metal Cladding', label: 'Metal Panels' },
-  { value: 'Weatherboard', label: 'Weatherboard' },
-  { value: 'Linea', label: 'Linea' },
-  { value: 'Cedar', label: 'Cedar' },
+  { value: 'Brick Veneer', label: 'Brick Veneer' },
+  { value: 'Natural Stone', label: 'Natural Stone' },
+  { value: 'Metal Panels', label: 'Metal Panels' },
+  { value: 'Lap Siding', label: 'Lap Siding' },
+  { value: 'Cedar', label: 'Cedar Siding' },
   { value: 'Corten Steel', label: 'Corten Steel' },
-  { value: 'Aluminum Composite Panel', label: 'Aluminum Composite Panel' },
+  { value: 'Aluminum Composite Panel', label: 'Aluminum Panels' },
   { value: 'Concrete', label: 'Concrete' },
-  { value: 'ColorSteel', label: 'ColorSteel' },
+  { value: 'Vinyl Siding', label: 'Vinyl Siding' },
 ];
 
 const internalMaterialOptions = [
-  { value: 'Plasterboard', label: 'Drywall' },
-  { value: 'Timber Flooring', label: 'Hardwood Flooring' },
-  { value: 'Quartz', label: 'Quartz Countertops' },
+  { value: 'Drywall', label: 'Drywall' },
+  { value: 'Hardwood Flooring', label: 'Hardwood Flooring' },
+  { value: 'Quartz Countertops', label: 'Quartz Countertops' },
   { value: 'Shaker Cabinets', label: 'Shaker Cabinets' },
   { value: 'Engineered Wood', label: 'Engineered Wood' },
   { value: 'Carpet', label: 'Carpet' },
@@ -31,7 +30,7 @@ const internalMaterialOptions = [
   { value: 'Vinyl', label: 'Vinyl' },
   { value: 'Concrete', label: 'Concrete' },
   { value: 'Natural Stone', label: 'Natural Stone' },
-  { value: 'Timber Paneling', label: 'Timber Paneling' },
+  { value: 'Wood Paneling', label: 'Wood Paneling' },
   { value: 'Marble', label: 'Marble' },
   { value: 'Granite', label: 'Granite' },
 ];

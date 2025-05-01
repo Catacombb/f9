@@ -33,13 +33,13 @@ export const GeneralQuestionsTab = ({
             Do you have an idea of the final size of the home?
           </Label>
           <p className="text-sm text-muted-foreground mb-2">
-            Please provide the approximate size in square meters or number of floors you envision for your home.
+            Please provide the approximate size in square feet or number of floors you envision for your home.
           </p>
           <Textarea
             id="homeSize"
             value={homeSize || ''}
             onChange={(e) => onHomeSizeChange(e.target.value)}
-            placeholder="e.g., Approximately 250 square meters across 2 floors"
+            placeholder="e.g., Approximately 2,500 square feet across 2 floors"
             className="min-h-[100px]"
           />
         </div>

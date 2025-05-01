@@ -5,8 +5,6 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { SectionHeader } from './SectionHeader';
 import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { Card, CardContent } from '@/components/ui/card';
 
@@ -25,33 +23,33 @@ import {
 
 // Material options for the helper functions
 const externalMaterialOptions = [
-  { value: 'Brick', label: 'Brick' },
-  { value: 'Weatherboard', label: 'Weatherboard' },
-  { value: 'Linea', label: 'Linea' },
-  { value: 'Cedar', label: 'Cedar' },
-  { value: 'Stone', label: 'Stone' },
-  { value: 'Corten Steel', label: 'Corten Steel' },
-  { value: 'Aluminum Composite Panel', label: 'Aluminum Composite Panel' },
-  { value: 'Concrete', label: 'Concrete' },
-  { value: 'Stucco', label: 'Stucco' },
   { value: 'Fiber Cement', label: 'Fiber Cement' },
-  { value: 'Metal Cladding', label: 'Metal Cladding' },
-  { value: 'ColorSteel', label: 'ColorSteel' },
+  { value: 'Stucco', label: 'Stucco' },
+  { value: 'Brick Veneer', label: 'Brick Veneer' },
+  { value: 'Natural Stone', label: 'Natural Stone' },
+  { value: 'Metal Panels', label: 'Metal Panels' },
+  { value: 'Lap Siding', label: 'Lap Siding' },
+  { value: 'Cedar', label: 'Cedar Siding' },
+  { value: 'Corten Steel', label: 'Corten Steel' },
+  { value: 'Aluminum Composite Panel', label: 'Aluminum Panels' },
+  { value: 'Concrete', label: 'Concrete' },
+  { value: 'Vinyl Siding', label: 'Vinyl Siding' },
 ];
 
 const internalMaterialOptions = [
-  { value: 'Timber Flooring', label: 'Timber Flooring' },
+  { value: 'Drywall', label: 'Drywall' },
+  { value: 'Hardwood Flooring', label: 'Hardwood Flooring' },
+  { value: 'Quartz Countertops', label: 'Quartz Countertops' },
+  { value: 'Shaker Cabinets', label: 'Shaker Cabinets' },
   { value: 'Engineered Wood', label: 'Engineered Wood' },
   { value: 'Carpet', label: 'Carpet' },
   { value: 'Tile', label: 'Tile' },
   { value: 'Vinyl', label: 'Vinyl' },
   { value: 'Concrete', label: 'Concrete' },
   { value: 'Natural Stone', label: 'Natural Stone' },
-  { value: 'Plasterboard', label: 'Plasterboard' },
-  { value: 'Timber Paneling', label: 'Timber Paneling' },
+  { value: 'Wood Paneling', label: 'Wood Paneling' },
   { value: 'Marble', label: 'Marble' },
   { value: 'Granite', label: 'Granite' },
-  { value: 'Quartz', label: 'Quartz' },
 ];
 
 export function ArchitectureSection() {
@@ -159,22 +157,6 @@ export function ArchitectureSection() {
                     onChange={handleInspirationEntriesChange}
                   />
                 </div>
-                
-                <div>
-                  <Label htmlFor="inspirationNotes" className="text-base font-medium mb-2 block">
-                    Additional Notes
-                  </Label>
-                  <p className="text-sm text-muted-foreground mb-2">
-                    Any other inspiration or design preferences you'd like to mention.
-                  </p>
-                  <Textarea
-                    id="inspirationNotes"
-                    value={architectureData.inspirationNotes || ''}
-                    onChange={(e) => handleInputChange('inspirationNotes', e.target.value)}
-                    placeholder="Any other design inspiration or preferences..."
-                    className="min-h-[80px]"
-                  />
-                </div>
               </div>
             </CardContent>
           </Card>
@@ -205,12 +187,8 @@ export function ArchitectureSection() {
         />
         
         <TechnologySection 
-          specialFeatures={architectureData.specialFeatures || ''}
-          inspirationNotes={architectureData.inspirationNotes || ''}
-          architectureNotes={architectureData.architectureNotes || ''}
           technologyRequirements={architectureData.technologyRequirements || []}
           onTechnologyChange={handleTechnologyChange}
-          onInputChange={handleInputChange}
         />
         
         <div className="flex justify-between mt-6">

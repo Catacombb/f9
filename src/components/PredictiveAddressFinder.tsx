@@ -35,7 +35,7 @@ export function PredictiveAddressFinder({
     setSearchInput(value);
   }, [value]);
 
-  // Function to fetch address suggestions - Modified to prioritize Colorado addresses
+  // Function to fetch address suggestions - Using OpenStreetMap Nominatim for Colorado addresses
   const fetchAddressSuggestions = async (query: string) => {
     if (query.length < 3) {
       setAddressSuggestions([]);
@@ -43,19 +43,11 @@ export function PredictiveAddressFinder({
     }
 
     try {
-      // Using Mapbox for geocoding with Colorado bias
-      const accessToken = 'pk.eyJ1IjoiZjlwcm9kdWN0aW9ucyIsImEiOiJjbHd2Ymw4Z3cwMW5pMmtucjN3MG4wNXA1In0.FOQTuI3VdQnC-KlD1AJWQg';
-      const endpoint = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json`;
-      const params = new URLSearchParams({
-        access_token: accessToken,
-        country: 'us',
-        types: 'address',
-        limit: '5',
-        proximity: '-104.9847,39.7392', // Denver, CO coordinates to bias results
-        bbox: '-109.060253,36.992426,-102.041524,41.003444', // Colorado bounding box
-      });
-
-      const response = await fetch(`${endpoint}?${params.toString()}`);
+      // Using Nominatim for geocoding (OpenStreetMap service)
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)},colorado,usa&limit=5&addressdetails=1&countrycodes=us`,
+        { headers: { 'Accept-Language': 'en' } }
+      );
 
       if (!response.ok) {
         throw new Error('Network response was not ok');
@@ -63,12 +55,35 @@ export function PredictiveAddressFinder({
 
       const data = await response.json();
 
-      if (data && data.features && data.features.length > 0) {
-        const suggestions = data.features.map((item: any, index: number): AddressSuggestion => ({
-          id: `suggestion-${index}`,
-          place_name: item.place_name,
-          center: item.center ? [item.center[1], item.center[0]] : undefined // Swap to [lat, lng]
-        }));
+      if (data && data.length > 0) {
+        // Format the suggestions
+        const suggestions = data.map((item: any, index: number): AddressSuggestion => {
+          // Get latitude and longitude
+          const lat = parseFloat(item.lat);
+          const lon = parseFloat(item.lon);
+          
+          // Format the place name to be more readable
+          let formattedAddress = item.display_name;
+          // If display_name is too long, try to shorten it
+          if (item.address) {
+            const parts = [];
+            if (item.address.house_number) parts.push(item.address.house_number);
+            if (item.address.road) parts.push(item.address.road);
+            if (item.address.city || item.address.town || item.address.village) {
+              parts.push(item.address.city || item.address.town || item.address.village);
+            }
+            if (item.address.state) parts.push(item.address.state);
+            if (parts.length >= 3) {
+              formattedAddress = parts.join(', ');
+            }
+          }
+          
+          return {
+            id: `suggestion-${index}`,
+            place_name: formattedAddress,
+            center: lat && lon ? [lat, lon] : undefined
+          };
+        });
 
         setAddressSuggestions(suggestions);
         if (suggestions.length > 0) {
@@ -84,23 +99,15 @@ export function PredictiveAddressFinder({
     }
   };
 
-  // Function to search for an address - Modified to use Mapbox
+  // Function to search for an address - Using OpenStreetMap Nominatim for Colorado addresses
   const searchAddress = async (searchAddress: string) => {
     if (!searchAddress.trim()) return;
 
     try {
-      const accessToken = 'pk.eyJ1IjoiZjlwcm9kdWN0aW9ucyIsImEiOiJjbHd2Ymw4Z3cwMW5pMmtucjN3MG4wNXA1In0.FOQTuI3VdQnC-KlD1AJWQg';
-      const endpoint = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(searchAddress)}.json`;
-      const params = new URLSearchParams({
-        access_token: accessToken,
-        country: 'us',
-        types: 'address',
-        limit: '1',
-        proximity: '-104.9847,39.7392', // Denver, CO
-        bbox: '-109.060253,36.992426,-102.041524,41.003444', // Colorado bounding box
-      });
-
-      const response = await fetch(`${endpoint}?${params.toString()}`);
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchAddress)},colorado,usa&limit=1&addressdetails=1&countrycodes=us`,
+        { headers: { 'Accept-Language': 'en' } }
+      );
 
       if (!response.ok) {
         throw new Error('Network response was not ok');
@@ -108,12 +115,28 @@ export function PredictiveAddressFinder({
 
       const data = await response.json();
 
-      if (data && data.features && data.features.length > 0) {
-        const feature = data.features[0];
-        const formattedAddress = feature.place_name;
+      if (data && data.length > 0) {
+        const item = data[0];
+        const lat = parseFloat(item.lat);
+        const lon = parseFloat(item.lon);
+        const coordinates: [number, number] = [lat, lon];
         
-        // Swap coordinates to [lat, lng] format
-        const coordinates: [number, number] = [feature.center[1], feature.center[0]];
+        // Format the place name to be more readable
+        let formattedAddress = item.display_name;
+        
+        // If display_name is too long, try to shorten it
+        if (item.address) {
+          const parts = [];
+          if (item.address.house_number) parts.push(item.address.house_number);
+          if (item.address.road) parts.push(item.address.road);
+          if (item.address.city || item.address.town || item.address.village) {
+            parts.push(item.address.city || item.address.town || item.address.village);
+          }
+          if (item.address.state) parts.push(item.address.state);
+          if (parts.length >= 3) {
+            formattedAddress = parts.join(', ');
+          }
+        }
 
         // Update coordinates in parent component if provided
         if (onCoordinatesSelect) {
@@ -126,7 +149,7 @@ export function PredictiveAddressFinder({
       } else {
         toast({
           title: "Address not found",
-          description: "Please try entering a more specific address.",
+          description: "Please try entering a more specific Colorado address.",
           variant: "destructive"
         });
       }

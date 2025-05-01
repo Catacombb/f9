@@ -1,6 +1,6 @@
-
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { DesignBriefSidebar } from './DesignBriefSidebar';
+import { Footer } from './Footer'; // Updated import for the new simplified footer
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { formatDistanceToNow } from 'date-fns';
 import { Link } from 'react-router-dom';
@@ -141,36 +141,7 @@ export function DesignBriefLayout({ children }: DesignBriefLayoutProps) {
           </Form>
         </main>
         
-        <footer className="border-t py-3 px-4 text-sm text-gray-600 w-full">
-          <div className="max-w-full mx-auto">
-            <div className="text-center mb-3">
-              <div className="flex justify-between items-center w-full max-w-full mx-auto px-2">
-                <span className="truncate font-medium">Overall Progress: {overallProgress}%</span>
-                {isMobile && (
-                  <span className="text-xs truncate max-w-[50%] text-black">
-                    Last saved {lastSavedFormatted}
-                  </span>
-                )}
-              </div>
-              <Progress value={overallProgress} className="h-2 w-full bg-gray-200 mt-1" />
-              
-              <div className="flex justify-center items-center gap-4 mt-3 text-xs">
-                <div className="flex items-center">
-                  <Mail className="h-3 w-3 mr-1" />
-                  <a href="mailto:LMC@F9Productions.com" className="hover:underline">LMC@F9Productions.com</a>
-                </div>
-                <div className="flex items-center">
-                  <Phone className="h-3 w-3 mr-1" />
-                  <a href="tel:3037757406" className="hover:underline">303.775.7406</a>
-                </div>
-                <div className="flex items-center">
-                  <Globe className="h-3 w-3 mr-1" />
-                  <a href="https://www.f9productions.com" target="_blank" rel="noopener noreferrer" className="hover:underline">www.f9productions.com</a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </footer>
+        <Footer />
       </div>
     </div>
   );

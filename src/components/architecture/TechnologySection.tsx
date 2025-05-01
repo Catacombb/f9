@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { MultiSelectButtons } from '@/components/MultiSelectButtons';
 
 const technologyOptions = [
@@ -18,21 +17,13 @@ const technologyOptions = [
 ];
 
 interface TechnologySectionProps {
-  specialFeatures: string;
-  inspirationNotes: string;
-  architectureNotes: string;
   technologyRequirements: string[];
   onTechnologyChange: (values: string[]) => void;
-  onInputChange: (field: string, value: string) => void;
 }
 
 export function TechnologySection({
-  specialFeatures,
-  inspirationNotes,
-  architectureNotes,
   technologyRequirements,
-  onTechnologyChange,
-  onInputChange
+  onTechnologyChange
 }: TechnologySectionProps) {
   return (
     <div className="design-brief-form-group">
@@ -44,36 +35,6 @@ export function TechnologySection({
           selectedValues={technologyRequirements || []}
           onChange={onTechnologyChange}
         />
-
-        <div className="space-y-2">
-          <Label htmlFor="specialFeatures" className="design-brief-question-title">Special Architectural Features</Label>
-          <Textarea 
-            id="specialFeatures" 
-            placeholder="Describe any special architectural features you're interested in..."
-            value={specialFeatures || ''}
-            onChange={(e) => onInputChange('specialFeatures', e.target.value)}
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="inspirationNotes" className="design-brief-question-title">Inspiration Notes</Label>
-          <Textarea 
-            id="inspirationNotes" 
-            placeholder="Describe sources of inspiration or reference projects..."
-            value={inspirationNotes || ''}
-            onChange={(e) => onInputChange('inspirationNotes', e.target.value)}
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="architectureNotes" className="design-brief-question-title">Additional Architecture Notes</Label>
-          <Textarea 
-            id="architectureNotes" 
-            placeholder="Any other architectural considerations or preferences..."
-            value={architectureNotes || ''}
-            onChange={(e) => onInputChange('architectureNotes', e.target.value)}
-          />
-        </div>
       </div>
     </div>
   );

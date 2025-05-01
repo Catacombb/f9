@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { Button } from '@/components/ui/button';
@@ -11,6 +10,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { PredictiveAddressFinder } from '@/components/PredictiveAddressFinder';
 import { toast } from "sonner";
 import { cn } from '@/lib/utils';
+
+// Updated project type options without "Mixed"
+const projectTypeOptions = [
+  { value: 'new_build', label: 'New Build' },
+  { value: 'renovation', label: 'Renovation/Addition' },
+  { value: 'commercial', label: 'Commercial' },
+];
 
 export function ProjectInfoSection() {
   const { setCurrentSection, updateFormData, formData } = useDesignBrief();
@@ -133,7 +139,7 @@ export function ProjectInfoSection() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="projectType" className="design-brief-question-title text-black font-bold">Project Type *</Label>
+              <Label htmlFor="projectType" className="design-brief-question-title text-black font-bold">Project Type</Label>
               <Select 
                 value={projectInfoData.projectType || ''} 
                 onValueChange={(value) => handleInputChange('projectType', value)}
@@ -142,10 +148,11 @@ export function ProjectInfoSection() {
                   <SelectValue placeholder="Select project type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="new_build">New Build</SelectItem>
-                  <SelectItem value="renovation">Renovation</SelectItem>
-                  <SelectItem value="addition">Addition</SelectItem>
-                  <SelectItem value="mixed">Mixed (New + Renovation)</SelectItem>
+                  {projectTypeOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
