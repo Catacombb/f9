@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback } from 'react';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { Button } from '@/components/ui/button';
@@ -35,12 +34,12 @@ const ALLOWED_FILE_TYPES = {
   ]
 };
 
-// File categories
+// File categories with American terminology
 const FILE_CATEGORIES = [
   { 
     id: 'siteDocuments', 
     label: 'Site Documents', 
-    description: 'Upload Certificate of Title, LIM Report, Resource Consent, Site Survey, and Topographic Files',
+    description: 'Upload property deeds, site measurements, local zoning information, and regulatory documents',
     accept: '.pdf,.doc,.docx,.xls,.xlsx,.txt,.zip,.dwg,.dxf'
   },
   { 
@@ -58,7 +57,7 @@ const FILE_CATEGORIES = [
   { 
     id: 'inspirationFiles', 
     label: 'Inspiration & Visuals', 
-    description: 'Upload moodboards, exterior/interior example images, materials',
+    description: 'Upload floor plans, concept drawings, or inspiration images',
     accept: '.jpg,.jpeg,.png,.gif,.webp,.pdf'
   }
 ];

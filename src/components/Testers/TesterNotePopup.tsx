@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { 
   Dialog, 
@@ -9,12 +10,12 @@ interface TesterNotePopupProps {
   onClose?: () => void;
 }
 
-// This component is now essentially disabled and won't show
+// This component is disabled and won't show
 export function TesterNotePopup({ isOpen = false, onClose }: TesterNotePopupProps) {
   return (
     <Dialog open={false}>
       <DialogContent className="max-w-md">
-        {/* Content removed as we're no longer showing this popup */}
+        {/* No content as this popup is disabled */}
       </DialogContent>
     </Dialog>
   );

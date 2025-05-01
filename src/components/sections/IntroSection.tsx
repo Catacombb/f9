@@ -4,15 +4,14 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { ArrowRight, Clipboard, PenLine, Share, AlertTriangle, MessageCircle } from 'lucide-react';
-import { TesterNotePopup } from '@/components/Testers/TesterNotePopup';
 
 export function IntroSection() {
   const { setCurrentSection } = useDesignBrief();
-  const [showTesterPopup, setShowTesterPopup] = useState(true);
+  const [showTesterPopup, setShowTesterPopup] = useState(false);
   
-  // Effect to ensure popup shows every time this component mounts
+  // Effect to ensure popup is not shown
   useEffect(() => {
-    setShowTesterPopup(true);
+    setShowTesterPopup(false);
   }, []);
   
   const handleStart = () => {
@@ -24,14 +23,13 @@ export function IntroSection() {
   };
   
   return <div className="design-brief-section-wrapper">
-      <TesterNotePopup isOpen={showTesterPopup} onClose={handleClosePopup} />
       <div className="design-brief-section-container">
         {/* Header Section with Blueprint Grid Background */}
         <div className="text-center mb-12 relative">
           <div className="absolute inset-0 blueprint-grid-bg -z-10"></div>
           
           <div className="py-8 px-4">
-            <h1 className="text-2xl md:text-3xl font-bold mb-6 font-heading text-charcoal-800 dark:text-gray-200">
+            <h1 className="text-2xl md:text-3xl font-bold mb-6 font-heading text-charcoal-800">
               Design Brief
             </h1>
             
@@ -47,64 +45,97 @@ export function IntroSection() {
           </div>
         </div>
         
-        <Card className="mb-8 border-blueprint-200 dark:border-blueprint-800">
+        <Card className="mb-8 border-blueprint-200">
           <div className="h-1 bg-blueprint-500"></div>
           <CardContent className="p-6">
             <div className="text-center mb-6">
-              <h2 className="text-2xl font-semibold mb-2 text-blueprint-600 dark:text-blueprint-400">Our Design-Build Process</h2>
+              <h2 className="text-2xl font-semibold mb-2 text-blueprint-600">Our Design-Build Process</h2>
             </div>
             
-            <div className="bg-blueprint-50 dark:bg-blueprint-900/30 border border-blueprint-200 dark:border-blueprint-800 p-4 mb-6">
+            <div className="bg-blueprint-50 border border-blueprint-200 p-4 mb-6">
               <div className="flex">
-                <AlertTriangle className="h-5 w-5 text-blueprint-600 dark:text-blueprint-400 mt-0.5 mr-2 shrink-0" />
-                <p className="text-charcoal-800 dark:text-gray-300 text-sm">
+                <AlertTriangle className="h-5 w-5 text-blueprint-600 mt-0.5 mr-2 shrink-0" />
+                <p className="text-charcoal-800 text-sm">
                   Your new home is a significant investment. Taking time to complete this brief thoroughly will help avoid unnecessary costs, delays, and future regrets. A well-thought-out brief saves time, money, and frustration during the design and construction phases.
                 </p>
               </div>
             </div>
             
-            <div className="grid gap-6 md:grid-cols-4">
-              {/* Step 1 */}
-              <div className="p-4 hover:bg-blueprint-50 dark:hover:bg-blueprint-900/20 transition-colors duration-300">
+            <div className="grid gap-6 md:grid-cols-7">
+              {/* Step 1 - Programming */}
+              <div className="p-4 hover:bg-blueprint-50 transition-colors duration-300">
                 <div className="mb-4 mx-auto w-16 h-16 flex items-center justify-center">
-                  <Clipboard className="h-8 w-8 text-blueprint-600 dark:text-blueprint-400" />
+                  <Clipboard className="h-8 w-8 text-blueprint-600" />
                 </div>
-                <h3 className="font-medium mb-2">Step 1: Complete the Brief</h3>
+                <h3 className="font-medium mb-2 text-center">Programming</h3>
                 <p className="text-sm text-muted-foreground">
-                  Fill out this brief with your project requirements and vision.
+                  Gathering information about your needs, wants, and budget.
                 </p>
               </div>
               
-              {/* Step 2 */}
-              <div className="p-4 hover:bg-blueprint-50 dark:hover:bg-blueprint-900/20 transition-colors duration-300">
+              {/* Step 2 - Schematic Design */}
+              <div className="p-4 hover:bg-blueprint-50 transition-colors duration-300">
                 <div className="mb-4 mx-auto w-16 h-16 flex items-center justify-center">
-                  <PenLine className="h-8 w-8 text-blueprint-600 dark:text-blueprint-400" />
+                  <PenLine className="h-8 w-8 text-blueprint-600" />
                 </div>
-                <h3 className="font-medium mb-2">Step 2: F9 Review</h3>
+                <h3 className="font-medium mb-2 text-center">Schematic Design</h3>
                 <p className="text-sm text-muted-foreground">
-                  Our team reviews your brief before your first consultation.
+                  Creating concept sketches and design options.
                 </p>
               </div>
               
-              {/* Step 3 */}
-              <div className="p-4 hover:bg-blueprint-50 dark:hover:bg-blueprint-900/20 transition-colors duration-300">
+              {/* Step 3 - Design Development */}
+              <div className="p-4 hover:bg-blueprint-50 transition-colors duration-300">
                 <div className="mb-4 mx-auto w-16 h-16 flex items-center justify-center">
-                  <Share className="h-8 w-8 text-blueprint-600 dark:text-blueprint-400" />
+                  <Share className="h-8 w-8 text-blueprint-600" />
                 </div>
-                <h3 className="font-medium mb-2">Step 3: Concept Design</h3>
+                <h3 className="font-medium mb-2 text-center">Design Development</h3>
                 <p className="text-sm text-muted-foreground">
-                  Your project moves into the concept design phase.
+                  Refining the design and selecting materials.
                 </p>
               </div>
               
-              {/* Step 4 */}
-              <div className="p-4 hover:bg-blueprint-50 dark:hover:bg-blueprint-900/20 transition-colors duration-300">
+              {/* Step 4 - Construction Documents */}
+              <div className="p-4 hover:bg-blueprint-50 transition-colors duration-300">
                 <div className="mb-4 mx-auto w-16 h-16 flex items-center justify-center">
-                  <MessageCircle className="h-8 w-8 text-blueprint-600 dark:text-blueprint-400" />
+                  <MessageCircle className="h-8 w-8 text-blueprint-600" />
                 </div>
-                <h3 className="font-medium mb-2">Step 4: Design-Build Pricing</h3>
+                <h3 className="font-medium mb-2 text-center">Construction Documents</h3>
                 <p className="text-sm text-muted-foreground">
-                  We provide accurate pricing based on your design specifications.
+                  Preparing detailed plans for building.
+                </p>
+              </div>
+              
+              {/* Step 5 - Permitting */}
+              <div className="p-4 hover:bg-blueprint-50 transition-colors duration-300">
+                <div className="mb-4 mx-auto w-16 h-16 flex items-center justify-center">
+                  <MessageCircle className="h-8 w-8 text-blueprint-600" />
+                </div>
+                <h3 className="font-medium mb-2 text-center">Permitting</h3>
+                <p className="text-sm text-muted-foreground">
+                  Obtaining necessary approvals from local authorities.
+                </p>
+              </div>
+              
+              {/* Step 6 - Bidding */}
+              <div className="p-4 hover:bg-blueprint-50 transition-colors duration-300">
+                <div className="mb-4 mx-auto w-16 h-16 flex items-center justify-center">
+                  <MessageCircle className="h-8 w-8 text-blueprint-600" />
+                </div>
+                <h3 className="font-medium mb-2 text-center">Bidding</h3>
+                <p className="text-sm text-muted-foreground">
+                  Selecting contractors for your project.
+                </p>
+              </div>
+              
+              {/* Step 7 - Construction Administration */}
+              <div className="p-4 hover:bg-blueprint-50 transition-colors duration-300">
+                <div className="mb-4 mx-auto w-16 h-16 flex items-center justify-center">
+                  <MessageCircle className="h-8 w-8 text-blueprint-600" />
+                </div>
+                <h3 className="font-medium mb-2 text-center">Construction Administration</h3>
+                <p className="text-sm text-muted-foreground">
+                  Overseeing construction to ensure design intent.
                 </p>
               </div>
             </div>

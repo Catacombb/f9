@@ -1,10 +1,11 @@
+
 import React, { useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { PlusCircle, HelpCircle } from 'lucide-react';
+import { PlusCircle } from 'lucide-react';
 import { predefinedRoomTypes } from './roomTypes';
 import { SpaceRoom } from '@/types';
 import { RoomItem } from './RoomItem';
@@ -101,25 +102,14 @@ export const RoomSelectionTab = ({
               >
                 <div className="flex flex-col items-center mb-3">
                   <div className="w-10 h-10 flex items-center justify-center">
-                    {roomType.value === 'Garage' ? (
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <div className="relative">
-                              {roomType.icon}
-                              <HelpCircle className="w-4 h-4 absolute -top-1 -right-1 text-muted-foreground" />
-                            </div>
-                          </TooltipTrigger>
-                          <TooltipContent side="top" className="max-w-[250px] text-xs">
-                            This refers to including a garage space in the design. The number of car parks will be selected separately later.
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    ) : (
-                      roomType.icon
-                    )}
+                    {roomType.icon}
                   </div>
                   <span className="mt-2 text-center font-medium">{roomType.label}</span>
+                  {roomType.value === 'Garage' && (
+                    <span className="text-xs text-center text-muted-foreground mt-1">
+                      (Specify how many cars this garage should fit)
+                    </span>
+                  )}
                 </div>
                 <div className="flex items-center space-x-2 mt-2">
                   <Button 

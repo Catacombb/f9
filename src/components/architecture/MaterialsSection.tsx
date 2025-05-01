@@ -4,35 +4,36 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { MultiSelectButtons } from '@/components/MultiSelectButtons';
 
-// Material options
+// Material options with Colorado-specific materials prioritized
 const externalMaterialOptions = [
+  { value: 'Fiber Cement', label: 'Fiber Cement' },
+  { value: 'Stucco', label: 'Stucco' },
   { value: 'Brick', label: 'Brick' },
+  { value: 'Stone', label: 'Natural Stone' },
+  { value: 'Metal Cladding', label: 'Metal Panels' },
   { value: 'Weatherboard', label: 'Weatherboard' },
   { value: 'Linea', label: 'Linea' },
   { value: 'Cedar', label: 'Cedar' },
-  { value: 'Stone', label: 'Stone' },
   { value: 'Corten Steel', label: 'Corten Steel' },
   { value: 'Aluminum Composite Panel', label: 'Aluminum Composite Panel' },
   { value: 'Concrete', label: 'Concrete' },
-  { value: 'Stucco', label: 'Stucco' },
-  { value: 'Fiber Cement', label: 'Fiber Cement' },
-  { value: 'Metal Cladding', label: 'Metal Cladding' },
   { value: 'ColorSteel', label: 'ColorSteel' },
 ];
 
 const internalMaterialOptions = [
-  { value: 'Timber Flooring', label: 'Timber Flooring' },
+  { value: 'Plasterboard', label: 'Drywall' },
+  { value: 'Timber Flooring', label: 'Hardwood Flooring' },
+  { value: 'Quartz', label: 'Quartz Countertops' },
+  { value: 'Shaker Cabinets', label: 'Shaker Cabinets' },
   { value: 'Engineered Wood', label: 'Engineered Wood' },
   { value: 'Carpet', label: 'Carpet' },
   { value: 'Tile', label: 'Tile' },
   { value: 'Vinyl', label: 'Vinyl' },
   { value: 'Concrete', label: 'Concrete' },
   { value: 'Natural Stone', label: 'Natural Stone' },
-  { value: 'Plasterboard', label: 'Plasterboard' },
   { value: 'Timber Paneling', label: 'Timber Paneling' },
   { value: 'Marble', label: 'Marble' },
   { value: 'Granite', label: 'Granite' },
-  { value: 'Quartz', label: 'Quartz' },
 ];
 
 interface MaterialsSectionProps {

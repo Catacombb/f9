@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { 
   Bed, 
@@ -13,68 +12,71 @@ import {
   Monitor,
   UtensilsCrossed,
   Toilet,
-  Shirt
+  Shirt,
+  DoorOpen,
+  Package,
+  LandPlot
 } from 'lucide-react';
 
 export const predefinedRoomTypes = [
   { 
     value: 'Bedroom', 
     label: 'Bedroom',
-    icon: <Bed className="h-6 w-6" />
+    icon: <Bed className="h-5 w-5" />
   },
   { 
     value: 'Bathroom', 
     label: 'Bathroom',
-    icon: <Bath className="h-6 w-6" />
+    icon: <Bath className="h-5 w-5" />
   },
   { 
     value: 'Kitchen', 
     label: 'Kitchen',
-    icon: <Utensils className="h-6 w-6" />
-  },
-  { 
-    value: 'Powder Room', 
-    label: 'Powder Room',
-    icon: <Toilet className="h-6 w-6" />
+    icon: <Utensils className="h-5 w-5" />
   },
   { 
     value: 'Living Room', 
     label: 'Living Room',
-    icon: <Sofa className="h-6 w-6" />
+    icon: <Sofa className="h-5 w-5" />
   },
   { 
-    value: 'Garage', 
-    label: 'Garage',
-    icon: <Car className="h-6 w-6" />
+    value: 'Dining Room', 
+    label: 'Dining Room',
+    icon: <Utensils className="h-5 w-5" />
   },
   { 
     value: 'Office', 
     label: 'Office',
-    icon: <Briefcase className="h-6 w-6" />
-  },
-  { 
-    value: 'Walk-in Robe', 
-    label: 'Walk-in Robe',
-    icon: <Shirt className="h-6 w-6" />
-  },
-  { 
-    value: 'Gym', 
-    label: 'Gym',
-    icon: <Dumbbell className="h-6 w-6" />
-  },
-  { 
-    value: 'Media Room', 
-    label: 'Media Room',
-    icon: <Monitor className="h-6 w-6" />
-  },
-  { 
-    value: 'Scullery', 
-    label: 'Scullery',
-    icon: <UtensilsCrossed className="h-6 w-6" />
+    icon: <Briefcase className="h-5 w-5" />
   },
   { 
     value: 'Laundry', 
     label: 'Laundry',
-    icon: <WashingMachine className="h-6 w-6" />
+    icon: <Shirt className="h-5 w-5" />
   },
+  { 
+    value: 'Garage', 
+    label: 'Garage',
+    icon: <Car className="h-5 w-5" />
+  },
+  { 
+    value: 'Mudroom', 
+    label: 'Mudroom',
+    icon: <DoorOpen className="h-5 w-5" />
+  },
+  { 
+    value: 'Pantry', 
+    label: 'Pantry',
+    icon: <Package className="h-5 w-5" />
+  },
+  { 
+    value: 'Closet', 
+    label: 'Closet',
+    icon: <Shirt className="h-5 w-5" />
+  },
+  { 
+    value: 'Basement', 
+    label: 'Basement',
+    icon: <LandPlot className="h-5 w-5" />
+  }
 ];

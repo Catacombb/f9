@@ -45,7 +45,7 @@ export const renderSpacesInfo = (ctx: PDFContext, projectData: ProjectData): voi
           // Build description
           const descriptionItems = [];
           
-          // Room-specific properties based on room type
+          // Room-specific properties based on room type with American terminology
           if (room.type === 'Kitchen' || room.type === 'Kitchenette') {
             if (descObj.kitchenType) {
               descriptionItems.push(`${descObj.kitchenType} kitchen`);
@@ -60,7 +60,7 @@ export const renderSpacesInfo = (ctx: PDFContext, projectData: ProjectData): voi
             }
           }
           
-          if (room.type === 'Living' || room.type === 'Family Room') {
+          if (room.type === 'Living Room' || room.type === 'Family Room') {
             if (descObj.entertainmentFocus) {
               descriptionItems.push("Entertainment focused");
             }
