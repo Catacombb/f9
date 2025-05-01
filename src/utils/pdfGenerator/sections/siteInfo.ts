@@ -11,24 +11,30 @@ export const renderSiteInfo = (ctx: PDFContext, projectData: ProjectData): void 
     addMultiLineText(ctx, projectData.formData.site.existingConditions);
   }
   
-  // Handle both string and string[] types for siteFeatures
-  if (projectData.formData.site.siteFeatures) {
-    addText(ctx, 'Site Features', '');
-    
-    // If siteFeatures is an array, convert to string first
-    if (Array.isArray(projectData.formData.site.siteFeatures)) {
-      // Format the array into a readable string
-      const featuresString = projectData.formData.site.siteFeatures.join(', ');
-      addMultiLineText(ctx, featuresString);
-    } else {
-      // It's already a string, pass directly
-      addMultiLineText(ctx, projectData.formData.site.siteFeatures);
+  // First check if we have the combined field
+  if (projectData.formData.site.siteFeaturesAndViews) {
+    addText(ctx, 'Site Features & Views', '');
+    addMultiLineText(ctx, projectData.formData.site.siteFeaturesAndViews);
+  } else {
+    // Handle both string and string[] types for siteFeatures
+    if (projectData.formData.site.siteFeatures) {
+      addText(ctx, 'Site Features', '');
+      
+      // If siteFeatures is an array, convert to string first
+      if (Array.isArray(projectData.formData.site.siteFeatures)) {
+        // Format the array into a readable string
+        const featuresString = projectData.formData.site.siteFeatures.join(', ');
+        addMultiLineText(ctx, featuresString);
+      } else {
+        // It's already a string, pass directly
+        addMultiLineText(ctx, projectData.formData.site.siteFeatures);
+      }
     }
-  }
-  
-  if (projectData.formData.site.viewsOrientations) {
-    addText(ctx, 'Views/Orientations', '');
-    addMultiLineText(ctx, projectData.formData.site.viewsOrientations);
+    
+    if (projectData.formData.site.viewsOrientations) {
+      addText(ctx, 'Views/Orientations', '');
+      addMultiLineText(ctx, projectData.formData.site.viewsOrientations);
+    }
   }
   
   if (projectData.formData.site.accessConstraints) {

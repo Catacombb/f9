@@ -1,3 +1,4 @@
+
 export interface SpaceRoom {
   id: string;
   type: string;
@@ -93,6 +94,7 @@ export interface FormData {
     viewsOrientations: string;
     accessConstraints: string;
     neighboringProperties: string;
+    siteFeaturesAndViews?: string; // Added new combined field for site features and views
     topographicSurvey?: string;
     existingHouseDrawings?: string;
     septicDesign?: string;

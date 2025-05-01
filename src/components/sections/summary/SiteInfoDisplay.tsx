@@ -17,7 +17,13 @@ export function SiteInfoDisplay({ site }: SiteInfoDisplayProps) {
             <p className="text-sm">{site.existingConditions}</p>
           </div>
         )}
-        {site.siteFeatures && (
+        {site.siteFeaturesAndViews && (
+          <div>
+            <p className="text-sm font-medium">Site Features & Views:</p>
+            <p className="text-sm">{site.siteFeaturesAndViews}</p>
+          </div>
+        )}
+        {!site.siteFeaturesAndViews && site.siteFeatures && (
           <div>
             <p className="text-sm font-medium">Site Features:</p>
             <p className="text-sm">
@@ -29,7 +35,7 @@ export function SiteInfoDisplay({ site }: SiteInfoDisplayProps) {
             </p>
           </div>
         )}
-        {site.viewsOrientations && (
+        {!site.siteFeaturesAndViews && site.viewsOrientations && (
           <div>
             <p className="text-sm font-medium">Views/Orientations:</p>
             <p className="text-sm">{site.viewsOrientations}</p>

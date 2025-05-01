@@ -44,6 +44,7 @@ export const initialProjectData: ProjectData = {
       viewsOrientations: '',
       accessConstraints: '',
       neighboringProperties: '',
+      siteFeaturesAndViews: '', // Added new combined field
       topographicSurvey: '',
       existingHouseDrawings: '',
       septicDesign: '',
