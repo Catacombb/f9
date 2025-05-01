@@ -7,6 +7,7 @@ export interface SpaceRoom {
   customName?: string;
   displayName?: string; // Added for naming individual rooms
   primaryUsers?: string[]; // Added for tracking who uses this room
+  level?: string; // Added for tracking which level the room is on
 }
 
 export interface Professional {
