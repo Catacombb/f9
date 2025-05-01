@@ -16,11 +16,9 @@ interface WelcomeModalProps {
 }
 
 export function WelcomeModal({ open, onOpenChange }: WelcomeModalProps) {
-  const { setCurrentSection } = useDesignBrief();
-  
   const handleStartBrief = () => {
+    // Simply close the modal without changing the section
     onOpenChange(false);
-    setCurrentSection('projectInfo');
   };
   
   return (
