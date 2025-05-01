@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Check, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { SpaceRoom, OccupantEntry } from '@/types';
+import { SpaceRoom } from '@/types';
 import { getRoomQuestions } from './roomQuestions';
 import { PrimaryUsersSelect } from './PrimaryUsersSelect';
 import { useDesignBrief } from '@/context/DesignBriefContext';
@@ -57,6 +57,10 @@ export const RoomItem = ({ room, onEdit, onRemove }: RoomItemProps) => {
       ...room,
       primaryUsers: selectedIds
     });
+  };
+
+  const handleCarSpacesChange = (value: string) => {
+    updateRoomDescription('carSpaces', value);
   };
 
   const updateRoomDescription = (key: string, value: any) => {
@@ -127,7 +131,7 @@ export const RoomItem = ({ room, onEdit, onRemove }: RoomItemProps) => {
   const autoSetSingleLevel = () => {
     if (isSingleLevel && descriptionData.level !== 'single_level') {
       handleLevelChange('single_level');
-      return null; // Return null to avoid rendering anything
+      return null;
     }
     return null;
   };
@@ -154,6 +158,12 @@ export const RoomItem = ({ room, onEdit, onRemove }: RoomItemProps) => {
             {descriptionData.level && (
               <div className="text-sm text-black mt-1">
                 <span className="font-medium">Level:</span> {descriptionData.level.replace(/_/g, ' ').toUpperCase()}
+              </div>
+            )}
+
+            {room.type === 'Garage' && descriptionData.carSpaces && (
+              <div className="text-sm text-black mt-1">
+                <span className="font-medium">Car Spaces:</span> {descriptionData.carSpaces}
               </div>
             )}
           </div>
@@ -232,6 +242,32 @@ export const RoomItem = ({ room, onEdit, onRemove }: RoomItemProps) => {
               {isSingleLevel && (
                 <div className="hidden">
                   {autoSetSingleLevel()}
+                </div>
+              )}
+
+              {/* Add car spaces dropdown for Garage rooms */}
+              {room.type === 'Garage' && (
+                <div>
+                  <Label htmlFor={`car-spaces-${room.id}`} className="text-black font-medium">Number of car spaces</Label>
+                  <Select 
+                    value={descriptionData.carSpaces || ''} 
+                    onValueChange={handleCarSpacesChange}
+                  >
+                    <SelectTrigger 
+                      id={`car-spaces-${room.id}`} 
+                      className="mt-1 text-black"
+                      onClick={preventPropagation}
+                    >
+                      <SelectValue placeholder="Select number of spaces" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">1</SelectItem>
+                      <SelectItem value="2">2</SelectItem>
+                      <SelectItem value="3">3</SelectItem>
+                      <SelectItem value="4">4</SelectItem>
+                      <SelectItem value="5+">5+</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               )}
             </div>

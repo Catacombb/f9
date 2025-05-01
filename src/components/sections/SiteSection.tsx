@@ -52,37 +52,26 @@ export function SiteSection() {
           </div>
 
           <div className="mb-6">
-            <Label htmlFor="siteFeatures" className="design-brief-question-title">
-              Key Site Features
+            <Label htmlFor="siteFeaturesAndViews" className="design-brief-question-title">
+              Site Features & Views
               <span className="text-muted-foreground text-sm ml-2">(optional)</span>
             </Label>
             <p className="design-brief-question-description">
-              What are the notable features of the site? Trees, slopes, water views, etc.?
+              What are the notable features of the site (trees, slopes, water)? What are the best views and which direction does the site face?
             </p>
             <Textarea
-              id="siteFeatures"
-              name="siteFeatures"
-              placeholder="List any significant features of the site..."
-              value={formData.site.siteFeatures}
-              onChange={handleChange}
-              className="mt-1"
-            />
-          </div>
-
-          <div className="mb-6">
-            <Label htmlFor="viewsOrientations" className="design-brief-question-title">
-              Views and Orientations
-              <span className="text-muted-foreground text-sm ml-2">(optional)</span>
-            </Label>
-            <p className="design-brief-question-description">
-              What are the best views from the site? Which direction does the site face?
-            </p>
-            <Textarea
-              id="viewsOrientations"
-              name="viewsOrientations"
-              placeholder="Describe the views and the site's orientation..."
-              value={formData.site.viewsOrientations}
-              onChange={handleChange}
+              id="siteFeaturesAndViews"
+              name="siteFeaturesAndViews"
+              placeholder="Describe any significant features, views, and orientation of the site..."
+              value={formData.site.siteFeaturesAndViews || formData.site.siteFeatures || formData.site.viewsOrientations}
+              onChange={(e) => {
+                updateFormData('site', { 
+                  siteFeaturesAndViews: e.target.value,
+                  // Keep the old fields populated for backward compatibility
+                  siteFeatures: e.target.value,
+                  viewsOrientations: e.target.value
+                });
+              }}
               className="mt-1"
             />
           </div>

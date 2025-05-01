@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { Button } from '@/components/ui/button';
@@ -40,7 +41,7 @@ export function ContractorsSection() {
       return;
     }
     
-    const professional: Omit<Professional, 'id'> = {
+    const professional = {
       type: newProfessionalType,
       name: newProfessionalName,
       businessName: newBusinessName,
@@ -70,12 +71,12 @@ export function ContractorsSection() {
     toast.success("Professional removed");
   };
   
-  const toggleGoToTender = () => {
-    updateFormData('contractors', { goToTender: !contractorsData.goToTender });
-  };
-
   const toggleWantF9Build = () => {
     updateFormData('contractors', { wantF9Build: !contractorsData.wantF9Build });
+  };
+
+  const toggleGoToTender = () => {
+    updateFormData('contractors', { goToTender: !contractorsData.goToTender });
   };
   
   return (
@@ -103,20 +104,6 @@ export function ContractorsSection() {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label htmlFor="goToTender" className="design-brief-question-title text-black font-bold">
-                    I would like to tender for a builder
-                  </Label>
-                  <p className="text-sm text-black">We can help you find qualified builders</p>
-                </div>
-                <Switch 
-                  id="goToTender"
-                  checked={!!contractorsData.goToTender}
-                  onCheckedChange={toggleGoToTender}
-                />
-              </div>
-              
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
                   <Label htmlFor="wantF9Build" className="design-brief-question-title text-black font-bold">
                     I want F9 Productions to build my project
                   </Label>
@@ -126,6 +113,20 @@ export function ContractorsSection() {
                   id="wantF9Build"
                   checked={!!contractorsData.wantF9Build}
                   onCheckedChange={toggleWantF9Build}
+                />
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label htmlFor="goToTender" className="design-brief-question-title text-black font-bold">
+                    I would like to tender for a builder
+                  </Label>
+                  <p className="text-sm text-black">We can help you find qualified builders</p>
+                </div>
+                <Switch 
+                  id="goToTender"
+                  checked={!!contractorsData.goToTender}
+                  onCheckedChange={toggleGoToTender}
                 />
               </div>
             </div>
@@ -290,17 +291,6 @@ export function ContractorsSection() {
                 </CardContent>
               </Card>
             )}
-            
-            <div className="space-y-2">
-              <Label htmlFor="additionalNotes" className="design-brief-question-title text-black font-bold">Additional Notes</Label>
-              <Textarea 
-                id="additionalNotes" 
-                value={contractorsData.additionalNotes || ''} 
-                onChange={(e) => updateFormData('contractors', { additionalNotes: e.target.value })}
-                placeholder="e.g., We've worked with this team before and trust them"
-                className="text-black"
-              />
-            </div>
           </div>
         </div>
         

@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
-import { Building, Building2, BuildingIcon } from 'lucide-react';
+import { Building, House } from 'lucide-react';
 
 interface LevelPreferenceTabProps {
   homeLevelType: string;
@@ -30,7 +30,7 @@ export const LevelPreferenceTab: React.FC<LevelPreferenceTabProps> = ({
               onValueChange={onHomeLevelTypeChange}
               className="flex flex-col gap-6"
             >
-              <div className="grid gap-6 grid-cols-1 sm:grid-cols-3">
+              <div className="grid gap-6 grid-cols-1 sm:grid-cols-2">
                 <div>
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem 
@@ -41,7 +41,7 @@ export const LevelPreferenceTab: React.FC<LevelPreferenceTabProps> = ({
                     <Label htmlFor="single_level" className="text-lg font-medium text-black">Single Level</Label>
                   </div>
                   <div className="flex items-center justify-center p-4 mt-2 bg-gray-50 rounded-md h-32">
-                    <BuildingIcon className="h-16 w-16 text-black" />
+                    <House className="h-16 w-16 text-black" />
                   </div>
                   <p className="mt-2 text-sm text-black">
                     All rooms on one floor. Great for accessibility and aging in place.
@@ -55,30 +55,13 @@ export const LevelPreferenceTab: React.FC<LevelPreferenceTabProps> = ({
                       id="two_level"
                       className="text-black"
                     />
-                    <Label htmlFor="two_level" className="text-lg font-medium text-black">Two Levels</Label>
+                    <Label htmlFor="two_level" className="text-lg font-medium text-black">Multi Level</Label>
                   </div>
                   <div className="flex items-center justify-center p-4 mt-2 bg-gray-50 rounded-md h-32">
                     <Building className="h-16 w-16 text-black" />
                   </div>
                   <p className="mt-2 text-sm text-black">
                     Main living areas plus bedrooms upstairs. Most common layout.
-                  </p>
-                </div>
-                
-                <div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem 
-                      value="split_level" 
-                      id="split_level" 
-                      className="text-black"
-                    />
-                    <Label htmlFor="split_level" className="text-lg font-medium text-black">Split Level</Label>
-                  </div>
-                  <div className="flex items-center justify-center p-4 mt-2 bg-gray-50 rounded-md h-32">
-                    <Building2 className="h-16 w-16 text-black" />
-                  </div>
-                  <p className="mt-2 text-sm text-black">
-                    Multiple staggered levels. Good for sloped sites.
                   </p>
                 </div>
               </div>

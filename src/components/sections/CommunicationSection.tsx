@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -138,27 +139,12 @@ export function CommunicationSection() {
           </div>
 
           <div className="mb-6">
-            <Label htmlFor="urgentContact" className="design-brief-question-title">
-              How to Contact for Urgent Matters
-              <span className="text-muted-foreground text-sm ml-2">(optional)</span>
-            </Label>
-            <Textarea
-              id="urgentContact"
-              name="urgentContact"
-              placeholder="For urgent matters, please contact me via..."
-              value={formData.communication.urgentContact}
-              onChange={handleChange}
-              className="mt-1"
-            />
-          </div>
-
-          <div className="mb-6">
             <Label htmlFor="responseTime" className="design-brief-question-title">
               Expected Response Time
               <span className="text-muted-foreground text-sm ml-2">(optional)</span>
             </Label>
             <p className="design-brief-question-description">
-              How quickly would you like to receive responses to your questions or inquiries?
+              The F9 team is trained to respond to all client questions within 24 hours.
             </p>
             <Select
               value={formData.communication.responseTime}

@@ -107,7 +107,7 @@ export const RoomSelectionTab = ({
                   <span className="mt-2 text-center font-medium">{roomType.label}</span>
                   {roomType.value === 'Garage' && (
                     <span className="text-xs text-center text-muted-foreground mt-1">
-                      (Specify how many cars this garage should fit)
+                      (This is the number of garages. You'll select the number of vehicle stalls per garage later.)
                     </span>
                   )}
                 </div>

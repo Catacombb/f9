@@ -87,7 +87,7 @@ export function BudgetSection() {
                 </SelectContent>
               </Select>
               <p className="text-sm italic text-black mt-1">
-                Does your budget include design fees, permitting, and extras like landscaping or solar?
+                This budget should include all architectural, permitting, and design fees.
               </p>
             </div>
 
