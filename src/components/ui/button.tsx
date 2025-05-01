@@ -47,12 +47,23 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     
     // For external links with href attribute
     if (external && 'href' in props) {
+      // Extract only the props that are valid for anchor elements
+      const { 
+        onClick, 
+        href, 
+        target, 
+        rel, 
+        className: anchorClassName,
+        ...restProps 
+      } = props as unknown as React.AnchorHTMLAttributes<HTMLAnchorElement> & { href: string }
+      
       return (
         <a 
-          className={cn(buttonVariants({ variant, size, className }))}
+          className={cn(buttonVariants({ variant, size, className: anchorClassName }))}
+          href={href}
           target="_blank" 
           rel="noopener noreferrer"
-          {...props as React.AnchorHTMLAttributes<HTMLAnchorElement>} 
+          onClick={onClick}
         />
       )
     }
