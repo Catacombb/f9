@@ -15,22 +15,27 @@ import {
   AlertTriangle,
   ExternalLink
 } from 'lucide-react';
+import { WelcomeModal } from '@/components/WelcomeModal';
 
 export function IntroSection() {
   const { setCurrentSection } = useDesignBrief();
-  const [showTesterPopup, setShowTesterPopup] = useState(false);
+  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
   
-  // Effect to ensure popup is not shown
+  // Effect to show the welcome modal on first visit
   useEffect(() => {
-    setShowTesterPopup(false);
+    // Check if this is the first visit
+    const hasVisitedBefore = localStorage.getItem('f9_design_brief_visited');
+    
+    if (!hasVisitedBefore) {
+      // Show welcome modal on first visit
+      setShowWelcomeModal(true);
+      // Set the flag in localStorage
+      localStorage.setItem('f9_design_brief_visited', 'true');
+    }
   }, []);
   
   const handleStart = () => {
     setCurrentSection('projectInfo');
-  };
-  
-  const handleClosePopup = () => {
-    setShowTesterPopup(false);
   };
   
   return <div className="design-brief-section-wrapper">
@@ -44,14 +49,11 @@ export function IntroSection() {
               Design Brief
             </h1>
             
-            <div className="text-base text-black max-w-2xl mx-auto space-y-4 animate-fade-in">
-              <p className="text-lg font-medium text-black">Your input shapes our design process.</p>
-              
-              <p className="text-black">This brief helps us understand your needs and expectations before we begin the design-build process. The more specific you are, the better we can tailor our solutions to your project requirements.</p>
-              
-              <p className="text-black">Feel free to skip any questions that don't apply to your project, but try to be as thorough as possible with the ones that do.</p>
-              
-              <p className="text-black">Let's get started.</p>
+            {/* Simplified intro text - now mostly in the modal */}
+            <div className="text-base text-black max-w-2xl mx-auto animate-fade-in">
+              <p className="text-lg font-medium text-black">
+                Let's build your vision with F9 Productions.
+              </p>
             </div>
           </div>
         </div>
@@ -182,5 +184,11 @@ export function IntroSection() {
           </Button>
         </div>
       </div>
+      
+      {/* Welcome Modal */}
+      <WelcomeModal 
+        open={showWelcomeModal} 
+        onOpenChange={setShowWelcomeModal} 
+      />
     </div>;
 }
