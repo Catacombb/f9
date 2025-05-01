@@ -34,24 +34,6 @@ export function SiteSection() {
 
         <div className="design-brief-form-group">
           <div className="mb-6">
-            <Label htmlFor="existingConditions" className="design-brief-question-title">
-              Existing Site Conditions
-              <span className="text-muted-foreground text-sm ml-2">(optional)</span>
-            </Label>
-            <p className="design-brief-question-description">
-              Describe the current state of the site. Is it vacant land, a teardown, or an existing building?
-            </p>
-            <Textarea
-              id="existingConditions"
-              name="existingConditions"
-              placeholder="Describe the site's current state..."
-              value={formData.site.existingConditions}
-              onChange={handleChange}
-              className="mt-1"
-            />
-          </div>
-
-          <div className="mb-6">
             <Label htmlFor="siteFeaturesAndViews" className="design-brief-question-title">
               Site Features & Views
               <span className="text-muted-foreground text-sm ml-2">(optional)</span>

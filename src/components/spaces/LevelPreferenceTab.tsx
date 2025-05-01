@@ -65,20 +65,6 @@ export const LevelPreferenceTab: React.FC<LevelPreferenceTabProps> = ({
                   </p>
                 </div>
               </div>
-              
-              <div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem 
-                    value="basement" 
-                    id="basement"
-                    className="text-black" 
-                  />
-                  <Label htmlFor="basement" className="text-lg font-medium text-black">With Basement</Label>
-                </div>
-                <p className="ml-6 mt-2 text-sm text-black">
-                  Includes a finished or unfinished basement below the main level(s).
-                </p>
-              </div>
             </RadioGroup>
           </div>
         </div>

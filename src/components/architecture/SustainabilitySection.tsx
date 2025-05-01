@@ -37,23 +37,22 @@ export function SustainabilitySection({
       <div className="grid gap-6">
         {/* F9 Productions Sustainability Message */}
         <div className="bg-blueprint-50 dark:bg-blueprint-900/30 border border-blueprint-200 dark:border-blueprint-800 p-4 mb-2">
-          <div className="flex">
-            <AlertTriangle className="h-5 w-5 text-blueprint-600 dark:text-blueprint-400 mt-0.5 mr-2 shrink-0" />
-            <p className="text-charcoal-800 dark:text-gray-300 text-sm">
-              F9 designs for long-term performance. We integrate passive solar, energy-efficient materials, and future-ready systems. Your home should work for you, not against the planet.
-            </p>
+          <div className="flex justify-between items-start">
+            <div className="flex">
+              <AlertTriangle className="h-5 w-5 text-blueprint-600 dark:text-blueprint-400 mt-0.5 mr-2 shrink-0" />
+              <p className="text-black dark:text-gray-300 text-sm">
+                F9 designs for long-term performance. We integrate passive solar, energy-efficient materials, and future-ready systems. Your home should work for you, not against the planet.
+              </p>
+            </div>
+            <Button 
+              variant="outline" 
+              className="border-yellow-400 hover:bg-yellow-50 bg-yellow-500 hover:border-yellow-600 text-black ml-4 shrink-0"
+              onClick={() => window.open("https://f9productions.com/f9-sustainability/", "_blank")}
+            >
+              <Leaf className="mr-2 h-4 w-4 text-black" />
+              Learn how F9 builds sustainably
+            </Button>
           </div>
-        </div>
-
-        <div className="text-center mb-4">
-          <Button 
-            variant="outline" 
-            className="border-green-300 hover:bg-green-50 hover:border-green-400 font-medium"
-            onClick={() => window.open("https://f9productions.com/f9-sustainability/", "_blank")}
-          >
-            <Leaf className="mr-2 h-4 w-4 text-green-600" />
-            Learn how F9 builds sustainably
-          </Button>
         </div>
 
         <MultiSelectButtons

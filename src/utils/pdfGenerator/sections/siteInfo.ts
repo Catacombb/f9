@@ -6,11 +6,6 @@ import { addSectionTitle, addText, addMultiLineText, addSpace } from '../layout'
 export const renderSiteInfo = (ctx: PDFContext, projectData: ProjectData): void => {
   addSectionTitle(ctx, 'Site Information');
   
-  if (projectData.formData.site.existingConditions) {
-    addText(ctx, 'Existing Conditions', '');
-    addMultiLineText(ctx, projectData.formData.site.existingConditions);
-  }
-  
   // First check if we have the combined field
   if (projectData.formData.site.siteFeaturesAndViews) {
     addText(ctx, 'Site Features & Views', '');
@@ -45,6 +40,11 @@ export const renderSiteInfo = (ctx: PDFContext, projectData: ProjectData): void 
   if (projectData.formData.site.neighboringProperties) {
     addText(ctx, 'Neighboring Properties', '');
     addMultiLineText(ctx, projectData.formData.site.neighboringProperties);
+  }
+  
+  if (projectData.formData.site.siteNotes) {
+    addText(ctx, 'Additional Site Notes', '');
+    addMultiLineText(ctx, projectData.formData.site.siteNotes);
   }
   
   // Add site documents information

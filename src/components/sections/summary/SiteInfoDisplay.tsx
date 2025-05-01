@@ -11,12 +11,6 @@ export function SiteInfoDisplay({ site }: SiteInfoDisplayProps) {
     <div className="pb-6 border-b">
       <h4 className="text-lg font-bold mb-4">Site Information</h4>
       <div className="space-y-4">
-        {site.existingConditions && (
-          <div>
-            <p className="text-sm font-medium">Existing Conditions:</p>
-            <p className="text-sm">{site.existingConditions}</p>
-          </div>
-        )}
         {site.siteFeaturesAndViews && (
           <div>
             <p className="text-sm font-medium">Site Features & Views:</p>
@@ -51,6 +45,12 @@ export function SiteInfoDisplay({ site }: SiteInfoDisplayProps) {
           <div>
             <p className="text-sm font-medium">Neighboring Properties:</p>
             <p className="text-sm">{site.neighboringProperties}</p>
+          </div>
+        )}
+        {site.siteNotes && (
+          <div>
+            <p className="text-sm font-medium">Additional Site Notes:</p>
+            <p className="text-sm">{site.siteNotes}</p>
           </div>
         )}
       </div>

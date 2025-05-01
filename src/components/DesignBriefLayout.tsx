@@ -9,7 +9,7 @@ import { Form } from '@/components/ui/form';
 import { useForm } from 'react-hook-form';
 import { Progress } from '@/components/ui/progress';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { Menu, Mail, Phone } from 'lucide-react';
+import { Menu, Mail, Phone, Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Separator } from '@/components/ui/separator';
@@ -141,40 +141,9 @@ export function DesignBriefLayout({ children }: DesignBriefLayoutProps) {
           </Form>
         </main>
         
-        <footer className="border-t py-4 px-4 text-sm text-black w-full">
+        <footer className="border-t py-3 px-4 text-sm text-gray-600 w-full">
           <div className="max-w-full mx-auto">
-            <div className="text-center mb-4">
-              <p className="font-medium">Serving all of Colorado including the entire Front Range and Western Slopes.</p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
-              <div className="space-y-1">
-                <p className="font-bold text-black">Longmont Office</p>
-                <p>825 Crisman Drive, Unit 100</p>
-                <p>Longmont, CO 80501</p>
-              </div>
-
-              <div className="space-y-1">
-                <p className="font-bold text-black">Denver Office</p>
-                <p>1415 Park Ave W</p>
-                <p>Denver, CO 80205</p>
-              </div>
-            </div>
-
-            <Separator className="my-4" />
-            
-            <div className="flex flex-col md:flex-row justify-center gap-4 md:gap-8 items-center">
-              <div className="flex items-center">
-                <Mail className="h-4 w-4 mr-2" />
-                <a href="mailto:LMC@F9Productions.com" className="hover:underline">LMC@F9Productions.com</a>
-              </div>
-              <div className="flex items-center">
-                <Phone className="h-4 w-4 mr-2" />
-                <a href="tel:3037757406" className="hover:underline">303.775.7406</a>
-              </div>
-            </div>
-
-            <div className="text-center mt-4">
+            <div className="text-center mb-3">
               <div className="flex justify-between items-center w-full max-w-full mx-auto px-2">
                 <span className="truncate font-medium">Overall Progress: {overallProgress}%</span>
                 {isMobile && (
@@ -183,9 +152,21 @@ export function DesignBriefLayout({ children }: DesignBriefLayoutProps) {
                   </span>
                 )}
               </div>
-              <Progress value={overallProgress} className="h-2 w-full bg-gray-200 mt-2" />
-              <div className="text-center mt-2 truncate w-full text-black font-medium">
-                © 2025 F9 Productions
+              <Progress value={overallProgress} className="h-2 w-full bg-gray-200 mt-1" />
+              
+              <div className="flex justify-center items-center gap-4 mt-3 text-xs">
+                <div className="flex items-center">
+                  <Mail className="h-3 w-3 mr-1" />
+                  <a href="mailto:LMC@F9Productions.com" className="hover:underline">LMC@F9Productions.com</a>
+                </div>
+                <div className="flex items-center">
+                  <Phone className="h-3 w-3 mr-1" />
+                  <a href="tel:3037757406" className="hover:underline">303.775.7406</a>
+                </div>
+                <div className="flex items-center">
+                  <Globe className="h-3 w-3 mr-1" />
+                  <a href="https://www.f9productions.com" target="_blank" rel="noopener noreferrer" className="hover:underline">www.f9productions.com</a>
+                </div>
               </div>
             </div>
           </div>
