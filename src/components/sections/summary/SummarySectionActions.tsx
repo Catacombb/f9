@@ -19,7 +19,7 @@ export function SummarySectionActions({ onPrevious }: SummarySectionActionsProps
     // Simulate sending process
     setTimeout(() => {
       toast.success("Design brief completed successfully!", {
-        description: "Your architect will be in touch with you soon.",
+        description: "Your architect will review your submission shortly.",
         duration: 5000
       });
       setIsSending(false);
@@ -33,20 +33,20 @@ export function SummarySectionActions({ onPrevious }: SummarySectionActionsProps
       <Button
         variant="outline"
         onClick={onPrevious}
-        className="group transition-all duration-200 active:scale-95"
+        className="transition-all duration-200 active:scale-95"
       >
-        <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
+        <ArrowLeft className="mr-2 h-4 w-4 transition-transform" />
         <span>Previous: Communication</span>
       </Button>
       
       <Button
         onClick={handleContinue}
         disabled={isSending}
-        className="bg-yellow-500 hover:bg-yellow-600 text-black transition-all duration-200 active:scale-95 group relative"
+        className="bg-blueprint-600 hover:bg-blueprint-700 text-white transition-all duration-200 active:scale-95"
       >
         {isSending ? (
           <>
-            <span className="inline-block animate-pulse">Processing...</span>
+            <span className="inline-block">Processing...</span>
             <span className="ml-2 h-4 w-4 inline-block animate-spin rounded-full border-2 border-b-transparent"></span>
           </>
         ) : (

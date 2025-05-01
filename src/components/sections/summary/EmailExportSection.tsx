@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Send, Check, InfoIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
 interface EmailExportSectionProps {
   onExportPDF: () => Promise<Blob>;
@@ -18,8 +20,9 @@ export function EmailExportSection({
 }: EmailExportSectionProps) {
   const [isSending, setIsSending] = useState(false);
   const [isSent, setIsSent] = useState(false);
+  const [sendTo, setSendTo] = useState("architect"); // Default: Send to Architect
   
-  const handleSendToArchitect = async () => {
+  const handleSendBrief = async () => {
     setIsSending(true);
     try {
       // Prepare the PDF
@@ -56,35 +59,50 @@ export function EmailExportSection({
       <div className="p-6 space-y-4 border rounded-lg">
         <div>
           <h4 className="font-medium mb-2 flex items-center">
-            Send to My Architect
+            Design Brief Submission
           </h4>
           <div className="flex flex-col md:flex-row md:items-start gap-4">
             <div className="flex-1">
-              <p className="text-sm text-muted-foreground mb-2">
-                Choose how you want to share your design brief with your architect.
+              <p className="text-sm text-muted-foreground mb-4">
+                Choose how you want to share your design brief.
               </p>
               
-              <Alert className="mb-4 bg-purple-50 dark:bg-purple-900/30 border border-purple-200 dark:border-purple-800">
-                <InfoIcon className="h-4 w-4 text-purple-700 dark:text-purple-400" />
-                <AlertDescription className="text-xs font-medium text-purple-800 dark:text-purple-300">
-                  Tester Note: This won't actually send anything during testing. You have options like:
-                  <ul className="list-disc list-inside mt-1">
-                    <li>Email with project brief and attachments</li>
-                    <li>Generate a downloadable PDF report</li>
-                    <li>etc.</li>
-                  </ul>
+              <RadioGroup 
+                defaultValue="architect" 
+                value={sendTo} 
+                onValueChange={setSendTo}
+                className="mb-4 space-y-3"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="architect" id="send-architect" />
+                  <Label htmlFor="send-architect" className="font-medium">
+                    Send to F9 Productions Architect
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="myself" id="send-myself" />
+                  <Label htmlFor="send-myself" className="font-medium">
+                    Send a Copy to Myself
+                  </Label>
+                </div>
+              </RadioGroup>
+              
+              <Alert className="mb-4 bg-blueprint-50 dark:bg-blueprint-900/30 border border-blueprint-200 dark:border-blueprint-800">
+                <InfoIcon className="h-4 w-4 text-blueprint-700 dark:text-blueprint-400" />
+                <AlertDescription className="text-xs font-medium text-blueprint-800 dark:text-blueprint-300">
+                  Tester Note: This won't actually send anything during testing.
                 </AlertDescription>
               </Alert>
             </div>
             <Button 
-              onClick={handleSendToArchitect} 
+              onClick={handleSendBrief} 
               disabled={isSending || isSent}
               className={`
                 w-full md:w-auto md:min-w-[140px] 
                 transition-all duration-200 
-                bg-purple-600 text-white 
-                hover:bg-purple-700 
-                dark:bg-purple-500 dark:hover:bg-purple-600 
+                bg-blueprint-600 text-white 
+                hover:bg-blueprint-700 
+                dark:bg-blueprint-500 dark:hover:bg-blueprint-600 
                 ${isSent ? 'bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700' : ''}
               `}
             >
@@ -101,7 +119,7 @@ export function EmailExportSection({
               ) : (
                 <>
                   <Send className="h-4 w-4 mr-2" />
-                  <span>Send to My Architect</span>
+                  <span>Submit Design Brief</span>
                 </>
               )}
             </Button>

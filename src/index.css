@@ -1,4 +1,3 @@
-
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
@@ -7,67 +6,67 @@
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 224 71.4% 4.1%;
-    --sidebar: 220 33% 98%;
-    --sidebar-foreground: 224 71.4% 4.1%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-accent: 45 93% 47%;
-    --sidebar-accent-foreground: 210 40% 98%;
+    --foreground: 0 0% 18%;
+    --sidebar: 210 33% 98%;
+    --sidebar-foreground: 0 0% 18%;
+    --sidebar-border: 210 13% 91%;
+    --sidebar-accent: 210 64% 43%;
+    --sidebar-accent-foreground: 0 0% 100%;
     --card: 0 0% 100%;
-    --card-foreground: 224 71.4% 4.1%;
+    --card-foreground: 0 0% 18%;
     --popover: 0 0% 100%;
-    --popover-foreground: 224 71.4% 4.1%;
-    --primary: 45 93% 47%;
-    --primary-foreground: 224 71.4% 4.1%;
+    --popover-foreground: 0 0% 18%;
+    --primary: 0 0% 18%; /* F9's primary color: charcoal gray #2D2D2D */
+    --primary-foreground: 0 0% 100%;
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 45 93% 47%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 210 64% 43%; /* Blueprint blue #3A6EA5 */
+    --accent-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 45 93% 47%;
-    --radius: 0.5rem;
-    --yellow-50: 48 96% 89%;
-    --yellow-100: 48 96% 80%;
-    --yellow-200: 48 96% 70%;
-    --yellow-300: 48 96% 60%;
-    --yellow-400: 48 96% 50%;
-    --yellow-500: 48 96% 40%;
-    --yellow-600: 48 96% 30%;
-    --yellow-700: 48 96% 20%;
-    --yellow-800: 48 96% 10%;
-    --yellow-900: 48 96% 5%;
+    --ring: 210 64% 43%;
+    --radius: 0; /* Square corners */
+    --blueprint-50: 209 64% 95%;
+    --blueprint-100: 209 64% 90%;
+    --blueprint-200: 210 64% 80%;
+    --blueprint-300: 210 64% 65%;
+    --blueprint-400: 210 64% 55%;
+    --blueprint-500: 210 64% 43%; /* #3A6EA5 */
+    --blueprint-600: 210 64% 35%;
+    --blueprint-700: 210 64% 30%;
+    --blueprint-800: 210 64% 25%;
+    --blueprint-900: 210 64% 20%;
   }
 
   .dark {
-    --background: 0 0% 12%; /* Dark grey background */
+    --background: 0 0% 12%;
     --foreground: 0 0% 100%;
-    --sidebar: 0 0% 8%; /* Darker grey for sidebar */
+    --sidebar: 0 0% 8%;
     --sidebar-foreground: 210 40% 98%;
-    --sidebar-border: 0 0% 20%; /* Adjusted for grey theme */
-    --sidebar-accent: 45 93% 47%;
-    --sidebar-accent-foreground: 224 71.4% 4.1%;
-    --card: 0 0% 15%; /* Adjusted for grey theme */
+    --sidebar-border: 0 0% 20%;
+    --sidebar-accent: 210 64% 43%; /* Blueprint blue */
+    --sidebar-accent-foreground: 0 0% 100%;
+    --card: 0 0% 15%;
     --card-foreground: 210 40% 98%;
-    --popover: 0 0% 15%; /* Adjusted for grey theme */
+    --popover: 0 0% 15%;
     --popover-foreground: 210 40% 98%;
-    --primary: 45 93% 47%;
-    --primary-foreground: 224 71.4% 4.1%;
-    --secondary: 0 0% 20%; /* Adjusted for grey theme */
+    --primary: 0 0% 18%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 20%;
     --secondary-foreground: 210 40% 98%;
-    --muted: 0 0% 20%; /* Adjusted for grey theme */
+    --muted: 0 0% 20%;
     --muted-foreground: 217.9 10.6% 64.9%;
-    --accent: 45 93% 47%;
-    --accent-foreground: 224 71.4% 4.1%;
+    --accent: 210 64% 43%;
+    --accent-foreground: 0 0% 100%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
-    --border: 0 0% 20%; /* Adjusted for grey theme */
-    --input: 0 0% 20%; /* Adjusted for grey theme */
-    --ring: 45 93% 47%;
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+    --ring: 210 64% 43%;
   }
 }
 
@@ -78,21 +77,25 @@
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
-    font-family: 'Inter', sans-serif;
-    overflow-x: hidden; /* Prevent horizontal scrolling at the body level */
+    font-family: 'Open Sans', sans-serif;
+    overflow-x: hidden;
   }
   
   html, body, #root {
-    overflow-x: hidden !important; /* Triple protection against horizontal scrolling */
+    overflow-x: hidden !important;
     max-width: 100vw;
     width: 100%;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading;
   }
 }
 
 /* Design Brief Application Styles */
 .design-brief-section-wrapper {
   width: 100%; 
-  max-width: 100vw; /* Ensure content doesn't exceed screen width */
+  max-width: 100vw;
   flex: 1;
   overflow: auto;
   padding: 2rem 1rem;
@@ -105,19 +108,17 @@
   margin-right: auto;
   margin-bottom: 2rem;
   width: 100%;
-  padding: 0 1rem; /* Add consistent padding */
+  padding: 0 1rem;
 }
 
 .design-brief-form-group {
   padding: 1.5rem;
   background-color: hsl(var(--card));
-  border-radius: 0.5rem;
-  border-width: 1px;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  border: 1px solid hsl(var(--border));
   margin-bottom: 2rem;
   width: 100%;
-  max-width: 100%; /* Ensure container respects parent width */
-  box-sizing: border-box; /* Include padding in width calculation */
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .design-brief-question-title {
@@ -131,6 +132,30 @@
   font-size: 0.875rem;
   color: hsl(var(--muted-foreground));
   margin-bottom: 1rem;
+}
+
+/* Blueprint grid overlay */
+.blueprint-grid-bg {
+  background-image: linear-gradient(#3A6EA520 1px, transparent 1px), 
+                    linear-gradient(90deg, #3A6EA520 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.blueprint-grid-overlay {
+  position: relative;
+}
+
+.blueprint-grid-overlay::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: linear-gradient(#3A6EA510 1px, transparent 1px), 
+                    linear-gradient(90deg, #3A6EA510 1px, transparent 1px);
+  background-size: 20px 20px;
+  z-index: -1;
 }
 
 /* Mobile optimizations */

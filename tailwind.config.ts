@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -21,6 +20,7 @@ export default {
     extend: {
       fontFamily: {
         'heading': ['Montserrat', 'sans-serif'],
+        'body': ['Open Sans', 'sans-serif'],
       },
       colors: {
         border: 'hsl(var(--border))',
@@ -63,17 +63,43 @@ export default {
           'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
           border: 'hsl(var(--sidebar-border))',
         },
-        yellow: {
-          50: 'hsl(var(--yellow-50))',
-          100: 'hsl(var(--yellow-100))',
-          200: 'hsl(var(--yellow-200))',
-          300: 'hsl(var(--yellow-300))',
-          400: 'hsl(var(--yellow-400))',
-          500: 'hsl(var(--yellow-500))',
-          600: 'hsl(var(--yellow-600))',
-          700: 'hsl(var(--yellow-700))',
-          800: 'hsl(var(--yellow-800))',
-          900: 'hsl(var(--yellow-900))',
+        blueprint: {
+          50: 'hsl(var(--blueprint-50))',
+          100: 'hsl(var(--blueprint-100))',
+          200: 'hsl(var(--blueprint-200))',
+          300: 'hsl(var(--blueprint-300))',
+          400: 'hsl(var(--blueprint-400))',
+          500: 'hsl(var(--blueprint-500))',
+          600: 'hsl(var(--blueprint-600))',
+          700: 'hsl(var(--blueprint-700))',
+          800: 'hsl(var(--blueprint-800))',
+          900: 'hsl(var(--blueprint-900))',
+        },
+        charcoal: {
+          50: '#f6f6f6',
+          100: '#e7e7e7',
+          200: '#d1d1d1',
+          300: '#b0b0b0',
+          400: '#888888',
+          500: '#6d6d6d',
+          600: '#5d5d5d',
+          700: '#4d4d4d',
+          800: '#2d2d2d', // F9's primary color
+          900: '#1a1a1a',
+          950: '#0a0a0a',
+        },
+        earth: {
+          50: '#f9f7f5',
+          100: '#f3efe9',
+          200: '#e7dfd4',
+          300: '#d6c7b3',
+          400: '#c3ab8f',
+          500: '#b3957a',
+          600: '#a58065',
+          700: '#8b6b53',
+          800: '#725847',
+          900: '#5e4a3c',
+          950: '#332720',
         },
         architect: {
           50: '#f7f7f7',
@@ -100,6 +126,18 @@ export default {
           800: '#7e4334',
           900: '#673a2f',
           950: '#371c16',
+        },
+        yellow: {
+          50: 'hsl(var(--yellow-50))',
+          100: 'hsl(var(--yellow-100))',
+          200: 'hsl(var(--yellow-200))',
+          300: 'hsl(var(--yellow-300))',
+          400: 'hsl(var(--yellow-400))',
+          500: 'hsl(var(--yellow-500))',
+          600: 'hsl(var(--yellow-600))',
+          700: 'hsl(var(--yellow-700))',
+          800: 'hsl(var(--yellow-800))',
+          900: 'hsl(var(--yellow-900))',
         },
       },
       borderRadius: {

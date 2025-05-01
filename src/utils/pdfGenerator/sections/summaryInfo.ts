@@ -20,7 +20,7 @@ export const renderSummaryInfo = (ctx: PDFContext, projectData: ProjectData): vo
     
     if (architect) {
       ctx.yPosition += 10;
-      addSectionTitle(ctx, 'Architect Information');
+      addSectionTitle(ctx, 'F9 Productions Architect');
       addMultiLineText(ctx, `Name: ${architect.name || 'Not specified'}`);
       addMultiLineText(ctx, `Contact: ${architect.contact || 'Not specified'}`);
       if (architect.notes) {
@@ -38,4 +38,5 @@ export const renderSummaryInfo = (ctx: PDFContext, projectData: ProjectData): vo
   // Add date of PDF generation
   const today = new Date();
   addMultiLineText(ctx, `Brief generated on: ${today.toLocaleDateString()}`);
+  addMultiLineText(ctx, `Submitted to: F9 Productions Design-Build Team`);
 };

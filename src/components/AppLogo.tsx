@@ -15,14 +15,9 @@ export const AppLogo = ({ size = 'default' }: { size?: 'small' | 'default' | 'la
   
   return (
     <div className="flex items-center justify-center w-full">
-      <img 
-        src={isDarkMode 
-          ? "/lovable-uploads/3e4d3eb9-8d76-44ba-8a4a-15faf8837c49.png" // Dark mode logo
-          : "/lovable-uploads/f87cbd00-65a2-4b67-ae04-55a828581a0e.png" // Light mode logo
-        } 
-        alt="Northstar Logo" 
-        className={`${sizeClasses[size]} object-contain`}
-      />
+      <div className={`font-heading font-bold text-charcoal-800 dark:text-white ${sizeClasses[size] === 'small' ? 'text-lg md:text-xl' : 'text-xl md:text-2xl'}`}>
+        F9 <span className="text-blueprint-500">PRODUCTIONS</span>
+      </div>
     </div>
   );
 };

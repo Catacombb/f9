@@ -32,31 +32,30 @@ export function TesterNotePopup({ isOpen = true, onClose }: TesterNotePopupProps
   
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="max-w-md border-purple-300 dark:border-purple-700">
+      <DialogContent className="max-w-md border-blueprint-300 dark:border-blueprint-700">
         <DialogHeader>
-          <DialogTitle className="text-lg font-medium text-purple-700 dark:text-purple-400">
+          <DialogTitle className="text-lg font-medium text-blueprint-700 dark:text-blueprint-400">
             Tester's Note
           </DialogTitle>
         </DialogHeader>
         
-        <div className="bg-purple-50 dark:bg-purple-900/30 border border-purple-200 dark:border-purple-800 rounded-lg p-4 my-2">
-          <DialogDescription className="text-sm text-purple-800 dark:text-purple-300 space-y-3">
-            <p className="font-medium">Thanks for taking the time to test Northstar in its early days — I really appreciate you.</p>
+        <div className="bg-blueprint-50 dark:bg-blueprint-900/30 border border-blueprint-200 dark:border-blueprint-800 p-4 my-2">
+          <DialogDescription className="text-sm text-blueprint-800 dark:text-blueprint-300 space-y-3">
+            <p className="font-medium">Thank you for testing F9's Design Brief Tool in its early stages.</p>
             
-            <p>There's so much more Northstar could do…<br />
-            But for now, I've kept it intentionally simple.</p>
+            <p>While future versions will include more functionality, we've kept this initial version focused and straightforward.</p>
             
-            <p>I'm looking for honest, early feedback — what works, what doesn't, what feels missing.</p>
+            <p>We value your honest feedback on what works, what doesn't, and what feels missing.</p>
             
-            <p>Please take notes as you go.<br />
-            At the end, you'll find a space to share your thoughts.</p>
+            <p>Please make notes as you proceed through the brief.<br />
+            At the end, you'll find a space to share your feedback.</p>
             
-            <p>Your input helps shape where this goes next.</p>
+            <p>Your input will directly shape improvements to this tool.</p>
             
-            <div className="flex items-center bg-purple-100 dark:bg-purple-900/50 p-3 rounded-lg mt-4 border border-purple-200 dark:border-purple-700">
-              <Computer className="h-6 w-6 mr-3 text-purple-700 dark:text-purple-400" />
-              <p className="text-sm text-purple-800 dark:text-purple-300">
-                <strong>Note:</strong> Please use a desktop computer for this initial testing.
+            <div className="flex items-center bg-blueprint-100 dark:bg-blueprint-900/50 p-3 rounded-lg mt-4 border border-blueprint-200 dark:border-blueprint-700">
+              <Computer className="h-6 w-6 mr-3 text-blueprint-700 dark:text-blueprint-400" />
+              <p className="text-sm text-blueprint-800 dark:text-blueprint-300">
+                <strong>Note:</strong> Please use a desktop computer for optimal experience during testing.
               </p>
             </div>
           </DialogDescription>
@@ -65,7 +64,7 @@ export function TesterNotePopup({ isOpen = true, onClose }: TesterNotePopupProps
         <DialogFooter>
           <Button 
             onClick={handleClose}
-            className="w-full bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900"
+            className="w-full bg-blueprint-600 hover:bg-blueprint-700"
           >
             Got it, thanks!
           </Button>

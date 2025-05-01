@@ -14,6 +14,7 @@ export function BudgetInfoDisplay({ budget }: BudgetInfoDisplayProps) {
         <div>
           <p className="text-sm font-medium">Budget Range:</p>
           <p className="text-sm">{budget.budgetRange || "Not provided"}</p>
+          <p className="text-xs text-muted-foreground mt-1">This isn't binding—it helps us design within reality.</p>
         </div>
         {budget.flexibilityNotes && (
           <div>
@@ -31,6 +32,7 @@ export function BudgetInfoDisplay({ budget }: BudgetInfoDisplayProps) {
           <div>
             <p className="text-sm font-medium">Timeframe:</p>
             <p className="text-sm">{budget.timeframe}</p>
+            <p className="text-xs text-muted-foreground mt-1">When do you want to break ground?</p>
           </div>
         )}
       </div>

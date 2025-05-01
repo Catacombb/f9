@@ -3,6 +3,7 @@ import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { MultiSelectButtons } from '@/components/MultiSelectButtons';
+import { AlertTriangle } from 'lucide-react';
 
 const sustainabilityOptions = [
   { value: 'Solar Panels', label: 'Solar Panels' },
@@ -33,6 +34,16 @@ export function SustainabilitySection({
   return (
     <div className="design-brief-form-group">
       <div className="grid gap-6">
+        {/* F9 Productions Sustainability Message */}
+        <div className="bg-blueprint-50 dark:bg-blueprint-900/30 border border-blueprint-200 dark:border-blueprint-800 p-4 mb-2">
+          <div className="flex">
+            <AlertTriangle className="h-5 w-5 text-blueprint-600 dark:text-blueprint-400 mt-0.5 mr-2 shrink-0" />
+            <p className="text-charcoal-800 dark:text-gray-300 text-sm">
+              F9 designs for long-term performance. We integrate passive solar, energy-efficient materials, and future-ready systems. Your home should work for you, not against the planet.
+            </p>
+          </div>
+        </div>
+
         <MultiSelectButtons
           label="Sustainability Features"
           description="Select the sustainability features you're interested in including."
@@ -45,7 +56,7 @@ export function SustainabilitySection({
           <Label htmlFor="sustainabilityGoals" className="design-brief-question-title">Sustainability Goals</Label>
           <Textarea 
             id="sustainabilityGoals" 
-            placeholder="Describe your sustainability goals and priorities..."
+            placeholder="Describe your specific sustainability priorities and goals..."
             value={sustainabilityGoals || ''}
             onChange={(e) => onInputChange('sustainabilityGoals', e.target.value)}
           />

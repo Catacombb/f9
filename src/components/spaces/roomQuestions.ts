@@ -1,4 +1,3 @@
-
 export const roomSpecificQuestions = {
   Bedroom: [
     {
@@ -168,7 +167,7 @@ export const roomSpecificQuestions = {
   Garage: [
     {
       id: 'vehicleCount',
-      question: 'How many vehicles will this garage accommodate?',
+      question: 'How many car spaces do you want in the garage?',
       type: 'select',
       options: ['1', '2', '3', '4+']
     },
