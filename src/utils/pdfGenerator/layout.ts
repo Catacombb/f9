@@ -36,17 +36,14 @@ export const addHeader = (ctx: PDFContext): void => {
   
   try {
     // Add actual image with preserved aspect ratio and transparency
-    // Setting the format to PNG to preserve transparency
+    // Using the proper format for PNG with transparency
     ctx.pdf.addImage({
       url: logoPath,
-      format: 'PNG',
+      format: 'PNG', // Use PNG format which supports transparency
       x: logoX,
       y: logoY,
       width: logoWidth,
-      height: logoHeight,
-      imageData: {
-        alphaChannel: true, // Ensure alpha channel for transparency
-      }
+      height: logoHeight
     });
   } catch (error) {
     // Fallback to text if image loading fails
