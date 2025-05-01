@@ -83,25 +83,27 @@ export const LifestyleGeneralTab = ({ formData, onFormChange }: LifestyleGeneral
     <Card className="border-blueprint-200">
       <CardContent className="pt-6">
         <div className="space-y-6">
-          <div className="space-y-2">
-            <Label htmlFor="dailyRoutine" className="text-black font-bold">Daily Routine</Label>
+          <div className="space-y-3">
+            <Label htmlFor="dailyRoutine" className="text-black font-bold text-lg">Tell us about your daily routines</Label>
+            <p className="text-sm text-muted-foreground">Share how you move through your day and use different spaces in your home.</p>
             <Textarea 
               id="dailyRoutine"
               value={dailyRoutine}
               onChange={(e) => onFormChange('dailyRoutine', e.target.value)}
-              placeholder="e.g., Busy mornings getting kids ready for school, work from home during the day, family dinner and relaxation in the evenings"
-              className="text-black"
+              placeholder="e.g., We host family BBQs every Sunday, need space for morning yoga, and work from home most days."
+              className="text-black min-h-32"
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="entertainmentStyle" className="text-black font-bold">Entertaining Style</Label>
+          <div className="space-y-3">
+            <Label htmlFor="entertainmentStyle" className="text-black font-bold text-lg">How do you entertain?</Label>
+            <p className="text-sm text-muted-foreground">Describe how you host guests and what types of gatherings you enjoy.</p>
             <Textarea 
               id="entertainmentStyle"
               value={entertainmentStyle}
               onChange={(e) => onFormChange('entertainingStyle', e.target.value)}
-              placeholder="e.g., We host family dinners weekly for 10-12 people, occasional larger gatherings 3-4 times per year"
-              className="text-black"
+              placeholder="e.g., We host family dinners weekly for 10-12 people, love outdoor entertaining, and occasionally have larger parties."
+              className="text-black min-h-24"
             />
             {entertainmentStyle && (
               <AIHelper 
@@ -112,36 +114,39 @@ export const LifestyleGeneralTab = ({ formData, onFormChange }: LifestyleGeneral
             )}
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="workFromHome" className="text-black font-bold">Work From Home</Label>
+          <div className="space-y-3">
+            <Label htmlFor="workFromHome" className="text-black font-bold text-lg">Work from home needs</Label>
+            <p className="text-sm text-muted-foreground">Tell us about your work-from-home requirements and preferences.</p>
             <Textarea 
               id="workFromHome"
               value={workFromHome}
               onChange={(e) => onFormChange('workFromHome', e.target.value)}
-              placeholder="e.g., Full-time remote work requiring a dedicated office with good natural light and sound isolation"
-              className="text-black"
+              placeholder="e.g., I need a dedicated home office with good natural light, sound isolation, and video conference capabilities."
+              className="text-black min-h-24"
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="homeFeeling" className="text-black font-bold">Desired Home Feeling</Label>
+          <div className="space-y-3">
+            <Label htmlFor="homeFeeling" className="text-black font-bold text-lg">Desired feeling of your home</Label>
+            <p className="text-sm text-muted-foreground">Describe the emotional experience you want your home to create.</p>
             <Textarea 
               id="homeFeeling"
               value={homeFeeling}
               onChange={(e) => onFormChange('homeFeeling', e.target.value)}
-              placeholder="e.g., We want our home to feel warm and cozy but with clean modern lines - a sanctuary from busy work lives"
-              className="text-black"
+              placeholder="e.g., We want our home to feel warm and cozy but with clean modern lines - a sanctuary from busy work lives."
+              className="text-black min-h-24"
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="specialRequirements" className="text-black font-bold">Special Requirements</Label>
+          <div className="space-y-3">
+            <Label htmlFor="specialRequirements" className="text-black font-bold text-lg">Special requirements or considerations</Label>
+            <p className="text-sm text-muted-foreground">Share any specific needs your home design should address.</p>
             <Textarea 
               id="specialRequirements"
               value={specialRequirements}
               onChange={(e) => onFormChange('specialRequirements', e.target.value)}
-              placeholder="e.g., Need wheelchair-accessible doorways, aging-in-place considerations, space for a grand piano"
-              className="text-black"
+              placeholder="e.g., Need wheelchair-accessible doorways, aging-in-place considerations, or space for special hobbies."
+              className="text-black min-h-24"
             />
             {aiSuggestion && (
               <AIHelper 

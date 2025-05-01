@@ -26,12 +26,12 @@ export const addHeader = (ctx: PDFContext): void => {
   ctx.pdf.setFillColor(ctx.colors.background);
   ctx.pdf.rect(0, 0, ctx.pageWidth, headerHeight, 'F');
   
-  // Get logo path - using the light mode logo
-  const logoPath = '/lovable-uploads/f87cbd00-65a2-4b67-ae04-55a828581a0e.png';
+  // Get logo path - using the uploaded F9 logo
+  const logoPath = '/lovable-uploads/4518a983-6b02-4360-ae61-34d54cdd8dbd.png';
   
-  // Properly preserve aspect ratio - original logo is approximately 3.33:1 (width:height)
-  const logoHeight = 18; // Increased from 15 for better visibility
-  const logoWidth = logoHeight * 3.33; // Preserve exact aspect ratio
+  // Properly preserve aspect ratio - F9 logo is approximately square 1:1 (width:height)
+  const logoHeight = 20; // Height for the logo
+  const logoWidth = logoHeight; // Square aspect ratio
   const logoX = (ctx.pageWidth - logoWidth) / 2; // Center horizontally
   const logoY = 8; // Properly centered in the taller header
   

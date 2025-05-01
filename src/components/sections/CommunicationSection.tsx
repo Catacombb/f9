@@ -38,12 +38,12 @@ export function CommunicationSection() {
   const communicationData = formData.communication;
 
   const handlePrevious = () => {
-    setCurrentSection('budget');
+    setCurrentSection('uploads');
     window.scrollTo(0, 0);
   };
   
   const handleNext = () => {
-    setCurrentSection('uploads');
+    setCurrentSection('summary');
     window.scrollTo(0, 0);
   };
 
@@ -129,11 +129,11 @@ export function CommunicationSection() {
         <div className="flex justify-between mt-6">
           <Button variant="outline" onClick={handlePrevious} className="group text-black">
             <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-            <span className="font-bold">Previous: Budget</span>
+            <span className="font-bold">Previous: Uploads</span>
           </Button>
           
           <Button onClick={handleNext} className="group bg-yellow-500 hover:bg-yellow-600 text-black">
-            <span className="font-bold">Next: Uploads</span>
+            <span className="font-bold">Next: Summary</span>
             <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
           </Button>
         </div>
