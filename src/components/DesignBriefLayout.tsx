@@ -1,7 +1,6 @@
-
 import React, { useState, useEffect } from 'react';
 import { DesignBriefSidebar } from './DesignBriefSidebar';
-import { ThemeToggle } from './ThemeProvider';
+// Remove ThemeToggle import since we've removed dark mode
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { formatDistanceToNow } from 'date-fns';
 import { Link } from 'react-router-dom';
@@ -130,7 +129,7 @@ export function DesignBriefLayout({ children }: DesignBriefLayoutProps) {
                 Last saved {lastSavedFormatted}
               </span>
             )}
-            <ThemeToggle />
+            {/* Removed ThemeToggle since we've removed dark mode */}
           </div>
         </header>
         
