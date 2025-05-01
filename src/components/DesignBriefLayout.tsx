@@ -153,7 +153,7 @@ export function DesignBriefLayout({ children }: DesignBriefLayoutProps) {
             </div>
             <Progress value={overallProgress} className="h-2 w-full" />
             <div className="text-center mt-1 pb-2 truncate w-full">
-              © 2025 Northstar by www.nickharrison.co
+              © 2025 F9 Productions
             </div>
           </div>
         </footer>

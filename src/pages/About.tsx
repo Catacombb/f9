@@ -15,7 +15,7 @@ const About = () => {
             <Link to="/">
               <Button variant="ghost" className="flex items-center gap-2">
                 <ChevronLeft className="h-4 w-4" />
-                Back to Northstar
+                Back to F9 Productions
               </Button>
             </Link>
             <Link to="/">
@@ -31,33 +31,25 @@ const About = () => {
               <div className="flex justify-center mb-4">
                 <AppLogo size="xlarge" />
               </div>
-              <p className="text-xl text-muted-foreground">Guiding you through the home design process</p>
+              <p className="text-xl text-muted-foreground">Build your vision</p>
             </div>
 
             <div className="space-y-6">
-              <h2 className="text-2xl font-semibold border-b pb-2">About Northstar</h2>
+              <h2 className="text-2xl font-semibold border-b pb-2">About F9 Productions</h2>
               <p>
-                Northstar is a digital design brief tool that replaces traditional PDF forms
+                F9 Productions Design Brief Tool replaces traditional PDF forms
                 for residential architecture projects. Whether you're planning a new build or
-                renovation, Northstar guides you through a structured process to capture your
+                renovation, this tool guides you through a structured process to capture your
                 vision, requirements, and preferences.
               </p>
 
               <div className="bg-muted p-6 rounded-lg my-8">
                 <p className="italic text-muted-foreground">
-                  "After years of working with clients to obtain their new home brief, I needed a better way. 
-                  That's why Northstar exists. Enjoy!"
+                  "After years of working with clients to obtain their new home brief, we needed a better way. 
+                  That's why this design tool exists. Enjoy!"
                 </p>
                 <div className="flex items-center mt-4 justify-between">
-                  <span className="font-medium">Nick Harrison, Creator</span>
-                  <a 
-                    href="https://www.linkedin.com/in/nick-harrison/" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-primary hover:text-primary/80 transition-colors"
-                  >
-                    <Linkedin className="h-5 w-5" />
-                  </a>
+                  <span className="font-medium">F9 Productions</span>
                 </div>
               </div>
 
@@ -97,12 +89,12 @@ const About = () => {
               <div className="mt-8 p-6 bg-muted rounded-lg">
                 <h3 className="text-xl font-medium mb-3">Ready to start your design journey?</h3>
                 <p className="mb-4">
-                  Return to Northstar and begin creating your personalized design brief. The more
+                  Return to F9 Productions and begin creating your personalized design brief. The more
                   information you provide, the more valuable your brief will be.
                 </p>
                 <Link to="/">
                   <Button className="mt-2">
-                    Return to Northstar
+                    Return to F9 Productions
                   </Button>
                 </Link>
               </div>

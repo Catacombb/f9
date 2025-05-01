@@ -30,7 +30,6 @@ const sections = [
   { id: 'uploads', title: 'Uploads', icon: <Upload className="h-5 w-5" /> },
   { id: 'communication', title: 'Communication', icon: <MessageSquare className="h-5 w-5" /> },
   { id: 'summary', title: 'Summary', icon: <FileText className="h-5 w-5" /> },
-  { id: 'feedback', title: 'Feedback', icon: <Star className="h-5 w-5 text-white" />, isTesterOnly: true },
 ];
 
 export function DesignBriefSidebar({ showLastSaved = false, lastSavedFormatted = '' }: DesignBriefSidebarProps) {
@@ -47,7 +46,7 @@ export function DesignBriefSidebar({ showLastSaved = false, lastSavedFormatted =
       <div className="h-full flex flex-col">
         <div className="py-6 px-4 flex flex-col items-center">
           <AppLogo size="large" />
-          <span className="text-xs text-muted-foreground mt-2 mb-3">Guiding Your Vision</span>
+          <span className="text-xs text-muted-foreground mt-2 mb-3">Build your vision</span>
           
           {showLastSaved && lastSavedFormatted && (
             <div className="mt-1 text-xs text-muted-foreground text-center pb-2 border-b border-sidebar-border w-full">
@@ -61,31 +60,6 @@ export function DesignBriefSidebar({ showLastSaved = false, lastSavedFormatted =
         <ScrollArea className="flex-1">
           <div className="px-2 py-2">
             {sections.map((section) => {
-              if (section.id === 'feedback') {
-                // Special styling for the Feedback button
-                return (
-                  <Button 
-                    key={section.id}
-                    variant="ghost" 
-                    className={cn(
-                      "w-full justify-start mb-1 relative mt-2",
-                      "bg-purple-600 hover:bg-purple-700 text-white font-medium",
-                      isMobile ? "text-sm py-2" : "",
-                      "transition-all duration-300"
-                    )}
-                    onClick={() => navigateToSection(section.id as SectionKey)}
-                  >
-                    <div className="flex items-center w-full">
-                      <span className="mr-2 transition-transform group-hover:scale-110 duration-200">{section.icon}</span>
-                      <span className="truncate">{section.title}</span>
-                      <Badge variant="outline" className="ml-2 text-[0.6rem] py-0 px-1.5 bg-white/20 text-white border-white/30">
-                        Testers
-                      </Badge>
-                    </div>
-                  </Button>
-                );
-              }
-
               return (
                 <Button
                   key={section.id}
@@ -119,12 +93,10 @@ export function DesignBriefSidebar({ showLastSaved = false, lastSavedFormatted =
             <Button 
               variant="ghost" 
               className="w-full justify-start truncate bg-sidebar-accent/20 hover:bg-sidebar-accent/30 text-sidebar-foreground font-medium text-sm transition-all duration-200 group" 
-              asChild
+              onClick={() => window.open('https://f9productions.com', '_blank')}
             >
-              <Link to="/about" className="flex items-center">
-                <ExternalLink className="mr-2 h-5 w-5 shrink-0 text-accent group-hover:scale-110 transition-transform duration-200" />
-                <span className="truncate">About Northstar</span>
-              </Link>
+              <ExternalLink className="mr-2 h-5 w-5 shrink-0 text-accent group-hover:scale-110 transition-transform duration-200" />
+              <span className="truncate">About F9 Productions</span>
             </Button>
           </div>
         </div>

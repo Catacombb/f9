@@ -7,9 +7,9 @@
   :root {
     --background: 0 0% 100%;
     --foreground: 0 0% 18%;
-    --sidebar: 210 33% 98%;
+    --sidebar: 0 0% 98%;
     --sidebar-foreground: 0 0% 18%;
-    --sidebar-border: 210 13% 91%;
+    --sidebar-border: 0 0% 91%;
     --sidebar-accent: 48 96% 53%; /* F9's yellow */
     --sidebar-accent-foreground: 0 0% 18%;
     --card: 0 0% 100%;
@@ -18,28 +18,18 @@
     --popover-foreground: 0 0% 18%;
     --primary: 0 0% 18%; /* F9's primary color: charcoal gray #2D2D2D */
     --primary-foreground: 0 0% 100%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 11%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 46%;
     --accent: 48 96% 53%; /* F9's yellow */
     --accent-foreground: 0 0% 18%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 91%;
+    --input: 0 0% 91%;
     --ring: 48 96% 53%; /* F9's yellow */
     --radius: 0; /* Square corners */
-    --blueprint-50: 209 64% 95%;
-    --blueprint-100: 209 64% 90%;
-    --blueprint-200: 210 64% 80%;
-    --blueprint-300: 210 64% 65%;
-    --blueprint-400: 210 64% 55%;
-    --blueprint-500: 210 64% 43%; /* #3A6EA5 */
-    --blueprint-600: 210 64% 35%;
-    --blueprint-700: 210 64% 30%;
-    --blueprint-800: 210 64% 25%;
-    --blueprint-900: 210 64% 20%;
     --yellow-50: 48 100% 96%;
     --yellow-100: 48 96% 89%;
     --yellow-200: 48 98% 77%;
@@ -117,10 +107,10 @@
   margin-bottom: 1rem;
 }
 
-/* Blueprint grid overlay */
+/* Blueprint grid overlay - change to use charcoal instead of blue */
 .blueprint-grid-bg {
-  background-image: linear-gradient(#3A6EA520 1px, transparent 1px), 
-                    linear-gradient(90deg, #3A6EA520 1px, transparent 1px);
+  background-image: linear-gradient(rgba(45, 45, 45, 0.12) 1px, transparent 1px), 
+                    linear-gradient(90deg, rgba(45, 45, 45, 0.12) 1px, transparent 1px);
   background-size: 20px 20px;
 }
 
@@ -135,8 +125,8 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-image: linear-gradient(#3A6EA510 1px, transparent 1px), 
-                    linear-gradient(90deg, #3A6EA510 1px, transparent 1px);
+  background-image: linear-gradient(rgba(45, 45, 45, 0.06) 1px, transparent 1px), 
+                    linear-gradient(90deg, rgba(45, 45, 45, 0.06) 1px, transparent 1px);
   background-size: 20px 20px;
   z-index: -1;
 }

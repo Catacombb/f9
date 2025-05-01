@@ -1,9 +1,8 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Send, Check, InfoIcon } from 'lucide-react';
+import { Send, Check } from 'lucide-react';
 import { toast } from 'sonner';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
@@ -28,9 +27,9 @@ export function EmailExportSection({
       // Prepare the PDF
       const pdfBlob = await onExportPDF();
       
-      toast.info("Tester Note", {
-        description: "This won't actually send anything during testing.",
-        duration: 5000
+      toast.info("Processing", {
+        description: "Your brief is being prepared for submission.",
+        duration: 3000
       });
       
       // Show sent state
@@ -86,13 +85,6 @@ export function EmailExportSection({
                   </Label>
                 </div>
               </RadioGroup>
-              
-              <Alert className="mb-4 bg-blueprint-50 dark:bg-blueprint-900/30 border border-blueprint-200 dark:border-blueprint-800">
-                <InfoIcon className="h-4 w-4 text-blueprint-700 dark:text-blueprint-400" />
-                <AlertDescription className="text-xs font-medium text-blueprint-800 dark:text-blueprint-300">
-                  Tester Note: This won't actually send anything during testing.
-                </AlertDescription>
-              </Alert>
             </div>
             <Button 
               onClick={handleSendBrief} 
@@ -100,15 +92,14 @@ export function EmailExportSection({
               className={`
                 w-full md:w-auto md:min-w-[140px] 
                 transition-all duration-200 
-                bg-blueprint-600 text-white 
-                hover:bg-blueprint-700 
-                dark:bg-blueprint-500 dark:hover:bg-blueprint-600 
-                ${isSent ? 'bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700' : ''}
+                bg-yellow-500 text-charcoal-800
+                hover:bg-yellow-600
+                ${isSent ? 'bg-green-500 hover:bg-green-600' : ''}
               `}
             >
               {isSending ? (
                 <span className="flex items-center justify-center w-full">
-                  <span className="animate-spin h-4 w-4 mr-2 border-2 border-white border-t-transparent rounded-full" />
+                  <span className="animate-spin h-4 w-4 mr-2 border-2 border-charcoal-800 border-t-transparent rounded-full" />
                   <span>Sending...</span>
                 </span>
               ) : isSent ? (

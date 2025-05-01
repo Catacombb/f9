@@ -11,9 +11,11 @@ export const AppLogo = ({ size = 'default' }: { size?: 'small' | 'default' | 'la
   
   return (
     <div className="flex items-center justify-center w-full">
-      <div className={`font-heading font-bold text-charcoal-800 ${sizeClasses[size] === 'small' ? 'text-lg md:text-xl' : 'text-xl md:text-2xl'}`}>
-        F9 <span className="text-yellow-500">PRODUCTIONS</span>
-      </div>
+      <img 
+        src="https://f9productions.com/wp-content/uploads/2023/01/cropped-logo-3.png" 
+        alt="F9 Productions Logo" 
+        className={`${sizeClasses[size]}`} 
+      />
     </div>
   );
 };
