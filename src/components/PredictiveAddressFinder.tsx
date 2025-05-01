@@ -38,9 +38,9 @@ export function PredictiveAddressFinder({
     }
 
     try {
-      // Using Nominatim for geocoding (with focus on New Zealand)
+      // Using Nominatim for geocoding (with focus on Colorado, USA)
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=nz&limit=5&addressdetails=1`,
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&state=colorado&countrycodes=us&limit=5&addressdetails=1`,
         { headers: { 'Accept-Language': 'en' } }
       );
 
@@ -80,7 +80,7 @@ export function PredictiveAddressFinder({
 
     try {
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchAddress)}&countrycodes=nz&limit=1&addressdetails=1`,
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchAddress)}&state=colorado&countrycodes=us&limit=1&addressdetails=1`,
         { headers: { 'Accept-Language': 'en' } }
       );
 
@@ -225,7 +225,7 @@ export function PredictiveAddressFinder({
       </Popover>
       
       <p className="text-sm text-muted-foreground">
-        Start typing to search for your address
+        Start typing to search for your Colorado address
       </p>
     </div>
   );

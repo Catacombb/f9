@@ -1,7 +1,7 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
-  darkMode: ["class"],
   content: [
     "./pages/**/*.{ts,tsx}",
     "./components/**/*.{ts,tsx}",
@@ -133,7 +133,7 @@ export default {
           200: 'hsl(var(--yellow-200))',
           300: 'hsl(var(--yellow-300))',
           400: 'hsl(var(--yellow-400))',
-          500: 'hsl(var(--yellow-500))',
+          500: 'hsl(var(--yellow-500))', // F9 yellow
           600: 'hsl(var(--yellow-600))',
           700: 'hsl(var(--yellow-700))',
           800: 'hsl(var(--yellow-800))',

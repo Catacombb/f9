@@ -10,8 +10,8 @@
     --sidebar: 210 33% 98%;
     --sidebar-foreground: 0 0% 18%;
     --sidebar-border: 210 13% 91%;
-    --sidebar-accent: 210 64% 43%;
-    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-accent: 48 96% 53%; /* F9's yellow */
+    --sidebar-accent-foreground: 0 0% 18%;
     --card: 0 0% 100%;
     --card-foreground: 0 0% 18%;
     --popover: 0 0% 100%;
@@ -22,13 +22,13 @@
     --secondary-foreground: 222.2 47.4% 11.2%;
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 64% 43%; /* Blueprint blue #3A6EA5 */
-    --accent-foreground: 0 0% 100%;
+    --accent: 48 96% 53%; /* F9's yellow */
+    --accent-foreground: 0 0% 18%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 210 64% 43%;
+    --ring: 48 96% 53%; /* F9's yellow */
     --radius: 0; /* Square corners */
     --blueprint-50: 209 64% 95%;
     --blueprint-100: 209 64% 90%;
@@ -40,33 +40,16 @@
     --blueprint-700: 210 64% 30%;
     --blueprint-800: 210 64% 25%;
     --blueprint-900: 210 64% 20%;
-  }
-
-  .dark {
-    --background: 0 0% 12%;
-    --foreground: 0 0% 100%;
-    --sidebar: 0 0% 8%;
-    --sidebar-foreground: 210 40% 98%;
-    --sidebar-border: 0 0% 20%;
-    --sidebar-accent: 210 64% 43%; /* Blueprint blue */
-    --sidebar-accent-foreground: 0 0% 100%;
-    --card: 0 0% 15%;
-    --card-foreground: 210 40% 98%;
-    --popover: 0 0% 15%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 0 0% 18%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 20%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 0 0% 20%;
-    --muted-foreground: 217.9 10.6% 64.9%;
-    --accent: 210 64% 43%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 0 0% 20%;
-    --input: 0 0% 20%;
-    --ring: 210 64% 43%;
+    --yellow-50: 48 100% 96%;
+    --yellow-100: 48 96% 89%;
+    --yellow-200: 48 98% 77%;
+    --yellow-300: 48 96% 67%;
+    --yellow-400: 48 96% 61%;
+    --yellow-500: 48 96% 53%; /* F9's yellow */
+    --yellow-600: 36 77% 49%;
+    --yellow-700: 29 80% 44%;
+    --yellow-800: 22 82% 39%;
+    --yellow-900: 17 79% 31%;
   }
 }
 
