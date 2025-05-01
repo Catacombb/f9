@@ -1,4 +1,3 @@
-
 export interface SpaceRoom {
   id: string;
   type: string;
@@ -137,6 +136,7 @@ export interface FormData {
   contractors: {
     preferredBuilder: string;
     goToTender: boolean;
+    wantF9Build?: boolean; // Added the missing property
     professionals: Professional[];
     additionalNotes: string;
   };

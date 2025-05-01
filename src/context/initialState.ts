@@ -91,6 +91,7 @@ export const initialProjectData: ProjectData = {
     contractors: {
       preferredBuilder: '',
       goToTender: false,
+      wantF9Build: false, // Added default value for the new property
       professionals: [],
       additionalNotes: ''
     },
