@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -7,20 +7,20 @@ import { UploadCloud, X, FileIcon } from 'lucide-react';
 
 export function InspirationsUploader() {
   const { updateFiles, files } = useDesignBrief();
-  const inspirationFiles = files.inspirations || [];
+  const inspirationFiles = files.inspirationFiles || [];
   
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const fileList = e.target.files;
     if (fileList && fileList.length > 0) {
       const newFiles = Array.from(fileList);
-      updateFiles('inspirations', [...inspirationFiles, ...newFiles]);
+      updateFiles({ inspirationFiles: [...inspirationFiles, ...newFiles] });
     }
   };
 
   const removeFile = (index: number) => {
     const updatedFiles = [...inspirationFiles];
     updatedFiles.splice(index, 1);
-    updateFiles('inspirations', updatedFiles);
+    updateFiles({ inspirationFiles: updatedFiles });
   };
 
   return (

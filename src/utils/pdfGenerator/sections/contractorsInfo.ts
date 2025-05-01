@@ -6,8 +6,25 @@ import { addSectionTitle, addText, addMultiLineText, addBulletPoints, addSpace }
 export const renderContractorsInfo = (ctx: PDFContext, projectData: ProjectData): void => {
   addSectionTitle(ctx, 'Project Team');
   
+  if (projectData.formData.contractors.wantF9Build) {
+    addText(ctx, 'F9 Productions Build', 'Yes, client wants F9 Productions to build their project');
+  }
+  
   addText(ctx, 'Preferred Builder', projectData.formData.contractors.preferredBuilder || 'Not specified');
   addText(ctx, 'Go To Tender', projectData.formData.contractors.goToTender ? 'Yes' : 'No');
+  
+  if (projectData.formData.contractors.structuralEngineer) {
+    addText(ctx, 'Structural Engineer', projectData.formData.contractors.structuralEngineer);
+  }
+  
+  if (projectData.formData.contractors.civilEngineer) {
+    addText(ctx, 'Civil Engineer', projectData.formData.contractors.civilEngineer);
+  }
+  
+  if (projectData.formData.contractors.otherConsultants) {
+    addText(ctx, 'Other Consultants', '');
+    addMultiLineText(ctx, projectData.formData.contractors.otherConsultants);
+  }
   
   if (projectData.formData.contractors.professionals.length > 0) {
     addSpace(ctx);

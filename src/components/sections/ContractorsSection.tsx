@@ -8,7 +8,6 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 export function ContractorsSection() {
   const { setCurrentSection, updateFormData, formData } = useDesignBrief();
@@ -29,7 +28,10 @@ export function ContractorsSection() {
   };
 
   const handleF9BuildChange = (value: string) => {
-    updateFormData('contractors', { f9Build: value === 'yes' });
+    updateFormData('contractors', { 
+      wantF9Build: value === 'yes',
+      f9Build: value === 'yes' // Update both properties for compatibility
+    });
   };
 
   return (
@@ -62,7 +64,7 @@ export function ContractorsSection() {
                 We offer full design-build services and can manage your project from start to finish.
               </p>
               <RadioGroup
-                value={formData.contractors.f9Build ? 'yes' : 'no'}
+                value={(formData.contractors.wantF9Build || formData.contractors.f9Build) ? 'yes' : 'no'}
                 onValueChange={handleF9BuildChange}
                 className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-4"
               >

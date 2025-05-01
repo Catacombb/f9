@@ -1,4 +1,3 @@
-
 export interface SpaceRoom {
   id: string;
   type: string;
@@ -40,9 +39,10 @@ export interface ProjectFiles {
   uploadedInspirationImages: File[];
   inspirationSelections: string[];
   siteDocuments: File[]; 
+  inspirationFiles: File[];
+  supportingDocuments: File[]; // Add missing property
   sitePhotos: File[]; // Added site photos
   designFiles: File[];
-  inspirationFiles: File[];
 }
 
 export interface BriefSummary {
@@ -142,7 +142,11 @@ export interface FormData {
   contractors: {
     preferredBuilder: string;
     goToTender: boolean;
-    wantF9Build?: boolean; // Added the missing property
+    wantF9Build: boolean; // Changed from optional to required
+    f9Build?: boolean; // Add this property for compatibility
+    structuralEngineer?: string; // Add these new properties
+    civilEngineer?: string;
+    otherConsultants?: string;
     professionals: Professional[];
     additionalNotes: string;
   };

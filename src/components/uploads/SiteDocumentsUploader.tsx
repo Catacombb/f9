@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -13,14 +13,14 @@ export function SiteDocumentsUploader() {
     const fileList = e.target.files;
     if (fileList && fileList.length > 0) {
       const newFiles = Array.from(fileList);
-      updateFiles('siteDocuments', [...siteDocuments, ...newFiles]);
+      updateFiles({ siteDocuments: [...siteDocuments, ...newFiles] });
     }
   };
 
   const removeFile = (index: number) => {
     const updatedFiles = [...siteDocuments];
     updatedFiles.splice(index, 1);
-    updateFiles('siteDocuments', updatedFiles);
+    updateFiles({ siteDocuments: updatedFiles });
   };
 
   return (

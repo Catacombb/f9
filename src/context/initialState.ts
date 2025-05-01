@@ -1,4 +1,3 @@
-
 import { ProjectData } from '@/types';
 
 export const initialProjectData: ProjectData = {
@@ -92,7 +91,11 @@ export const initialProjectData: ProjectData = {
     contractors: {
       preferredBuilder: '',
       goToTender: false,
-      wantF9Build: false, // Added default value for the new property
+      wantF9Build: false,
+      f9Build: false,
+      structuralEngineer: '',
+      civilEngineer: '',
+      otherConsultants: '',
       professionals: [],
       additionalNotes: ''
     },
@@ -132,7 +135,8 @@ export const initialProjectData: ProjectData = {
     siteDocuments: [],
     sitePhotos: [], // Added missing sitePhotos property
     designFiles: [],
-    inspirationFiles: []
+    inspirationFiles: [],
+    supportingDocuments: [] // Add the missing supportingDocuments property
   },
   summary: {
     generatedSummary: '',
