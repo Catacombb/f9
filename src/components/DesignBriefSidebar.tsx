@@ -46,7 +46,7 @@ export function DesignBriefSidebar({ showLastSaved = false, lastSavedFormatted =
       <div className="h-full flex flex-col">
         <div className="py-6 px-4 flex flex-col items-center">
           <AppLogo size="large" />
-          <span className="text-xs text-muted-foreground mt-2 mb-3">Build your vision</span>
+          <span className="text-xs text-muted-foreground mt-2 mb-3">Build your vision with F9 Productions</span>
           
           {showLastSaved && lastSavedFormatted && (
             <div className="mt-1 text-xs text-muted-foreground text-center pb-2 border-b border-sidebar-border w-full">

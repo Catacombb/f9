@@ -1,4 +1,3 @@
-
 import { formatDistanceToNow } from 'date-fns';
 import { PDFContext } from './types';
 import { removeMarkdown } from './helpers';
@@ -26,7 +25,7 @@ export const addHeader = (ctx: PDFContext): void => {
   ctx.pdf.setFillColor(ctx.colors.background);
   ctx.pdf.rect(0, 0, ctx.pageWidth, headerHeight, 'F');
   
-  // Get logo path - using the F9 logo from the provided URL
+  // Get logo path - using the F9 logo from the provided URL with transparent background
   const logoPath = 'https://i.ibb.co/NgZ3y5SR/cropped-logo-3.webp';
   
   // Properly preserve aspect ratio - F9 logo is approximately square 1:1 (width:height)
@@ -36,8 +35,19 @@ export const addHeader = (ctx: PDFContext): void => {
   const logoY = 8; // Properly centered in the taller header
   
   try {
-    // Add actual image with preserved aspect ratio
-    ctx.pdf.addImage(logoPath, 'PNG', logoX, logoY, logoWidth, logoHeight);
+    // Add actual image with preserved aspect ratio and transparency
+    // Setting the format to PNG to preserve transparency
+    ctx.pdf.addImage({
+      url: logoPath,
+      format: 'PNG',
+      x: logoX,
+      y: logoY,
+      width: logoWidth,
+      height: logoHeight,
+      imageData: {
+        alphaChannel: true, // Ensure alpha channel for transparency
+      }
+    });
   } catch (error) {
     // Fallback to text if image loading fails
     ctx.pdf.setFont('helvetica', 'bold');

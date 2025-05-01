@@ -31,7 +31,7 @@ const About = () => {
               <div className="flex justify-center mb-4">
                 <AppLogo size="xlarge" />
               </div>
-              <p className="text-xl text-muted-foreground">Build your vision</p>
+              <p className="text-xl text-muted-foreground">Build your vision with F9 Productions</p>
             </div>
 
             <div className="space-y-6">
