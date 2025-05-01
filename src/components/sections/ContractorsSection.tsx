@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { SectionHeader } from './SectionHeader';
@@ -6,11 +7,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Button } from '@/components/ui/button';
-import { ExternalLink } from 'lucide-react';
-import { toast } from 'sonner';
+import { ExternalLink, ArrowRight } from 'lucide-react';
 
 export function ContractorsSection() {
-  const { updateFormData, formData } = useDesignBrief();
+  const { updateFormData, formData, setCurrentSection } = useDesignBrief();
   const contractors = formData.contractors;
 
   const handleInputChange = (field: string, value: string) => {
@@ -20,6 +20,12 @@ export function ContractorsSection() {
   // Add this new function to open the F9 team page
   const openF9TeamPage = () => {
     window.open('https://f9productions.com/team', '_blank');
+  };
+  
+  // Add this new function to navigate to the budget section
+  const handleNext = () => {
+    setCurrentSection('budget');
+    window.scrollTo(0, 0);
   };
 
   return (
@@ -193,6 +199,14 @@ export function ContractorsSection() {
             </div>
           </CardContent>
         </Card>
+        
+        {/* Add the "Next Section" button */}
+        <div className="flex justify-end mt-6">
+          <Button onClick={handleNext} className="group">
+            <span>Next: Budget</span>
+            <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+          </Button>
+        </div>
       </div>
     </div>
   );
