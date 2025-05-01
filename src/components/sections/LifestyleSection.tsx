@@ -52,6 +52,16 @@ export function LifestyleSection() {
     return activeTab === "people" ? "Next: Daily Life" : "Next: Site";
   };
   
+  // Extract only the lifestyle properties needed by LifestyleGeneralTab
+  const lifestyleGeneralData = {
+    dailyRoutine: formData.lifestyle.dailyRoutine || '',
+    entertainmentStyle: formData.lifestyle.entertainmentStyle || '',
+    workFromHome: formData.lifestyle.workFromHome || '',
+    homeFeeling: formData.lifestyle.homeFeeling || '',
+    specialRequirements: formData.lifestyle.specialRequirements || '',
+    hobbies: formData.lifestyle.hobbies || [],
+  };
+  
   return (
     <div className="design-brief-section-wrapper">
       <div className="design-brief-section-container">
@@ -100,7 +110,7 @@ export function LifestyleSection() {
           
           <TabsContent value="general" className="space-y-6 min-h-[400px]">
             <LifestyleGeneralTab 
-              formData={formData.lifestyle}
+              formData={lifestyleGeneralData}
               onFormChange={(name, value) => updateFormData('lifestyle', { [name]: value })}
             />
           </TabsContent>

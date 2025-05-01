@@ -20,4 +20,3 @@ export interface DesignBriefContextType {
   saveProjectData: () => void;
   exportAsPDF: () => Promise<Blob>;
 }
-

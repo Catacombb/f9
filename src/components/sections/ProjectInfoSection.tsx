@@ -102,10 +102,8 @@ export function ProjectInfoSection() {
               <Label htmlFor="projectAddress" className="design-brief-question-title text-black font-bold">Project Address *</Label>
               <PredictiveAddressFinder
                 value={projectInfoData.projectAddress || ''}
-                onChange={(value) => handleInputChange('projectAddress', value)}
-                onCoordinatesSelect={(coords) => {
-                  updateFormData('projectInfo', { coordinates: coords });
-                }}
+                onChange={handleAddressChange}
+                onCoordinatesSelect={handleCoordinatesChange}
               />
             </div>
 

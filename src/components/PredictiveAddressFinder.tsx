@@ -14,21 +14,26 @@ interface AddressSuggestion {
 }
 
 interface PredictiveAddressFinderProps {
-  address: string;
-  onAddressChange: (address: string) => void;
-  onCoordinatesChange?: (coordinates: [number, number]) => void;
+  value: string;
+  onChange: (address: string) => void;
+  onCoordinatesSelect?: (coordinates: [number, number]) => void;
 }
 
 export function PredictiveAddressFinder({ 
-  address, 
-  onAddressChange, 
-  onCoordinatesChange 
+  value, 
+  onChange, 
+  onCoordinatesSelect 
 }: PredictiveAddressFinderProps) {
-  const [searchInput, setSearchInput] = useState(address);
+  const [searchInput, setSearchInput] = useState(value);
   const [addressSuggestions, setAddressSuggestions] = useState<AddressSuggestion[]>([]);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const { toast } = useToast();
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Update local state when prop changes
+  useEffect(() => {
+    setSearchInput(value);
+  }, [value]);
 
   // Function to fetch address suggestions using Nominatim
   const fetchAddressSuggestions = async (query: string) => {
@@ -96,14 +101,14 @@ export function PredictiveAddressFinder({
         const coordinates: [number, number] = [lat, lon];
 
         // Update coordinates in parent component if provided
-        if (onCoordinatesChange) {
-          onCoordinatesChange(coordinates);
+        if (onCoordinatesSelect) {
+          onCoordinatesSelect(coordinates);
         }
 
         // Update address with formatted version
         const formattedAddress = data[0].display_name;
         setSearchInput(formattedAddress);
-        onAddressChange(formattedAddress);
+        onChange(formattedAddress);
 
         toast({
           title: "Address found",
@@ -155,11 +160,11 @@ export function PredictiveAddressFinder({
 
   const handleAddressSelect = (suggestion: AddressSuggestion) => {
     setSearchInput(suggestion.place_name);
-    onAddressChange(suggestion.place_name);
+    onChange(suggestion.place_name);
     
     // Update coordinates in parent component if provided
-    if (suggestion.center && onCoordinatesChange) {
-      onCoordinatesChange(suggestion.center);
+    if (suggestion.center && onCoordinatesSelect) {
+      onCoordinatesSelect(suggestion.center);
     }
     
     toast({

@@ -123,6 +123,15 @@ export const RoomItem = ({ room, onEdit, onRemove }: RoomItemProps) => {
     e.stopPropagation();
   };
 
+  // Conditionally set the level if it's a single level home
+  const autoSetSingleLevel = () => {
+    if (isSingleLevel && descriptionData.level !== 'single_level') {
+      handleLevelChange('single_level');
+      return null; // Return null to avoid rendering anything
+    }
+    return null;
+  };
+
   return (
     <Card className="mb-4 border">
       <CardContent 
@@ -220,10 +229,9 @@ export const RoomItem = ({ room, onEdit, onRemove }: RoomItemProps) => {
                   </Select>
                 </div>
               )}
-              {isSingleLevel && descriptionData.level != 'single_level' && (
+              {isSingleLevel && (
                 <div className="hidden">
-                  {/* Auto-set to single level */}
-                  {handleLevelChange('single_level')}
+                  {autoSetSingleLevel()}
                 </div>
               )}
             </div>

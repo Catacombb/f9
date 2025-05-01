@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { Button } from '@/components/ui/button';
@@ -52,10 +51,7 @@ export function ContractorsSection() {
       isCustom: false,
     };
     
-    addProfessional({
-      ...professional,
-      id: crypto.randomUUID(), // Generate ID here since our function expects it
-    });
+    addProfessional(professional);
     
     // Clear form
     setNewProfessionalType('');
