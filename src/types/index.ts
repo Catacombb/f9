@@ -13,7 +13,11 @@ export interface Professional {
   id: string;
   type: string;
   name: string;
-  contact?: string;
+  businessName?: string; // Added for business name
+  email?: string; // Added for email
+  phone?: string; // Added for phone
+  website?: string; // Added for website
+  contact?: string; // Kept for backward compatibility
   notes?: string;
   isCustom?: boolean;
 }

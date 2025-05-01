@@ -1,6 +1,6 @@
+
 import React, { useState, useEffect } from 'react';
 import { DesignBriefSidebar } from './DesignBriefSidebar';
-// Remove ThemeToggle import since we've removed dark mode
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { formatDistanceToNow } from 'date-fns';
 import { Link } from 'react-router-dom';
@@ -102,7 +102,7 @@ export function DesignBriefLayout({ children }: DesignBriefLayoutProps) {
       ) : (
         <Sheet>
           <SheetTrigger asChild>
-            <Button variant="ghost" size="icon" className="absolute top-4 left-4 z-50">
+            <Button variant="ghost" size="icon" className="absolute top-4 left-4 z-50 text-black">
               <Menu className="h-6 w-6" />
               <span className="sr-only">Toggle menu</span>
             </Button>
@@ -125,11 +125,10 @@ export function DesignBriefLayout({ children }: DesignBriefLayoutProps) {
           
           <div className="flex-1 flex justify-end items-center">
             {!isMobile && (
-              <span className="text-xs text-muted-foreground mr-2 truncate max-w-[150px]">
+              <span className="text-xs text-black mr-2 truncate max-w-[150px]">
                 Last saved {lastSavedFormatted}
               </span>
             )}
-            {/* Removed ThemeToggle since we've removed dark mode */}
           </div>
         </header>
         
@@ -141,18 +140,18 @@ export function DesignBriefLayout({ children }: DesignBriefLayoutProps) {
           </Form>
         </main>
         
-        <footer className="h-16 border-t flex flex-col justify-between px-4 py-2 text-xs text-muted-foreground w-full">
+        <footer className="h-16 border-t flex flex-col justify-between px-4 py-2 text-xs text-black w-full">
           <div className="flex flex-col gap-2 w-full items-center">
             <div className="flex justify-between items-center w-full max-w-full mx-auto px-2">
-              <span className="truncate">Overall Progress: {overallProgress}%</span>
+              <span className="truncate font-medium">Overall Progress: {overallProgress}%</span>
               {isMobile && (
-                <span className="text-xs truncate max-w-[50%]">
+                <span className="text-xs truncate max-w-[50%] text-black">
                   Last saved {lastSavedFormatted}
                 </span>
               )}
             </div>
-            <Progress value={overallProgress} className="h-2 w-full" />
-            <div className="text-center mt-1 pb-2 truncate w-full">
+            <Progress value={overallProgress} className="h-2 w-full bg-gray-200" />
+            <div className="text-center mt-1 pb-2 truncate w-full text-black font-medium">
               © 2025 F9 Productions
             </div>
           </div>

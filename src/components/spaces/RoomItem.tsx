@@ -25,6 +25,10 @@ export const RoomItem = ({ room, onEdit, onRemove }: RoomItemProps) => {
   const [selectedLevel, setSelectedLevel] = useState<string>('');
   const { formData } = useDesignBrief();
   const occupants = formData.lifestyle.occupantEntries || [];
+  
+  // Get the homeLevelType to auto-set or hide level selection
+  const homeLevelType = formData.spaces.homeLevelType;
+  const isSingleLevel = homeLevelType === 'single_level';
 
   const descriptionData = useMemo(() => {
     try {
@@ -127,11 +131,11 @@ export const RoomItem = ({ room, onEdit, onRemove }: RoomItemProps) => {
       >
         <div className="flex justify-between items-center">
           <div className="flex-1">
-            <div className="font-medium text-lg">{roomName}</div>
+            <div className="font-bold text-lg text-black">{roomName}</div>
             
             {primaryUsers && primaryUsers.length > 0 && (
-              <div className="text-xs text-muted-foreground mt-1">
-                Intended for: {primaryUsers.map(id => {
+              <div className="text-sm text-black mt-1">
+                <span className="font-medium">Used by:</span> {primaryUsers.map(id => {
                   const user = occupants.find(o => o.id === id);
                   return user?.name || 'Unknown';
                 }).join(", ")}
@@ -139,8 +143,8 @@ export const RoomItem = ({ room, onEdit, onRemove }: RoomItemProps) => {
             )}
             
             {descriptionData.level && (
-              <div className="text-xs text-muted-foreground mt-1">
-                Level: {descriptionData.level.toUpperCase()}
+              <div className="text-sm text-black mt-1">
+                <span className="font-medium">Level:</span> {descriptionData.level.replace(/_/g, ' ').toUpperCase()}
               </div>
             )}
           </div>
@@ -162,16 +166,16 @@ export const RoomItem = ({ room, onEdit, onRemove }: RoomItemProps) => {
         
         {isExpanded && (
           <div className="mt-4 space-y-4" onClick={preventPropagation}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4">
               <div>
-                <Label htmlFor={`room-name-${room.id}`}>Room Name</Label>
+                <Label htmlFor={`room-name-${room.id}`} className="text-black font-medium">Room Name</Label>
                 <div className="flex gap-2 mt-1">
                   <Input 
                     id={`room-name-${room.id}`}
                     value={displayName} 
                     onChange={handleDisplayNameChange} 
                     placeholder={`${room.type} Name`} 
-                    className="flex-1"
+                    className="flex-1 text-black"
                     onFocus={preventPropagation}
                     onClick={preventPropagation}
                   />
@@ -179,38 +183,54 @@ export const RoomItem = ({ room, onEdit, onRemove }: RoomItemProps) => {
                     variant="outline" 
                     size="sm" 
                     onClick={handleDisplayNameSave}
-                    className="shrink-0"
+                    className="shrink-0 text-black"
                   >
                     <Check className="h-4 w-4" />
                   </Button>
                 </div>
               </div>
               
-              <div>
-                <Label htmlFor={`room-level-${room.id}`}>Level</Label>
-                <Select 
-                  value={descriptionData.level || ''} 
-                  onValueChange={handleLevelChange}
-                >
-                  <SelectTrigger 
-                    id={`room-level-${room.id}`} 
-                    className="mt-1"
-                    onClick={preventPropagation}
+              {/* Move PrimaryUsersSelect to be right after the room name */}
+              <PrimaryUsersSelect 
+                occupants={occupants}
+                selectedUsers={primaryUsers}
+                onChange={handlePrimaryUsersChange}
+              />
+              
+              {/* Only show level selection if not single level or if explicitly overridden */}
+              {!isSingleLevel && (
+                <div>
+                  <Label htmlFor={`room-level-${room.id}`} className="text-black font-medium">Level</Label>
+                  <Select 
+                    value={descriptionData.level || ''} 
+                    onValueChange={handleLevelChange}
                   >
-                    <SelectValue placeholder="Select level" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="ground">Ground Floor</SelectItem>
-                    <SelectItem value="upper">Upper Floor</SelectItem>
-                    <SelectItem value="lower">Lower Floor/Basement</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+                    <SelectTrigger 
+                      id={`room-level-${room.id}`} 
+                      className="mt-1 text-black"
+                      onClick={preventPropagation}
+                    >
+                      <SelectValue placeholder="Select level" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="ground">Ground Floor</SelectItem>
+                      <SelectItem value="upper">Upper Floor</SelectItem>
+                      <SelectItem value="lower">Lower Floor/Basement</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+              {isSingleLevel && descriptionData.level != 'single_level' && (
+                <div className="hidden">
+                  {/* Auto-set to single level */}
+                  {handleLevelChange('single_level')}
+                </div>
+              )}
             </div>
             
             {questions.map((question) => (
               <div key={question.id}>
-                <Label htmlFor={`room-${question.id}-${room.id}`}>{question.label}</Label>
+                <Label htmlFor={`room-${question.id}-${room.id}`} className="text-black font-medium">{question.label}</Label>
                 {question.type === 'select' && (
                   <Select 
                     value={descriptionData[question.id] || ''} 
@@ -218,7 +238,7 @@ export const RoomItem = ({ room, onEdit, onRemove }: RoomItemProps) => {
                   >
                     <SelectTrigger 
                       id={`room-${question.id}-${room.id}`} 
-                      className="mt-1"
+                      className="mt-1 text-black"
                       onClick={preventPropagation}
                     >
                       <SelectValue placeholder={question.placeholder || `Select ${question.label.toLowerCase()}`} />
@@ -245,7 +265,7 @@ export const RoomItem = ({ room, onEdit, onRemove }: RoomItemProps) => {
                     />
                     <Label 
                       htmlFor={`room-${question.id}-${room.id}`}
-                      className="text-sm text-muted-foreground"
+                      className="text-sm text-black"
                     >
                       {question.checkboxLabel || question.label}
                     </Label>
@@ -254,20 +274,14 @@ export const RoomItem = ({ room, onEdit, onRemove }: RoomItemProps) => {
               </div>
             ))}
             
-            <PrimaryUsersSelect 
-              occupants={occupants}
-              selectedUsers={primaryUsers}
-              onChange={handlePrimaryUsersChange}
-            />
-            
             <div>
-              <Label htmlFor={`room-notes-${room.id}`}>Notes</Label>
+              <Label htmlFor={`room-notes-${room.id}`} className="text-black font-medium">Notes</Label>
               <Textarea 
                 id={`room-notes-${room.id}`}
                 value={descriptionData.notes || ''} 
                 onChange={handleNotesChange}
                 placeholder={getNotesPlaceholder()}
-                className="mt-1"
+                className="mt-1 text-black"
                 onFocus={preventPropagation}
                 onClick={preventPropagation}
               />

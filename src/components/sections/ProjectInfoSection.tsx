@@ -1,21 +1,20 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useDesignBrief } from '@/context/DesignBriefContext';
 import { Button } from '@/components/ui/button';
+import { ArrowRight } from 'lucide-react';
+import { SectionHeader } from './SectionHeader';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { useDesignBrief } from '@/context/DesignBriefContext';
-import { ArrowRight, Calendar } from 'lucide-react';
-import { SectionHeader } from './SectionHeader';
 import { PredictiveAddressFinder } from '@/components/PredictiveAddressFinder';
-import { format } from 'date-fns';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar as CalendarComponent } from '@/components/ui/calendar';
+import { toast } from "sonner";
 import { cn } from '@/lib/utils';
 
 export function ProjectInfoSection() {
-  const { formData, updateFormData, setCurrentSection } = useDesignBrief();
+  const { setCurrentSection, updateFormData, formData } = useDesignBrief();
+  const projectInfoData = formData.projectInfo;
+
   const [coordinates, setCoordinates] = useState<[number, number] | null>(
     formData.projectInfo.coordinates || null
   );
@@ -57,124 +56,146 @@ export function ProjectInfoSection() {
     }
   };
   
+  const handleInputChange = (field: string, value: string) => {
+    updateFormData('projectInfo', { [field]: value });
+  };
+
   const handleNext = () => {
+    // Form validation
+    if (!projectInfoData.clientName || !projectInfoData.projectAddress || 
+        !projectInfoData.contactEmail || !projectInfoData.contactPhone || 
+        !projectInfoData.projectType) {
+      toast.error("Please fill out all required fields marked with *");
+      return;
+    }
+    
     setCurrentSection('contractors');
     window.scrollTo(0, 0);
   };
-  
+
   return (
     <div className="design-brief-section-wrapper">
       <div className="design-brief-section-container">
         <SectionHeader 
           title="Project Information" 
-          description="Tell us about yourself and your project. This information helps us understand the basics of what you're looking to achieve."
+          description="Tell us about your project and its key details."
+          isBold={true}
         />
         
         <div className="design-brief-form-group">
-          <div className="mb-6">
-            <Label htmlFor="clientName" className="font-bold text-black">Your Name</Label>
-            <Input
-              id="clientName"
-              name="clientName"
-              placeholder="e.g. John Smith"
-              value={formData.projectInfo.clientName}
-              onChange={handleChange}
-              className="mt-1 text-black"
-            />
-          </div>
-          
-          <div className="mb-6">
-            <Label htmlFor="projectAddress" className="font-bold text-black">Project Address</Label>
-            <div className="mt-1 space-y-4">
-              <PredictiveAddressFinder 
-                address={formData.projectInfo.projectAddress} 
-                onAddressChange={handleAddressChange}
-                onCoordinatesChange={handleCoordinatesChange}
+          <div className="grid gap-6">
+            <div className="space-y-2">
+              <Label htmlFor="clientName" className="design-brief-question-title text-black font-bold">Client Name(s) *</Label>
+              <Input 
+                id="clientName" 
+                value={projectInfoData.clientName || ''} 
+                onChange={(e) => handleInputChange('clientName', e.target.value)}
+                className="text-black"
+                placeholder="e.g., John and Mary Smith, Smith Family Trust"
+              />
+              <p className="text-sm italic text-black mt-1">
+                You can enter multiple names for joint projects (e.g., couples, business partners, family members)
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="projectAddress" className="design-brief-question-title text-black font-bold">Project Address *</Label>
+              <PredictiveAddressFinder
+                value={projectInfoData.projectAddress || ''}
+                onChange={(value) => handleInputChange('projectAddress', value)}
+                onCoordinatesSelect={(coords) => {
+                  updateFormData('projectInfo', { coordinates: coords });
+                }}
               />
             </div>
-          </div>
-          
-          <div className="mb-6">
-            <Label className="block mb-2 font-bold text-black">When would you like to move into your new home?</Label>
-            <RadioGroup 
-              value={formData.projectInfo.moveInPreference || 'as_soon_as_possible'}
-              onValueChange={handleMoveInPreferenceChange}
-              className="space-y-3 mt-2"
-            >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="as_soon_as_possible" id="as_soon_as_possible" />
-                <Label htmlFor="as_soon_as_possible" className="text-black">As soon as possible</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="specific_date" id="specific_date" />
-                <Label htmlFor="specific_date" className="text-black">On or around a specific date</Label>
-              </div>
-            </RadioGroup>
-            
-            {formData.projectInfo.moveInPreference === 'specific_date' && (
-              <div className="mt-3 ml-6">
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-full justify-start text-left font-normal text-black",
-                        !moveInDate && "text-black/70"
-                      )}
-                    >
-                      <Calendar className="mr-2 h-4 w-4" />
-                      {moveInDate ? format(moveInDate, "PPP") : <span>Pick a target move-in date</span>}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <CalendarComponent
-                      mode="single"
-                      selected={moveInDate}
-                      onSelect={handleMoveInDateChange}
-                      initialFocus
-                      className="p-3 pointer-events-auto"
-                      disabled={(date) => date < new Date()}
-                    />
-                  </PopoverContent>
-                </Popover>
+
+            <div className="space-y-2">
+              <Label htmlFor="contactEmail" className="design-brief-question-title text-black font-bold">Contact Email *</Label>
+              <Input 
+                id="contactEmail" 
+                type="email"
+                value={projectInfoData.contactEmail || ''} 
+                onChange={(e) => handleInputChange('contactEmail', e.target.value)} 
+                className="text-black"
+                placeholder="e.g., john@example.com"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="contactPhone" className="design-brief-question-title text-black font-bold">Contact Phone *</Label>
+              <Input 
+                id="contactPhone" 
+                type="tel"
+                value={projectInfoData.contactPhone || ''} 
+                onChange={(e) => handleInputChange('contactPhone', e.target.value)} 
+                className="text-black"
+                placeholder="e.g., (303) 555-1234"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="projectType" className="design-brief-question-title text-black font-bold">Project Type *</Label>
+              <Select 
+                value={projectInfoData.projectType || ''} 
+                onValueChange={(value) => handleInputChange('projectType', value)}
+              >
+                <SelectTrigger id="projectType" className="text-black">
+                  <SelectValue placeholder="Select project type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="new_build">New Build</SelectItem>
+                  <SelectItem value="renovation">Renovation</SelectItem>
+                  <SelectItem value="addition">Addition</SelectItem>
+                  <SelectItem value="mixed">Mixed (New + Renovation)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="projectDescription" className="design-brief-question-title text-black font-bold">Project Description</Label>
+              <Textarea 
+                id="projectDescription" 
+                value={projectInfoData.projectDescription || ''} 
+                onChange={(e) => handleInputChange('projectDescription', e.target.value)}
+                className="text-black" 
+                placeholder="e.g., We're looking to build a modern mountain home with 4 bedrooms and an open-concept floor plan"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="moveInPreference" className="design-brief-question-title text-black font-bold">Move-In Preference</Label>
+              <Select 
+                value={projectInfoData.moveInPreference || ''} 
+                onValueChange={(value) => handleInputChange('moveInPreference', value)}
+              >
+                <SelectTrigger id="moveInPreference" className="text-black">
+                  <SelectValue placeholder="Select move-in preference" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="asap">As soon as possible</SelectItem>
+                  <SelectItem value="flexible">Flexible timeline</SelectItem>
+                  <SelectItem value="specific_date">Specific date</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {projectInfoData.moveInPreference === 'specific_date' && (
+              <div className="space-y-2">
+                <Label htmlFor="moveInDate" className="design-brief-question-title text-black font-bold">Target Move-In Date</Label>
+                <Input 
+                  id="moveInDate" 
+                  type="date"
+                  value={projectInfoData.moveInDate || ''} 
+                  onChange={(e) => handleInputChange('moveInDate', e.target.value)} 
+                  className="text-black"
+                />
               </div>
             )}
           </div>
-          
-          <div className="grid gap-6 md:grid-cols-2">
-            <div>
-              <Label htmlFor="contactEmail" className="font-bold text-black">Email Address</Label>
-              <Input
-                id="contactEmail"
-                name="contactEmail"
-                type="email"
-                placeholder="e.g. yourname@example.com"
-                value={formData.projectInfo.contactEmail}
-                onChange={handleChange}
-                className="mt-1 text-black"
-              />
-            </div>
-            
-            <div>
-              <Label htmlFor="contactPhone" className="font-bold text-black">Phone Number</Label>
-              <Input
-                id="contactPhone"
-                name="contactPhone"
-                placeholder="e.g. (303) 555-1234"
-                value={formData.projectInfo.contactPhone}
-                onChange={handleChange}
-                className="mt-1 text-black"
-              />
-            </div>
-          </div>
         </div>
         
-        <div className="flex justify-between mt-6">
-          <div></div> {/* Empty div for spacing */}
-          <Button 
-            onClick={handleNext} 
-            className="group bg-yellow-500 hover:bg-yellow-600 text-black transition-all duration-300 hover:scale-105"
-          >
+        <div className="flex justify-end mt-6">
+          <Button onClick={handleNext} className="group bg-yellow-500 text-black hover:bg-yellow-600">
             <span className="font-bold">Next: Project Team</span>
             <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
           </Button>

@@ -44,13 +44,13 @@ export function IntroSection() {
             </h1>
             
             <div className="text-base text-black max-w-2xl mx-auto space-y-4 animate-fade-in">
-              <p className="text-lg font-medium">Your input shapes our design process.</p>
+              <p className="text-lg font-medium text-black">Your input shapes our design process.</p>
               
-              <p>This brief helps us understand your needs and expectations before we begin the design-build process. The more specific you are, the better we can tailor our solutions to your project requirements.</p>
+              <p className="text-black">This brief helps us understand your needs and expectations before we begin the design-build process. The more specific you are, the better we can tailor our solutions to your project requirements.</p>
               
-              <p>Feel free to skip any questions that don't apply to your project, but try to be as thorough as possible with the ones that do.</p>
+              <p className="text-black">Feel free to skip any questions that don't apply to your project, but try to be as thorough as possible with the ones that do.</p>
               
-              <p>Let's get started.</p>
+              <p className="text-black">Let's get started.</p>
             </div>
           </div>
         </div>
@@ -72,83 +72,83 @@ export function IntroSection() {
             </div>
             
             {/* First row of process steps */}
-            <div className="grid gap-6 md:grid-cols-3 mb-6 animate-fade-in">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-3 mb-6 animate-fade-in">
               {/* Step 1 - Programming */}
-              <div className="p-4 hover:bg-blueprint-50 transition-colors duration-300 group">
+              <div className="p-4 border rounded-md hover:bg-blueprint-50 transition-colors duration-300 group cursor-pointer">
                 <div className="mb-4 mx-auto w-16 h-16 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                   <Code className="h-8 w-8 text-black" />
                 </div>
                 <h3 className="font-bold mb-2 text-center text-black">Programming</h3>
-                <p className="text-sm text-black">
+                <p className="text-sm text-black text-center">
                   Gathering information about your needs, wants, and budget.
                 </p>
               </div>
               
               {/* Step 2 - Schematic Design */}
-              <div className="p-4 hover:bg-blueprint-50 transition-colors duration-300 group">
+              <div className="p-4 border rounded-md hover:bg-blueprint-50 transition-colors duration-300 group cursor-pointer">
                 <div className="mb-4 mx-auto w-16 h-16 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                   <LayoutDashboard className="h-8 w-8 text-black" />
                 </div>
                 <h3 className="font-bold mb-2 text-center text-black">Schematic Design</h3>
-                <p className="text-sm text-black">
+                <p className="text-sm text-black text-center">
                   Creating concept sketches and design options.
                 </p>
               </div>
               
               {/* Step 3 - Design Development */}
-              <div className="p-4 hover:bg-blueprint-50 transition-colors duration-300 group">
+              <div className="p-4 border rounded-md hover:bg-blueprint-50 transition-colors duration-300 group cursor-pointer">
                 <div className="mb-4 mx-auto w-16 h-16 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                   <PenTool className="h-8 w-8 text-black" />
                 </div>
                 <h3 className="font-bold mb-2 text-center text-black">Design Development</h3>
-                <p className="text-sm text-black">
+                <p className="text-sm text-black text-center">
                   Refining the design and selecting materials.
                 </p>
               </div>
             </div>
             
             {/* Second row of process steps */}
-            <div className="grid gap-6 md:grid-cols-4 animate-fade-in">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-4 animate-fade-in">
               {/* Step 4 - Construction Documents */}
-              <div className="p-4 hover:bg-blueprint-50 transition-colors duration-300 group">
+              <div className="p-4 border rounded-md hover:bg-blueprint-50 transition-colors duration-300 group cursor-pointer">
                 <div className="mb-4 mx-auto w-16 h-16 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                   <FileText className="h-8 w-8 text-black" />
                 </div>
                 <h3 className="font-bold mb-2 text-center text-black">Construction Documents</h3>
-                <p className="text-sm text-black">
+                <p className="text-sm text-black text-center">
                   Preparing detailed plans for building.
                 </p>
               </div>
               
               {/* Step 5 - Permitting */}
-              <div className="p-4 hover:bg-blueprint-50 transition-colors duration-300 group">
+              <div className="p-4 border rounded-md hover:bg-blueprint-50 transition-colors duration-300 group cursor-pointer">
                 <div className="mb-4 mx-auto w-16 h-16 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                   <FileSearch className="h-8 w-8 text-black" />
                 </div>
                 <h3 className="font-bold mb-2 text-center text-black">Permitting</h3>
-                <p className="text-sm text-black">
+                <p className="text-sm text-black text-center">
                   Obtaining necessary approvals from local authorities.
                 </p>
               </div>
               
               {/* Step 6 - Bidding */}
-              <div className="p-4 hover:bg-blueprint-50 transition-colors duration-300 group">
+              <div className="p-4 border rounded-md hover:bg-blueprint-50 transition-colors duration-300 group cursor-pointer">
                 <div className="mb-4 mx-auto w-16 h-16 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                   <Gavel className="h-8 w-8 text-black" />
                 </div>
                 <h3 className="font-bold mb-2 text-center text-black">Bidding</h3>
-                <p className="text-sm text-black">
+                <p className="text-sm text-black text-center">
                   Selecting contractors for your project.
                 </p>
               </div>
               
               {/* Step 7 - Construction Administration */}
-              <div className="p-4 hover:bg-blueprint-50 transition-colors duration-300 group">
+              <div className="p-4 border rounded-md hover:bg-blueprint-50 transition-colors duration-300 group cursor-pointer">
                 <div className="mb-4 mx-auto w-16 h-16 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                   <Construction className="h-8 w-8 text-black" />
                 </div>
                 <h3 className="font-bold mb-2 text-center text-black">Construction Administration</h3>
-                <p className="text-sm text-black">
+                <p className="text-sm text-black text-center">
                   Overseeing construction to ensure design intent.
                 </p>
               </div>
@@ -166,10 +166,10 @@ export function IntroSection() {
           <Button 
             size="lg" 
             onClick={handleStart} 
-            className="bg-yellow-500 hover:bg-yellow-600 text-black transition-all duration-300 hover:scale-105"
+            className="bg-yellow-500 hover:bg-yellow-600 text-black transition-all duration-300 hover:scale-105 animate-fade-in"
           >
             <span className="font-bold">Begin Your Design Brief</span>
-            <ArrowRight className="ml-2 h-4 w-4 transition-transform" />
+            <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
           </Button>
         </div>
       </div>
