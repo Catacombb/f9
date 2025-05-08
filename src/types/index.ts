@@ -189,6 +189,7 @@ export interface ProjectData {
   summary: BriefSummary;
   lastSaved?: string;
   currentSection?: string;
+  projectId?: string; // Added to store the project ID directly in the project data
 }
 
 export type SectionKey = 'intro' | 'projectInfo' | 'budget' | 'lifestyle' | 'site' | 'spaces' | 'architecture' | 'contractors' | 'communication' | 'uploads' | 'summary' | 'feedback';

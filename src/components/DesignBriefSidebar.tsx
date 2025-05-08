@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -6,9 +5,23 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { SectionKey } from '@/types';
-import { ChevronRight, Info, Home, PiggyBank, Users, MapPin, Layout, Building, Image, Upload, FileText, ExternalLink, MessageSquare, Star } from 'lucide-react';
+import { 
+  Info, 
+  Home, 
+  Building, 
+  PiggyBank, 
+  Users, 
+  MapPin, 
+  Layout, 
+  Upload, 
+  FileText, 
+  ExternalLink, 
+  MessageSquare, 
+  Star,
+  DollarSign,
+  Heart 
+} from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { Link } from 'react-router-dom';
 import { AppLogo } from '@/components/AppLogo';
 import { Badge } from '@/components/ui/badge';
 
@@ -17,19 +30,36 @@ interface DesignBriefSidebarProps {
   lastSavedFormatted?: string;
 }
 
-// Reorder to make "feedback" come after "summary"
-const sections = [
-  { id: 'intro', title: 'Introduction', icon: <Info className="h-5 w-5" /> },
-  { id: 'projectInfo', title: 'Project Info', icon: <Home className="h-5 w-5" /> },
-  { id: 'contractors', title: 'Project Team', icon: <Users className="h-5 w-5" /> },
-  { id: 'budget', title: 'Budget', icon: <PiggyBank className="h-5 w-5" /> },
-  { id: 'lifestyle', title: 'Lifestyle', icon: <Users className="h-5 w-5" /> },
-  { id: 'site', title: 'Site', icon: <MapPin className="h-5 w-5" /> },
-  { id: 'spaces', title: 'Spaces', icon: <Layout className="h-5 w-5" /> },
-  { id: 'architecture', title: 'Architecture', icon: <Building className="h-5 w-5" /> },
-  { id: 'uploads', title: 'Uploads', icon: <Upload className="h-5 w-5" /> },
-  { id: 'communication', title: 'Communication', icon: <MessageSquare className="h-5 w-5" /> },
-  { id: 'summary', title: 'Summary', icon: <FileText className="h-5 w-5" /> },
+// Define section data with proper typing for better maintainability
+const sectionData: Record<SectionKey, { icon: React.ReactNode, label: string, isTesterOnly?: boolean }> = {
+  intro: { icon: <Info className="h-5 w-5" />, label: 'Introduction' },
+  projectInfo: { icon: <Home className="h-5 w-5" />, label: 'Project Info' },
+  site: { icon: <MapPin className="h-5 w-5" />, label: 'Site' },
+  lifestyle: { icon: <Heart className="h-5 w-5" />, label: 'Lifestyle' },
+  spaces: { icon: <Layout className="h-5 w-5" />, label: 'Spaces' },
+  architecture: { icon: <Building className="h-5 w-5" />, label: 'Architecture' },
+  contractors: { icon: <Users className="h-5 w-5" />, label: 'Project Team' },
+  budget: { icon: <DollarSign className="h-5 w-5" />, label: 'Budget' },
+  communication: { icon: <MessageSquare className="h-5 w-5" />, label: 'Communication' },
+  uploads: { icon: <Upload className="h-5 w-5" />, label: 'Uploads' },
+  summary: { icon: <FileText className="h-5 w-5" />, label: 'Summary' },
+  feedback: { icon: <Star className="h-5 w-5" />, label: 'Feedback', isTesterOnly: true }
+};
+
+// Define section order for consistent navigation
+const sectionOrder: SectionKey[] = [
+  'intro', 
+  'projectInfo', 
+  'site', 
+  'lifestyle', 
+  'spaces', 
+  'architecture', 
+  'contractors', 
+  'budget', 
+  'communication', 
+  'uploads', 
+  'summary',
+  'feedback'
 ];
 
 export function DesignBriefSidebar({ showLastSaved = false, lastSavedFormatted = '' }: DesignBriefSidebarProps) {
@@ -59,27 +89,42 @@ export function DesignBriefSidebar({ showLastSaved = false, lastSavedFormatted =
         
         <ScrollArea className="flex-1">
           <div className="px-2 py-2">
-            {sections.map((section) => {
+            {sectionOrder.map((sectionKey) => {
+              const section = sectionData[sectionKey];
+              const isActive = currentSection === sectionKey;
+              
+              // Skip the feedback section if it's not currently active
+              // This keeps it hidden until explicitly navigated to
+              if (section.isTesterOnly && currentSection !== sectionKey) {
+                return null;
+              }
+              
               return (
                 <Button
-                  key={section.id}
-                  variant={currentSection === section.id ? "secondary" : "ghost"}
+                  key={sectionKey}
+                  variant={isActive ? "secondary" : "ghost"}
                   className={cn(
                     "w-full justify-start mb-1 relative group",
-                    currentSection === section.id 
+                    isActive 
                       ? "bg-sidebar-accent text-sidebar-accent-foreground animate-slide-in" 
                       : "hover:bg-sidebar-accent/20 transition-colors duration-200",
                     isMobile ? "text-sm py-2" : ""
                   )}
-                  onClick={() => navigateToSection(section.id as SectionKey)}
+                  onClick={() => navigateToSection(sectionKey)}
                 >
                   <div className="flex items-center w-full">
-                    <span className={`mr-2 ${currentSection !== section.id ? 'group-hover:text-primary group-hover:scale-110 transition-all duration-200' : ''}`}>
+                    <span className={`mr-2 ${isActive !== true ? 'group-hover:text-primary group-hover:scale-110 transition-all duration-200' : ''}`}>
                       {section.icon}
                     </span>
-                    <span className="truncate">{section.title}</span>
+                    <span className="truncate">{section.label}</span>
+                    
+                    {section.isTesterOnly && (
+                      <Badge variant="outline" className="ml-2 text-[0.6rem] py-0 px-1.5 bg-purple-100 text-purple-800 border-purple-300">
+                        Testers
+                      </Badge>
+                    )}
                   </div>
-                  {currentSection === section.id && (
+                  {isActive && (
                     <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-primary rounded-r animate-fade-in" />
                   )}
                 </Button>
@@ -98,6 +143,10 @@ export function DesignBriefSidebar({ showLastSaved = false, lastSavedFormatted =
               <ExternalLink className="mr-2 h-5 w-5 shrink-0 text-accent group-hover:scale-110 transition-transform duration-200" />
               <span className="truncate">About F9 Productions</span>
             </Button>
+          </div>
+          
+          <div className="mt-3 text-center text-xs text-muted-foreground">
+            Design Brief Tool © {new Date().getFullYear()}
           </div>
         </div>
       </div>

@@ -1,4 +1,3 @@
-
 import { ProjectData, SectionKey, SpaceRoom, Professional, FormData } from '@/types';
 
 export interface DesignBriefContextType {
@@ -17,6 +16,9 @@ export interface DesignBriefContextType {
   removeProfessional: (professionalId: string) => void;
   currentSection: SectionKey;
   setCurrentSection: React.Dispatch<React.SetStateAction<SectionKey>>;
-  saveProjectData: () => void;
+  saveProjectData: () => Promise<{ success: boolean; error?: any; projectId?: string; projectData?: ProjectData }>;
   exportAsPDF: () => Promise<Blob>;
+  isLoading: boolean;
+  error: string | null;
+  sendByEmail: (email: string) => Promise<boolean>;
 }

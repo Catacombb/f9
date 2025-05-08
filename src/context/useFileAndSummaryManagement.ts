@@ -1,12 +1,15 @@
-
 import { useCallback } from 'react';
 import { ProjectData } from '@/types';
 import { generatePDF } from '@/utils/pdfGenerator/index';
+import { saveProject } from '@/lib/supabase/services/projectService';
+import { useSupabase } from '@/hooks/useSupabase';
 
 export const useFileAndSummaryManagement = (
   projectData: ProjectData,
   setProjectData: React.Dispatch<React.SetStateAction<ProjectData>>
 ) => {
+  const { user } = useSupabase();
+
   const updateFiles = useCallback((updates: Partial<ProjectData['files']>) => {
     setProjectData(draft => {
       const updatedDraft = { ...draft };
@@ -31,9 +34,26 @@ export const useFileAndSummaryManagement = (
     });
   }, [setProjectData]);
 
-  const saveProjectData = useCallback(() => {
-    localStorage.setItem('projectData', JSON.stringify(projectData));
-  }, [projectData]);
+  const saveProjectData = useCallback(async () => {
+    if (!user) {
+      console.warn('Cannot save data: User not authenticated');
+      return { success: false, error: 'User not authenticated' };
+    }
+    
+    try {
+      const result = await saveProject(projectData, user.id, projectData.projectId);
+      
+      if (result.success && result.projectData) {
+        // Update local state with any changes (like new projectId)
+        setProjectData(result.projectData);
+      }
+      
+      return result;
+    } catch (error) {
+      console.error('Error saving project data to Supabase:', error);
+      return { success: false, error };
+    }
+  }, [projectData, user, setProjectData]);
 
   const sendByEmail = useCallback(async (email: string): Promise<boolean> => {
     // During testing, this function always sends to Nick Harrison
@@ -129,6 +149,7 @@ The Northstar Team`;
     updateFiles, 
     updateSummary, 
     saveProjectData, 
-    exportAsPDF 
+    exportAsPDF,
+    sendByEmail
   };
 };
