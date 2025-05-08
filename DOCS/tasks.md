@@ -23,36 +23,36 @@ This document outlines the phased approach for implementing the client onboardin
 - [x] Create trigger for logging status changes in activities table
 
 ### Testing
-- [ ] Test database operations with the new schema
-- [ ] Verify RLS policies are working correctly
-- [ ] Test triggers with various scenarios
-- [ ] Validate type generation and TypeScript integration
+- [x] Test database operations with the new schema
+- [x] Verify RLS policies are working correctly
+- [x] Test triggers with various scenarios
+- [x] Validate type generation and TypeScript integration
 
 ## Phase 2: Core Dashboard Logic (2-3 weeks)
 
 ### Services Creation
-- [ ] Create statusService.ts for managing project statuses
-- [ ] Implement roleService.ts for role-based access control
-- [ ] Develop activitiesService.ts for logging and retrieving activities
-- [ ] Build dashboardService.ts for dashboard-specific operations
+- [x] Create statusService.ts for managing project statuses
+- [x] Implement roleService.ts for role-based access control
+- [x] Develop activitiesService.ts for logging and retrieving activities
+- [x] Build dashboardService.ts for dashboard-specific operations
 
 ### Status Management
-- [ ] Implement status transition rules (Brief → Sent → Complete)
-- [ ] Add validation for status changes (permissions, sequence)
-- [ ] Create functions to retrieve projects by status
-- [ ] Build logic for status change timestamps and history
+- [x] Implement status transition rules (Brief → Sent → Complete)
+- [x] Add validation for status changes (permissions, sequence)
+- [x] Create functions to retrieve projects by status
+- [x] Build logic for status change timestamps and history
 
 ### Role Management
-- [ ] Create functions to check user roles
-- [ ] Implement admin detection functions
-- [ ] Build permission validators for dashboard actions
-- [ ] Add role-specific data access patterns
+- [x] Create functions to check user roles
+- [x] Implement admin detection functions
+- [x] Build permission validators for dashboard actions
+- [x] Add role-specific data access patterns
 
 ### Activity Logging
-- [ ] Create standardized activity logging function
-- [ ] Implement activity retrieval with filtering
-- [ ] Add activity grouping by project and type
-- [ ] Build activity timeline generation
+- [x] Create standardized activity logging function
+- [x] Implement activity retrieval with filtering
+- [x] Add activity grouping by project and type
+- [x] Build activity timeline generation
 
 ### Testing
 - [ ] Test status transition logic with various scenarios

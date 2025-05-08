@@ -51,6 +51,33 @@ CREATE INDEX IF NOT EXISTS idx_activities_user_id ON public.activities(user_id);
 CREATE INDEX IF NOT EXISTS idx_activities_activity_type ON public.activities(activity_type);
 CREATE INDEX IF NOT EXISTS idx_activities_created_at ON public.activities(created_at DESC);
 
+-- Remove any existing RLS policies before recreating them (to avoid conflicts)
+DROP POLICY IF EXISTS "Users can view their own profile" ON user_profiles;
+DROP POLICY IF EXISTS "Users can update their own profile" ON user_profiles;
+DROP POLICY IF EXISTS "Admins can view all profiles" ON user_profiles;
+DROP POLICY IF EXISTS "Admins can update all profiles" ON user_profiles;
+DROP POLICY IF EXISTS "Users can view their project activities" ON activities;
+DROP POLICY IF EXISTS "Admins can view all activities" ON activities;
+DROP POLICY IF EXISTS "Users can insert activities for their projects" ON activities;
+DROP POLICY IF EXISTS "Admins can insert activities for any project" ON activities;
+
+-- 5. Create an admin check function (avoids circular references)
+CREATE OR REPLACE FUNCTION public.is_admin()
+RETURNS BOOLEAN AS $$
+DECLARE
+  is_admin BOOLEAN;
+BEGIN
+  -- This security definer function allows us to check if a user is admin
+  -- without getting into an infinite recursion with RLS policies
+  SELECT EXISTS (
+    SELECT 1 FROM user_profiles
+    WHERE id = auth.uid() AND role = 'admin'
+  ) INTO is_admin;
+  
+  RETURN is_admin;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
 -- 5. Enable Row Level Security on new tables
 ALTER TABLE public.user_profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.activities ENABLE ROW LEVEL SECURITY;
@@ -65,23 +92,13 @@ CREATE POLICY "Users can view their own profile" ON user_profiles
 CREATE POLICY "Users can update their own profile" ON user_profiles
   FOR UPDATE USING (auth.uid() = id);
 
--- Admin users can see all user profiles
+-- Admin users can see all user profiles - uses the security definer function
 CREATE POLICY "Admins can view all profiles" ON user_profiles
-  FOR SELECT USING (
-    EXISTS (
-      SELECT 1 FROM user_profiles up 
-      WHERE up.id = auth.uid() AND up.role = 'admin'
-    )
-  );
+  FOR SELECT USING (public.is_admin());
 
--- Admin users can update all user profiles
+-- Admin users can update all user profiles - uses the security definer function
 CREATE POLICY "Admins can update all profiles" ON user_profiles
-  FOR UPDATE USING (
-    EXISTS (
-      SELECT 1 FROM user_profiles up 
-      WHERE up.id = auth.uid() AND up.role = 'admin'
-    )
-  );
+  FOR UPDATE USING (public.is_admin());
 
 -- 7. Add RLS policies for activities
 
@@ -96,12 +113,7 @@ CREATE POLICY "Users can view their project activities" ON activities
 
 -- Admin users can see all activities
 CREATE POLICY "Admins can view all activities" ON activities
-  FOR SELECT USING (
-    EXISTS (
-      SELECT 1 FROM user_profiles up 
-      WHERE up.id = auth.uid() AND up.role = 'admin'
-    )
-  );
+  FOR SELECT USING (public.is_admin());
 
 -- Users can create activities for their own projects
 CREATE POLICY "Users can insert activities for their projects" ON activities
@@ -114,12 +126,7 @@ CREATE POLICY "Users can insert activities for their projects" ON activities
 
 -- Admin users can create activities for any project
 CREATE POLICY "Admins can insert activities for any project" ON activities
-  FOR INSERT WITH CHECK (
-    EXISTS (
-      SELECT 1 FROM user_profiles up 
-      WHERE up.id = auth.uid() AND up.role = 'admin'
-    )
-  );
+  FOR INSERT WITH CHECK (public.is_admin());
 
 -- 8. Create trigger function for user registration with automatic project creation
 CREATE OR REPLACE FUNCTION public.handle_new_user()
@@ -225,4 +232,5 @@ CREATE TRIGGER on_project_status_change
 -- 10. Grant necessary permissions
 -- This is usually handled by Supabase but including for completeness
 GRANT ALL ON public.user_profiles TO authenticated;
-GRANT ALL ON public.activities TO authenticated; 
+GRANT ALL ON public.activities TO authenticated;
+GRANT EXECUTE ON FUNCTION public.is_admin TO authenticated; 
