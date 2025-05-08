@@ -11,6 +11,7 @@ import NotFound from "./pages/NotFound";
 import TestSupabasePage from "./pages/TestSupabasePage";
 import TestDashboardSchemePage from "./pages/TestDashboardSchemePage";
 import { Login, Register, ForgotPassword, ResetPassword, ProtectedRoute } from "@/components/auth";
+import { DashboardRouter } from "@/components/dashboard";
 
 const App = () => {
   // Create a client instance inside the component to ensure proper React lifecycle
@@ -46,7 +47,9 @@ const App = () => {
                   <Route path="/" element={<Index />} />
                   <Route path="/test-supabase" element={<TestSupabasePage />} />
                   <Route path="/test-dashboard-schema" element={<TestDashboardSchemePage />} />
-                  {/* Add more protected routes here */}
+                  
+                  {/* Dashboard Routes */}
+                  <Route path="/dashboard/*" element={<DashboardRouter />} />
                 </Route>
                 
                 {/* Catch all route */}

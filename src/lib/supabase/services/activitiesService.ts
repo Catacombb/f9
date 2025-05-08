@@ -57,7 +57,7 @@ export async function getProjectActivities(projectId: string, limit?: number, of
   try {
     const query = supabase
       .from('activities')
-      .select('*, user_profiles:user_id(role)')
+      .select('*')
       .eq('project_id', projectId)
       .order('created_at', { ascending: false });
     
@@ -95,14 +95,18 @@ export async function getUserActivities(userId: string, limit?: number, offset?:
     
     // If user is an admin, they can see all activities
     // If user is a client, they can only see activities for their projects
-    let query = supabase.from('activities').select('*, projects:project_id(user_id)');
+    let query = supabase
+      .from('activities')
+      .select(`
+        *,
+        projects:project_id(id, client_name, user_id)
+      `)
+      .order('created_at', { ascending: false });
     
     if (!isUserAdmin) {
-      // For clients, join with projects and filter by user_id
+      // For clients, filter activities where the project belongs to them
       query = query.eq('projects.user_id', userId);
     }
-    
-    query = query.order('created_at', { ascending: false });
     
     if (limit) {
       query.limit(limit);
@@ -135,7 +139,10 @@ export async function getRecentActivities(limit?: number, offset?: number): Prom
   try {
     const query = supabase
       .from('activities')
-      .select('*, user_profiles:user_id(role), projects:project_id(client_name)')
+      .select(`
+        *,
+        projects:project_id(client_name)
+      `)
       .order('created_at', { ascending: false });
     
     if (limit) {

@@ -188,7 +188,7 @@ export async function getRecentProjects(limit: number = 5): Promise<Project[]> {
   try {
     const { data, error } = await supabase
       .from('projects')
-      .select('*, user_profiles:user_id(role)')
+      .select('*')
       .order('updated_at', { ascending: false })
       .limit(limit);
     
@@ -210,9 +210,10 @@ export async function getRecentProjects(limit: number = 5): Promise<Project[]> {
  */
 export async function getRecentClients(limit: number = 5): Promise<UserProfile[]> {
   try {
+    // Modified the join to avoid relationship issues
     const { data, error } = await supabase
       .from('user_profiles')
-      .select('*, projects:projects(*)')
+      .select('*')
       .eq('role', 'client')
       .order('created_at', { ascending: false })
       .limit(limit);
@@ -221,7 +222,25 @@ export async function getRecentClients(limit: number = 5): Promise<UserProfile[]
       throw new Error(`Error fetching recent clients: ${error.message}`);
     }
     
-    return data || [];
+    // For each client, get their project count separately
+    const clientsWithProjectCounts = await Promise.all(
+      data.map(async (client) => {
+        const { count, error: countError } = await supabase
+          .from('projects')
+          .select('id', { count: 'exact', head: true })
+          .eq('user_id', client.id);
+        
+        // Add project count to client data
+        return {
+          ...client,
+          projects_count: count || 0,
+          // Add a placeholder for last activity - could be retrieved separately if needed
+          last_activity: new Date().toISOString()
+        };
+      })
+    );
+    
+    return clientsWithProjectCounts || [];
   } catch (error) {
     console.error('Error in getRecentClients:', error);
     throw error;
