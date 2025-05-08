@@ -1,4 +1,3 @@
-
 export type Json =
   | string
   | number
@@ -27,6 +26,8 @@ export interface Database {
           project_goals: string | null
           coordinates: [number, number] | null
           user_id: string
+          status: 'brief' | 'sent' | 'complete'
+          status_updated_at: string
         }
         Insert: {
           id?: string
@@ -44,6 +45,8 @@ export interface Database {
           project_goals?: string | null
           coordinates?: [number, number] | null
           user_id: string
+          status?: 'brief' | 'sent' | 'complete'
+          status_updated_at?: string
         }
         Update: {
           id?: string
@@ -61,6 +64,8 @@ export interface Database {
           project_goals?: string | null
           coordinates?: [number, number] | null
           user_id?: string
+          status?: 'brief' | 'sent' | 'complete'
+          status_updated_at?: string
         }
         Relationships: [
           {
@@ -383,6 +388,92 @@ export interface Database {
             foreignKeyName: "summaries_project_id_fkey"
             columns: ["project_id"]
             referencedRelation: "projects"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      user_profiles: {
+        Row: {
+          id: string
+          created_at: string
+          updated_at: string
+          role: 'admin' | 'client'
+          first_name: string | null
+          last_name: string | null
+          company: string | null
+          phone: string | null
+          notification_preferences: Json
+        }
+        Insert: {
+          id: string
+          created_at?: string
+          updated_at?: string
+          role?: 'admin' | 'client'
+          first_name?: string | null
+          last_name?: string | null
+          company?: string | null
+          phone?: string | null
+          notification_preferences?: Json
+        }
+        Update: {
+          id?: string
+          created_at?: string
+          updated_at?: string
+          role?: 'admin' | 'client'
+          first_name?: string | null
+          last_name?: string | null
+          company?: string | null
+          phone?: string | null
+          notification_preferences?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_profiles_id_fkey"
+            columns: ["id"]
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      activities: {
+        Row: {
+          id: string
+          created_at: string
+          project_id: string | null
+          user_id: string | null
+          activity_type: 'status_change' | 'comment' | 'document_upload' | 'system_event'
+          details: Json
+          is_system_generated: boolean
+        }
+        Insert: {
+          id?: string
+          created_at?: string
+          project_id?: string | null
+          user_id?: string | null
+          activity_type: 'status_change' | 'comment' | 'document_upload' | 'system_event'
+          details: Json
+          is_system_generated?: boolean
+        }
+        Update: {
+          id?: string
+          created_at?: string
+          project_id?: string | null
+          user_id?: string | null
+          activity_type?: 'status_change' | 'comment' | 'document_upload' | 'system_event'
+          details?: Json
+          is_system_generated?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activities_project_id_fkey"
+            columns: ["project_id"]
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activities_user_id_fkey"
+            columns: ["user_id"]
+            referencedRelation: "users"
             referencedColumns: ["id"]
           }
         ]
