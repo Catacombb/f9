@@ -13,7 +13,8 @@ import {
   LogOut,
   CheckSquare,
   User,
-  Activity
+  Activity,
+  Trash2
 } from 'lucide-react';
 
 type UserRole = 'admin' | 'client' | null;
@@ -59,6 +60,18 @@ export function DashboardSidebar({ userRole }: DashboardSidebarProps) {
       title: 'Completed Projects',
       href: '/dashboard/completed',
       icon: <CheckSquare className="mr-2 h-4 w-4" />,
+      roles: ['admin']
+    },
+    {
+      title: 'File Cleanup',
+      href: '/dashboard/file-cleanup',
+      icon: <Trash2 className="mr-2 h-4 w-4" />,
+      roles: ['admin']
+    },
+    {
+      title: 'Diagnostics',
+      href: '/dashboard/diagnostics',
+      icon: <Activity className="mr-2 h-4 w-4" />,
       roles: ['admin']
     }
   ];

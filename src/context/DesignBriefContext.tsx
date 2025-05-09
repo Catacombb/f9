@@ -10,6 +10,7 @@ import { loadProject, getOrCreateProject } from '@/lib/supabase/services/project
 import { supabase } from '@/lib/supabase/schema';
 import { isAdmin } from '@/lib/supabase/services/roleService';
 import { useToast } from '@/hooks/use-toast';
+import { createDiagnosticSession } from '@/lib/supabase/services/diagnosticService';
 
 // Session storage key for project ID
 const PROJECT_ID_STORAGE_KEY = 'currentProjectId';
@@ -171,49 +172,152 @@ export const DesignBriefProvider: React.FC<{ children: React.ReactNode }> = ({ c
       }
     }
     
-    // Helper function for creating a new project
-    async function createNewProject(userId: string) {
+    // Function to create a new project
+    const createNewProject = async (userId: string) => {
+      const diagnostic = createDiagnosticSession(userId, 'design_brief_project_creation');
+      
       try {
+        await diagnostic.log('info', 'start_creation', {
+          userId,
+          timestamp: new Date().toISOString()
+        });
+        
         console.log('Creating new project for user:', userId);
         
         // Try to create a new project using up to 3 attempts
-        let result;
+        let result: any = null;
         let attempts = 0;
         const maxAttempts = 3;
         
         while (attempts < maxAttempts) {
           attempts++;
+          await diagnostic.log('info', 'attempt', {
+            attemptNumber: attempts,
+            maxAttempts
+          });
+          
           console.log(`Project creation attempt ${attempts} of ${maxAttempts}`);
           
-          // Create a new project using the dedicated function
-          result = await getOrCreateProject(userId);
+          // Get the user role first to determine if this user is allowed to create projects
+          const userIsAdmin = await diagnostic.timeAndLog('check_admin_status', async () => {
+            return isAdmin(userId);
+          });
+          
+          // Create a new project using the dedicated function with diagnostics
+          // Note: For admin users, this will now work properly with the updated stored procedure
+          result = await diagnostic.timeAndLog('get_or_create_project', async () => {
+            return getOrCreateProject(userId);
+          });
+          
+          await diagnostic.log('info', 'attempt_result', {
+            success: result?.success || false,
+            projectId: result?.projectId,
+            isNewProject: result?.isNewProject,
+            diagnosticId: result?.diagnosticId,
+            error: result?.error ? JSON.stringify(result.error) : null
+          });
           
           if (result.success && result.projectId) {
+            await diagnostic.log('success', 'creation_succeeded', {
+              projectId: result.projectId,
+              isNewProject: result.isNewProject,
+              diagnosticId: result.diagnosticId
+            });
             break; // Exit the retry loop if successful
+          } else if (result.error) {
+            await diagnostic.log('error', 'creation_attempt_failed', {
+              attempt: attempts,
+              errorMessage: result.error.message,
+              diagnosticId: result.diagnosticId
+            }, result.error.message);
+            
+            console.error(`Project creation attempt ${attempts} failed:`, result.error);
+            
+            // If the error is about admin users not being allowed to create projects,
+            // and we are in force creation mode, we might want to handle it specially
+            if (result.error.message && 
+                result.error.message.includes('Admin users cannot') && 
+                sessionStorage.getItem(FORCE_CREATION_KEY) === 'true') {
+              await diagnostic.log('info', 'admin_force_creation', {
+                userId,
+                isAdmin: userIsAdmin
+              });
+              
+              console.log('Admin user is forcing project creation, using special handling...');
+              toast({
+                title: 'Admin Project Creation',
+                description: 'Admins should create projects for clients, not themselves.',
+                duration: 5000
+              });
+              
+              // Clear the force creation flag
+              sessionStorage.removeItem(FORCE_CREATION_KEY);
+              setIsLoading(false);
+              
+              await diagnostic.end(false, {
+                reason: 'admin_force_creation_rejected'
+              });
+              
+              return;
+            }
           }
           
           // Small delay before retry
           if (attempts < maxAttempts) {
+            await diagnostic.log('info', 'retry_delay', {
+              attemptNumber: attempts,
+              delayMs: 500
+            });
+            
             await new Promise(resolve => setTimeout(resolve, 500));
           }
         }
         
         if (result?.success && result.projectId) {
+          await diagnostic.log('success', 'project_created', {
+            projectId: result.projectId,
+            attemptsMade: attempts,
+            diagnosticId: result.diagnosticId
+          });
+          
           console.log('New project created, ID:', result.projectId);
           // Store the project ID in session storage
           sessionStorage.setItem(PROJECT_ID_STORAGE_KEY, result.projectId);
           
+          // Log this to make sure we can audit project creations
+          console.log('Project ID stored in session storage:', result.projectId);
+          
           // Load the project data
-          const loadResult = await loadProject(result.projectId);
+          await diagnostic.log('info', 'loading_project_data', {
+            projectId: result.projectId
+          });
+          
+          const loadResult = await diagnostic.timeAndLog('load_project', async () => {
+            return loadProject(result.projectId);
+          });
           
           if (loadResult.success && loadResult.projectData) {
+            await diagnostic.log('success', 'project_data_loaded', {
+              projectId: result.projectId
+            });
+            
             setProjectData(loadResult.projectData);
             toast({
               title: 'New Project Created',
               description: 'Your new design brief has been created.',
               duration: 3000
             });
+            
+            await diagnostic.end(true, {
+              result: 'project_created_and_loaded',
+              projectId: result.projectId
+            });
           } else if (loadResult.error) {
+            await diagnostic.log('error', 'project_load_failed', {
+              projectId: result.projectId,
+              error: loadResult.error instanceof Error ? loadResult.error.message : String(loadResult.error)
+            }, loadResult.error instanceof Error ? loadResult.error.message : 'Unknown error');
+            
             console.error('Error loading project:', loadResult.error);
             setError('Failed to load project data');
             toast({
@@ -221,43 +325,56 @@ export const DesignBriefProvider: React.FC<{ children: React.ReactNode }> = ({ c
               title: 'Error Loading Project',
               description: 'Failed to load project data. Please try again.'
             });
+            
+            await diagnostic.end(false, {
+              result: 'project_created_but_load_failed',
+              projectId: result.projectId
+            });
           }
         } else {
-          console.error('Error creating project after multiple attempts:', result?.error);
+          await diagnostic.log('error', 'project_creation_failed', {
+            attempts,
+            error: result?.error ? JSON.stringify(result.error) : 'Unknown error'
+          }, result?.error?.message || 'Failed to create project after multiple attempts');
           
-          // Fallback: Try to find the most recent project for this user
-          const { data: existingProjects } = await supabase
-            .from('projects')
-            .select('id')
-            .eq('user_id', userId)
-            .order('created_at', { ascending: false }) // get newest first
-            .limit(1);
-            
-          if (existingProjects && existingProjects.length > 0) {
-            console.log('Falling back to most recent project:', existingProjects[0].id);
-            const fallbackResult = await loadProject(existingProjects[0].id);
-            
-            if (fallbackResult.success && fallbackResult.projectData) {
-              setProjectData(fallbackResult.projectData);
-              sessionStorage.setItem(PROJECT_ID_STORAGE_KEY, existingProjects[0].id);
-              toast({
-                title: 'Using Existing Project',
-                description: 'We found an existing project for you.',
-                duration: 3000
-              });
-              setIsLoading(false);
-              return;
-            }
-          }
-          
-          // If we get here, both creation and fallback failed
-          setError('Failed to create or load a project');
+          console.error('Failed to create project after multiple attempts:', result?.error);
+          setError('Failed to create project');
           toast({
             variant: 'destructive',
             title: 'Error Creating Project',
-            description: result?.error?.message || 'Failed to create project. Please try again.'
+            description: result?.error?.message || 'Failed to create project. Please try again.',
+            action: (
+              <div className="flex flex-col">
+                <div className="text-xs text-gray-400 mt-1">
+                  Diagnostic ID: {result?.diagnosticId || 'Not available'}
+                </div>
+              </div>
+            )
+          });
+          
+          await diagnostic.end(false, {
+            result: 'project_creation_failed_after_attempts',
+            attempts,
+            error: result?.error?.message
           });
         }
+      } catch (error) {
+        await diagnostic.log('error', 'unexpected_exception', {
+          error: error instanceof Error ? error.message : String(error)
+        }, error instanceof Error ? error.message : 'Unknown error');
+        
+        console.error('Unexpected error during project creation:', error);
+        setError('An unexpected error occurred during project creation');
+        toast({
+          variant: 'destructive',
+          title: 'Unexpected Error',
+          description: 'An unexpected error occurred during project creation. Please try again.'
+        });
+        
+        await diagnostic.end(false, {
+          result: 'unexpected_exception',
+          error: error instanceof Error ? error.message : String(error)
+        });
       } finally {
         setIsLoading(false);
       }

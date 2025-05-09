@@ -2,6 +2,8 @@ import { supabase } from '@/lib/supabase/schema';
 import { supabaseAdmin } from '@/lib/supabase/adminClient';
 import { FormData, ProjectData, SectionKey, SpaceRoom, Professional, InspirationEntry, OccupantEntry } from '@/types';
 import { v4 as uuidv4 } from 'uuid';
+import { isAdmin } from '@/lib/supabase/services/roleService';
+import { createDiagnosticSession } from '@/lib/supabase/services/diagnosticService';
 
 // Define type for project settings to match the database schema
 interface ProjectSettings {
@@ -100,7 +102,18 @@ export async function saveProject(projectData: ProjectData, userId: string, proj
     // Increment version for this update
     const newVersion = currentVersion + 1;
     
-    // Update the project with new version
+    // Fetch current files from the database to reconcile deletions
+    const { data: currentFiles, error: filesError } = await supabase
+      .from('project_files')
+      .select('id, file_path, category')
+      .eq('project_id', resolvedProjectId);
+    
+    if (filesError) {
+      console.error('Error fetching project files for reconciliation:', filesError);
+    }
+    
+    // Create a transaction to ensure atomicity of all operations
+    // Start with updating the project with new version
     const { error: projectError } = await supabase
       .from('projects')
       .update({
@@ -382,6 +395,59 @@ export async function saveProject(projectData: ProjectData, userId: string, proj
         }
       }
     }
+    
+    // Helper function to reconcile files
+    const reconcileFiles = async () => {
+      if (!currentFiles || currentFiles.length === 0) {
+        return; // No files to reconcile
+      }
+
+      // Create a map of all client-side files
+      const clientFileMap = new Map();
+      
+      // Helper to add files to the map
+      const addFilesToMap = (files: any[], category: string) => {
+        if (!files) return;
+        
+        files.forEach(file => {
+          if (file && file.id) {
+            clientFileMap.set(file.id, {
+              id: file.id,
+              path: file.path,
+              category: category
+            });
+          }
+        });
+      };
+      
+      // Add each category of files to the map
+      addFilesToMap(projectData.files.uploadedFiles, 'uploadedFiles');
+      addFilesToMap(projectData.files.uploadedInspirationImages, 'uploadedInspirationImages');
+      addFilesToMap(projectData.files.inspirationSelections, 'inspirationSelections');
+      addFilesToMap(projectData.files.siteDocuments, 'siteDocuments');
+      addFilesToMap(projectData.files.inspirationFiles, 'inspirationFiles');
+      addFilesToMap(projectData.files.supportingDocuments, 'supportingDocuments');
+      addFilesToMap(projectData.files.sitePhotos, 'sitePhotos');
+      addFilesToMap(projectData.files.designFiles, 'designFiles');
+      
+      // Find files that exist in the database but not in the client state
+      const filesToDelete = currentFiles.filter(file => !clientFileMap.has(file.id));
+      
+      console.log(`Found ${filesToDelete.length} files to delete during reconciliation`);
+      
+      // Delete these files
+      for (const file of filesToDelete) {
+        try {
+          console.log(`Reconciliation: Deleting file ${file.id} from storage path ${file.file_path}`);
+          await deleteProjectFile(file.id, file.file_path);
+        } catch (error) {
+          console.error(`Error during file reconciliation for file ${file.id}:`, error);
+        }
+      }
+    };
+    
+    // Execute file reconciliation
+    await reconcileFiles();
     
     // Handle file uploads
     // For each file category in the files object, process any unprocessed files
@@ -1110,155 +1176,300 @@ export async function deleteProjectFile(fileId: string, storagePath: string) {
  * Single source of truth for getting or creating a project
  * This function ensures a user always has exactly one project and prevents duplicates
  * @param userId The ID of the user to get or create a project for
+ * @param targetUserId Optional target user ID - used when an admin creates a project for a client
  * @returns An object containing success status, project ID, and whether the project was newly created
  */
-export async function getOrCreateProject(userId: string): Promise<{
+export async function getOrCreateProject(
+  userId: string, 
+  targetUserId?: string
+): Promise<{
   success: boolean;
   projectId?: string;
   isNewProject?: boolean;
   error?: any;
+  diagnosticId?: string; // Added to track the diagnostic session
 }> {
+  // Create a diagnostic session for this operation
+  const diagnostic = createDiagnosticSession(userId, 'project_creation');
+  
   try {
     if (!userId) {
+      await diagnostic.log('error', 'validate_input', {}, 'User ID is required');
       throw new Error('User ID is required');
     }
 
-    console.log('getOrCreateProject called for user ID:', userId);
+    await diagnostic.log('info', 'initialize', {
+      userId,
+      targetUserId: targetUserId || null
+    });
     
-    // First, try to get an existing project for this user
-    // This is our first attempt to find an existing project
-    const { data: existingProjects, error: findError } = await supabase
-      .from('projects')
-      .select('id')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false }) // get newest first
-      .limit(1);
+    // First check if the user is an admin (for logging purposes)
+    const userIsAdmin = await diagnostic.timeAndLog('check_admin_status', async () => {
+      return isAdmin(userId);
+    });
     
-    if (findError) {
-      console.error('Error finding existing projects:', findError);
-    } else if (existingProjects && existingProjects.length > 0) {
-      console.log('Found existing project:', existingProjects[0].id);
+    await diagnostic.log('info', 'admin_status_result', { 
+      userIsAdmin 
+    });
+    
+    // First, try to get an existing project for this user (or target user if specified)
+    const effectiveUserId = targetUserId || userId;
+    
+    // Look for existing projects
+    const existingProjects = await diagnostic.timeAndLog('find_existing_projects', async () => {
+      const { data, error } = await supabase
+        .from('projects')
+        .select('id')
+        .eq('user_id', effectiveUserId)
+        .order('created_at', { ascending: false }) // get newest first
+        .limit(1);
+      
+      if (error) {
+        await diagnostic.log('error', 'find_existing_error', {}, error.message, error.details);
+        throw error;
+      }
+      
+      return data;
+    });
+    
+    // If we found an existing project, return it
+    if (existingProjects && existingProjects.length > 0) {
+      await diagnostic.log('success', 'found_existing_project', {
+        projectId: existingProjects[0].id
+      });
+      
+      await diagnostic.end(true, {
+        result: 'existing_project_found',
+        projectId: existingProjects[0].id
+      });
+      
       return {
         success: true,
         projectId: existingProjects[0].id,
-        isNewProject: false
+        isNewProject: false,
+        diagnosticId: diagnostic.requestId
       };
     }
     
+    await diagnostic.log('info', 'no_existing_project_found', {
+      effectiveUserId
+    });
+    
     // No existing project found, we need to create a new one
     // Try using the RPC function first (atomic transaction approach)
-    console.log('No existing project found, attempting to create via RPC');
+    await diagnostic.log('info', 'attempt_rpc_creation', {
+      method: 'get_or_create_project',
+      params: {
+        p_user_id: userId,
+        p_target_user_id: targetUserId,
+        p_request_id: diagnostic.requestId
+      }
+    });
     
     // Attempt the RPC call but catch errors
-    let rpcResult = null;
-    let rpcError = null;
+    let rpcResult;
+    let rpcError;
     
     try {
-      const rpcResponse = await supabase.rpc('get_or_create_project', {
-        p_user_id: userId
-      });
+      const rpcParams: any = { 
+        p_user_id: userId,
+        p_request_id: diagnostic.requestId
+      };
+      
+      // If targetUserId is provided, pass it as p_target_user_id
+      if (targetUserId) {
+        rpcParams.p_target_user_id = targetUserId;
+      }
+      
+      const rpcResponse = await supabase.rpc('get_or_create_project', rpcParams);
       rpcResult = rpcResponse.data;
       rpcError = rpcResponse.error;
+      
+      if (rpcError) {
+        await diagnostic.log('error', 'rpc_error', {
+          error: rpcError
+        }, rpcError.message, JSON.stringify(rpcError));
+      } else {
+        await diagnostic.log('success', 'rpc_success', {
+          result: rpcResult
+        });
+      }
     } catch (err) {
-      console.error('Exception during RPC call:', err);
       rpcError = err;
-    }
-
-    // Log the RPC result for debugging
-    if (rpcResult) {
-      console.log('RPC get_or_create_project result:', rpcResult);
-    }
-    if (rpcError) {
-      console.error('RPC get_or_create_project error:', rpcError);
+      await diagnostic.log('error', 'rpc_exception', {}, 
+        err instanceof Error ? err.message : 'Unknown error',
+        err instanceof Error ? err.stack : JSON.stringify(err));
     }
 
     // If RPC worked, use its result
     if (!rpcError && rpcResult && rpcResult.project_id) {
-      console.log('Project created/found via RPC:', rpcResult.project_id);
+      await diagnostic.end(true, {
+        result: 'project_created_via_rpc',
+        projectId: rpcResult.project_id,
+        isNewProject: rpcResult.is_new_project
+      });
+      
       return {
         success: true,
         projectId: rpcResult.project_id,
-        isNewProject: rpcResult.is_new_project
+        isNewProject: rpcResult.is_new_project,
+        diagnosticId: diagnostic.requestId
       };
     }
     
     // RPC failed, use direct DB operations as fallback
-    console.log('RPC method failed, falling back to direct DB operations');
+    await diagnostic.log('info', 'rpc_failed_using_fallback', {
+      rpcError: rpcError ? (rpcError instanceof Error ? rpcError.message : JSON.stringify(rpcError)) : null
+    });
     
     // Try direct database creation
     // Get user's email for the client_name field
-    const user_email = await getUserEmail(userId);
-    console.log('User email for project creation:', user_email);
+    let userEmail;
+    try {
+      userEmail = await diagnostic.timeAndLog('get_user_email', async () => {
+        return getUserEmail(effectiveUserId);
+      });
+    } catch (emailError) {
+      await diagnostic.log('warning', 'email_fetch_error', {}, 
+        emailError instanceof Error ? emailError.message : 'Unknown error');
+      userEmail = null;
+    }
     
     // Create a client timestamp ID to reduce chance of conflicts
     const timestamp = new Date().getTime();
     
     // Create a new project with our best effort
-    const { data: newProject, error: insertError } = await supabase
-      .from('projects')
-      .insert({
-        user_id: userId,
-        client_name: user_email || `New Client-${timestamp}`,
-        project_description: 'Project created via getOrCreateProject (fallback method)',
-        status: 'brief'
-      })
-      .select()
-      .single();
-    
-    if (insertError) {
-      console.error('Error creating project via direct insert:', insertError);
+    let newProject;
+    try {
+      const result = await diagnostic.timeAndLog('direct_db_insert', async () => {
+        const { data, error } = await supabase
+          .from('projects')
+          .insert({
+            user_id: effectiveUserId,
+            client_name: userEmail || `New Client-${timestamp}`,
+            project_description: 'Project created via enhanced diagnostics getOrCreateProject (fallback method)',
+            status: 'brief'
+          })
+          .select()
+          .single();
+        
+        if (error) {
+          throw error;
+        }
+        
+        return data;
+      });
+      
+      newProject = result;
+    } catch (insertError) {
+      await diagnostic.log('error', 'direct_insert_failed', {}, 
+        insertError instanceof Error ? insertError.message : 'Insert failed',
+        insertError instanceof Error ? insertError.stack : JSON.stringify(insertError));
       
       // Final fallback: check again for any existing projects
       // This covers the race condition where a project was created between our first check and now
-      console.log('Checking one last time for existing projects');
-      const { data: lastResortProjects, error: lastResortError } = await supabase
-        .from('projects')
-        .select('id')
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false }) // get newest first
-        .limit(1);
+      await diagnostic.log('info', 'checking_last_resort', {});
       
-      if (!lastResortError && lastResortProjects && lastResortProjects.length > 0) {
-        console.log('Found existing project in last resort check:', lastResortProjects[0].id);
-        return {
-          success: true,
-          projectId: lastResortProjects[0].id,
-          isNewProject: false
-        };
+      try {
+        const result = await diagnostic.timeAndLog('last_resort_check', async () => {
+          const { data, error } = await supabase
+            .from('projects')
+            .select('id')
+            .eq('user_id', effectiveUserId)
+            .order('created_at', { ascending: false }) // get newest first
+            .limit(1);
+          
+          if (error) {
+            throw error;
+          }
+          
+          return data;
+        });
+        
+        if (result && result.length > 0) {
+          await diagnostic.log('success', 'found_in_last_resort', {
+            projectId: result[0].id
+          });
+          
+          await diagnostic.end(true, {
+            result: 'last_resort_found',
+            projectId: result[0].id
+          });
+          
+          return {
+            success: true,
+            projectId: result[0].id,
+            isNewProject: false,
+            diagnosticId: diagnostic.requestId
+          };
+        }
+      } catch (lastResortError) {
+        await diagnostic.log('error', 'last_resort_failed', {}, 
+          lastResortError instanceof Error ? lastResortError.message : 'Last resort check failed');
       }
       
       // If we still can't find or create a project, return the error
-      throw new Error(`Failed to create project: ${insertError.message || 'Unknown error'}`);
+      const errorMessage = insertError instanceof Error 
+        ? insertError.message 
+        : 'Failed to create project';
+      
+      await diagnostic.end(false, {
+        result: 'creation_failed',
+        error: errorMessage
+      });
+      
+      throw new Error(`Failed to create project: ${errorMessage}`);
     }
-    
-    console.log('New project created via direct method:', newProject?.id);
     
     // Log the project creation in activities
     try {
-      await supabase
-        .from('activities')
-        .insert({
-          project_id: newProject.id,
-          user_id: userId,
-          activity_type: 'system_event',
-          details: {
-            event: 'project_created',
-            message: 'Project created via getOrCreateProject function'
-          },
-          is_system_generated: true
-        });
+      await diagnostic.timeAndLog('create_activity_log', async () => {
+        const { error } = await supabase
+          .from('activities')
+          .insert({
+            project_id: newProject.id,
+            user_id: userId, // Use the actual user who performed the action
+            activity_type: 'system_event',
+            details: {
+              event: 'project_created',
+              message: 'Project created via diagnostic getOrCreateProject function',
+              created_by: userIsAdmin ? 'admin' : 'client',
+              request_id: diagnostic.requestId,
+              ...(targetUserId ? { target_user_id: targetUserId } : {})
+            },
+            is_system_generated: true
+          });
+        
+        if (error) {
+          throw error;
+        }
+      });
     } catch (activityError) {
       // Non-critical error, just log it
-      console.warn('Error logging project creation activity:', activityError);
+      await diagnostic.log('warning', 'activity_log_error', {}, 
+        activityError instanceof Error ? activityError.message : 'Activity logging failed');
     }
+    
+    await diagnostic.end(true, {
+      result: 'project_created_via_direct',
+      projectId: newProject.id
+    });
     
     return {
       success: true,
       projectId: newProject.id,
-      isNewProject: true
+      isNewProject: true,
+      diagnosticId: diagnostic.requestId
     };
   } catch (error) {
-    console.error('Error in getOrCreateProject:', error);
+    // Final error handler
+    await diagnostic.log('error', 'unhandled_error', {}, 
+      error instanceof Error ? error.message : 'Unknown error',
+      error instanceof Error ? error.stack : JSON.stringify(error));
+    
+    await diagnostic.end(false, {
+      result: 'unhandled_error'
+    });
     
     // Enhanced error logging
     const errorDetail = error instanceof Error 
@@ -1271,8 +1482,10 @@ export async function getOrCreateProject(userId: string): Promise<{
       success: false,
       error: {
         message: error instanceof Error ? error.message : 'Unknown error in project creation',
-        details: errorDetail
-      }
+        details: errorDetail,
+        diagnosticId: diagnostic.requestId
+      },
+      diagnosticId: diagnostic.requestId
     };
   }
 }

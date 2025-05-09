@@ -11,6 +11,7 @@ import TestSupabasePage from "./pages/TestSupabasePage";
 import TestDashboardSchemePage from "./pages/TestDashboardSchemePage";
 import { Login, Register, ForgotPassword, ResetPassword, ProtectedRoute, RedirectIfAuthenticated } from "@/components/auth";
 import { DashboardRouter } from "@/components/dashboard";
+import { DiagnosticsPage } from '@/components/dashboard/pages/DiagnosticsPage';
 
 const App = () => {
   // Create a client instance inside the component to ensure proper React lifecycle

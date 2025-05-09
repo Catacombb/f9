@@ -6,11 +6,13 @@ import { Button } from '@/components/ui/button';
 import { Link, useNavigate } from 'react-router-dom';
 import { Plus } from 'lucide-react';
 import { setForceProjectCreation } from '@/context/DesignBriefContext';
+import { useToast } from '@/hooks/use-toast';
 
 export function ProjectsPage() {
   const { user } = useSupabase();
   const navigate = useNavigate();
   const [userIsAdmin, setUserIsAdmin] = useState(false);
+  const { toast } = useToast();
   
   // Check if the user is an admin when the component mounts
   React.useEffect(() => {
@@ -30,9 +32,30 @@ export function ProjectsPage() {
   
   // Handle creating a new project
   const handleCreateNewProject = () => {
-    // Set the force creation flag before navigating
-    setForceProjectCreation();
-    navigate('/design-brief?create=true');
+    try {
+      // Set the force creation flag before navigating
+      setForceProjectCreation();
+      
+      // Log that we're initiating project creation
+      console.log('User initiated project creation from dashboard');
+      
+      // Provide user feedback
+      toast({
+        title: 'Creating Design Brief',
+        description: 'Starting your new design brief...',
+        duration: 3000
+      });
+      
+      // Navigate to the design brief page with create parameter
+      navigate('/design-brief?create=true');
+    } catch (error) {
+      console.error('Error initiating project creation:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Failed to create new project. Please try again.'
+      });
+    }
   };
 
   return (

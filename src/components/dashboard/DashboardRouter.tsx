@@ -7,6 +7,8 @@ import { AdminDashboard } from './AdminDashboard';
 import { ClientDashboard } from './ClientDashboard';
 import { ProjectsPage } from './pages/ProjectsPage';
 import { ProjectDetailPage } from './pages/ProjectDetailPage';
+import { FileCleanupPage } from './pages/FileCleanupPage';
+import { DiagnosticsPage } from './pages/DiagnosticsPage';
 
 export function DashboardRouter() {
   const { user, loading } = useSupabase();
@@ -60,6 +62,8 @@ export function DashboardRouter() {
           <Route path="/" element={<AdminDashboard />} />
           <Route path="/projects" element={<ProjectsPage />} />
           <Route path="/projects/:id" element={<ProjectDetailPage />} />
+          <Route path="/file-cleanup" element={<FileCleanupPage />} />
+          <Route path="/diagnostics" element={<DiagnosticsPage />} />
           {/* 
             Add additional admin routes here, such as:
             <Route path="/clients" element={<ClientsList />} />
