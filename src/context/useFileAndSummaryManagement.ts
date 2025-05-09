@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { ProjectData } from '@/types';
 import { generatePDF } from '@/utils/pdfGenerator/index';
-import { saveProject } from '@/lib/supabase/services/projectService';
+import { saveProject, deleteProjectFile } from '@/lib/supabase/services/projectService';
 import { useSupabase } from '@/hooks/useSupabase';
 
 export const useFileAndSummaryManagement = (
@@ -145,11 +145,44 @@ The Northstar Team`;
     }
   }, [projectData]);
 
+  const deleteFile = useCallback(async (fileId: string, storagePath: string, category: string) => {
+    try {
+      const result = await deleteProjectFile(fileId, storagePath);
+      
+      if (result.success) {
+        // Update local state to remove the file
+        setProjectData(draft => {
+          const updatedDraft = { ...draft };
+          
+          // Remove the file from the appropriate category
+          if (updatedDraft.files[category as keyof typeof updatedDraft.files]) {
+            const categoryFiles = updatedDraft.files[category as keyof typeof updatedDraft.files] as any[];
+            updatedDraft.files = {
+              ...updatedDraft.files,
+              [category]: categoryFiles.filter(file => file.id !== fileId)
+            };
+          }
+          
+          updatedDraft.lastSaved = new Date().toISOString();
+          return updatedDraft;
+        });
+        
+        return { success: true };
+      }
+      
+      return { success: false, error: result.error };
+    } catch (error) {
+      console.error('Error deleting file:', error);
+      return { success: false, error };
+    }
+  }, [setProjectData]);
+
   return { 
     updateFiles, 
     updateSummary, 
     saveProjectData, 
     exportAsPDF,
-    sendByEmail
+    sendByEmail,
+    deleteFile
   };
 };

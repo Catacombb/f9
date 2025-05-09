@@ -43,8 +43,8 @@ export function Register() {
         description: 'Please check your email to confirm your account.',
       });
       
-      // Navigate to login page after successful registration
-      navigate('/login');
+      // Navigate to dashboard after successful registration
+      navigate('/dashboard');
     } catch (error: any) {
       toast({
         title: 'Registration Failed',

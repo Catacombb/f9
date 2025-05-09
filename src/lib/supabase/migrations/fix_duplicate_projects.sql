@@ -1,13 +1,10 @@
--- Fix for the handle_new_user function that had a syntax error
--- This script drops and recreates the function with proper syntax
-
 -- First, drop the existing trigger
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 
 -- Then drop the existing function
 DROP FUNCTION IF EXISTS public.handle_new_user();
 
--- Recreate the function with correct syntax
+-- Recreate the function with correct syntax and duplicate prevention
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 DECLARE
@@ -79,25 +76,18 @@ CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 
--- Create a profile for the existing user
--- This will insert a profile for any existing auth user who doesn't have one
-INSERT INTO public.user_profiles (id, role, created_at, updated_at)
-SELECT 
-  id, 
-  'client', 
-  NOW(), 
-  NOW()
-FROM 
-  auth.users
-WHERE 
-  NOT EXISTS (
-    SELECT 1 FROM public.user_profiles WHERE id = auth.users.id
-  );
+-- Clean up duplicate projects
+-- Note: This will keep the oldest project for each user and remove duplicates
+-- Uncomment and run carefully in production after testing
 
--- Report the result
-SELECT 
-  (SELECT COUNT(*) FROM auth.users) AS total_auth_users,
-  (SELECT COUNT(*) FROM public.user_profiles) AS total_profiles,
-  (SELECT COUNT(*) FROM auth.users WHERE 
-    NOT EXISTS (SELECT 1 FROM public.user_profiles WHERE id = auth.users.id)
-  ) AS users_without_profiles; 
+WITH ranked_projects AS (
+  SELECT 
+    id,
+    user_id,
+    ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY created_at) AS rn
+  FROM projects
+)
+DELETE FROM projects
+WHERE id IN (
+  SELECT id FROM ranked_projects WHERE rn > 1
+);

@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Search, Filter, SortAsc, SortDesc } from 'lucide-react';
+import { Search, Filter, SortAsc, SortDesc, RefreshCw } from 'lucide-react';
 import { Database } from '@/lib/supabase/database.types';
 
 type Project = Database['public']['Tables']['projects']['Row'];
@@ -26,11 +26,12 @@ export function ProjectList({ initialProjects, isAdmin = false }: ProjectListPro
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [sortField, setSortField] = useState<'updated_at' | 'client_name'>('updated_at');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
+  const [refreshCounter, setRefreshCounter] = useState(0);
 
   // Load projects if not provided as props
   useEffect(() => {
     async function loadProjects() {
-      if (initialProjects || !user) return;
+      if (!user) return;
       
       try {
         setLoading(true);
@@ -44,7 +45,7 @@ export function ProjectList({ initialProjects, isAdmin = false }: ProjectListPro
     }
 
     loadProjects();
-  }, [initialProjects, user]);
+  }, [user, refreshCounter]); // Add refreshCounter to dependencies to trigger a refresh
 
   // Apply filters and sorting whenever relevant state changes
   useEffect(() => {
@@ -105,6 +106,17 @@ export function ProjectList({ initialProjects, isAdmin = false }: ProjectListPro
     setSortField(value as 'updated_at' | 'client_name');
   };
 
+  // Handler for project deletion
+  const handleProjectDeleted = () => {
+    // Increment the refresh counter to trigger a reload of projects
+    setRefreshCounter(prev => prev + 1);
+  };
+
+  // Manually refresh the project list
+  const refreshProjects = () => {
+    setRefreshCounter(prev => prev + 1);
+  };
+
   if (loading) {
     return <ProjectListSkeleton />;
   }
@@ -157,6 +169,10 @@ export function ProjectList({ initialProjects, isAdmin = false }: ProjectListPro
               <SortDesc className="h-4 w-4" />
             )}
           </Button>
+
+          <Button variant="outline" size="icon" onClick={refreshProjects} title="Refresh Projects">
+            <RefreshCw className="h-4 w-4" />
+          </Button>
         </div>
       </div>
 
@@ -167,7 +183,8 @@ export function ProjectList({ initialProjects, isAdmin = false }: ProjectListPro
             <ProjectCard 
               key={project.id} 
               project={project} 
-              isAdmin={isAdmin} 
+              isAdmin={isAdmin}
+              onDelete={handleProjectDeleted}
             />
           ))}
         </div>
@@ -194,6 +211,7 @@ function ProjectListSkeleton() {
         <div className="flex gap-2">
           <Skeleton className="h-10 w-[140px]" />
           <Skeleton className="h-10 w-[160px]" />
+          <Skeleton className="h-10 w-10" />
           <Skeleton className="h-10 w-10" />
         </div>
       </div>

@@ -189,7 +189,8 @@ export interface ProjectData {
   summary: BriefSummary;
   lastSaved?: string;
   currentSection?: string;
-  projectId?: string; // Added to store the project ID directly in the project data
+  projectId?: string; // ID of the project in the database
+  version?: number;   // Version number for optimistic locking
 }
 
 export type SectionKey = 'intro' | 'projectInfo' | 'budget' | 'lifestyle' | 'site' | 'spaces' | 'architecture' | 'contractors' | 'communication' | 'uploads' | 'summary' | 'feedback';

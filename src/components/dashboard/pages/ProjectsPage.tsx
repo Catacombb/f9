@@ -3,11 +3,13 @@ import { useSupabase } from '@/hooks/useSupabase';
 import { isAdmin } from '@/lib/supabase/services/roleService';
 import { ProjectList } from '../ProjectList';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Plus } from 'lucide-react';
+import { setForceProjectCreation } from '@/context/DesignBriefContext';
 
 export function ProjectsPage() {
   const { user } = useSupabase();
+  const navigate = useNavigate();
   const [userIsAdmin, setUserIsAdmin] = useState(false);
   
   // Check if the user is an admin when the component mounts
@@ -25,6 +27,13 @@ export function ProjectsPage() {
     
     checkAdminStatus();
   }, [user]);
+  
+  // Handle creating a new project
+  const handleCreateNewProject = () => {
+    // Set the force creation flag before navigating
+    setForceProjectCreation();
+    navigate('/design-brief?create=true');
+  };
 
   return (
     <div className="space-y-6">
@@ -37,14 +46,14 @@ export function ProjectsPage() {
               : 'View and manage your design brief projects'}
           </p>
         </div>
-        <div className="flex mt-4 md:mt-0">
-          <Button asChild>
-            <Link to="/design-brief">
+        {!userIsAdmin && (
+          <div className="flex mt-4 md:mt-0">
+            <Button onClick={handleCreateNewProject}>
               <Plus className="mr-2 h-4 w-4" />
               New Project
-            </Link>
-          </Button>
-        </div>
+            </Button>
+          </div>
+        )}
       </div>
 
       <ProjectList isAdmin={userIsAdmin} />

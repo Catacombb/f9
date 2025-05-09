@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase/schema';
 import { useNavigate } from 'react-router-dom';
@@ -41,7 +40,7 @@ export function useSupabase() {
     try {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
-      navigate('/');
+      navigate('/dashboard');
       return { success: true };
     } catch (error) {
       console.error('Error signing in:', error);

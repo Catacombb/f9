@@ -1,23 +1,42 @@
 import React, { useState, useEffect } from 'react';
 import { useSupabase } from '@/hooks/useSupabase';
 import { getClientDashboardData } from '@/lib/supabase/services/dashboardService';
+import { isAdmin } from '@/lib/supabase/services/roleService';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
-import { AlertCircle, File, Clock, CheckCircle, FileEdit, PieChart } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { AlertCircle, File, Clock, CheckCircle, FileEdit, PieChart, Users } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { ActivityFeed } from './ActivityFeed';
+import { setForceProjectCreation } from '@/context/DesignBriefContext';
 
 export function ClientDashboard() {
   const { user } = useSupabase();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [dashboardData, setDashboardData] = useState<any>(null);
   const [activeTab, setActiveTab] = useState('projects');
   const [error, setError] = useState<string | null>(null);
+  const [userIsAdmin, setUserIsAdmin] = useState(false);
+
+  useEffect(() => {
+    async function checkAdminStatus() {
+      if (!user) return;
+      
+      try {
+        const adminStatus = await isAdmin(user.id);
+        setUserIsAdmin(adminStatus);
+      } catch (error) {
+        console.error('Error checking admin status:', error);
+      }
+    }
+    
+    checkAdminStatus();
+  }, [user]);
 
   useEffect(() => {
     async function loadDashboardData() {
@@ -44,6 +63,13 @@ export function ClientDashboard() {
 
     loadDashboardData();
   }, [user, toast]);
+
+  // Handler for creating a new design brief
+  const handleCreateNewBrief = () => {
+    // Set the force creation flag before navigating
+    setForceProjectCreation();
+    navigate('/design-brief?create=true');
+  };
 
   // Render loading state
   if (loading) {
@@ -75,9 +101,13 @@ export function ClientDashboard() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold mb-2">My Dashboard</h1>
+        <h1 className="text-3xl font-bold mb-2">
+          {userIsAdmin ? 'Admin Dashboard' : 'My Dashboard'}
+        </h1>
         <p className="text-muted-foreground">
-          Track your projects and view recent activity.
+          {userIsAdmin 
+            ? 'Manage client projects and track activity'
+            : 'Track your projects and view recent activity'}
         </p>
       </div>
 
@@ -92,7 +122,9 @@ export function ClientDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{dashboardData.stats.totalProjects}</div>
-            <p className="text-xs text-muted-foreground">All your projects</p>
+            <p className="text-xs text-muted-foreground">
+              {userIsAdmin ? 'All client projects' : 'All your projects'}
+            </p>
           </CardContent>
         </Card>
         
@@ -123,20 +155,31 @@ export function ClientDashboard() {
         </Card>
       </div>
 
-      {/* Create New Project Button */}
+      {/* Action Button - Different for admins and clients */}
       <div className="flex justify-center">
-        <Button asChild className="w-full md:w-auto">
-          <Link to="/design-brief">
+        {!userIsAdmin ? (
+          // Client users see "Create New Design Brief" button
+          <Button onClick={handleCreateNewBrief} className="w-full md:w-auto">
             <FileEdit className="mr-2 h-4 w-4" />
             Create New Design Brief
-          </Link>
-        </Button>
+          </Button>
+        ) : (
+          // Admin users see "Manage Client Projects" button
+          <Button asChild className="w-full md:w-auto">
+            <Link to="/dashboard/projects">
+              <Users className="mr-2 h-4 w-4" />
+              Manage Client Projects
+            </Link>
+          </Button>
+        )}
       </div>
 
       {/* Tabs for projects and activity */}
       <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="projects">My Projects</TabsTrigger>
+          <TabsTrigger value="projects">
+            {userIsAdmin ? 'Recent Projects' : 'My Projects'}
+          </TabsTrigger>
           <TabsTrigger value="activity">Recent Activity</TabsTrigger>
         </TabsList>
 
@@ -144,8 +187,14 @@ export function ClientDashboard() {
         <TabsContent value="projects" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>My Projects</CardTitle>
-              <CardDescription>All your design briefs and their current status</CardDescription>
+              <CardTitle>
+                {userIsAdmin ? 'Recent Projects' : 'My Projects'}
+              </CardTitle>
+              <CardDescription>
+                {userIsAdmin 
+                  ? 'Recently updated client design briefs' 
+                  : 'All your design briefs and their current status'}
+              </CardDescription>
             </CardHeader>
             <CardContent>
               {dashboardData.projects && dashboardData.projects.length > 0 ? (
@@ -173,11 +222,13 @@ export function ClientDashboard() {
                           Last updated: {new Date(project.updated_at).toLocaleDateString()}
                         </span>
                         <div className="space-x-2">
-                          <Button variant="outline" size="sm" asChild>
-                            <Link to={`/design-brief/${project.id}`}>
-                              Edit
-                            </Link>
-                          </Button>
+                          {!userIsAdmin && (
+                            <Button variant="outline" size="sm" asChild>
+                              <Link to={`/design-brief?projectId=${project.id}`}>
+                                Edit
+                              </Link>
+                            </Button>
+                          )}
                           <Button variant="ghost" size="sm" asChild>
                             <Link to={`/dashboard/projects/${project.id}`}>
                               View
@@ -192,12 +243,20 @@ export function ClientDashboard() {
                 <div className="text-center p-8 border rounded-md">
                   <File className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
                   <h3 className="text-lg font-medium mb-2">No projects yet</h3>
-                  <p className="text-muted-foreground mb-4">
-                    Create a new design brief to get started with your project.
-                  </p>
-                  <Button asChild>
-                    <Link to="/design-brief">Create Design Brief</Link>
-                  </Button>
+                  {!userIsAdmin ? (
+                    <>
+                      <p className="text-muted-foreground mb-4">
+                        Create a new design brief to get started with your project.
+                      </p>
+                      <Button onClick={handleCreateNewBrief}>
+                        Create Design Brief
+                      </Button>
+                    </>
+                  ) : (
+                    <p className="text-muted-foreground">
+                      There are no client projects available at this time.
+                    </p>
+                  )}
                 </div>
               )}
             </CardContent>
@@ -207,8 +266,7 @@ export function ClientDashboard() {
         {/* Activity Tab */}
         <TabsContent value="activity" className="space-y-4">
           <ActivityFeed 
-            activities={dashboardData.recentActivities} 
-            maxItems={10}
+            activities={dashboardData.activities || []}
           />
         </TabsContent>
       </Tabs>
@@ -221,8 +279,8 @@ function ClientDashboardSkeleton() {
   return (
     <div className="space-y-6">
       <div>
-        <Skeleton className="h-8 w-64 mb-2" />
-        <Skeleton className="h-4 w-48" />
+        <div className="h-8 w-64 bg-gray-200 rounded mb-2 animate-pulse" />
+        <div className="h-4 w-96 bg-gray-200 rounded animate-pulse" />
       </div>
 
       {/* Stats Cards Skeleton */}
@@ -230,11 +288,11 @@ function ClientDashboardSkeleton() {
         {[1, 2, 3].map(i => (
           <Card key={i}>
             <CardHeader className="pb-2">
-              <Skeleton className="h-4 w-24" />
+              <div className="h-5 w-32 bg-gray-200 rounded animate-pulse" />
             </CardHeader>
             <CardContent>
-              <Skeleton className="h-8 w-12 mb-2" />
-              <Skeleton className="h-3 w-32" />
+              <div className="h-8 w-16 bg-gray-200 rounded animate-pulse mb-2" />
+              <div className="h-4 w-24 bg-gray-200 rounded animate-pulse" />
             </CardContent>
           </Card>
         ))}
@@ -242,7 +300,7 @@ function ClientDashboardSkeleton() {
 
       {/* Create Button Skeleton */}
       <div className="flex justify-center">
-        <Skeleton className="h-10 w-48" />
+        <div className="h-10 w-40 bg-gray-200 rounded animate-pulse" />
       </div>
 
       {/* Tabs Skeleton */}

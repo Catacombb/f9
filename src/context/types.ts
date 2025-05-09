@@ -21,4 +21,6 @@ export interface DesignBriefContextType {
   isLoading: boolean;
   error: string | null;
   sendByEmail: (email: string) => Promise<boolean>;
+  loadProject: (projectId: string) => Promise<void>;
+  deleteFile: (fileId: string, storagePath: string, category: string) => Promise<{success: boolean, error?: any}>;
 }

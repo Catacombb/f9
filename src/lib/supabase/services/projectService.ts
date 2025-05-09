@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase/schema';
+import { supabaseAdmin } from '@/lib/supabase/adminClient';
 import { FormData, ProjectData, SectionKey, SpaceRoom, Professional, InspirationEntry, OccupantEntry } from '@/types';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -39,81 +40,99 @@ interface ProjectSettings {
  */
 export async function saveProject(projectData: ProjectData, userId: string, projectId?: string) {
   try {
-    // First, check if the project exists to determine if we're creating or updating
-    let resolvedProjectId = projectId || '';
-    let isNewProject = true;
+    let resolvedProjectId = projectId || projectData.projectId;
     
-    // If no projectId was provided, check if we have one in the project data
-    if (!resolvedProjectId && projectData.projectId) {
-      resolvedProjectId = projectData.projectId;
+    if (!resolvedProjectId) {
+      // If no projectId is provided at all, get or create one
+      const result = await getOrCreateProject(userId);
+      
+      if (!result.success || !result.projectId) {
+        throw new Error(`Failed to get or create project: ${result.error}`);
+      }
+      
+      resolvedProjectId = result.projectId;
     }
     
-    // If we have a projectId, check if the project exists and belongs to the user
-    if (resolvedProjectId) {
-      const { data: existingProject } = await supabase
-        .from('projects')
-        .select('id')
-        .eq('id', resolvedProjectId)
-        .eq('user_id', userId)
-        .single();
+    // Get the current version of the project for optimistic locking
+    const { data: currentProject, error: fetchError } = await supabase
+      .from('projects')
+      .select('id, updated_at, version')
+      .eq('id', resolvedProjectId)
+      .single();
       
-      if (existingProject) {
-        isNewProject = false;
-      } else {
-        // If project doesn't exist or doesn't belong to user, treat as new project
-        resolvedProjectId = '';
-        isNewProject = true;
-      }
+    if (fetchError) {
+      throw new Error(`Error fetching current project: ${fetchError.message}`);
     }
     
-    // If it's a new project, create the project record
-    if (isNewProject) {
-      resolvedProjectId = uuidv4();
+    if (!currentProject) {
+      throw new Error(`Project not found with ID: ${resolvedProjectId}`);
+    }
+    
+    // Check if the project has been modified since we last loaded it
+    const lastSavedTimestamp = projectData.lastSaved ? new Date(projectData.lastSaved) : null;
+    const dbTimestamp = currentProject.updated_at ? new Date(currentProject.updated_at) : null;
+    
+    // If the project has a version field and it doesn't match, or if we have timestamps and they don't match
+    const currentVersion = currentProject.version || 1;
+    const previousVersion = projectData.version || 1;
+    
+    // Check for conflict: Either by version mismatch or by timestamp
+    const hasVersionConflict = currentVersion > previousVersion;
+    const hasTimestampConflict = 
+      lastSavedTimestamp && 
+      dbTimestamp && 
+      dbTimestamp > lastSavedTimestamp;
       
-      const { error: projectError } = await supabase
-        .from('projects')
-        .insert({
-          id: resolvedProjectId,
-          user_id: userId,
-          client_name: projectData.formData.projectInfo.clientName,
-          project_address: projectData.formData.projectInfo.projectAddress,
-          contact_email: projectData.formData.projectInfo.contactEmail,
-          contact_phone: projectData.formData.projectInfo.contactPhone,
-          project_type: projectData.formData.projectInfo.projectType,
-          project_description: projectData.formData.projectInfo.projectDescription,
-          budget_range: projectData.formData.budget.budgetRange,
-          move_in_preference: projectData.formData.projectInfo.moveInPreference,
-          move_in_date: projectData.formData.projectInfo.moveInDate,
-          project_goals: projectData.formData.projectInfo.projectGoals,
-          coordinates: projectData.formData.projectInfo.coordinates
-        });
-      
-      if (projectError) {
-        throw new Error(`Error creating project: ${projectError.message}`);
+    // If there's a conflict, we can either:
+    // 1. Throw an error and let the client handle it
+    // 2. Merge changes (more complex)
+    // 3. Force update anyway (potential data loss)
+    // We'll go with option 1 for safety
+    if (hasVersionConflict || hasTimestampConflict) {
+      return {
+        success: false,
+        error: 'Conflict detected: The project has been modified since you last loaded it. Please refresh and try again.',
+        conflict: true,
+        projectId: resolvedProjectId
+      };
+    }
+    
+    // Increment version for this update
+    const newVersion = currentVersion + 1;
+    
+    // Update the project with new version
+    const { error: projectError } = await supabase
+      .from('projects')
+      .update({
+        client_name: projectData.formData.projectInfo.clientName,
+        project_address: projectData.formData.projectInfo.projectAddress,
+        contact_email: projectData.formData.projectInfo.contactEmail,
+        contact_phone: projectData.formData.projectInfo.contactPhone,
+        project_type: projectData.formData.projectInfo.projectType,
+        project_description: projectData.formData.projectInfo.projectDescription,
+        budget_range: projectData.formData.budget.budgetRange,
+        move_in_preference: projectData.formData.projectInfo.moveInPreference,
+        move_in_date: projectData.formData.projectInfo.moveInDate,
+        project_goals: projectData.formData.projectInfo.projectGoals,
+        coordinates: projectData.formData.projectInfo.coordinates,
+        updated_at: new Date().toISOString(),
+        version: newVersion
+      })
+      .eq('id', resolvedProjectId)
+      .eq('version', currentVersion); // Ensure version matches for update
+    
+    if (projectError) {
+      // If optimistic lock failed, it means someone else updated the project first
+      if (projectError.message.includes('no rows affected') || projectError.code === '23514') {
+        return {
+          success: false,
+          error: 'Conflict detected: The project was updated by someone else. Please refresh and try again.',
+          conflict: true,
+          projectId: resolvedProjectId
+        };
       }
-    } else {
-      // Update the existing project
-      const { error: projectError } = await supabase
-        .from('projects')
-        .update({
-          client_name: projectData.formData.projectInfo.clientName,
-          project_address: projectData.formData.projectInfo.projectAddress,
-          contact_email: projectData.formData.projectInfo.contactEmail,
-          contact_phone: projectData.formData.projectInfo.contactPhone,
-          project_type: projectData.formData.projectInfo.projectType,
-          project_description: projectData.formData.projectInfo.projectDescription,
-          budget_range: projectData.formData.budget.budgetRange,
-          move_in_preference: projectData.formData.projectInfo.moveInPreference,
-          move_in_date: projectData.formData.projectInfo.moveInDate,
-          project_goals: projectData.formData.projectInfo.projectGoals,
-          coordinates: projectData.formData.projectInfo.coordinates,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', resolvedProjectId);
       
-      if (projectError) {
-        throw new Error(`Error updating project: ${projectError.message}`);
-      }
+      throw new Error(`Error updating project: ${projectError.message}`);
     }
     
     // Now handle all the related tables
@@ -377,18 +396,27 @@ export async function saveProject(projectData: ProjectData, userId: string, proj
       const processedFiles = [];
       
       for (const file of files) {
-        // Check if file is a File object (needs to be uploaded)
-        if (file instanceof File) {
+        // More robust check for file objects
+        const isFileObject = file instanceof File || 
+                            (file && typeof file === 'object' && 
+                             'name' in file && 'size' in file && 
+                             (file.type !== undefined || file.mime !== undefined));
+        
+        // Check if this is an unprocessed file that needs uploading
+        if (isFileObject && !file.publicUrl && !file.url && !file.path) {
+          console.log(`Processing file for upload:`, file.name);
           try {
             const uploadResult = await uploadProjectFile(file, resolvedProjectId, fileType, category);
             
             if (uploadResult.success) {
+              console.log(`Successfully uploaded file ${file.name}`);
               // Create a processed file entry with metadata
               processedFiles.push({
                 name: file.name,
                 size: file.size,
-                type: file.type,
+                type: file.type || file.mime || 'application/octet-stream',
                 url: uploadResult.publicUrl,
+                publicUrl: uploadResult.publicUrl,
                 path: uploadResult.path,
                 category
               });
@@ -401,8 +429,12 @@ export async function saveProject(projectData: ProjectData, userId: string, proj
             console.error(`Error processing file ${file.name}:`, error);
             processedFiles.push(file);
           }
-        } else {
+        } else if (file.publicUrl || file.url || file.path) {
           // File is already processed, just pass it through
+          console.log(`File already processed, skipping upload: ${file.name || 'unnamed file'}`);
+          processedFiles.push(file);
+        } else {
+          console.error(`Unrecognized file object:`, file);
           processedFiles.push(file);
         }
       }
@@ -475,11 +507,13 @@ export async function saveProject(projectData: ProjectData, userId: string, proj
       );
     }
     
-    // Return updated project data with the project ID
+    // Return updated project data with the project ID and new version
     const updatedProjectData = {
       ...projectData,
       projectId: resolvedProjectId,
-      files: updatedFiles
+      version: newVersion,
+      files: updatedFiles,
+      lastSaved: new Date().toISOString()
     };
     
     return {
@@ -590,9 +624,67 @@ export async function loadProject(projectId: string) {
       console.error('Error loading project files:', filesError);
     }
 
+    // Group files by category
+    const filesByCategory: Record<string, any[]> = {};
+
+    // Initialize default file categories with empty arrays
+    const defaultCategories = [
+      'uploadedFiles',
+      'uploadedInspirationImages',
+      'inspirationSelections',
+      'siteDocuments',
+      'inspirationFiles',
+      'supportingDocuments',
+      'sitePhotos',
+      'designFiles'
+    ];
+    
+    defaultCategories.forEach(category => {
+      filesByCategory[category] = [];
+    });
+
+    // Process files and categorize them
+    if (files && files.length > 0) {
+      console.log(`Processing ${files.length} files for project ${projectId}`);
+      
+      for (const file of files) {
+        try {
+          // Get public URL for the file
+          const { data: publicUrlData } = supabase.storage
+            .from('project-files')
+            .getPublicUrl(file.file_path);
+
+          const fileData = {
+            id: file.id,
+            name: file.file_name,
+            path: file.file_path,
+            publicUrl: publicUrlData?.publicUrl || '',
+            size: file.file_size,
+            type: file.file_type,
+            category: file.category
+          };
+
+          // Add to the appropriate category
+          if (file.category && defaultCategories.includes(file.category)) {
+            console.log(`Adding file ${file.id} to category ${file.category}`);
+            filesByCategory[file.category].push(fileData);
+          } else {
+            // Default category if none exists or category is invalid
+            console.log(`Adding file ${file.id} to default category uploadedFiles`);
+            filesByCategory['uploadedFiles'].push(fileData);
+          }
+        } catch (error) {
+          console.error(`Error processing file ${file.id}:`, error);
+        }
+      }
+    } else {
+      console.log(`No files found for project ${projectId}`);
+    }
+
     // Create the ProjectData structure from the loaded data
     const projectData: ProjectData = {
       projectId: projectId, // Store the project ID directly in the project data
+      userId: project.user_id, // Add userId to identify owner
       formData: {
         projectInfo: {
           clientName: project.client_name,
@@ -748,22 +840,33 @@ export async function loadProject(projectId: string) {
         }
       },
       files: {
-        uploadedFiles: [],
-        uploadedInspirationImages: [],
-        inspirationSelections: [],
-        siteDocuments: [],
-        inspirationFiles: [],
-        supportingDocuments: [],
-        sitePhotos: [],
-        designFiles: []
+        uploadedFiles: filesByCategory['uploadedFiles'] || [],
+        uploadedInspirationImages: filesByCategory['uploadedInspirationImages'] || [],
+        inspirationSelections: filesByCategory['inspirationSelections'] || [],
+        siteDocuments: filesByCategory['siteDocuments'] || [],
+        inspirationFiles: filesByCategory['inspirationFiles'] || [],
+        supportingDocuments: filesByCategory['supportingDocuments'] || [],
+        sitePhotos: filesByCategory['sitePhotos'] || [],
+        designFiles: filesByCategory['designFiles'] || []
       },
       summary: {
         generatedSummary: summary?.generated_summary || '',
         editedSummary: summary?.edited_summary || ''
       },
       lastSaved: project.updated_at,
+      version: project.version || 1, // Include version for optimistic locking
       currentSection: undefined
     };
+
+    // Log summary of file loading
+    console.log('Files loaded for project:', {
+      projectId: projectId,
+      totalFiles: files?.length || 0,
+      byCategory: Object.entries(filesByCategory).map(([category, files]) => ({
+        category,
+        count: files.length
+      }))
+    });
 
     return {
       success: true,
@@ -793,13 +896,53 @@ export async function uploadProjectFile(file: File, projectId: string, fileType:
       throw new Error('File and projectId are required');
     }
 
+    console.log(`Starting upload for file: ${file.name}, size: ${file.size}, type: ${file.type}`);
+
+    // Check if the storage API is available using admin client
+    try {
+      // Test if we can access the storage API with admin privileges
+      const { data: buckets, error: bucketsError } = await supabaseAdmin.storage.listBuckets();
+      
+      if (bucketsError) {
+        console.error("Storage API error:", bucketsError);
+        throw new Error(`Storage API not available: ${bucketsError.message}`);
+      }
+      
+      // Check if our bucket exists
+      const bucketExists = buckets?.some(bucket => bucket.name === 'project-files');
+      if (!bucketExists) {
+        console.error("Bucket 'project-files' does not exist. Available buckets:", buckets?.map(b => b.name).join(', '));
+        
+        // Try to create the bucket using admin client
+        try {
+          console.log("Attempting to create 'project-files' bucket...");
+          const { data: newBucket, error: createError } = await supabaseAdmin.storage.createBucket('project-files', {
+            public: true
+          });
+          
+          if (createError) {
+            throw new Error(`Failed to create bucket: ${createError.message}`);
+          }
+          console.log("Successfully created bucket 'project-files'");
+        } catch (createErr) {
+          console.error("Failed to create bucket:", createErr);
+          throw new Error(`Bucket 'project-files' does not exist and could not be created automatically`);
+        }
+      }
+    } catch (storageCheckError) {
+      console.error("Error checking storage:", storageCheckError);
+      throw new Error(`Storage service check failed: ${storageCheckError.message}`);
+    }
+
     // Create a unique file path using the project ID and a timestamp
     const timestamp = new Date().getTime();
     const fileExt = file.name.split('.').pop();
     const bucketPath = `${fileType}/${projectId}/${timestamp}_${file.name}`;
     
-    // Upload the file to Supabase Storage
-    const { data, error } = await supabase.storage
+    console.log(`Uploading to path: ${bucketPath}`);
+    
+    // Upload the file to Supabase Storage using admin client
+    const { data, error } = await supabaseAdmin.storage
       .from('project-files')
       .upload(bucketPath, file, {
         cacheControl: '3600',
@@ -807,16 +950,27 @@ export async function uploadProjectFile(file: File, projectId: string, fileType:
       });
     
     if (error) {
+      console.error(`Storage upload error:`, error);
       throw new Error(`Error uploading file: ${error.message}`);
     }
     
-    // Get the public URL for the file
-    const { data: publicUrlData } = supabase.storage
+    console.log(`File uploaded successfully, getting public URL`);
+    
+    // Get the public URL for the file using admin client
+    const { data: publicUrlData } = supabaseAdmin.storage
       .from('project-files')
       .getPublicUrl(bucketPath);
     
-    // Save the file metadata to the project_files table
-    const { error: fileMetadataError } = await supabase
+    if (!publicUrlData?.publicUrl) {
+      console.warn(`Could not get public URL for ${bucketPath}`);
+    } else {
+      console.log(`Public URL obtained: ${publicUrlData.publicUrl}`);
+    }
+    
+    // Save the file metadata to the project_files table using regular client
+    // This ensures proper RLS applies to the metadata
+    console.log(`Saving file metadata to database`);
+    const { data: fileMetadata, error: fileMetadataError } = await supabase
       .from('project_files')
       .insert({
         project_id: projectId,
@@ -825,10 +979,13 @@ export async function uploadProjectFile(file: File, projectId: string, fileType:
         file_type: fileType,
         file_size: file.size,
         category: category
-      });
+      })
+      .select();
     
     if (fileMetadataError) {
       console.error('Error saving file metadata:', fileMetadataError);
+    } else {
+      console.log(`File metadata saved successfully`);
     }
     
     return {
@@ -838,49 +995,73 @@ export async function uploadProjectFile(file: File, projectId: string, fileType:
       fileName: file.name,
       fileType,
       fileSize: file.size,
-      category
+      category,
+      metadataId: fileMetadata?.[0]?.id
     };
   } catch (error) {
     console.error('Error in uploadProjectFile:', error);
     return {
       success: false,
-      error
+      error: error instanceof Error ? error.message : String(error)
     };
   }
 }
 
 /**
- * Gets file metadata for a project
- * @param projectId The project ID to get files for
- * @param fileType Optional filter by file type
- * @returns An array of file metadata objects
+ * Get all files for a project with their public URLs for direct access
+ * @param projectId The ID of the project
+ * @returns Object with success flag and files array
  */
-export async function getProjectFiles(projectId: string, fileType?: string) {
+export async function getProjectFiles(projectId: string) {
   try {
-    let query = supabase
+    // Fetch file metadata from the database
+    const { data, error } = await supabase
       .from('project_files')
       .select('*')
-      .eq('project_id', projectId);
-      
-    if (fileType) {
-      query = query.eq('file_type', fileType);
-    }
-    
-    const { data, error } = await query;
+      .eq('project_id', projectId)
+      .order('created_at', { ascending: false });
     
     if (error) {
       throw new Error(`Error fetching project files: ${error.message}`);
     }
     
+    if (!data || data.length === 0) {
+      return { success: true, files: [] };
+    }
+    
+    // Generate public URLs for each file
+    const filesWithUrls = await Promise.all(data.map(async (file) => {
+      try {
+        // Use the file_path directly from the database record
+        const storagePath = file.file_path;
+        
+        // Get public URL for the file using admin client for storage access
+        const { data: urlData } = await supabaseAdmin.storage
+          .from('project-files')
+          .createSignedUrl(storagePath, 60 * 60); // 1 hour expiration
+        
+        return {
+          ...file,
+          publicUrl: urlData?.signedUrl || null
+        };
+      } catch (urlError) {
+        console.error(`Error getting URL for file ${file.file_name}:`, urlError);
+        return {
+          ...file,
+          publicUrl: null
+        };
+      }
+    }));
+    
     return {
       success: true,
-      files: data || []
+      files: filesWithUrls
     };
   } catch (error) {
     console.error('Error in getProjectFiles:', error);
-  return {
-    success: false,
-      error,
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error getting project files',
       files: []
     };
   }
@@ -894,8 +1075,8 @@ export async function getProjectFiles(projectId: string, fileType?: string) {
  */
 export async function deleteProjectFile(fileId: string, storagePath: string) {
   try {
-    // Delete the file from storage
-    const { error: storageError } = await supabase.storage
+    // Delete the file from storage using admin client
+    const { error: storageError } = await supabaseAdmin.storage
       .from('project-files')
       .remove([storagePath]);
     
@@ -903,7 +1084,7 @@ export async function deleteProjectFile(fileId: string, storagePath: string) {
       console.error('Error deleting file from storage:', storageError);
     }
     
-    // Delete the file metadata
+    // Delete the file metadata using regular client (subject to RLS)
     const { error: metadataError } = await supabase
       .from('project_files')
       .delete()
@@ -922,5 +1103,357 @@ export async function deleteProjectFile(fileId: string, storagePath: string) {
       success: false,
       error
   };
+  }
+}
+
+/**
+ * Single source of truth for getting or creating a project
+ * This function ensures a user always has exactly one project and prevents duplicates
+ * @param userId The ID of the user to get or create a project for
+ * @returns An object containing success status, project ID, and whether the project was newly created
+ */
+export async function getOrCreateProject(userId: string): Promise<{
+  success: boolean;
+  projectId?: string;
+  isNewProject?: boolean;
+  error?: any;
+}> {
+  try {
+    if (!userId) {
+      throw new Error('User ID is required');
+    }
+
+    console.log('getOrCreateProject called for user ID:', userId);
+    
+    // First, try to get an existing project for this user
+    // This is our first attempt to find an existing project
+    const { data: existingProjects, error: findError } = await supabase
+      .from('projects')
+      .select('id')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false }) // get newest first
+      .limit(1);
+    
+    if (findError) {
+      console.error('Error finding existing projects:', findError);
+    } else if (existingProjects && existingProjects.length > 0) {
+      console.log('Found existing project:', existingProjects[0].id);
+      return {
+        success: true,
+        projectId: existingProjects[0].id,
+        isNewProject: false
+      };
+    }
+    
+    // No existing project found, we need to create a new one
+    // Try using the RPC function first (atomic transaction approach)
+    console.log('No existing project found, attempting to create via RPC');
+    
+    // Attempt the RPC call but catch errors
+    let rpcResult = null;
+    let rpcError = null;
+    
+    try {
+      const rpcResponse = await supabase.rpc('get_or_create_project', {
+        p_user_id: userId
+      });
+      rpcResult = rpcResponse.data;
+      rpcError = rpcResponse.error;
+    } catch (err) {
+      console.error('Exception during RPC call:', err);
+      rpcError = err;
+    }
+
+    // Log the RPC result for debugging
+    if (rpcResult) {
+      console.log('RPC get_or_create_project result:', rpcResult);
+    }
+    if (rpcError) {
+      console.error('RPC get_or_create_project error:', rpcError);
+    }
+
+    // If RPC worked, use its result
+    if (!rpcError && rpcResult && rpcResult.project_id) {
+      console.log('Project created/found via RPC:', rpcResult.project_id);
+      return {
+        success: true,
+        projectId: rpcResult.project_id,
+        isNewProject: rpcResult.is_new_project
+      };
+    }
+    
+    // RPC failed, use direct DB operations as fallback
+    console.log('RPC method failed, falling back to direct DB operations');
+    
+    // Try direct database creation
+    // Get user's email for the client_name field
+    const user_email = await getUserEmail(userId);
+    console.log('User email for project creation:', user_email);
+    
+    // Create a client timestamp ID to reduce chance of conflicts
+    const timestamp = new Date().getTime();
+    
+    // Create a new project with our best effort
+    const { data: newProject, error: insertError } = await supabase
+      .from('projects')
+      .insert({
+        user_id: userId,
+        client_name: user_email || `New Client-${timestamp}`,
+        project_description: 'Project created via getOrCreateProject (fallback method)',
+        status: 'brief'
+      })
+      .select()
+      .single();
+    
+    if (insertError) {
+      console.error('Error creating project via direct insert:', insertError);
+      
+      // Final fallback: check again for any existing projects
+      // This covers the race condition where a project was created between our first check and now
+      console.log('Checking one last time for existing projects');
+      const { data: lastResortProjects, error: lastResortError } = await supabase
+        .from('projects')
+        .select('id')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false }) // get newest first
+        .limit(1);
+      
+      if (!lastResortError && lastResortProjects && lastResortProjects.length > 0) {
+        console.log('Found existing project in last resort check:', lastResortProjects[0].id);
+        return {
+          success: true,
+          projectId: lastResortProjects[0].id,
+          isNewProject: false
+        };
+      }
+      
+      // If we still can't find or create a project, return the error
+      throw new Error(`Failed to create project: ${insertError.message || 'Unknown error'}`);
+    }
+    
+    console.log('New project created via direct method:', newProject?.id);
+    
+    // Log the project creation in activities
+    try {
+      await supabase
+        .from('activities')
+        .insert({
+          project_id: newProject.id,
+          user_id: userId,
+          activity_type: 'system_event',
+          details: {
+            event: 'project_created',
+            message: 'Project created via getOrCreateProject function'
+          },
+          is_system_generated: true
+        });
+    } catch (activityError) {
+      // Non-critical error, just log it
+      console.warn('Error logging project creation activity:', activityError);
+    }
+    
+    return {
+      success: true,
+      projectId: newProject.id,
+      isNewProject: true
+    };
+  } catch (error) {
+    console.error('Error in getOrCreateProject:', error);
+    
+    // Enhanced error logging
+    const errorDetail = error instanceof Error 
+      ? `${error.name}: ${error.message}` 
+      : String(error);
+    
+    console.error('Detailed error:', errorDetail);
+    
+    return {
+      success: false,
+      error: {
+        message: error instanceof Error ? error.message : 'Unknown error in project creation',
+        details: errorDetail
+      }
+    };
+  }
+}
+
+/**
+ * Helper function to get a user's email from their ID
+ * @param userId The ID of the user
+ * @returns The user's email or null if not found
+ */
+async function getUserEmail(userId: string): Promise<string | null> {
+  try {
+    if (!userId) return null;
+    
+    // First try to get from user_profiles which is in public schema
+    const { data: profileData, error: profileError } = await supabase
+      .from('user_profiles')
+      .select('email')
+      .eq('id', userId)
+      .single();
+      
+    if (!profileError && profileData?.email) {
+      return profileData.email;
+    }
+    
+    // Fallback to auth.users if we can't get it from profiles
+    // This requires proper permissions setup
+    console.log('Getting email from auth.users (fallback)');
+    
+    try {
+      // Using RPC is safer as it can be permission-controlled
+      const { data: userData, error: userError } = await supabase.rpc(
+        'get_user_email_by_id',
+        { user_id: userId }
+      );
+      
+      if (!userError && userData) {
+        return userData;
+      }
+    } catch (err) {
+      console.warn('Error getting email via RPC:', err);
+    }
+    
+    console.log('Could not find email for user');
+    return null;
+  } catch (error) {
+    console.error('Error in getUserEmail:', error);
+    return null;
+  }
+}
+
+/**
+ * Deletes a project and all its related data
+ * @param projectId The ID of the project to delete
+ * @param userId The ID of the user requesting the deletion
+ * @returns An object indicating success or error
+ */
+export async function deleteProject(projectId: string, userId: string): Promise<{
+  success: boolean;
+  error?: any;
+}> {
+  try {
+    // First verify that the user is an admin or the owner of the project
+    const { data: userRole } = await supabase
+      .from('user_profiles')
+      .select('role')
+      .eq('id', userId)
+      .single();
+      
+    const isUserAdmin = userRole?.role === 'admin';
+    
+    if (!isUserAdmin) {
+      // If user is not an admin, check if they own the project
+      const { data: project, error: projectError } = await supabase
+        .from('projects')
+        .select('user_id')
+        .eq('id', projectId)
+        .single();
+        
+      if (projectError || !project) {
+        return {
+          success: false,
+          error: 'Project not found or you don\'t have permission to delete it'
+        };
+      }
+      
+      if (project.user_id !== userId) {
+        return {
+          success: false,
+          error: 'You do not have permission to delete this project'
+        };
+      }
+    }
+    
+    // Get all files for this project to delete from storage
+    const { data: projectFiles } = await supabase
+      .from('project_files')
+      .select('id, storage_path')
+      .eq('project_id', projectId);
+    
+    // Use the admin client for storage operations
+    if (projectFiles && projectFiles.length > 0) {
+      // Delete files from storage
+      const storagePaths = projectFiles.map(file => file.storage_path);
+      
+      for (const path of storagePaths) {
+        if (path) {
+          await supabaseAdmin.storage.from('project-files').remove([path]);
+        }
+      }
+    }
+    
+    // Delete related records in transaction
+    // Note: This relies on foreign key cascades being set up in the database
+    const { error: deleteError } = await supabase.rpc('delete_project_and_related_data', {
+      p_project_id: projectId
+    });
+    
+    if (deleteError) {
+      // If the RPC function doesn't exist, do manual deletion
+      // Delete activities first (if they exist)
+      const { error: activitiesError } = await supabase
+        .from('activities')
+        .delete()
+        .eq('project_id', projectId);
+      
+      if (activitiesError) {
+        console.error('Error deleting project activities:', activitiesError);
+      }
+      
+      // Delete project files
+      const { error: filesError } = await supabase
+        .from('project_files')
+        .delete()
+        .eq('project_id', projectId);
+      
+      if (filesError) {
+        console.error('Error deleting project files:', filesError);
+      }
+      
+      // Delete rooms
+      const { error: roomsError } = await supabase
+        .from('rooms')
+        .delete()
+        .eq('project_id', projectId);
+      
+      if (roomsError) {
+        console.error('Error deleting rooms:', roomsError);
+      }
+      
+      // Delete project settings
+      const { error: settingsError } = await supabase
+        .from('project_settings')
+        .delete()
+        .eq('project_id', projectId);
+      
+      if (settingsError) {
+        console.error('Error deleting project settings:', settingsError);
+      }
+      
+      // Finally delete the project itself
+      const { error: projectError } = await supabase
+        .from('projects')
+        .delete()
+        .eq('id', projectId);
+      
+      if (projectError) {
+        return {
+          success: false,
+          error: `Failed to delete project: ${projectError.message}`
+        };
+      }
+    }
+    
+    return {
+      success: true
+    };
+  } catch (error) {
+    console.error('Error deleting project:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'An unknown error occurred'
+    };
   }
 }

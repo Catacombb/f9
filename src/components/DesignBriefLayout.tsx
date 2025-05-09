@@ -9,7 +9,7 @@ import { Form } from '@/components/ui/form';
 import { useForm } from 'react-hook-form';
 import { Progress } from '@/components/ui/progress';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { Menu, Mail, Phone, Globe } from 'lucide-react';
+import { Menu, Mail, Phone, Globe, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Separator } from '@/components/ui/separator';
@@ -117,7 +117,12 @@ export function DesignBriefLayout({ children }: DesignBriefLayoutProps) {
       <div className="flex-1 flex flex-col overflow-hidden">
         <header className={`h-16 border-b flex items-center justify-center px-4 bg-background z-10 w-full ${isMobile ? 'sticky top-0' : ''}`}>
           <div className={`flex-1 flex justify-start items-center ${isMobile ? 'ml-8' : ''}`}>
-            {/* Empty div to balance the layout */}
+            <Button variant="ghost" size="sm" asChild>
+              <Link to="/dashboard" className="flex items-center gap-1">
+                <ArrowLeft className="h-4 w-4" />
+                Dashboard
+              </Link>
+            </Button>
           </div>
           
           <div className="flex-1 flex flex-col justify-center items-center">

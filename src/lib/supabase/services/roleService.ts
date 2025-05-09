@@ -35,8 +35,26 @@ export async function getUserRole(userId: string): Promise<UserRole | null> {
  * @returns True if the user is an admin, false otherwise
  */
 export async function isAdmin(userId: string): Promise<boolean> {
-  const role = await getUserRole(userId);
-  return role === 'admin';
+  try {
+    if (!userId) return false;
+    
+    // Query the user_profiles table to check if user has admin role
+    const { data, error } = await supabase
+      .from('user_profiles')
+      .select('role')
+      .eq('id', userId)
+      .single();
+    
+    if (error) {
+      console.error('Error checking admin status:', error);
+      return false;
+    }
+    
+    return data?.role === 'admin';
+  } catch (err) {
+    console.error('Error in isAdmin check:', err);
+    return false;
+  }
 }
 
 /**

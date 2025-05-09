@@ -1,5 +1,5 @@
-
 import React, { useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import { DesignBriefLayout } from './DesignBriefLayout';
 import { IntroSection } from './sections/IntroSection';
 import { ProjectInfoSection } from './sections/ProjectInfoSection';
@@ -16,7 +16,15 @@ import { SummarySection } from './sections/SummarySection';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 
 export function DesignBrief() {
-  const { currentSection, setCurrentSection } = useDesignBrief();
+  const { projectId } = useParams();
+  const { currentSection, setCurrentSection, loadProject } = useDesignBrief();
+  
+  // Load project data if projectId is provided
+  useEffect(() => {
+    if (projectId) {
+      loadProject(projectId);
+    }
+  }, [projectId, loadProject]);
   
   // Scroll to top when section changes
   useEffect(() => {

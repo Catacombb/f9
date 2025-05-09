@@ -1,5 +1,4 @@
 import React from "react";
-import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -10,7 +9,7 @@ import About from "./pages/About";
 import NotFound from "./pages/NotFound";
 import TestSupabasePage from "./pages/TestSupabasePage";
 import TestDashboardSchemePage from "./pages/TestDashboardSchemePage";
-import { Login, Register, ForgotPassword, ResetPassword, ProtectedRoute } from "@/components/auth";
+import { Login, Register, ForgotPassword, ResetPassword, ProtectedRoute, RedirectIfAuthenticated } from "@/components/auth";
 import { DashboardRouter } from "@/components/dashboard";
 
 const App = () => {
@@ -31,20 +30,23 @@ const App = () => {
         <DesignBriefProvider>
           <TooltipProvider delayDuration={300}>
             <div className="w-full max-w-[100vw] overflow-x-hidden">
-              <Toaster />
               <Sonner />
               <Routes>
                 {/* Public Routes */}
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-                <Route path="/forgot-password" element={<ForgotPassword />} />
-                <Route path="/reset-password" element={<ResetPassword />} />
+                <Route element={<RedirectIfAuthenticated />}>
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/register" element={<Register />} />
+                  <Route path="/forgot-password" element={<ForgotPassword />} />
+                  <Route path="/reset-password" element={<ResetPassword />} />
+                </Route>
                 <Route path="/about" element={<About />} />
                 <Route path="/test-supabase-public" element={<TestSupabasePage />} />
                 
                 {/* Protected Routes */}
                 <Route element={<ProtectedRoute />}>
-                  <Route path="/" element={<Index />} />
+                  <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                  <Route path="/design-brief" element={<Index />} />
+                  <Route path="/design-brief/:projectId" element={<Index />} />
                   <Route path="/test-supabase" element={<TestSupabasePage />} />
                   <Route path="/test-dashboard-schema" element={<TestDashboardSchemePage />} />
                   

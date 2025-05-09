@@ -1,10 +1,9 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { OccupantEntryList } from './OccupantEntryList';
 import { OccupantEntry } from '@/types';
 import { cn } from '@/lib/utils';
-import { animations } from '@/lib/animation';
+import { animations } from '@/lib/utils';
 import { Users, User, Baby, Dog, Cat, HelpCircle } from 'lucide-react';
 
 interface NamedOccupantsSectionProps {

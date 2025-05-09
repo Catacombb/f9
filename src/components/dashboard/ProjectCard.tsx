@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useSupabase } from '@/hooks/useSupabase';
 import { changeProjectStatus } from '@/lib/supabase/services/statusService';
+import { deleteProject } from '@/lib/supabase/services/projectService';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -11,9 +12,10 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { Clock, FileEdit, MoreHorizontal, ArrowRight, CheckCircle, AlertCircle, Calendar } from 'lucide-react';
+import { Clock, FileEdit, MoreHorizontal, ArrowRight, CheckCircle, AlertCircle, Calendar, Trash2 } from 'lucide-react';
 import { Database } from '@/lib/supabase/database.types';
 
 type Project = Database['public']['Tables']['projects']['Row'];
@@ -22,14 +24,17 @@ type Status = 'brief' | 'sent' | 'complete';
 interface ProjectCardProps {
   project: Project;
   isAdmin?: boolean;
+  onDelete?: () => void;
 }
 
-export function ProjectCard({ project, isAdmin = false }: ProjectCardProps) {
+export function ProjectCard({ project, isAdmin = false, onDelete }: ProjectCardProps) {
   const { user } = useSupabase();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [statusToChange, setStatusToChange] = useState<Status | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   // Status helpers
   const statusColors = {
@@ -88,6 +93,46 @@ export function ProjectCard({ project, isAdmin = false }: ProjectCardProps) {
       setLoading(false);
       setConfirmDialogOpen(false);
       setStatusToChange(null);
+    }
+  };
+
+  // Handle project deletion
+  const handleDeleteProject = () => {
+    if (!user || !project.id) return;
+    setDeleteDialogOpen(true);
+  };
+
+  // Confirm project deletion
+  const confirmDeleteProject = async () => {
+    if (!user || !project.id) return;
+    
+    try {
+      setLoading(true);
+      const { success, error } = await deleteProject(project.id, user.id);
+      
+      if (success) {
+        toast({
+          title: 'Project deleted',
+          description: 'The project has been successfully deleted',
+        });
+        
+        // Call the onDelete callback if provided to refresh the project list
+        if (onDelete) {
+          onDelete();
+        }
+      } else {
+        throw new Error(error || 'Failed to delete project');
+      }
+    } catch (error) {
+      console.error('Error deleting project:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Failed to delete project',
+        description: error instanceof Error ? error.message : 'An unknown error occurred',
+      });
+    } finally {
+      setLoading(false);
+      setDeleteDialogOpen(false);
     }
   };
 
@@ -166,6 +211,17 @@ export function ProjectCard({ project, isAdmin = false }: ProjectCardProps) {
                         Revert to Brief
                       </DropdownMenuItem>
                     )}
+                    
+                    {/* Delete project option */}
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem 
+                      onClick={handleDeleteProject} 
+                      disabled={loading}
+                      className="text-red-600 focus:text-red-600"
+                    >
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Delete Project
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               )}
@@ -236,7 +292,7 @@ export function ProjectCard({ project, isAdmin = false }: ProjectCardProps) {
         </CardFooter>
       </Card>
       
-      {/* Confirmation Dialog */}
+      {/* Status Change Confirmation Dialog */}
       <AlertDialog open={confirmDialogOpen} onOpenChange={setConfirmDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -249,10 +305,33 @@ export function ProjectCard({ project, isAdmin = false }: ProjectCardProps) {
           <AlertDialogFooter>
             <AlertDialogCancel disabled={loading}>Cancel</AlertDialogCancel>
             <AlertDialogAction 
-              onClick={confirmStatusChange}
+              onClick={confirmStatusChange} 
               disabled={loading}
             >
-              {loading ? 'Updating...' : 'Yes, Change Status'}
+              {loading ? 'Updating...' : 'Confirm'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      
+      {/* Delete Project Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Project</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this project? This action cannot be undone. 
+              All project data, including design brief, files, and settings will be permanently removed.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={loading}>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={confirmDeleteProject} 
+              disabled={loading}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {loading ? 'Deleting...' : 'Delete Project'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

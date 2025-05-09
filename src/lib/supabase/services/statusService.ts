@@ -138,6 +138,8 @@ export async function changeProjectStatus(projectId: string, newStatus: Status, 
     }
     
     // Update the project status
+    // This will automatically trigger the handle_status_change database trigger
+    // which will log the status change in the activities table
     const { data: updatedProject, error: updateError } = await supabase
       .from('projects')
       .update({ 
@@ -153,25 +155,8 @@ export async function changeProjectStatus(projectId: string, newStatus: Status, 
       throw new Error(`Error updating project status: ${updateError.message}`);
     }
     
-    // Log the status change in the activities table
-    // This will be handled by the status_change trigger in the database
-    // but we also log it directly here to ensure it's captured
-    const { error: activityError } = await supabase
-      .from('activities')
-      .insert({
-        project_id: projectId,
-        user_id: userId,
-        activity_type: 'status_change',
-        details: {
-          previous_status: currentStatus,
-          new_status: newStatus
-        }
-      });
-    
-    if (activityError) {
-      console.error(`Error logging status change activity: ${activityError.message}`);
-      // We don't throw here as the status was successfully updated
-    }
+    // No need to manually log the activity since it's handled by the database trigger
+    // This removes the redundant activity log entry
     
     return updatedProject;
   } catch (error) {
