@@ -1,66 +1,34 @@
-import React from "react";
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { DesignBriefProvider } from '@/context/DesignBriefContext';
-import Index from "./pages/Index";
-import About from "./pages/About";
-import NotFound from "./pages/NotFound";
-import TestSupabasePage from "./pages/TestSupabasePage";
-import TestDashboardSchemePage from "./pages/TestDashboardSchemePage";
-import { Login, Register, ForgotPassword, ResetPassword, ProtectedRoute } from "@/components/auth";
-import { DashboardRouter } from "@/components/dashboard";
+import DesignBriefPage from '@/pages/Index'; // Assuming Index.tsx is the main design brief page
+import { Toaster } from '@/components/ui/toaster'; // Keep ShadCN Toaster
+import { TooltipProvider } from '@/components/ui/tooltip';
+import { ThemeProvider } from '@/components/ThemeProvider'; // Keep for now
+import NotFound from '@/pages/NotFound'; // Keep for unmatched routes
 
-const App = () => {
-  // Create a client instance inside the component to ensure proper React lifecycle
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        staleTime: 5 * 60 * 1000, // 5 minutes
-        refetchOnWindowFocus: false,
-      },
-    },
-  });
-
+function App() {
   return (
-    // Move BrowserRouter to the top level so all components have access to routing features
-    <BrowserRouter>
-      <QueryClientProvider client={queryClient}>
+    <ThemeProvider>
+      <TooltipProvider>
         <DesignBriefProvider>
-          <TooltipProvider delayDuration={300}>
+          <Router>
             <div className="w-full max-w-[100vw] overflow-x-hidden">
-              <Toaster />
-              <Sonner />
+              <Toaster /> 
               <Routes>
-                {/* Public Routes */}
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-                <Route path="/forgot-password" element={<ForgotPassword />} />
-                <Route path="/reset-password" element={<ResetPassword />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/test-supabase-public" element={<TestSupabasePage />} />
-                
-                {/* Protected Routes */}
-                <Route element={<ProtectedRoute />}>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/test-supabase" element={<TestSupabasePage />} />
-                  <Route path="/test-dashboard-schema" element={<TestDashboardSchemePage />} />
-                  
-                  {/* Dashboard Routes */}
-                  <Route path="/dashboard/*" element={<DashboardRouter />} />
-                </Route>
-                
-                {/* Catch all route */}
+                {/* Main route for the design brief form */}
+                <Route path="/design-brief" element={<DesignBriefPage />} />
+                {/* Redirect root path to the design brief form */}
+                <Route path="/" element={<Navigate to="/design-brief" replace />} />
+                {/* Catch-all for 404 */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </div>
-          </TooltipProvider>
+          </Router>
         </DesignBriefProvider>
-      </QueryClientProvider>
-    </BrowserRouter>
+      </TooltipProvider>
+    </ThemeProvider>
   );
-};
+}
 
 export default App;

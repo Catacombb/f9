@@ -46,11 +46,6 @@ export interface ProjectFiles {
   designFiles: File[];
 }
 
-export interface BriefSummary {
-  generatedSummary: string;
-  editedSummary: string;
-}
-
 // Define the form data sections with their respective properties
 export interface FormData {
   projectInfo: {
@@ -186,7 +181,6 @@ export interface FormData {
 export interface ProjectData {
   formData: FormData;
   files: ProjectFiles;
-  summary: BriefSummary;
   lastSaved?: string;
   currentSection?: string;
   projectId?: string; // Added to store the project ID directly in the project data

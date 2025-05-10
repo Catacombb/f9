@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { PredictiveAddressFinder } from '@/components/PredictiveAddressFinder';
-import { toast } from "sonner";
+import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 
 // Updated project type options without "Mixed"
@@ -20,6 +20,7 @@ const projectTypeOptions = [
 
 export function ProjectInfoSection() {
   const { setCurrentSection, updateFormData, formData } = useDesignBrief();
+  const { toast } = useToast();
   const projectInfoData = formData.projectInfo;
 
   const [coordinates, setCoordinates] = useState<[number, number] | null>(
@@ -72,7 +73,11 @@ export function ProjectInfoSection() {
     if (!projectInfoData.clientName || !projectInfoData.projectAddress || 
         !projectInfoData.contactEmail || !projectInfoData.contactPhone || 
         !projectInfoData.projectType) {
-      toast.error("Please fill out all required fields marked with *");
+      toast({
+        title: "Error",
+        description: "Please fill out all required fields marked with *",
+        variant: "destructive"
+      });
       return;
     }
     

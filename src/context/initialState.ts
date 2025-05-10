@@ -138,10 +138,6 @@ export const initialProjectData: ProjectData = {
     inspirationFiles: [],
     supportingDocuments: [] // Add the missing supportingDocuments property
   },
-  summary: {
-    generatedSummary: '',
-    editedSummary: ''
-  },
   lastSaved: new Date().toISOString(),
   currentSection: 'intro',
 };

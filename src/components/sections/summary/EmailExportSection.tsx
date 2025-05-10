@@ -1,8 +1,7 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Send, Download } from 'lucide-react';
-import { toast } from 'sonner';
+import { useToast } from '@/hooks/use-toast';
 
 interface EmailExportSectionProps {
   onExportPDF: () => Promise<Blob>;
@@ -17,6 +16,7 @@ export function EmailExportSection({
 }: EmailExportSectionProps) {
   const [isSending, setIsSending] = useState(false);
   const [isSent, setIsSent] = useState(false);
+  const { toast } = useToast();
   
   const handleSendBrief = async () => {
     setIsSending(true);
@@ -24,9 +24,9 @@ export function EmailExportSection({
       // Prepare the PDF
       const pdfBlob = await onExportPDF();
       
-      toast.info("Processing", {
-        description: "Your brief is being prepared for submission to F9 Productions.",
-        duration: 3000
+      toast({
+        title: "Processing", 
+        description: "Your brief is being prepared for submission to F9 Productions."
       });
       
       // Show sent state
@@ -37,16 +37,17 @@ export function EmailExportSection({
         setIsSent(false);
       }, 3000);
       
-      toast.success("Success", {
-        description: "Your design brief has been submitted to F9 Productions.",
-        duration: 5000
+      toast({
+        title: "Success",
+        description: "Your design brief has been submitted to F9 Productions."
       });
       
     } catch (error) {
       console.error("Error preparing brief:", error);
-      toast.error("Error", {
+      toast({
+        title: "Error",
         description: "There was a problem preparing the brief. Please try again.",
-        duration: 5000
+        variant: "destructive"
       });
     } finally {
       setIsSending(false);
@@ -64,15 +65,16 @@ export function EmailExportSection({
       link.click();
       document.body.removeChild(link);
       
-      toast.success("Success", {
-        description: "Your design brief has been downloaded.",
-        duration: 3000
+      toast({
+        title: "Success",
+        description: "Your design brief has been downloaded."
       });
     } catch (error) {
       console.error("Error downloading brief:", error);
-      toast.error("Error", {
+      toast({
+        title: "Error",
         description: "There was a problem downloading the brief. Please try again.",
-        duration: 5000
+        variant: "destructive"
       });
     }
   };

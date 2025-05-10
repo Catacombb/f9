@@ -1,5 +1,4 @@
-
-import { useState, useCallback } from 'react';
+import { useCallback } from 'react';
 import { ProjectData, SpaceRoom } from '@/types';
 
 export const useRoomsManagement = (
@@ -13,29 +12,26 @@ export const useRoomsManagement = (
         id: crypto.randomUUID(),
       };
       const updatedDraft = { ...draft };
-      updatedDraft.formData.spaces.rooms.push(newRoom);
-      updatedDraft.lastSaved = new Date().toISOString();
+      updatedDraft.formData.spaces.rooms = [...updatedDraft.formData.spaces.rooms, newRoom];
       return updatedDraft;
     });
   }, [setProjectData]);
 
-  const updateRoom = useCallback((room: ProjectData['formData']['spaces']['rooms'][0]) => {
+  const updateRoom = useCallback((updatedRoom: SpaceRoom) => {
     setProjectData(draft => {
       const updatedDraft = { ...draft };
-      const roomIndex = updatedDraft.formData.spaces.rooms.findIndex(r => r.id === room.id);
+      const roomIndex = updatedDraft.formData.spaces.rooms.findIndex(r => r.id === updatedRoom.id);
       if (roomIndex !== -1) {
-        updatedDraft.formData.spaces.rooms[roomIndex] = room;
+        updatedDraft.formData.spaces.rooms[roomIndex] = updatedRoom;
       }
-      updatedDraft.lastSaved = new Date().toISOString();
       return updatedDraft;
     });
   }, [setProjectData]);
 
-  const removeRoom = useCallback((id: string) => {
+  const removeRoom = useCallback((roomId: string) => {
     setProjectData(draft => {
       const updatedDraft = { ...draft };
-      updatedDraft.formData.spaces.rooms = updatedDraft.formData.spaces.rooms.filter(room => room.id !== id);
-      updatedDraft.lastSaved = new Date().toISOString();
+      updatedDraft.formData.spaces.rooms = updatedDraft.formData.spaces.rooms.filter(room => room.id !== roomId);
       return updatedDraft;
     });
   }, [setProjectData]);

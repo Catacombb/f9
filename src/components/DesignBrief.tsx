@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { DesignBriefLayout } from './DesignBriefLayout';
 import { IntroSection } from './sections/IntroSection';
@@ -11,11 +10,14 @@ import { ArchitectureSection } from './sections/ArchitectureSection';
 import { ContractorsSection } from './sections/ContractorsSection';
 import { CommunicationSection } from './sections/CommunicationSection';
 import { UploadsSection } from './sections/UploadsSection';
-import { FeedbackSection } from './sections/FeedbackSection';
 import { SummarySection } from './sections/SummarySection';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 
-export function DesignBrief() {
+interface DesignBriefProps {
+  projectId?: string;
+}
+
+export const DesignBrief: React.FC<DesignBriefProps> = ({ projectId }) => {
   const { currentSection, setCurrentSection } = useDesignBrief();
   
   // Scroll to top when section changes
@@ -46,7 +48,7 @@ export function DesignBrief() {
       case 'communication':
         return <CommunicationSection />;
       case 'feedback':
-        return <FeedbackSection />;
+        return <SummarySection />;
       case 'summary':
         return <SummarySection />;
       default:
@@ -59,4 +61,4 @@ export function DesignBrief() {
       {renderSection()}
     </DesignBriefLayout>
   );
-}
+};

@@ -1,33 +1,22 @@
+// Simple animation utility for UI elements
 
-import { ClassValue, clsx } from "clsx";
-import { twMerge } from "tailwind-merge";
-
-/**
- * Combine animation classes with Tailwind
- */
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
-
-/**
- * Animation classes for different components
- */
 export const animations = {
-  fadeIn: "animate-fade-in",
-  slideIn: "animate-slide-in",
-  slideInRight: "animate-slide-in-right",
-  pop: "animate-pop",
-  pulse: "animate-pulse",
-  spin: "animate-spin",
-  bounce: "animate-bounce",
-  ping: "animate-ping"
-};
-
-/**
- * Check if reduced motion is preferred
- */
-export function useReducedMotion(): boolean {
-  if (typeof window === "undefined") return false;
-  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-  return prefersReducedMotion.matches;
-}
+  fadeIn: {
+    initial: { opacity: 0 },
+    animate: { opacity: 1 },
+    exit: { opacity: 0 },
+    transition: { duration: 0.3 }
+  },
+  slideUp: {
+    initial: { opacity: 0, y: 20 },
+    animate: { opacity: 1, y: 0 },
+    exit: { opacity: 0, y: -20 },
+    transition: { duration: 0.3 }
+  },
+  slideLeft: {
+    initial: { opacity: 0, x: 20 },
+    animate: { opacity: 1, x: 0 },
+    exit: { opacity: 0, x: -20 },
+    transition: { duration: 0.3 }
+  }
+}; 
