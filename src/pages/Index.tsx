@@ -1,17 +1,12 @@
 import React from 'react';
 import { DesignBrief } from '@/components/DesignBrief';
-import { ThemeProvider } from '@/components/ThemeProvider';
 import { useParams } from 'react-router-dom';
 
 const Index = () => {
-  // Get projectId from URL if available
-  const { projectId } = useParams();
+  // Get briefId from URL if available
+  const { briefId } = useParams();
   
-  return (
-    <ThemeProvider>
-      <DesignBrief projectId={projectId} />
-    </ThemeProvider>
-  );
+  return <DesignBrief projectId={briefId} />;
 };
 
 export default Index;

@@ -7,6 +7,8 @@ The current application is a Design Brief tool built with React, TypeScript, and
 
 ## File Structure and Organization
 
+**Note on Obsolete Directories**: Automated attempts to delete `src/emailTemplates/` and `src/utils/pdfGenerator/` failed due to an issue with file resolution. These directories are non-functional in the current application state (missing dependencies, tied to unimplemented backend features) and are recommended for manual deletion.
+
 ### Root Structure
 ```
 ├── public/                      # Public static assets
@@ -18,7 +20,7 @@ The current application is a Design Brief tool built with React, TypeScript, and
 │   ├── __tests__/               # Vitest test files
 │   ├── components/              # UI components
 │   ├── context/                 # React context providers
-│   ├── emailTemplates/          # Email templates (structure observed, content not verified)
+│   ├── emailTemplates/          # Email templates (structure observed, content not verified - RECOMMENDED FOR DELETION, automated attempt failed)
 │   ├── hooks/                   # Custom React hooks
 │   ├── lib/                     # Library code and utilities
 │   ├── pages/                   # Page components
@@ -94,7 +96,7 @@ lib/
 **Observation**: `pdfGenerator/` might be present but its functionality is questionable without PDF libraries in `package.json`.
 ```
 utils/
-├── pdfGenerator/                # PDF generation utilities (functionality TBC - jsPDF/html2canvas missing from dependencies)
+├── pdfGenerator/                # PDF generation utilities (functionality TBC - jsPDF/html2canvas missing from dependencies - RECOMMENDED FOR DELETION, automated attempt failed)
 │   ├── helpers.ts
 │   ├── index.ts
 │   ├── layout.ts

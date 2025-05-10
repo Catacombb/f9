@@ -13,6 +13,7 @@ import { CommunicationSection } from './sections/CommunicationSection';
 import { UploadsSection } from './sections/UploadsSection';
 import { SummarySection } from './sections/SummarySection';
 import { useDesignBrief } from '@/context/DesignBriefContext';
+import { BriefTester } from './BriefTester';
 
 interface DesignBriefProps {
   projectId?: string;
@@ -59,6 +60,7 @@ export const DesignBrief: React.FC<DesignBriefProps> = ({ projectId }) => {
   
   return (
     <DesignBriefLayout>
+      <BriefTester />
       {renderSection()}
     </DesignBriefLayout>
   );

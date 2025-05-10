@@ -23,6 +23,8 @@
     "@radix-ui/react-tabs": "^1.0.4",
     "@radix-ui/react-toast": "^1.2.1",
     "@radix-ui/react-tooltip": "^1.0.7",
+    "@supabase/ssr": "^0.6.1",
+    "@supabase/supabase-js": "^2.49.4",
     "caniuse-lite": "^1.0.30001717",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",

@@ -4,6 +4,7 @@ export interface DesignBriefContextType {
   projectData: ProjectData;
   formData: FormData;
   files: ProjectData['files'];
+  currentBriefId: string | null;
   updateFormData: (section: string, updates: Record<string, any>) => void;
   updateFiles: (updates: Partial<ProjectData['files']>) => void;
   addRoom: (room: SpaceRoom) => void;
@@ -15,6 +16,7 @@ export interface DesignBriefContextType {
   currentSection: SectionKey;
   setCurrentSection: React.Dispatch<React.SetStateAction<SectionKey>>;
   saveProjectData: () => Promise<any>;
+  loadProjectData: (briefId: string) => Promise<boolean>;
   exportAsPDF: () => Promise<Blob>;
   isLoading: boolean;
   error: string | null;
