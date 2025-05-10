@@ -8,7 +8,7 @@ interface ProtectedRouteProps {
 }
 
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ allowedRoles }) => {
-  const { user, session, isLoading, isAuthenticated } = useStableAuth();
+  const { user, session, isLoading, isAuthenticated, isAdmin } = useStableAuth();
   const location = useLocation();
   const [initialLoad, setInitialLoad] = useState(true);
 
@@ -16,6 +16,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ allowedRoles }) 
     user: user ? `${user.id} (${user.email})` : 'null', 
     session: session ? 'active' : 'null',
     isLoading, 
+    isAdmin,
     pathname: location.pathname 
   });
 
@@ -58,8 +59,8 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ allowedRoles }) 
 
   // Role-based access control
   if (allowedRoles && allowedRoles.length > 0) {
-    // Get role from user object if available, otherwise assume 'client'
-    const userRole = user.app_metadata?.role === 'admin' ? 'admin' : 'client';
+    // Use the isAdmin property directly from useStableAuth
+    const userRole = isAdmin ? 'admin' : 'client';
     if (!allowedRoles.includes(userRole)) {
       console.log('[ProtectedRoute] User role not allowed, redirecting to dashboard');
       return <Navigate to="/dashboard" replace />;

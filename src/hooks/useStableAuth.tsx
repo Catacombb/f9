@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { createBrowserSupabaseClient } from '@/lib/supabase/client';
+import { isAdmin as checkIsAdmin } from '@/lib/supabase/services/roleService';
 
 const supabase = createBrowserSupabaseClient();
 const AUTH_STORAGE_KEY = 'f9_auth_state';
@@ -10,6 +11,7 @@ interface AuthContextType {
   session: Session | null;
   isLoading: boolean;
   isAuthenticated: boolean;
+  isAdmin: boolean;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<{ error: Error | null }>;
   signUp: (email: string, password: string, fullName: string) => Promise<{ 
@@ -23,6 +25,7 @@ const AuthContext = createContext<AuthContextType>({
   session: null,
   isLoading: true,
   isAuthenticated: false,
+  isAdmin: false,
   signIn: async () => ({ error: new Error('Not implemented') }),
   signOut: async () => ({ error: new Error('Not implemented') }),
   signUp: async () => ({ data: null, error: new Error('Not implemented') })
@@ -33,7 +36,8 @@ export const StableAuthProvider = ({ children }) => {
     user: null,
     session: null,
     isLoading: true,
-    isAuthenticated: false
+    isAuthenticated: false,
+    isAdmin: false
   });
   
   const authCheckRef = useRef<NodeJS.Timeout | null>(null);
@@ -52,7 +56,8 @@ export const StableAuthProvider = ({ children }) => {
             user: parsed.user,
             session: parsed.session,
             isLoading: false,
-            isAuthenticated: true
+            isAuthenticated: true,
+            isAdmin: parsed.isAdmin || false
           });
         }
       } catch (e) {
@@ -61,16 +66,27 @@ export const StableAuthProvider = ({ children }) => {
     }
     
     // Set up Supabase auth listener
-    authListenerRef.current = supabase.auth.onAuthStateChange((event, session) => {
+    authListenerRef.current = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log('[StableAuth] Auth state changed:', event, session);
       
       if (session) {
         const user = session.user;
+        
+        // Check if user is admin
+        let adminStatus = false;
+        try {
+          adminStatus = await checkIsAdmin();
+          console.log('[StableAuth] Admin status check result:', adminStatus);
+        } catch (err) {
+          console.error('[StableAuth] Error checking admin status:', err);
+        }
+        
         setAuthState({
           user,
           session,
           isLoading: false,
-          isAuthenticated: true
+          isAuthenticated: true,
+          isAdmin: adminStatus
         });
         
         // Store in localStorage with expiry
@@ -81,6 +97,7 @@ export const StableAuthProvider = ({ children }) => {
             refresh_token: session.refresh_token,
             expires_at: session.expires_at
           },
+          isAdmin: adminStatus,
           expiresAt: new Date(Date.now() + 3600000).toISOString() // 1 hour cache
         }));
       } else { // This includes SIGNED_OUT and other events where session becomes null
@@ -89,7 +106,8 @@ export const StableAuthProvider = ({ children }) => {
           user: null,
           session: null,
           isLoading: false, 
-          isAuthenticated: false
+          isAuthenticated: false,
+          isAdmin: false
         });
       }
     });
@@ -105,13 +123,33 @@ export const StableAuthProvider = ({ children }) => {
                     user: session.user,
                     session,
                     isLoading: false,
-                    isAuthenticated: true
+                    isAuthenticated: true,
+                    isAdmin: false // Default until we check
+                 });
+                 
+                 // Try to check admin status
+                 checkIsAdmin().then(adminStatus => {
+                    if (adminStatus) {
+                      setAuthState(prev => ({ ...prev, isAdmin: true }));
+                    }
+                 }).catch(err => {
+                    console.error('[StableAuth] Error checking admin status during timeout:', err);
                  });
             } else {
-                setAuthState(prev => ({ ...prev, isLoading: false, isAuthenticated: !!prev.user }));
+                setAuthState(prev => ({ 
+                  ...prev, 
+                  isLoading: false, 
+                  isAuthenticated: !!prev.user,
+                  isAdmin: false 
+                }));
             }
         }).catch(() => {
-             setAuthState(prev => ({ ...prev, isLoading: false, isAuthenticated: !!prev.user }));
+             setAuthState(prev => ({ 
+               ...prev, 
+               isLoading: false, 
+               isAuthenticated: !!prev.user,
+               isAdmin: false 
+             }));
         });
       }
     }, 5000);
