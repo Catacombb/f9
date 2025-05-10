@@ -102,9 +102,20 @@ export const briefService = {
     console.log('[briefService] getUserBriefs called');
     
     try {
+      // Get the current user's ID from session
+      const { data: sessionData } = await supabase.auth.getSession();
+      const user = sessionData?.session?.user;
+      
+      if (!user) {
+        console.error('[briefService] No authenticated user found');
+        return { data: [], error: new Error('User not authenticated') };
+      }
+      
+      // Explicitly filter by owner_id for clarity and safety
       const { data, error } = await supabase
         .from('briefs')
         .select('id, title, owner_id, created_at, updated_at, status')
+        .eq('owner_id', user.id)
         .order('updated_at', { ascending: false });
       
       if (error) {
@@ -112,7 +123,7 @@ export const briefService = {
         return { data: [], error };
       }
       
-      console.log('[briefService] Retrieved', data?.length || 0, 'briefs for user');
+      console.log('[briefService] Retrieved', data?.length || 0, 'briefs for user:', user.id);
       return { data: (data as BriefFull[]) || [], error: null };
     } catch (unexpectedError) {
       console.error('[briefService] Unexpected error in getUserBriefs:', unexpectedError);
@@ -124,6 +135,16 @@ export const briefService = {
     console.log('[briefService] getAllBriefs called (admin function)');
     
     try {
+      // Get the current user's session
+      const { data: sessionData } = await supabase.auth.getSession();
+      const user = sessionData?.session?.user;
+      
+      if (!user) {
+        console.error('[briefService] No authenticated user found');
+        return { data: [], error: new Error('User not authenticated') };
+      }
+      
+      // This function relies on RLS policies to limit data based on admin status
       const { data, error } = await supabase
         .from('briefs')
         .select('id, title, owner_id, created_at, updated_at, status, user_profiles(full_name)')

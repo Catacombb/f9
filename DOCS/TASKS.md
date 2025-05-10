@@ -112,6 +112,7 @@ This document outlines the phased implementation plan to enhance the Design Brie
 - [x] **Supabase Storage Configuration**:
     - [x] Create `brief_uploads` bucket.
     - [x] Set up appropriate security policies.
+    - [x] Configure bucket for proper public file access.
 - [x] **File Management Service**:
     - [x] Create `fileService.ts` in `src/lib/supabase/services/` to handle upload, download, and deletion operations.
     - [x] Add methods to `briefService.ts` for file operations.
@@ -124,6 +125,9 @@ This document outlines the phased implementation plan to enhance the Design Brie
     - [x] Add appropriate error handling for file operations.
     - [x] Ensure proper permissions checks.
     - [x] Sanitize file uploads.
+- [x] **RLS Policy Fixes**:
+    - [x] Configure storage objects INSERT policy to allow authenticated uploads.
+    - [x] Set bucket to public for file previews to work correctly.
 
 ---
 
@@ -133,17 +137,17 @@ This document outlines the phased implementation plan to enhance the Design Brie
 - [x] **Admin Role & Access**:
     - [x] Implement the `is_admin()` PostgreSQL function. (Assumed done, `roleService.ts` calls it).
     - [x] Update `useStableAuth.tsx` hook to include an `isAdmin` flag by calling `is_admin()` RPC via `roleService.ts`. (Verified).
-- [ ] **Admin Dashboard UI Components**:
-    - [ ] Create `src/components/dashboard/AdminDashboardView.tsx`.
-    - [ ] `DashboardPage.tsx` (functional version) should render `AdminDashboardView.tsx` if an admin user is logged in.
-- [ ] **Admin Dashboard Features (`AdminDashboardView.tsx`)**:
-    - [ ] Fetch and display ALL briefs from all clients (new method `briefService.getAllBriefs()` - verified in `briefService.ts` but UI not implemented).
-    - [ ] Admin should be able to view any brief's details (navigate to `/design-brief/[briefId]`).
-    - [ ] (Optional based on requirements: Admin edit/delete capabilities for any brief).
-- [ ] **RLS for Admin Access** (Review and implement specific policies in Supabase Studio):
-    - [ ] `user_profiles`: Admins can `SELECT` all profiles.
-    - [ ] `briefs`: Admins can `SELECT` all briefs.
-    - [ ] `brief_files`: Admins can `SELECT` all brief files.
+- [x] **Admin Dashboard UI Components**:
+    - [x] Create `src/components/dashboard/AdminDashboardView.tsx`.
+    - [x] `DashboardPage.tsx` (functional version) should render `AdminDashboardView.tsx` if an admin user is logged in.
+- [x] **Admin Dashboard Features (`AdminDashboardView.tsx`)**:
+    - [x] Fetch and display ALL briefs from all clients (using `briefService.getAllBriefs()`).
+    - [x] Admin should be able to view any brief's details (navigate to `/design-brief/[briefId]`).
+    - [x] (Optional based on requirements: Admin edit/delete capabilities for any brief).
+- [x] **RLS for Admin Access** (Review and implement specific policies in Supabase Studio):
+    - [x] `user_profiles`: Admins can `SELECT` all profiles.
+    - [x] `briefs`: Admins can `SELECT` all briefs.
+    - [x] `brief_files`: Admins can `SELECT` all brief files.
 
 ---
 

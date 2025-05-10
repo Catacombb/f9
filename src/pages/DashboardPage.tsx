@@ -1,6 +1,7 @@
 import React from 'react';
 import { useStableAuth } from '@/hooks/useStableAuth';
 import { ClientDashboardView } from '@/components/dashboard/ClientDashboardView';
+import { AdminDashboardView } from '@/components/dashboard/AdminDashboardView';
 import { ReloadIcon } from '@radix-ui/react-icons';
 
 // Placeholder for AdminDashboardView - to be created in Phase 5
@@ -29,18 +30,8 @@ const DashboardPage: React.FC = () => {
     return <p>Redirecting to login...</p>; 
   }
   
-  // For Phase 5, this will be a more fleshed-out AdminDashboardView
-  // For now, we show a placeholder or the ClientDashboardView if they happen to be admin but no admin view is ready
   if (isAdmin) {
-    // return <AdminDashboardViewPlaceholder />;
-    // For Phase 3, let's allow admins to see the client view as well, or a specific message.
-    // Later, this will be a proper AdminDashboardView.
-    console.log("[DashboardPage] Admin user detected. Showing client view for now, or admin placeholder if preferred.");
-    // If you want a distinct placeholder for admins until Phase 5 is ready:
-    // return <AdminDashboardViewPlaceholder />;
-    // For now, let's let admins also use the ClientDashboardView to see their own briefs.
-    // In Phase 5, a proper AdminDashboardView will show all briefs.
-    return <ClientDashboardView />; 
+    return <AdminDashboardView />;
   }
 
   return <ClientDashboardView />;

@@ -195,8 +195,8 @@ pages/
 
 ## Missing/Incomplete Features (High-Level)
 
-1.  **File Uploads**: Full implementation with Supabase Storage (Phase 4).
-2.  **Admin Dashboard & Full Admin Capabilities**: (Phase 5). `isAdmin` check exists, but no dedicated admin view.
+1.  **File Uploads**: ✅ Implemented in Phase 4 with Supabase Storage.
+2.  **Admin Dashboard & Full Admin Capabilities**: ✅ Implemented in Phase 5. Admin users can now view and manage all briefs from all users.
 3.  **Autosave Functionality**: (Phase 6). TanStack Query is not in `package.json`.
 4.  **PDF Generation**: Requires libraries and implementation (Phase 7).
 5.  **Advanced Theming**: `next-themes` not installed (Phase 7).
@@ -219,8 +219,17 @@ This document should be updated as the project progresses through its developmen
 - **User Authentication**: Registration, login, role-based access control.
 - **Design Brief Creation**: A multi-step form for creating design briefs.
 - **Dashboard**: Client dashboard for viewing, editing, and deleting briefs.
-- **File Uploads**: Upload, view, and manage design inspirations, site plans, and supporting documents with Supabase Storage.
+- **Admin Dashboard**: Admin view for managing all briefs from all users.
+- **File Uploads**: Upload, view, preview, and manage design inspirations, site plans, and supporting documents with Supabase Storage. Files can be viewed by clicking on filenames after upload.
 - **Data Persistence**: All brief data is stored in Supabase database.
+
+## File Storage Implementation
+
+The file storage system uses Supabase Storage with the following features:
+- A `brief_uploads` bucket for storing all design brief-related files
+- `brief_files` database table for tracking file metadata and organization
+- Appropriate RLS policies for secure access control
+- Public file URLs for easy preview and download
 
 ## Current Implementation Status
 
@@ -228,6 +237,16 @@ This document should be updated as the project progresses through its developmen
 2. ✅ **Phase 2**: User Authentication Implemented
 3. ✅ **Phase 3**: Client Dashboard & Brief Management Implemented
 4. ✅ **Phase 4**: File Uploads with Supabase Storage Implemented
-5. ⬜ **Phase 5**: PDF Export & Email Sharing
+   - File uploads working for multiple file types
+   - File preview functionality operating correctly
+   - File deletion fully implemented
+   - Proper error handling and user feedback
+5. ✅ **Phase 5**: Admin Dashboard Implementation
+   - Admin-specific view implemented 
+   - Ability to see and manage all briefs from all users
+   - View and delete functionality for admin users
+6. ⬜ **Phase 6**: Autosave Implementation
+7. ⬜ **Phase 7**: Advanced Features & Refinements
+8. ⬜ **Phase 8**: Deployment to Vercel
 
 This document should be updated as the project progresses through its development phases. 
