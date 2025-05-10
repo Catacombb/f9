@@ -11,7 +11,6 @@ const DesignBriefContext = createContext<DesignBriefContextType | undefined>(und
 export const DesignBriefProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [projectData, setProjectData] = useState<ProjectData>(initialProjectData);
   const [currentSection, setCurrentSection] = useState<SectionKey>('intro');
-
   const updateFormData: DesignBriefContextType['updateFormData'] = useCallback((section, updates) => {
     setProjectData(draft => {
       const updatedDraft = { ...draft };
@@ -75,4 +74,9 @@ export const useDesignBrief = () => {
     throw new Error('useDesignBrief must be used within a DesignBriefProvider');
   }
   return context;
+};
+
+// Function to set the force creation flag - call this before redirecting to design-brief
+export const setForceProjectCreation = () => {
+  sessionStorage.setItem(FORCE_CREATION_KEY, 'true');
 };

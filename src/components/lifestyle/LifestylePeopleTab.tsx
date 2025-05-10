@@ -1,8 +1,7 @@
-
 import React from 'react';
 import { OccupantEntry } from '@/types';
 import { NamedOccupantsSection } from './NamedOccupantsSection';
-import { animations } from '@/lib/animation';
+import { animations } from '@/lib/utils';
 import { cn } from '@/lib/utils';
 
 interface LifestylePeopleTabProps {

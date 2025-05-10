@@ -1,12 +1,29 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import { useDesignBrief } from '@/context/DesignBriefContext';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { UploadCloud, X, FileIcon } from 'lucide-react';
+import { UploadCloud, X, FileIcon, Trash2 } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+
+// Define types for our files
+type UploadedFile = {
+  id: string;
+  name: string;
+  path: string;
+  [key: string]: any;
+};
+
+type LocalFile = File;
+
+// Type guard to check if a file is an uploaded file
+function isUploadedFile(file: any): file is UploadedFile {
+  return file && typeof file === 'object' && 'id' in file && 'path' in file;
+}
 
 export function SiteDocumentsUploader() {
-  const { updateFiles, files } = useDesignBrief();
+  const { updateFiles, files, deleteFile } = useDesignBrief();
+  const [deletingFiles, setDeletingFiles] = useState<Set<string>>(new Set());
+  const { toast } = useToast();
   const siteDocuments = files.siteDocuments || [];
   
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -17,10 +34,53 @@ export function SiteDocumentsUploader() {
     }
   };
 
-  const removeFile = (index: number) => {
+  const removeLocalFile = (index: number) => {
     const updatedFiles = [...siteDocuments];
     updatedFiles.splice(index, 1);
     updateFiles({ siteDocuments: updatedFiles });
+  };
+
+  const handleDeleteFile = async (file: UploadedFile | LocalFile, index: number) => {
+    // Check if this is a stored file that needs to be deleted from storage
+    if (isUploadedFile(file)) {
+      // Mark file as being deleted
+      setDeletingFiles(prev => {
+        const newSet = new Set(prev);
+        newSet.add(file.id);
+        return newSet;
+      });
+      
+      try {
+        const result = await deleteFile(file.id, file.path, 'siteDocuments');
+        if (result.success) {
+          toast({
+            title: "File deleted",
+            description: "The file was successfully deleted.",
+            variant: "default",
+          });
+          // Remove from local state
+          removeLocalFile(index);
+        } else {
+          throw new Error('Failed to delete file');
+        }
+      } catch (error) {
+        console.error('Error deleting file:', error);
+        toast({
+          title: "Error",
+          description: "Failed to delete the file. Please try again.",
+          variant: "destructive",
+        });
+        // If deletion fails, remove it from the deleting set
+        setDeletingFiles(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(file.id);
+          return newSet;
+        });
+      }
+    } else {
+      // For local files, just remove them from state
+      removeLocalFile(index);
+    }
   };
 
   return (
@@ -33,22 +93,29 @@ export function SiteDocumentsUploader() {
       </p>
       
       <div className="flex flex-wrap gap-4 mb-4">
-        {siteDocuments.map((file, index) => (
-          <div key={index} className="relative flex items-center border rounded p-2 bg-gray-50">
-            <FileIcon className="h-4 w-4 mr-2" />
-            <span className="text-sm truncate max-w-[200px]">{file.name}</span>
-            <Button 
-              type="button" 
-              variant="ghost" 
-              size="icon" 
-              className="h-6 w-6 p-0 ml-2"
-              onClick={() => removeFile(index)}
-            >
-              <X className="h-4 w-4" />
-              <span className="sr-only">Remove</span>
-            </Button>
-          </div>
-        ))}
+        {siteDocuments.map((file, index) => {
+          const isStored = isUploadedFile(file);
+          const isDeleting = isStored ? deletingFiles.has(file.id) : false;
+          const fileName = file.name;
+          
+          return (
+            <div key={index} className="relative flex items-center border rounded p-2 bg-gray-50">
+              <FileIcon className="h-4 w-4 mr-2" />
+              <span className="text-sm truncate max-w-[200px]">{fileName}</span>
+              <Button 
+                type="button" 
+                variant="ghost" 
+                size="icon" 
+                className="h-6 w-6 p-0 ml-2"
+                onClick={() => handleDeleteFile(file, index)}
+                disabled={isDeleting}
+              >
+                {isStored ? <Trash2 className="h-4 w-4 text-red-500" /> : <X className="h-4 w-4" />}
+                <span className="sr-only">Remove</span>
+              </Button>
+            </div>
+          );
+        })}
       </div>
 
       <div className="flex items-center justify-center w-full">
