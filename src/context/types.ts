@@ -1,4 +1,5 @@
 import { ProjectData, FormData, SectionKey, SpaceRoom, Professional } from '@/types';
+import { UploadedFile, FileUploadResult, FileDeleteResult } from '@/lib/supabase/services/fileService';
 
 export interface DesignBriefContextType {
   projectData: ProjectData;
@@ -18,8 +19,14 @@ export interface DesignBriefContextType {
   saveProjectData: () => Promise<any>;
   loadProjectData: (briefId: string) => Promise<boolean>;
   exportAsPDF: () => Promise<Blob>;
+  sendByEmail: (email: string) => Promise<boolean>;
   isLoading: boolean;
   error: string | null;
-  sendByEmail: (email: string) => Promise<boolean>;
   isNewProject: boolean;
+  
+  // File management methods
+  uploadFile: (category: string, file: File) => Promise<FileUploadResult>;
+  deleteFile: (fileId: string) => Promise<FileDeleteResult>;
+  uploadedFiles: Record<string, UploadedFile[]>;
+  loadFilesForBrief: (briefId: string) => Promise<void>;
 }

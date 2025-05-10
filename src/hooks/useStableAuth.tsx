@@ -72,24 +72,39 @@ export const StableAuthProvider = ({ children }) => {
       if (session) {
         const user = session.user;
         
-        // Check if user is admin
-        let adminStatus = false;
-        try {
-          adminStatus = await checkIsAdmin();
-          console.log('[StableAuth] Admin status check result:', adminStatus);
-        } catch (err) {
-          console.error('[StableAuth] Error checking admin status:', err);
-        }
-        
+        // First set auth state to authenticated without waiting for admin check
         setAuthState({
           user,
           session,
           isLoading: false,
           isAuthenticated: true,
-          isAdmin: adminStatus
+          isAdmin: false // Will be updated after admin check
         });
         
-        // Store in localStorage with expiry
+        // Check if user is admin with a timeout
+        let adminStatus = false;
+        try {
+          // Create a promise that rejects after 3 seconds
+          const adminCheckWithTimeout = Promise.race([
+            checkIsAdmin(),
+            new Promise<boolean>((_, reject) => {
+              setTimeout(() => reject(new Error('Admin check timed out')), 3000);
+            })
+          ]);
+          
+          adminStatus = await adminCheckWithTimeout;
+          console.log('[StableAuth] Admin status check result:', adminStatus);
+          
+          // Only update state if admin status is true (no need to re-render if false)
+          if (adminStatus) {
+            setAuthState(prev => ({ ...prev, isAdmin: true }));
+          }
+        } catch (err) {
+          console.error('[StableAuth] Error checking admin status:', err);
+          // No state update needed, we already set isAdmin to false above
+        }
+        
+        // Store in localStorage with expiry regardless of admin check success
         localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({
           user,
           session: {
@@ -127,13 +142,21 @@ export const StableAuthProvider = ({ children }) => {
                     isAdmin: false // Default until we check
                  });
                  
-                 // Try to check admin status
-                 checkIsAdmin().then(adminStatus => {
+                 // Try to check admin status with a timeout
+                 const adminCheckPromise = Promise.race([
+                   checkIsAdmin(),
+                   new Promise<boolean>((_, reject) => {
+                     setTimeout(() => reject(new Error('Admin check timed out during safety timeout')), 3000);
+                   })
+                 ]);
+                 
+                 adminCheckPromise.then(adminStatus => {
                     if (adminStatus) {
                       setAuthState(prev => ({ ...prev, isAdmin: true }));
                     }
                  }).catch(err => {
                     console.error('[StableAuth] Error checking admin status during timeout:', err);
+                    // Already set isAdmin to false above, no need to update state
                  });
             } else {
                 setAuthState(prev => ({ 
@@ -143,7 +166,8 @@ export const StableAuthProvider = ({ children }) => {
                   isAdmin: false 
                 }));
             }
-        }).catch(() => {
+        }).catch((err) => {
+             console.error('[StableAuth] Error getting session during timeout:', err);
              setAuthState(prev => ({ 
                ...prev, 
                isLoading: false, 

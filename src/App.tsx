@@ -11,16 +11,16 @@ import { Register } from '@/components/auth/Register';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { StableAuthProvider, useStableAuth } from '@/hooks/useStableAuth';
 import CreateBriefPage from '@/pages/CreateBriefPage'; // Import the new page
+import DashboardPage from '@/pages/DashboardPage'; // Import the real DashboardPage
 
-// Placeholder for DashboardPage - will be created in Phase 3
-const DashboardPagePlaceholder = () => (
-  <div className="p-4">
-    <h1 className="text-2xl">Dashboard</h1>
-    <p>Welcome to your dashboard!</p>
-    {/* Link to create a new brief - for testing protected route */}
-    <Link to="/create-brief" className="text-blue-500 hover:underline">Create New Brief</Link>
-  </div>
-);
+// Remove DashboardPagePlaceholder as it's replaced by the actual DashboardPage
+// const DashboardPagePlaceholder = () => (
+//   <div className="p-4">
+//     <h1 className="text-2xl">Dashboard</h1>
+//     <p>Welcome to your dashboard!</p>
+//     <Link to="/create-brief" className="text-blue-500 hover:underline">Create New Brief</Link>
+//   </div>
+// );
 
 // Wrapper component to provide the brief ID to DesignBriefProvider
 const BriefWrapper = () => {
@@ -90,7 +90,7 @@ function App() {
 
                 {/* Protected Routes */}
                 <Route element={<ProtectedRoute />}>
-                  <Route path="/dashboard" element={<DashboardPagePlaceholder />} />
+                  <Route path="/dashboard" element={<DashboardPage />} /> {/* Use actual DashboardPage */}
                   <Route path="/create-brief" element={<CreateBriefPage />} />
                   <Route path="/design-brief" element={<BriefWrapper />} />
                   <Route path="/design-brief/:briefId" element={<BriefWrapper />} />

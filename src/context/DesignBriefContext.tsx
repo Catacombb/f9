@@ -6,6 +6,7 @@ import { useRoomsManagement } from './useRoomsManagement';
 import { useProfessionalsManagement } from './useProfessionalsManagement';
 import { useFileAndSummaryManagement } from './useFileAndSummaryManagement';
 import { briefService } from '@/lib/supabase/services/briefService';
+import { fileService, UploadedFile } from '@/lib/supabase/services/fileService';
 
 const DesignBriefContext = createContext<DesignBriefContextType | undefined>(undefined);
 
@@ -20,6 +21,7 @@ export const DesignBriefProvider: React.FC<{
   const [currentBriefId, setCurrentBriefId] = useState<string | null>(briefId || null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [uploadedFiles, setUploadedFiles] = useState<Record<string, UploadedFile[]>>({});
   
   useEffect(() => {
     console.log('[DesignBriefProvider] isLoading state changed:', isLoading);
@@ -30,12 +32,18 @@ export const DesignBriefProvider: React.FC<{
     if (briefId) {
       console.log('[DesignBriefProvider] briefId prop is present, calling loadProjectData.');
       loadProjectData(briefId);
+      
+      // Also load the files for this brief
+      loadFilesForBrief(briefId).catch(err => {
+        console.error('[DesignBriefProvider] Error loading files for brief:', err);
+      });
     } else {
       console.log('[DesignBriefProvider] briefId prop is NOT present, resetting state for new brief.');
       setProjectData(initialProjectData); // Reset to initial state for a new brief
       setCurrentBriefId(null);           // Ensure no old briefId lingers
       setIsLoading(false);               // Explicitly ensure loading is false for a new brief
       setError(null);                    // Clear any previous errors
+      setUploadedFiles({});              // Clear uploaded files state
     }
   }, [briefId]);
 
@@ -164,6 +172,110 @@ export const DesignBriefProvider: React.FC<{
     }
   };
 
+  // File management functions
+  
+  // Load all files for a brief
+  const loadFilesForBrief = async (briefId: string) => {
+    console.log('[DesignBriefProvider] loadFilesForBrief called for:', briefId);
+    if (!briefId) return;
+    
+    try {
+      setIsLoading(true);
+      const { files, error } = await fileService.getFilesForBrief(briefId);
+      
+      if (error) {
+        console.error('[DesignBriefProvider] Error loading files:', error);
+        return;
+      }
+      
+      // Group files by category
+      const filesByCategory: Record<string, UploadedFile[]> = {};
+      files.forEach(file => {
+        if (!filesByCategory[file.category]) {
+          filesByCategory[file.category] = [];
+        }
+        filesByCategory[file.category].push(file);
+      });
+      
+      setUploadedFiles(filesByCategory);
+      console.log('[DesignBriefProvider] Files loaded and grouped by category:', filesByCategory);
+    } catch (err) {
+      console.error('[DesignBriefProvider] Error in loadFilesForBrief:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  // Upload a file
+  const uploadFile = async (category: string, file: File) => {
+    console.log('[DesignBriefProvider] uploadFile called for category:', category);
+    if (!currentBriefId) {
+      console.error('[DesignBriefProvider] Cannot upload file without a current brief ID');
+      return { success: false, error: new Error('No current brief ID') };
+    }
+    
+    try {
+      setIsLoading(true);
+      const result = await fileService.uploadFile(currentBriefId, category, file);
+      
+      if (result.success && result.file) {
+        // Update uploadedFiles state
+        setUploadedFiles(prev => {
+          const updated = { ...prev };
+          if (!updated[category]) {
+            updated[category] = [];
+          }
+          updated[category] = [...updated[category], result.file!];
+          return updated;
+        });
+        
+        console.log('[DesignBriefProvider] File uploaded successfully:', result.file);
+      } else {
+        console.error('[DesignBriefProvider] File upload failed:', result.error);
+      }
+      
+      return result;
+    } catch (err) {
+      console.error('[DesignBriefProvider] Error in uploadFile:', err);
+      return { success: false, error: err };
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  // Delete a file
+  const deleteFile = async (fileId: string) => {
+    console.log('[DesignBriefProvider] deleteFile called for ID:', fileId);
+    
+    try {
+      setIsLoading(true);
+      const result = await fileService.deleteFile(fileId);
+      
+      if (result.success) {
+        // Update uploadedFiles state by removing the deleted file
+        setUploadedFiles(prev => {
+          const updated = { ...prev };
+          // Look through all categories
+          Object.keys(updated).forEach(category => {
+            updated[category] = updated[category].filter(file => file.id !== fileId);
+          });
+          return updated;
+        });
+        
+        console.log('[DesignBriefProvider] File deleted successfully');
+      } else {
+        console.error('[DesignBriefProvider] File deletion failed:', result.error);
+      }
+      
+      return result;
+    } catch (err) {
+      console.error('[DesignBriefProvider] Error in deleteFile:', err);
+      return { success: false, error: err };
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const value: DesignBriefContextType = {
     projectData,
     formData: projectData.formData,
@@ -192,6 +304,10 @@ export const DesignBriefProvider: React.FC<{
     isLoading,
     error,
     isNewProject: !currentBriefId,
+    uploadFile,
+    deleteFile,
+    uploadedFiles,
+    loadFilesForBrief
   };
 
   return (
