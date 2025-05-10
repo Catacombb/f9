@@ -248,8 +248,8 @@ export function SummarySection() {
             
             <EmailExportSection 
               onExportPDF={handleExportPDF}
-              clientName={formData.projectInfo.clientName}
-              projectAddress={formData.projectInfo.projectAddress}
+              clientName={formData.projectInfo.clientName || 'Untitled'}
+              projectAddress={formData.projectInfo.projectAddress || undefined}
             />
           </TabsContent>
         </Tabs>

@@ -89,38 +89,43 @@ This document outlines the phased implementation plan to enhance the Design Brie
 ## Phase 2: User Authentication with Supabase Auth (SSR)
 *Goal: Implement secure user registration, login, and session management.*
 
-- [ ] **SSR Supabase Client**:
-    - [ ] Install `@supabase/ssr` package.
-    - [ ] Update `src/lib/supabase/client.ts` to use `createBrowserClient` and `createServerClient` from `@supabase/ssr` (refer to `improvements.md` for example).
-- [ ] **Auth UI Components (`src/components/auth/`)**:
-    - [ ] Create `Login.tsx`.
-    - [ ] Create `Register.tsx`.
-    - [ ] Create `ForgotPassword.tsx` (optional for first pass, can be added later).
-- [ ] **Auth Hook (`src/hooks/useSupabaseAuth.tsx` or similar name)**:
-    - [ ] Implement functions for `signIn`, `signUp`, `signOut`.
-    - [ ] Manage user session state (`user`, `isLoading`, `session`).
-    - [ ] Provide this context via a `SupabaseAuthProvider` wrapping the app in `App.tsx` or `main.tsx`.
-- [ ] **Routing & Protection**:
-    - [ ] Create `src/components/auth/ProtectedRoute.tsx` to guard routes.
-    - [ ] Update `App.tsx` to include routes for `/login`, `/register`.
-    - [ ] Protect dashboard and design brief creation/editing routes using `ProtectedRoute`.
-- [ ] **User Profile Functionality**:
-    - [ ] After user registration (`signUp`), create a corresponding entry in `public.user_profiles` table (can be done via a Supabase Edge Function triggered on `auth.users` insert, or client-side after successful signup).
-- [ ] **Brief Ownership**:
-    - [ ] When a new brief is created, associate it with the `auth.uid()` of the logged-in user as `owner_id`.
-    - [ ] Modify `briefService` methods to work with the authenticated user's ID where appropriate.
-    - [ ] Update the database schema to make `owner_id` column in `briefs` table required again (NOT NULL). *Note: In Phase 1, we temporarily made this column nullable to allow for testing without authentication.*
-- [ ] **Row Level Security (RLS) - Initial**:
-    - [ ] `user_profiles`:
+- [x] **SSR Supabase Client**:
+    - [x] Install `@supabase/ssr` package.
+    - [x] Update `src/lib/supabase/client.ts` to use `createBrowserClient` and `createServerClient` from `@supabase/ssr` (refer to `improvements.md` for example).
+- [x] **Auth UI Components (`src/components/auth/`)**:
+    - [x] Create `Login.tsx`.
+    - [x] Create `Register.tsx`.
+    - [x] Create `ForgotPassword.tsx` (optional for first pass, can be added later).
+- [x] **Auth Hook (`src/hooks/useSupabase.tsx`)**:
+    - [x] Implement functions for `signIn`, `signUp`, `signOut`.
+    - [x] Manage user session state (`user`, `isLoading`, `session`).
+    - [x] Provide this context via a `SupabaseProvider` wrapping the app in `App.tsx` or `main.tsx`.
+- [x] **Routing & Protection**:
+    - [x] Create `src/components/auth/ProtectedRoute.tsx` to guard routes.
+    - [x] Update `App.tsx` to include routes for `/login`, `/register`.
+    - [x] Protect dashboard and design brief creation/editing routes using `ProtectedRoute`.
+- [x] **User Profile Functionality**:
+    - [x] After user registration (`signUp`), create a corresponding entry in `public.user_profiles` table (can be done via a Supabase Edge Function triggered on `auth.users` insert, or client-side after successful signup).
+    - [x] Enhance registration to capture and store user's full name in profile.
+- [x] **Brief Ownership**:
+    - [x] When a new brief is created, associate it with the `auth.uid()` of the logged-in user as `owner_id`.
+    - [x] Modify `briefService` methods to work with the authenticated user's ID where appropriate.
+    - [x] Update the database schema to make `owner_id` column in `briefs` table required again (NOT NULL). *Note: In Phase 1, we temporarily made this column nullable to allow for testing without authentication.*
+- [x] **Row Level Security (RLS) - Initial**:
+    - [x] `user_profiles`:
         - Users can `SELECT` their own profile.
         - Users can `UPDATE` their own profile.
         - (Admins will be handled later).
-    - [ ] `briefs`:
+    - [x] `briefs`:
         - Users can `SELECT` their own briefs.
         - Users can `INSERT` briefs with their `owner_id`.
         - Users can `UPDATE` their own briefs.
         - Users can `DELETE` their own briefs.
         - (Admins will be handled later).
+- [ ] **Fix Infinite Loading Spinner Issue**:
+    - [x] Implement the `is_admin()` RPC function (moved up from Phase 5).
+    - [x] Add improved error handling and logging to auth flow.
+    - [ ] Fix the remaining loading spinner issues in the ProtectedRoute component or BriefWrapper component.
 
 ---
 

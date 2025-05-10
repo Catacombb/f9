@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
-import { ProjectData, SectionKey } from '@/types';
+import { ProjectData, SectionKey, FormData as LocalFormData } from '@/types';
 import { initialProjectData } from './initialState';
 import { DesignBriefContextType } from './types';
 import { useRoomsManagement } from './useRoomsManagement';
@@ -13,16 +13,29 @@ export const DesignBriefProvider: React.FC<{
   children: React.ReactNode;
   briefId?: string; // Optional prop to load a specific brief
 }> = ({ children, briefId }) => {
+  console.log('[DesignBriefProvider] Initializing. Prop briefId:', briefId);
+
   const [projectData, setProjectData] = useState<ProjectData>(initialProjectData);
   const [currentSection, setCurrentSection] = useState<SectionKey>('intro');
   const [currentBriefId, setCurrentBriefId] = useState<string | null>(briefId || null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   
-  // Load project data if briefId is provided
   useEffect(() => {
+    console.log('[DesignBriefProvider] isLoading state changed:', isLoading);
+  }, [isLoading]);
+
+  useEffect(() => {
+    console.log('[DesignBriefProvider] useEffect for loading based on prop briefId. Prop briefId:', briefId);
     if (briefId) {
+      console.log('[DesignBriefProvider] briefId prop is present, calling loadProjectData.');
       loadProjectData(briefId);
+    } else {
+      console.log('[DesignBriefProvider] briefId prop is NOT present, resetting state for new brief.');
+      setProjectData(initialProjectData); // Reset to initial state for a new brief
+      setCurrentBriefId(null);           // Ensure no old briefId lingers
+      setIsLoading(false);               // Explicitly ensure loading is false for a new brief
+      setError(null);                    // Clear any previous errors
     }
   }, [briefId]);
 
@@ -47,33 +60,47 @@ export const DesignBriefProvider: React.FC<{
 
   // Load project data from Supabase
   const loadProjectData = async (briefId: string): Promise<boolean> => {
+    console.log('[DesignBriefProvider] loadProjectData called for briefId:', briefId);
     setIsLoading(true);
     setError(null);
     
     try {
-      const { data, error } = await briefService.getBriefById(briefId);
+      const { data: briefFullData, error: fetchError } = await briefService.getBriefById(briefId);
       
-      if (error) {
-        console.error('Error loading brief:', error);
+      if (fetchError) {
+        console.error('Error loading brief:', fetchError);
         setError('Failed to load brief data');
         setIsLoading(false);
         return false;
       }
       
-      if (data) {
-        // Update project data with data from the brief
-        setProjectData(prevData => ({
-          ...prevData,
-          formData: data, // BriefDataType is FormData
-          lastSaved: new Date().toISOString()
-        }));
+      if (briefFullData && briefFullData.data) {
+        // Assuming briefFullData.data (which is Json) is structurally compatible with LocalFormData
+        const loadedFormData = briefFullData.data as unknown as LocalFormData;
+
+        setProjectData(prevData => {
+          // Create a new object for projectData to ensure no stale references from prevData.formData
+          const newProjectData: ProjectData = {
+            ...prevData,
+            formData: loadedFormData, // Assign the loaded and casted form data
+            lastSaved: new Date().toISOString(),
+            projectId: briefFullData.id,
+            // Ensure other fields of ProjectData are preserved or updated as needed
+            files: prevData.files, // Preserve existing files state
+            currentSection: prevData.currentSection, // Preserve currentSection
+            version: prevData.version, // Preserve version
+          };
+          return newProjectData;
+        });
         
         setCurrentBriefId(briefId);
         setIsLoading(false);
+        console.log('[DesignBriefProvider] Brief data loaded successfully for:', briefId);
         return true;
       } else {
-        setError('Brief not found');
+        setError('Brief not found or data field is missing');
         setIsLoading(false);
+        console.log('[DesignBriefProvider] Brief not found or data field missing for:', briefId);
         return false;
       }
     } catch (err) {

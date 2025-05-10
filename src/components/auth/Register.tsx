@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSupabase } from '@/hooks/useSupabase';
+import { useStableAuth } from '@/hooks/useStableAuth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -8,8 +8,9 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { ReloadIcon } from '@radix-ui/react-icons';
 
 export const Register = () => {
-  const { signUp, isLoading: authLoading } = useSupabase();
+  const { signUp, isLoading: authLoading } = useStableAuth();
   const navigate = useNavigate();
+  const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -28,7 +29,7 @@ export const Register = () => {
     }
     setIsLoading(true);
     try {
-      const { data, error: signUpError } = await signUp(email, password);
+      const { data, error: signUpError } = await signUp(email, password, fullName);
       if (signUpError) {
         setError(signUpError.message);
       } else if (data?.user?.identities?.length === 0) {
@@ -61,6 +62,18 @@ export const Register = () => {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="fullName">Full Name</Label>
+              <Input
+                id="fullName"
+                type="text"
+                placeholder="John Doe"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                required
+                disabled={currentIsLoading}
+              />
+            </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input

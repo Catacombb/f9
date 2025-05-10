@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSupabase } from '@/hooks/useSupabase';
+import { useStableAuth } from '@/hooks/useStableAuth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { ReloadIcon } from '@radix-ui/react-icons'; // For loading spinner
 
 export const Login = () => {
-  const { signIn, isLoading: authLoading } = useSupabase();
+  const { signIn, isLoading: authLoading } = useStableAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
