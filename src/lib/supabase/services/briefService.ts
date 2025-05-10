@@ -1,58 +1,100 @@
-import { supabase, supabaseService } from '@/lib/supabase/client';
+import { createBrowserSupabaseClient } from '@/lib/supabase/client';
 import type { FormData as BriefDataType } from '@/types';
+import type { Database, Json } from '@/lib/supabase/database.types';
 
-// Re-export BriefDataType for external use if needed, or use it internally
+// Define a more specific type for what briefService.getById and others will return
+export type BriefFull = Database['public']['Tables']['briefs']['Row'] & {
+  user_profiles?: { full_name: string | null } | null;
+};
+
+const supabase = createBrowserSupabaseClient();
+
+// Re-export BriefDataType for external use if needed
 export type { BriefDataType };
 
-// For Phase 1 testing, use the service client to bypass RLS
-// In Phase 2 with authentication, this will be switched back to regular supabase client
-const client = supabaseService;
-
 export const briefService = {
-  async createBrief(title: string, ownerId?: string): Promise<{ id: string | null; error: any }> {
-    // For Phase 1 testing only: create brief without specifying owner_id for now
-    // This will be properly implemented in Phase 2 with authentication
-    const { data, error } = await client
+  async createBrief(title: string): Promise<{ id: string | null; error: any }> {
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError || !user) {
+      return { id: null, error: userError || new Error('User not authenticated') };
+    }
+    const initialBriefData: Json = {
+      projectInfo: {},
+      budget: {},
+      lifestyle: {},
+      site: {},
+      spaces: [],
+      architecture: {},
+      contractors: {},
+      communication: {},
+      uploads: {},
+      summary: {}
+    };
+    const { data, error } = await supabase
       .from('briefs')
-      .insert({ 
-        title, 
-        owner_id: null, // Explicitly set to null for Phase 1
-        data: {} 
-      })
+      .insert({ title, owner_id: user.id, data: initialBriefData })
       .select('id')
       .single();
-
-    if (error) {
-      console.error('Error creating brief:', error);
-      return { id: null, error };
-    }
-    return { id: data?.id || null, error: null };
+    return { id: data?.id || null, error };
   },
 
-  async getBriefById(briefId: string): Promise<{ data: BriefDataType | null; error: any }> {
-    const { data, error } = await client
+  async getBriefById(briefId: string): Promise<{ data: BriefFull | null; error: any }> {
+    const { data, error } = await supabase
       .from('briefs')
-      .select('data') // We only need the 'data' JSONB field for now as per YourBriefDataType
+      .select('id, title, data, owner_id, created_at, updated_at, status')
       .eq('id', briefId)
       .single();
-
-    if (error) {
-      console.error('Error fetching brief by ID:', error);
-      return { data: null, error };
-    }
-    // The 'data' field from the table IS the BriefDataType (FormData)
-    return { data: data?.data as BriefDataType || null, error: null };
+    return { data: data as BriefFull | null, error };
   },
 
-  async updateBriefData(briefId: string, briefData: BriefDataType): Promise<{ error: any }> {
-    const { error } = await client
+  async getUserBriefs(): Promise<{ data: BriefFull[]; error: any }> {
+    const { data, error } = await supabase
       .from('briefs')
-      .update({ data: briefData, updated_at: new Date().toISOString() })
-      .eq('id', briefId);
+      .select('id, title, owner_id, created_at, updated_at, status')
+      .order('updated_at', { ascending: false });
+    return { data: (data as BriefFull[]) || [], error };
+  },
 
-    if (error) {
-      console.error('Error updating brief data:', error);
-    }
+  async getAllBriefs(): Promise<{ data: BriefFull[]; error: any }> {
+    // This is for admin use
+    // It requires RLS to allow admins to see all, or will only return user's briefs
+    const { data, error } = await supabase
+      .from('briefs')
+      .select('id, title, owner_id, created_at, updated_at, status, user_profiles(full_name)')
+      .order('updated_at', { ascending: false });
+    return { data: (data as BriefFull[]) || [], error };
+  },
+  
+  async updateBriefData(briefId: string, briefData: BriefDataType): Promise<{ error: any }> {
+    const { error } = await supabase
+      .from('briefs')
+      .update({ data: briefData as unknown as Json, updated_at: new Date().toISOString() })
+      .eq('id', briefId);
     return { error };
   },
+
+  async updateSection(briefId: string, section: string, sectionData: any): Promise<{ error: any }> {
+    const { data: existingBrief, error: fetchError } = await supabase
+      .from('briefs')
+      .select('data')
+      .eq('id', briefId)
+      .single();
+    if (fetchError || !existingBrief) {
+      return { error: fetchError || new Error('Brief not found') };
+    }
+    const currentData = (existingBrief.data as Json || {}) as { [key: string]: Json | undefined };
+    const newData: Json = { ...currentData, [section]: sectionData as Json };
+    const { error } = await supabase
+      .from('briefs')
+      .update({ data: newData, updated_at: new Date().toISOString() })
+      .eq('id', briefId);
+    return { error };
+  },
+  
+  async deleteBrief(briefId: string): Promise<{ error: any }> {
+    // Cascade delete in the DB should handle related entries if configured
+    const { error } = await supabase.from('briefs').delete().eq('id', briefId);
+    return { error };
+  }
+  // File related methods will be added in Phase 4
 }; 
