@@ -1,6 +1,6 @@
 import { useSearchParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { useSupabase } from './useSupabase';
+import { useStableAuth } from './useStableAuth';
 import { isAdmin } from '@/lib/supabase/services/roleService';
 
 /**
@@ -15,7 +15,7 @@ export function useProjectParams() {
     isValid: false,
     isProcessing: true
   });
-  const { user } = useSupabase();
+  const { user } = useStableAuth();
 
   useEffect(() => {
     async function validateParams() {
