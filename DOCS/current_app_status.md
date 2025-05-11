@@ -53,7 +53,8 @@ The application is a Design Brief tool built with React, TypeScript, and Vite, u
 components/
 ├── ui/                          # UI components (ShadCN UI)
 ├── dashboard/                   # Dashboard related components
-│   └── ClientDashboardView.tsx  # Client dashboard view with brief management
+│   ├── ClientDashboardView.tsx  # Client dashboard view with brief management
+│   └── AdminDashboardView.tsx   # Admin dashboard view with full brief management
 ├── sections/                    # Design brief section components
 ├── uploads/                     # File upload components (functionality depends on Phase 4)
 ├── spaces/                      # Space-related components
@@ -186,10 +187,18 @@ pages/
     -   Create new brief functionality.
     -   Edit brief navigation.
     -   Delete brief with confirmation dialog.
-5.  **Interactive Elements**:
+5.  **Admin Dashboard**:
+    -   Full view of all briefs from all users.
+    -   Display of user information for each brief.
+    -   Ability to view and delete any brief in the system.
+    -   Proper RLS policies ensuring data security.
+6.  **Interactive Elements**:
     -   Room, professional management (client-side via Context).
     -   Predictive address finding.
-6.  **Routing**:
+7.  **File Upload & Management**:
+    -   Upload, preview, and delete files with Supabase Storage.
+    -   Secure file access through proper RLS policies.
+8.  **Routing**:
     -   Public routes for login, register.
     -   Protected routes for dashboard, create brief, view/edit brief.
 
@@ -197,7 +206,7 @@ pages/
 
 1.  **File Uploads**: ✅ Implemented in Phase 4 with Supabase Storage.
 2.  **Admin Dashboard & Full Admin Capabilities**: ✅ Implemented in Phase 5. Admin users can now view and manage all briefs from all users.
-3.  **Autosave Functionality**: (Phase 6). TanStack Query is not in `package.json`.
+3.  **Autosave Functionality**: ✅ Implemented in Phase 6 using TanStack Query and a custom `useAutosave` hook.
 4.  **PDF Generation**: Requires libraries and implementation (Phase 7).
 5.  **Advanced Theming**: `next-themes` not installed (Phase 7).
 6.  **Comprehensive Testing and UI/UX Polish**: Ongoing.
@@ -219,9 +228,10 @@ This document should be updated as the project progresses through its developmen
 - **User Authentication**: Registration, login, role-based access control.
 - **Design Brief Creation**: A multi-step form for creating design briefs.
 - **Dashboard**: Client dashboard for viewing, editing, and deleting briefs.
-- **Admin Dashboard**: Admin view for managing all briefs from all users.
+- **Admin Dashboard**: Admin view for managing all briefs from all users, with proper role-based security.
 - **File Uploads**: Upload, view, preview, and manage design inspirations, site plans, and supporting documents with Supabase Storage. Files can be viewed by clicking on filenames after upload.
 - **Data Persistence**: All brief data is stored in Supabase database.
+- **Row Level Security**: Comprehensive RLS policies ensuring data security and proper access control for both regular and admin users.
 
 ## File Storage Implementation
 
@@ -245,7 +255,12 @@ The file storage system uses Supabase Storage with the following features:
    - Admin-specific view implemented 
    - Ability to see and manage all briefs from all users
    - View and delete functionality for admin users
-6. ⬜ **Phase 6**: Autosave Implementation
+   - RLS policies ensuring proper data access security
+6. ✅ **Phase 6**: Autosave Implementation
+   - TanStack Query setup with `QueryClientProvider`.
+   - `useAutosave` hook implemented with 7-second debounce and `useMutation`.
+   - Silent autosave integrated into `DesignBriefContext` (no visual notifications to avoid distraction).
+   - Automatic saving of form data without interrupting user experience.
 7. ⬜ **Phase 7**: Advanced Features & Refinements
 8. ⬜ **Phase 8**: Deployment to Vercel
 

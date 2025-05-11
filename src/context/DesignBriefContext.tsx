@@ -7,6 +7,7 @@ import { useProfessionalsManagement } from './useProfessionalsManagement';
 import { useFileAndSummaryManagement } from './useFileAndSummaryManagement';
 import { briefService } from '@/lib/supabase/services/briefService';
 import { fileService, UploadedFile } from '@/lib/supabase/services/fileService';
+import { useAutosave } from '@/hooks/useAutosave';
 
 const DesignBriefContext = createContext<DesignBriefContextType | undefined>(undefined);
 
@@ -23,6 +24,10 @@ export const DesignBriefProvider: React.FC<{
   const [error, setError] = useState<string | null>(null);
   const [uploadedFiles, setUploadedFiles] = useState<Record<string, UploadedFile[]>>({});
   
+  useAutosave(projectData.formData, {
+    briefId: currentBriefId,
+  });
+
   useEffect(() => {
     console.log('[DesignBriefProvider] isLoading state changed:', isLoading);
   }, [isLoading]);
@@ -325,9 +330,9 @@ export const useDesignBrief = () => {
   return context;
 };
 
-// Function to set the force creation flag - call this before redirecting to design-brief
-export const setForceProjectCreation = () => {
-  sessionStorage.setItem('force_project_creation', 'true');
-};
+// Global flag to control new project creation if navigating to /design-brief directly without an ID
+let forceProjectCreation = false;
 
-const FORCE_CREATION_KEY = 'force_project_creation';
+export const getForceProjectCreation = () => forceProjectCreation;
+export const setForceProjectCreation = () => { forceProjectCreation = true; };
+export const clearForceProjectCreation = () => { forceProjectCreation = false; };

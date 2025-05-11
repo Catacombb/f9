@@ -154,14 +154,14 @@ This document outlines the phased implementation plan to enhance the Design Brie
 ## Phase 6: Autosave Implementation
 *Goal: Automatically save brief form data periodically as the user types.*
 
-- [ ] **Setup TanStack Query (React Query)**:
-    - [ ] Install `@tanstack/react-query` (Not currently in `package.json`).
-    - [ ] Wrap the application with `QueryClientProvider`.
-- [ ] **Autosave Hook (`src/hooks/useAutosave.ts`)**:
-    - [ ] Implement a debounced autosave hook (e.g., using TanStack Query `useMutation` or a custom hook).
-    - [ ] This hook should call `briefService.updateBriefData` or a more granular section update.
-- [ ] **Integration with Design Brief Form**:
-    - [ ] Integrate `useAutosave` into `DesignBriefContext` or individual section components.
+- [x] **Setup TanStack Query (React Query)**:
+    - [x] Install `@tanstack/react-query`.
+    - [x] Wrap the application with `QueryClientProvider`.
+- [x] **Autosave Hook (`src/hooks/useAutosave.ts`)**:
+    - [x] Implement a debounced autosave hook using TanStack Query `useMutation`.
+    - [x] This hook calls `briefService.updateBriefData`.
+- [x] **Integration with Design Brief Form**:
+    - [x] Integrate `useAutosave` into `DesignBriefContext`.
 
 ---
 
