@@ -12,6 +12,7 @@ import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { StableAuthProvider, useStableAuth } from '@/hooks/useStableAuth';
 import CreateBriefPage from '@/pages/CreateBriefPage'; // Import the new page
 import DashboardPage from '@/pages/DashboardPage'; // Import the real DashboardPage
+import ConvaiWidget from '@/components/ConvaiWidget'; // Import our new ConvaiWidget component
 
 // Remove DashboardPagePlaceholder as it's replaced by the actual DashboardPage
 // const DashboardPagePlaceholder = () => (
@@ -72,6 +73,7 @@ const BriefWrapper = () => {
   return (
     <DesignBriefProvider briefId={briefId}>
       <DesignBriefPage />
+      <ConvaiWidget />
     </DesignBriefProvider>
   );
 };
