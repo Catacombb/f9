@@ -1,6 +1,11 @@
 import { useCallback } from 'react';
 import { ProjectData, SpaceRoom } from '@/types';
 
+// Simple random ID generator function compatible with all browsers
+const generateUniqueId = () => {
+  return 'room-' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+};
+
 export const useRoomsManagement = (
   projectData: ProjectData,
   setProjectData: React.Dispatch<React.SetStateAction<ProjectData>>
@@ -9,7 +14,7 @@ export const useRoomsManagement = (
     setProjectData(draft => {
       const newRoom = {
         ...room,
-        id: crypto.randomUUID(),
+        id: generateUniqueId(),
       };
       const updatedDraft = { ...draft };
       updatedDraft.formData.spaces.rooms = [...updatedDraft.formData.spaces.rooms, newRoom];

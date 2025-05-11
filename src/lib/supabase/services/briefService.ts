@@ -64,7 +64,13 @@ export const briefService = {
               occupantEntries: [] // Initialize as empty array
             },
             site: {},
-            spaces: [],
+            spaces: {
+              rooms: [], // Ensure rooms array is properly initialized
+              homeLevelType: '',
+              additionalNotes: '',
+              homeSize: '',
+              eliminableSpaces: ''
+            },
             architecture: {},
             contractors: {},
             communication: {},
