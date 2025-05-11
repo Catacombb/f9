@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { ReloadIcon, Pencil2Icon, TrashIcon } from '@radix-ui/react-icons';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useToast } from '@/hooks/use-toast';
+import { Badge } from "@/components/ui/badge";
 
 export const AdminDashboardView: React.FC = () => {
   const { user, isLoading: authLoading } = useStableAuth();
@@ -108,8 +109,12 @@ export const AdminDashboardView: React.FC = () => {
 
   return (
     <div className="p-4 md:p-8">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">All Design Briefs (Admin View)</h1>
+      <div className="flex flex-col md:flex-row justify-between md:items-center mb-8 pb-4 border-b">
+        <div>
+          <h1 className="text-4xl font-bold text-gray-800">Administrator Dashboard</h1>
+          <p className="text-lg text-muted-foreground mt-1">Manage all design briefs and system settings.</p>
+        </div>
+        <Badge variant="outline" className="text-sm font-semibold mt-4 md:mt-0">ADMIN MODE</Badge>
       </div>
 
       {briefs.length === 0 ? (

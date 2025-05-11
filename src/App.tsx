@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useParams, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useParams, Link, Outlet } from 'react-router-dom';
 import { DesignBriefProvider } from '@/context/DesignBriefContext';
 import DesignBriefPage from '@/pages/Index'; // Assuming Index.tsx is the main design brief page
 import { Toaster } from '@/components/ui/toaster'; // Keep ShadCN Toaster
@@ -12,7 +12,8 @@ import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { StableAuthProvider, useStableAuth } from '@/hooks/useStableAuth';
 import CreateBriefPage from '@/pages/CreateBriefPage'; // Import the new page
 import DashboardPage from '@/pages/DashboardPage'; // Import the real DashboardPage
-import ConvaiWidget from '@/components/ConvaiWidget'; // Import our new ConvaiWidget component
+import { Header } from '@/components/layout/Header'; // Import Header
+import ConvaiWidget from '@/components/ConvaiWidget'; // Ensure it is imported for ProtectedLayout
 
 // Remove DashboardPagePlaceholder as it's replaced by the actual DashboardPage
 // const DashboardPagePlaceholder = () => (
@@ -73,10 +74,21 @@ const BriefWrapper = () => {
   return (
     <DesignBriefProvider briefId={briefId}>
       <DesignBriefPage />
-      <ConvaiWidget />
     </DesignBriefProvider>
   );
 };
+
+// Layout for Protected Routes
+const ProtectedLayout = () => (
+  <div className="min-h-screen flex flex-col bg-muted/40">
+    <Header />
+    <main className="flex-grow">
+      <Outlet /> {/* Nested routes will render here */}
+    </main>
+    <ConvaiWidget /> {/* Add ConvaiWidget to the protected layout */}
+    {/* You can add a common footer here if needed */}
+  </div>
+);
 
 function App() {
   return (
@@ -90,13 +102,15 @@ function App() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
 
-                {/* Protected Routes */}
+                {/* Protected Routes with Header */}
                 <Route element={<ProtectedRoute />}>
-                  <Route path="/dashboard" element={<DashboardPage />} /> {/* Use actual DashboardPage */}
-                  <Route path="/create-brief" element={<CreateBriefPage />} />
-                  <Route path="/design-brief" element={<BriefWrapper />} />
-                  <Route path="/design-brief/:briefId" element={<BriefWrapper />} />
-                  <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                  <Route element={<ProtectedLayout />}> {/* Wrap protected routes with the new layout */}
+                    <Route path="/dashboard" element={<DashboardPage />} />
+                    <Route path="/create-brief" element={<CreateBriefPage />} />
+                    <Route path="/design-brief" element={<BriefWrapper />} />
+                    <Route path="/design-brief/:briefId" element={<BriefWrapper />} />
+                    <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                  </Route>
                 </Route>
 
                 {/* Catch-all for 404 */}
