@@ -8,6 +8,7 @@ import { useFileAndSummaryManagement } from './useFileAndSummaryManagement';
 import { briefService } from '@/lib/supabase/services/briefService';
 import { fileService, UploadedFile } from '@/lib/supabase/services/fileService';
 import { useAutosave } from '@/hooks/useAutosave';
+import { generatePDF } from '@/utils/pdfGenerator';
 
 const DesignBriefContext = createContext<DesignBriefContextType | undefined>(undefined);
 
@@ -299,8 +300,16 @@ export const DesignBriefProvider: React.FC<{
     saveProjectData,
     loadProjectData,
     exportAsPDF: async () => { 
-      console.warn('exportAsPDF called but is no-op in client-only mode');
-      return new Blob();
+      try {
+        console.log('[DesignBriefContext] Exporting PDF for project');
+        // Make sure we have the latest data saved before generating PDF
+        await saveProjectData();
+        // Use the PDF generator utility to create the PDF
+        return await generatePDF(projectData);
+      } catch (error) {
+        console.error('[DesignBriefContext] Error generating PDF:', error);
+        throw error;
+      }
     },
     sendByEmail: async () => { 
       console.warn('sendByEmail called but is no-op in client-only mode');

@@ -171,12 +171,12 @@ This document outlines the phased implementation plan to enhance the Design Brie
 - [x] **JSONB Schema Validation (Postgres)**:
     - [x] Enable and configure `pg_jsonschema` extension.
     - [x] Define and apply schema constraint to `briefs.data`. (Using native PostgreSQL JSONB constraint validation)
-- [ ] **PDF Generation (If Required)**:
-    - [ ] Confirm requirement.
-    - [ ] If yes:
-        - Install `jsPDF`, `html2canvas` (Not currently in `package.json`).
-        - Re-implement or create `src/utils/pdfGenerator/` logic.
-        - Add UI for PDF download.
+- [x] **PDF Generation (If Required)**:
+    - [x] Confirm requirement.
+    - [x] If yes:
+        - [x] Install `jsPDF`, `html2canvas`.
+        - [x] Re-implement and simplify `src/utils/pdfGenerator/` logic.
+        - [x] Add UI for PDF download.
 - [ ] **Theme Switching (If Required)**:
     - [ ] If dynamic themes are desired:
         - Install `next-themes` (Not currently in `package.json`).
