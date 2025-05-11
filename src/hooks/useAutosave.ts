@@ -14,7 +14,7 @@ export function useAutosave<T extends BriefDataType>(
   formData: T,
   options: AutosaveOptions
 ) {
-  const { briefId, debounceMs = 7000, onSaveSuccess, onSaveError } = options;
+  const { briefId, debounceMs = 2000, onSaveSuccess, onSaveError } = options;
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);

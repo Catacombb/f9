@@ -16,12 +16,17 @@ interface OccupantEntryListProps {
   onChange: (entries: OccupantEntry[]) => void;
 }
 
+// Simple random ID generator function compatible with all browsers
+const generateUniqueId = () => {
+  return 'id-' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+};
+
 export function OccupantEntryList({ entries = [], onChange }: OccupantEntryListProps) {
   const { toast } = useToast();
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
   const addEntry = () => {
-    const newEntry = { id: crypto.randomUUID(), type: 'adult', name: '' };
+    const newEntry = { id: generateUniqueId(), type: 'adult', name: '' };
     const newEntries = [...entries, newEntry];
     onChange(newEntries);
     setActiveIndex(newEntries.length - 1);

@@ -168,9 +168,9 @@ This document outlines the phased implementation plan to enhance the Design Brie
 ## Phase 7: Advanced Features, Refinements & Testing
 *Goal: Enhance the application with advanced functionalities and ensure stability.*
 
-- [ ] **JSONB Schema Validation (Postgres)**:
-    - [ ] Enable and configure `pg_jsonschema` extension.
-    - [ ] Define and apply schema constraint to `briefs.data`.
+- [x] **JSONB Schema Validation (Postgres)**:
+    - [x] Enable and configure `pg_jsonschema` extension.
+    - [x] Define and apply schema constraint to `briefs.data`. (Using native PostgreSQL JSONB constraint validation)
 - [ ] **PDF Generation (If Required)**:
     - [ ] Confirm requirement.
     - [ ] If yes:

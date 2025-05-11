@@ -28,6 +28,21 @@ export const briefService = {
       
       console.log('[briefService] Creating brief for user:', user.id);
       
+      // Fetch the user's full name from user_profiles
+      const { data: profileData, error: profileError } = await supabase
+        .from('user_profiles')
+        .select('full_name')
+        .eq('id', user.id)
+        .single();
+        
+      if (profileError) {
+        console.error('[briefService] Error fetching user profile:', profileError);
+        // Continue with empty name if there's an error
+      }
+      
+      const userFullName = profileData?.full_name || '';
+      const userEmail = user.email || '';
+      
       // Create the brief with minimal data
       const { data, error } = await supabase
         .from('briefs')
@@ -35,9 +50,19 @@ export const briefService = {
           title, 
           owner_id: user.id, 
           data: { 
-            projectInfo: { clientName: title },
+            title: title,
+            clientInfo: { 
+              name: userFullName,
+              email: userEmail 
+            },
+            projectInfo: { 
+              briefName: title,
+              clientName: userFullName 
+            },
             budget: {},
-            lifestyle: {},
+            lifestyle: {
+              occupantEntries: [] // Initialize as empty array
+            },
             site: {},
             spaces: [],
             architecture: {},

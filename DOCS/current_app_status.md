@@ -258,7 +258,7 @@ The file storage system uses Supabase Storage with the following features:
    - RLS policies ensuring proper data access security
 6. ✅ **Phase 6**: Autosave Implementation
    - TanStack Query setup with `QueryClientProvider`.
-   - `useAutosave` hook implemented with 7-second debounce and `useMutation`.
+   - `useAutosave` hook implemented with 2-second debounce and `useMutation`.
    - Silent autosave integrated into `DesignBriefContext` (no visual notifications to avoid distraction).
    - Automatic saving of form data without interrupting user experience.
 7. ⬜ **Phase 7**: Advanced Features & Refinements
