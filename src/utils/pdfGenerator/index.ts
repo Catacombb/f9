@@ -2,7 +2,7 @@ import { jsPDF } from 'jspdf';
 import { formatDistanceToNow } from 'date-fns';
 import { ProjectData } from '@/types';
 import { PDFContext, COLORS } from './types';
-import { addHeader, addFooter } from './layout';
+import { addHeader, addFooter, addNewPage } from './layout';
 
 // Import section renderers
 import { renderProjectInfo } from './sections/projectInfo';
@@ -26,199 +26,110 @@ export const generatePDF = async (projectData: ProjectData): Promise<Blob> => {
     const pageWidth = pdf.internal.pageSize.getWidth();
     const pageHeight = pdf.internal.pageSize.getHeight();
     const margin = 15; // margin in mm
-    const textColor = '#000000'; // Black text for readability
-    const accentColor = '#f8b500'; // F9 Yellow accent color
-    const primaryColor = '#333333'; // Dark gray for headings
-    const borderColor = '#e0e0e0'; // Light gray for borders
+    
+    // PDF context to share across section renderers
+    const ctx: PDFContext = {
+      pdf,
+      pageWidth,
+      pageHeight,
+      margin,
+      contentWidth: pageWidth - (margin * 2),
+      yPosition: 40, // Start position after header
+      pageNumber: 1,
+      colors: {
+        primary: '#333333',     // Dark gray for headings
+        secondary: '#666666',   // Medium gray for secondary text
+        accent: '#f8b500',      // F9 Yellow accent color
+        border: '#e0e0e0',      // Light gray for borders
+        background: '#ffffff',  // White background
+        muted: '#f5f5f5'        // Light gray for backgrounds
+      }
+    };
     
     // Add header with F9 branding
     // Add a yellow header bar
-    pdf.setFillColor(accentColor);
-    pdf.rect(0, 0, pageWidth, 25, 'F');
+    pdf.setFillColor(ctx.colors.accent);
+    pdf.rect(0, 0, pageWidth, 30, 'F');
     
-    // Add F9 logo text
+    // Add F9 logo text - centered
     pdf.setFont('helvetica', 'bold');
-    pdf.setTextColor(primaryColor);
-    pdf.setFontSize(18);
-    pdf.text('F9 PRODUCTIONS', margin, 15);
+    pdf.setTextColor(ctx.colors.primary);
+    pdf.setFontSize(22);
+    const mainTitle = 'F9 PRODUCTIONS';
+    const mainTitleWidth = pdf.getTextWidth(mainTitle);
+    pdf.text(mainTitle, (pageWidth - mainTitleWidth) / 2, 15);
     
-    // Add document title
-    pdf.setFont('helvetica', 'bold');
-    pdf.setTextColor(textColor);
-    pdf.setFontSize(20);
-    pdf.text('DESIGN BRIEF', pageWidth - margin - 50, 15);
+    // Add "DESIGN BRIEF" subtitle under the main title in italics
+    pdf.setFont('helvetica', 'italic');
+    pdf.setFontSize(14);
+    const subtitle = 'DESIGN BRIEF';
+    const subtitleWidth = pdf.getTextWidth(subtitle);
+    pdf.text(subtitle, (pageWidth - subtitleWidth) / 2, 23);
     
     // Add a divider line
-    pdf.setDrawColor(accentColor);
+    pdf.setDrawColor(ctx.colors.accent);
     pdf.setLineWidth(0.5);
     pdf.line(margin, 35, pageWidth - margin, 35);
     
-    // Add brief info section
+    // Add client info box with better spacing
     pdf.setFont('helvetica', 'bold');
     pdf.setFontSize(16);
-    pdf.setTextColor(primaryColor);
-    pdf.text(`Project: ${projectData.formData.projectInfo?.clientName || 'Untitled Project'}`, margin, 45);
+    pdf.setTextColor(ctx.colors.primary);
+    pdf.text(`Project: ${projectData.formData.projectInfo?.clientName || 'Untitled Project'}`, margin, ctx.yPosition);
+    ctx.yPosition += 10;
     
-    // Add client info box
-    pdf.setDrawColor(borderColor);
-    pdf.setLineWidth(0.2);
-    pdf.setFillColor('#f5f5f5'); // Light gray background
-    pdf.roundedRect(margin, 55, pageWidth - (margin * 2), 40, 3, 3, 'FD'); // Filled rectangle with rounded corners
-    
-    // Client details
+    // Render all sections using the imported renderers
     pdf.setFont('helvetica', 'normal');
-    pdf.setTextColor(textColor);
+    pdf.setTextColor(ctx.colors.primary);
     pdf.setFontSize(12);
-    let y = 65;
+
+    // --- Render Project Information ---
+    renderProjectInfo(ctx, projectData);
     
-    if (projectData.formData.projectInfo) {
-      // Two column layout for client info
-      const leftColumn = margin + 5;
-      const rightColumn = pageWidth / 2 + 5;
+    // --- Render Budget Information ---
+    renderBudgetInfo(ctx, projectData);
+    
+    // --- Render Lifestyle Information ---
+    renderLifestyleInfo(ctx, projectData);
+    
+    // --- Render Site Information ---
+    renderSiteInfo(ctx, projectData);
+    
+    // --- Render Spaces Information ---
+    renderSpacesInfo(ctx, projectData);
+    
+    // --- Render Architecture Information ---
+    renderArchitectureInfo(ctx, projectData);
+    
+    // --- Render Contractors Information ---
+    renderContractorsInfo(ctx, projectData);
+    
+    // --- Render Communication Information ---
+    renderCommunicationInfo(ctx, projectData);
+    
+    // --- Render Inspiration Information ---
+    renderInspirationInfo(ctx, projectData);
+    
+    // --- Render Summary Information ---
+    // Call renderSummaryInfo directly - it has its own internal checks
+    renderSummaryInfo(ctx, projectData);
+    
+    // Add footer to all pages
+    for (let i = 1; i <= ctx.pageNumber; i++) {
+      pdf.setPage(i);
       
-      // Left column
-      pdf.setFont('helvetica', 'bold');
-      pdf.text('Client:', leftColumn, y);
+      // Add a more elegant footer
+      pdf.setDrawColor(ctx.colors.accent);
+      pdf.setLineWidth(0.5);
+      pdf.line(margin, pageHeight - 20, pageWidth - margin, pageHeight - 20);
+      
       pdf.setFont('helvetica', 'normal');
-      pdf.text(projectData.formData.projectInfo.clientName || 'Not specified', leftColumn + 25, y);
-      y += 10;
-      
-      pdf.setFont('helvetica', 'bold');
-      pdf.text('Address:', leftColumn, y);
-      pdf.setFont('helvetica', 'normal');
-      pdf.text(projectData.formData.projectInfo.projectAddress || 'Not specified', leftColumn + 25, y);
-      
-      // Right column
-      y = 65; // Reset y for right column
-      
-      pdf.setFont('helvetica', 'bold');
-      pdf.text('Email:', rightColumn, y);
-      pdf.setFont('helvetica', 'normal');
-      pdf.text(projectData.formData.projectInfo.contactEmail || 'Not specified', rightColumn + 25, y);
-      y += 10;
-      
-      pdf.setFont('helvetica', 'bold');
-      pdf.text('Phone:', rightColumn, y);
-      pdf.setFont('helvetica', 'normal');
-      pdf.text(projectData.formData.projectInfo.contactPhone || 'Not specified', rightColumn + 25, y);
+      pdf.setFontSize(9);
+      pdf.setTextColor(ctx.colors.primary);
+      pdf.text(`Generated: ${new Date().toLocaleDateString()}`, margin, pageHeight - 10);
+      pdf.text('F9 Productions, Inc.', pageWidth / 2, pageHeight - 10, { align: 'center' });
+      pdf.text(`Page ${i} of ${ctx.pageNumber}`, pageWidth - margin, pageHeight - 10, { align: 'right' });
     }
-    
-    // Add project details section
-    y = 110;
-    
-    // Add section heading
-    pdf.setFillColor(accentColor);
-    pdf.rect(margin, y, pageWidth - (margin * 2), 8, 'F');
-    pdf.setFont('helvetica', 'bold');
-    pdf.setTextColor(primaryColor);
-    pdf.setFontSize(12);
-    pdf.text('PROJECT DETAILS', margin + 5, y + 5.5);
-    y += 15;
-    
-    // Project details content
-    pdf.setFont('helvetica', 'normal');
-    pdf.setTextColor(textColor);
-    pdf.setFontSize(11);
-    
-    if (projectData.formData.projectInfo?.projectDescription) {
-      pdf.setFont('helvetica', 'bold');
-      pdf.text('Project Description:', margin, y);
-      y += 7;
-      pdf.setFont('helvetica', 'normal');
-      
-      // Handle multiline text
-      const description = projectData.formData.projectInfo.projectDescription;
-      const splitDescription = pdf.splitTextToSize(description, pageWidth - (margin * 2) - 10);
-      
-      pdf.text(splitDescription, margin + 5, y);
-      y += splitDescription.length * 6 + 5;
-    }
-    
-    // Add budget information if available
-    if (projectData.formData.budget?.budgetRange) {
-      pdf.setFont('helvetica', 'bold');
-      pdf.text('Budget Range:', margin, y);
-      pdf.setFont('helvetica', 'normal');
-      pdf.text(projectData.formData.budget.budgetRange, margin + 40, y);
-      y += 7;
-    }
-    
-    // Add site information if available
-    if (projectData.formData.site) {
-      y += 5;
-      // Add section heading
-      pdf.setFillColor(accentColor);
-      pdf.rect(margin, y, pageWidth - (margin * 2), 8, 'F');
-      pdf.setFont('helvetica', 'bold');
-      pdf.setTextColor(primaryColor);
-      pdf.setFontSize(12);
-      pdf.text('SITE INFORMATION', margin + 5, y + 5.5);
-      y += 15;
-      
-      pdf.setFont('helvetica', 'normal');
-      pdf.setTextColor(textColor);
-      pdf.setFontSize(11);
-      
-      if (projectData.formData.site.siteFeatures && Array.isArray(projectData.formData.site.siteFeatures)) {
-        pdf.setFont('helvetica', 'bold');
-        pdf.text('Site Features:', margin, y);
-        y += 7;
-        pdf.setFont('helvetica', 'normal');
-        
-        const features = projectData.formData.site.siteFeatures.join(', ');
-        const splitFeatures = pdf.splitTextToSize(features, pageWidth - (margin * 2) - 10);
-        
-        pdf.text(splitFeatures, margin + 5, y);
-        y += splitFeatures.length * 6 + 5;
-      }
-    }
-    
-    // Add spaces information if available
-    if (projectData.formData.spaces && projectData.formData.spaces.rooms) {
-      y += 5;
-      // Add section heading
-      pdf.setFillColor(accentColor);
-      pdf.rect(margin, y, pageWidth - (margin * 2), 8, 'F');
-      pdf.setFont('helvetica', 'bold');
-      pdf.setTextColor(primaryColor);
-      pdf.setFontSize(12);
-      pdf.text('SPACES', margin + 5, y + 5.5);
-      y += 15;
-      
-      pdf.setFont('helvetica', 'normal');
-      pdf.setTextColor(textColor);
-      pdf.setFontSize(11);
-      
-      // Count rooms by type
-      const roomTypes = {};
-      projectData.formData.spaces.rooms.forEach(room => {
-        const type = room.type;
-        roomTypes[type] = (roomTypes[type] || 0) + 1;
-      });
-      
-      // Display room counts
-      pdf.setFont('helvetica', 'bold');
-      pdf.text('Room Summary:', margin, y);
-      y += 7;
-      
-      pdf.setFont('helvetica', 'normal');
-      Object.entries(roomTypes).forEach(([type, count]) => {
-        pdf.text(`${type}: ${count}`, margin + 5, y);
-        y += 6;
-      });
-    }
-    
-    // Add footer
-    pdf.setDrawColor(accentColor);
-    pdf.setLineWidth(0.5);
-    pdf.line(margin, pageHeight - 20, pageWidth - margin, pageHeight - 20);
-    
-    pdf.setFont('helvetica', 'normal');
-    pdf.setFontSize(9);
-    pdf.setTextColor(primaryColor);
-    pdf.text(`Generated: ${new Date().toLocaleDateString()}`, margin, pageHeight - 10);
-    pdf.text('F9 Productions, Inc.', pageWidth / 2, pageHeight - 10, { align: 'center' });
-    pdf.text('Page 1', pageWidth - margin, pageHeight - 10, { align: 'right' });
     
     console.log('[PDF Generator] PDF generation complete');
     
