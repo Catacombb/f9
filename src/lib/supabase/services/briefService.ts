@@ -72,7 +72,16 @@ export const briefService = {
               eliminableSpaces: ''
             },
             architecture: {},
-            contractors: {},
+            contractors: {
+              professionals: [], // Initialize professionals array
+              goToTender: false,
+              wantF9Build: false,
+              preferredBuilder: '',
+              structuralEngineer: '',
+              civilEngineer: '',
+              otherConsultants: '',
+              additionalNotes: ''
+            },
             communication: {},
             uploads: {},
             summary: {}

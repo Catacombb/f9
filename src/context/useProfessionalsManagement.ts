@@ -1,6 +1,11 @@
 import { useCallback } from 'react';
 import { ProjectData, Professional } from '@/types';
 
+// Simple random ID generator function compatible with all browsers
+const generateUniqueId = () => {
+  return 'prof-' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+};
+
 export const useProfessionalsManagement = (
   projectData: ProjectData,
   setProjectData: React.Dispatch<React.SetStateAction<ProjectData>>
@@ -9,7 +14,7 @@ export const useProfessionalsManagement = (
     setProjectData(draft => {
       const newProfessional = {
         ...professional,
-        id: professional.id || crypto.randomUUID(),
+        id: professional.id || generateUniqueId(),
       };
       const updatedDraft = { ...draft };
       updatedDraft.formData.contractors.professionals = [
