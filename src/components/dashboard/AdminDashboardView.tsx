@@ -272,6 +272,65 @@ export const AdminDashboardView: React.FC = () => {
     }
   };
 
+  const handleDeleteProposal = async (brief: BriefFull) => {
+    if (!brief.proposal_file_id) {
+      toast({
+        title: "No Proposal Found",
+        description: "There is no proposal to delete for this brief.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (brief.status === 'proposal_accepted') {
+      toast({
+        title: "Cannot Delete Proposal",
+        description: "This proposal has already been accepted by the client and cannot be deleted.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    try {
+      const { error } = await briefService.deleteProposal(brief.id);
+      
+      if (error) {
+        console.error('[AdminDashboardView] Error deleting proposal:', error);
+        toast({
+          title: "Error Deleting Proposal",
+          description: error.message || "Could not delete the proposal. Please try again.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Proposal Deleted",
+          description: "The proposal has been successfully deleted and the brief is back in 'Brief Ready' status.",
+        });
+        
+        // Update the local state to reflect changes
+        setBriefs(prevBriefs => 
+          prevBriefs.map(b => 
+            b.id === brief.id 
+              ? { 
+                  ...b, 
+                  status: 'brief_ready',
+                  proposal_file_id: undefined,
+                  proposal_sent_at: undefined
+                } 
+              : b
+          )
+        );
+      }
+    } catch (e:any) {
+      console.error('[AdminDashboardView] Unexpected error deleting proposal:', e);
+      toast({
+        title: "Error Deleting Proposal",
+        description: "An unexpected error occurred while deleting the proposal.",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (authLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)]">
@@ -434,6 +493,34 @@ export const AdminDashboardView: React.FC = () => {
                     >
                       <EyeOpenIcon className="mr-2 h-4 w-4" /> Download Proposal
                     </Button>
+                    
+                    {brief.status === 'proposal_sent' && (
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button 
+                            variant="destructive" 
+                            size="sm"
+                          >
+                            <TrashIcon className="mr-2 h-4 w-4" /> Delete Proposal
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete Proposal</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Are you sure you want to delete the proposal for "{brief.title || 'Untitled Brief'}"? 
+                              This will revert the brief status back to "Brief Ready" and allow you to upload a new proposal.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => handleDeleteProposal(brief)}>
+                              Delete Proposal
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    )}
                     
                     {brief.status === 'proposal_accepted' && (
                       <Button variant="secondary" size="sm" disabled>

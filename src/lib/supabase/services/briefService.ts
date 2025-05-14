@@ -669,5 +669,68 @@ export const briefService = {
       console.error('[briefService] Unexpected error in acceptProposal:', unexpectedError);
       return { error: unexpectedError };
     }
+  },
+
+  async deleteProposal(
+    briefId: string
+  ): Promise<{ error: any }> {
+    console.log('[briefService] deleteProposal called for brief:', briefId);
+    
+    try {
+      // First get the brief to find the proposal_file_id
+      const { data: brief, error: fetchError } = await supabase
+        .from('briefs')
+        .select('proposal_file_id, status')
+        .eq('id', briefId)
+        .single();
+      
+      if (fetchError || !brief) {
+        console.error('[briefService] Error fetching brief for proposal deletion:', fetchError);
+        return { error: fetchError || new Error('Brief not found') };
+      }
+      
+      // Check if there's actually a proposal to delete
+      const typedBrief = brief as unknown as BriefFull;
+      if (!typedBrief.proposal_file_id) {
+        console.error('[briefService] No proposal file found for brief:', briefId);
+        return { error: new Error('No proposal file found for this brief') };
+      }
+      
+      // Only allow deletion if status is 'proposal_sent' (not if already accepted)
+      if (typedBrief.status === 'proposal_accepted') {
+        console.error('[briefService] Cannot delete proposal: brief has already been accepted');
+        return { error: new Error('Cannot delete proposal that has already been accepted') };
+      }
+      
+      // Delete the file from storage and database
+      const { error: deleteFileError } = await this.deleteFileFromBrief(typedBrief.proposal_file_id);
+      
+      if (deleteFileError) {
+        console.error('[briefService] Error deleting proposal file:', deleteFileError);
+        return { error: deleteFileError };
+      }
+      
+      // Update the brief status back to brief_ready
+      const { error: updateError } = await supabase
+        .from('briefs')
+        .update({ 
+          status: 'brief_ready',
+          proposal_file_id: null,
+          proposal_sent_at: null,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', briefId);
+      
+      if (updateError) {
+        console.error('[briefService] Error reverting brief status after proposal deletion:', updateError);
+        return { error: updateError };
+      }
+      
+      console.log('[briefService] Proposal successfully deleted for brief:', briefId);
+      return { error: null };
+    } catch (unexpectedError) {
+      console.error('[briefService] Unexpected error in deleteProposal:', unexpectedError);
+      return { error: unexpectedError };
+    }
   }
 }; 
