@@ -12,7 +12,6 @@ import { Label } from "@/components/ui/label";
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from "@/components/ui/badge";
 import { ProgressTracker } from '@/components/ui/ProgressTracker';
-import { PDFViewer } from '@/components/ui/PDFViewer';
 import { createBrowserSupabaseClient } from '@/lib/supabase/client';
 
 export const AdminDashboardView: React.FC = () => {
@@ -27,8 +26,6 @@ export const AdminDashboardView: React.FC = () => {
   const [uploadingProposal, setUploadingProposal] = useState<{id: string, title: string} | null>(null);
   const [proposalFile, setProposalFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
-  const [viewingProposal, setViewingProposal] = useState<{id: string, fileId: string} | null>(null);
-  const [proposalUrl, setProposalUrl] = useState<string | null>(null);
   const supabase = createBrowserSupabaseClient();
 
   const fetchBriefs = useCallback(async () => {
@@ -66,58 +63,6 @@ export const AdminDashboardView: React.FC = () => {
       fetchBriefs();
     }
   }, [user, fetchBriefs]);
-
-  // Fetch proposal file URL when viewingProposal changes
-  useEffect(() => {
-    const fetchProposalUrl = async () => {
-      if (!viewingProposal) {
-        setProposalUrl(null);
-        return;
-      }
-      
-      try {
-        // First, get the file record
-        const { data: fileData } = await supabase
-          .from('brief_files')
-          .select('storage_path, bucket_id')
-          .eq('id', viewingProposal.fileId)
-          .single();
-          
-        if (!fileData) {
-          toast({
-            title: "Error",
-            description: "Could not find the proposal file.",
-            variant: "destructive",
-          });
-          return;
-        }
-        
-        // Then get a temporary URL for the file
-        const { data: urlData } = await supabase.storage
-          .from(fileData.bucket_id)
-          .createSignedUrl(fileData.storage_path, 3600); // URL valid for 1 hour
-          
-        if (urlData?.signedUrl) {
-          setProposalUrl(urlData.signedUrl);
-        } else {
-          toast({
-            title: "Error",
-            description: "Could not generate a link to the proposal.",
-            variant: "destructive",
-          });
-        }
-      } catch (e) {
-        console.error('[AdminDashboardView] Error fetching proposal URL:', e);
-        toast({
-          title: "Error",
-          description: "An error occurred while retrieving the proposal.",
-          variant: "destructive",
-        });
-      }
-    };
-    
-    fetchProposalUrl();
-  }, [viewingProposal, toast, supabase]);
 
   const handleDeleteBrief = async (briefId: string) => {
     try {
@@ -275,7 +220,7 @@ export const AdminDashboardView: React.FC = () => {
     }
   };
 
-  const handleViewProposal = (brief: BriefFull) => {
+  const downloadProposal = async (brief: BriefFull) => {
     if (!brief.proposal_file_id) {
       toast({
         title: "No Proposal Available",
@@ -285,10 +230,46 @@ export const AdminDashboardView: React.FC = () => {
       return;
     }
     
-    setViewingProposal({
-      id: brief.id,
-      fileId: brief.proposal_file_id
-    });
+    try {
+      // First, get the file record
+      const { data: fileData } = await supabase
+        .from('brief_files')
+        .select('storage_path, bucket_id')
+        .eq('id', brief.proposal_file_id)
+        .single();
+        
+      if (!fileData) {
+        toast({
+          title: "Error",
+          description: "Could not find the proposal file.",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      // Then get a temporary URL for the file
+      const { data: urlData } = await supabase.storage
+        .from(fileData.bucket_id)
+        .createSignedUrl(fileData.storage_path, 3600); // URL valid for 1 hour
+        
+      if (urlData?.signedUrl) {
+        // Open the proposal in a new tab
+        window.open(urlData.signedUrl, '_blank');
+      } else {
+        toast({
+          title: "Error",
+          description: "Could not generate a link to the proposal.",
+          variant: "destructive",
+        });
+      }
+    } catch (e) {
+      console.error('[AdminDashboardView] Error downloading proposal:', e);
+      toast({
+        title: "Error",
+        description: "An error occurred while retrieving the proposal.",
+        variant: "destructive",
+      });
+    }
   };
 
   if (authLoading) {
@@ -446,45 +427,13 @@ export const AdminDashboardView: React.FC = () => {
 
                 {(brief.status === 'proposal_sent' || brief.status === 'proposal_accepted') && (
                   <>
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => handleViewProposal(brief)}
-                        >
-                          <EyeOpenIcon className="mr-2 h-4 w-4" /> View Proposal
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="sm:max-w-[900px]">
-                        <DialogHeader>
-                          <DialogTitle>
-                            Proposal for {brief.title || 'Untitled Brief'}
-                            {brief.status === 'proposal_accepted' && " (Accepted)"}
-                          </DialogTitle>
-                          <DialogDescription>
-                            {brief.status === 'proposal_accepted' 
-                              ? `This proposal was accepted by the client on ${brief.proposal_accepted_at ? new Date(brief.proposal_accepted_at).toLocaleDateString() : 'N/A'}.`
-                              : "This proposal has been sent to the client but has not been accepted yet."}
-                          </DialogDescription>
-                        </DialogHeader>
-                        <div className="py-4">
-                          {proposalUrl ? (
-                            <PDFViewer url={proposalUrl} />
-                          ) : (
-                            <div className="flex items-center justify-center h-[500px]">
-                              <ReloadIcon className="mr-2 h-5 w-5 animate-spin" /> Loading proposal...
-                            </div>
-                          )}
-                        </div>
-                        {brief.status === 'proposal_accepted' && brief.acceptance_message && (
-                          <div className="border-t pt-4 mt-2">
-                            <h4 className="font-medium mb-2">Client Message:</h4>
-                            <p className="text-sm bg-muted p-3 rounded">{brief.acceptance_message}</p>
-                          </div>
-                        )}
-                      </DialogContent>
-                    </Dialog>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => downloadProposal(brief)}
+                    >
+                      <EyeOpenIcon className="mr-2 h-4 w-4" /> Download Proposal
+                    </Button>
                     
                     {brief.status === 'proposal_accepted' && (
                       <Button variant="secondary" size="sm" disabled>
