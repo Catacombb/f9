@@ -6,6 +6,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { ReloadIcon, Pencil2Icon, TrashIcon } from '@radix-ui/react-icons';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from "@/components/ui/badge";
 
@@ -16,6 +19,8 @@ export const AdminDashboardView: React.FC = () => {
   const [briefs, setBriefs] = useState<BriefFull[]>([]);
   const [isLoadingBriefs, setIsLoadingBriefs] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [editingBrief, setEditingBrief] = useState<{id: string, title: string} | null>(null);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   const fetchBriefs = useCallback(async () => {
     if (!user) return;
@@ -80,6 +85,60 @@ export const AdminDashboardView: React.FC = () => {
     }
   };
 
+  const handleEditBrief = (brief: BriefFull) => {
+    setEditingBrief({
+      id: brief.id,
+      title: brief.title || 'Untitled Brief'
+    });
+  };
+
+  const handleUpdateBriefTitle = async () => {
+    if (!editingBrief) return;
+    
+    setIsUpdating(true);
+    try {
+      const { error: updateError } = await briefService.updateBriefTitle(
+        editingBrief.id,
+        editingBrief.title
+      );
+      
+      if (updateError) {
+        console.error('[AdminDashboardView] Error updating brief title:', updateError);
+        toast({
+          title: "Error Updating Brief",
+          description: updateError.message || "Could not update the brief. Please try again.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Brief Updated",
+          description: "The brief has been successfully updated.",
+        });
+        
+        // Update the local state to reflect changes
+        setBriefs(prevBriefs => 
+          prevBriefs.map(b => 
+            b.id === editingBrief.id 
+              ? { ...b, title: editingBrief.title } 
+              : b
+          )
+        );
+        
+        // Reset editing state
+        setEditingBrief(null);
+      }
+    } catch (e:any) {
+      console.error('[AdminDashboardView] Unexpected error updating brief:', e);
+      toast({
+        title: "Error Updating Brief",
+        description: "An unexpected error occurred while updating the brief.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
   if (authLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)]">
@@ -139,8 +198,46 @@ export const AdminDashboardView: React.FC = () => {
                 <p className="text-sm text-muted-foreground mt-1">Owner ID: <span className="font-mono text-xs">{brief.owner_id}</span></p>
               </CardContent>
               <CardFooter className="flex justify-end space-x-2">
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" size="sm" onClick={() => handleEditBrief(brief)}>
+                      <Pencil2Icon className="mr-2 h-4 w-4" /> Edit
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Edit Brief</DialogTitle>
+                      <DialogDescription>
+                        Update the title of the brief for {brief.user_profiles?.full_name || 'user'}.
+                      </DialogDescription>
+                    </DialogHeader>
+                    {editingBrief && (
+                      <div className="space-y-4 py-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="title">Brief Title</Label>
+                          <Input 
+                            id="title" 
+                            value={editingBrief.title} 
+                            onChange={(e) => setEditingBrief({...editingBrief, title: e.target.value})}
+                          />
+                        </div>
+                      </div>
+                    )}
+                    <DialogFooter>
+                      <DialogClose asChild>
+                        <Button variant="outline">Cancel</Button>
+                      </DialogClose>
+                      <Button 
+                        onClick={handleUpdateBriefTitle} 
+                        disabled={isUpdating || !editingBrief?.title.trim()}
+                      >
+                        {isUpdating ? 'Saving...' : 'Save Changes'}
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
                 <Button variant="outline" size="sm" onClick={() => navigate(`/design-brief/${brief.id}`)}>
-                  <Pencil2Icon className="mr-2 h-4 w-4" /> View
+                  <Pencil2Icon className="mr-2 h-4 w-4" /> View Brief
                 </Button>
                 <AlertDialog>
                   <AlertDialogTrigger asChild>

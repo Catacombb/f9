@@ -273,7 +273,10 @@ export const briefService = {
     console.log('[briefService] deleteBrief called for ID:', briefId);
     
     try {
-      const { error } = await supabase.from('briefs').delete().eq('id', briefId);
+      const { error } = await supabase
+        .from('briefs')
+        .delete()
+        .eq('id', briefId);
       
       if (error) {
         console.error('[briefService] Error deleting brief:', error);
@@ -284,6 +287,73 @@ export const briefService = {
       return { error: null };
     } catch (unexpectedError) {
       console.error('[briefService] Unexpected error in deleteBrief:', unexpectedError);
+      return { error: unexpectedError };
+    }
+  },
+
+  async updateBriefTitle(briefId: string, title: string): Promise<{ error: any }> {
+    console.log('[briefService] updateBriefTitle called for ID:', briefId, 'with title:', title);
+    
+    try {
+      // Update the brief title in the briefs table
+      const { error } = await supabase
+        .from('briefs')
+        .update({ 
+          title,
+          updated_at: new Date().toISOString() 
+        })
+        .eq('id', briefId);
+      
+      if (error) {
+        console.error('[briefService] Error updating brief title:', error);
+        return { error };
+      }
+      
+      // Also get the current brief data to update the title within the data JSON too
+      const { data: existingBrief, error: fetchError } = await supabase
+        .from('briefs')
+        .select('data')
+        .eq('id', briefId)
+        .single();
+      
+      if (fetchError) {
+        console.error('[briefService] Error fetching brief data for title update:', fetchError);
+        // We still consider the update successful even if we can't update the inner data
+        console.log('[briefService] Brief title updated in table but not in data JSON');
+        return { error: null };
+      }
+      
+      if (existingBrief && existingBrief.data) {
+        const briefData = existingBrief.data as any;
+        
+        // Update title references in the inner data structure
+        if (briefData.title !== undefined) {
+          briefData.title = title;
+        }
+        
+        if (briefData.projectInfo && briefData.projectInfo.briefName !== undefined) {
+          briefData.projectInfo.briefName = title;
+        }
+        
+        // Save the updated data back
+        const { error: updateError } = await supabase
+          .from('briefs')
+          .update({
+            data: briefData as Json,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', briefId);
+        
+        if (updateError) {
+          console.error('[briefService] Error updating brief inner data:', updateError);
+          // We still consider the update successful since the main title was updated
+        }
+      }
+      
+      console.log('[briefService] Brief title successfully updated for ID:', briefId);
+      return { error: null };
+    } catch (unexpectedError) {
+      console.error('[briefService] Unexpected error in updateBriefTitle:', unexpectedError);
       return { error: unexpectedError };
     }
   },
