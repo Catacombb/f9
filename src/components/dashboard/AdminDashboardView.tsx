@@ -4,13 +4,16 @@ import { briefService, BriefFull } from '@/lib/supabase/services/briefService';
 import { useStableAuth } from '@/hooks/useStableAuth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { ReloadIcon, Pencil2Icon, TrashIcon } from '@radix-ui/react-icons';
+import { ReloadIcon, Pencil2Icon, TrashIcon, UploadIcon, CheckIcon, EyeOpenIcon } from '@radix-ui/react-icons';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from "@/components/ui/badge";
+import { ProgressTracker } from '@/components/ui/ProgressTracker';
+import { PDFViewer } from '@/components/ui/PDFViewer';
+import { createBrowserSupabaseClient } from '@/lib/supabase/client';
 
 export const AdminDashboardView: React.FC = () => {
   const { user, isLoading: authLoading } = useStableAuth();
@@ -21,6 +24,12 @@ export const AdminDashboardView: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [editingBrief, setEditingBrief] = useState<{id: string, title: string} | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [uploadingProposal, setUploadingProposal] = useState<{id: string, title: string} | null>(null);
+  const [proposalFile, setProposalFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [viewingProposal, setViewingProposal] = useState<{id: string, fileId: string} | null>(null);
+  const [proposalUrl, setProposalUrl] = useState<string | null>(null);
+  const supabase = createBrowserSupabaseClient();
 
   const fetchBriefs = useCallback(async () => {
     if (!user) return;
@@ -57,6 +66,58 @@ export const AdminDashboardView: React.FC = () => {
       fetchBriefs();
     }
   }, [user, fetchBriefs]);
+
+  // Fetch proposal file URL when viewingProposal changes
+  useEffect(() => {
+    const fetchProposalUrl = async () => {
+      if (!viewingProposal) {
+        setProposalUrl(null);
+        return;
+      }
+      
+      try {
+        // First, get the file record
+        const { data: fileData } = await supabase
+          .from('brief_files')
+          .select('storage_path, bucket_id')
+          .eq('id', viewingProposal.fileId)
+          .single();
+          
+        if (!fileData) {
+          toast({
+            title: "Error",
+            description: "Could not find the proposal file.",
+            variant: "destructive",
+          });
+          return;
+        }
+        
+        // Then get a temporary URL for the file
+        const { data: urlData } = await supabase.storage
+          .from(fileData.bucket_id)
+          .createSignedUrl(fileData.storage_path, 3600); // URL valid for 1 hour
+          
+        if (urlData?.signedUrl) {
+          setProposalUrl(urlData.signedUrl);
+        } else {
+          toast({
+            title: "Error",
+            description: "Could not generate a link to the proposal.",
+            variant: "destructive",
+          });
+        }
+      } catch (e) {
+        console.error('[AdminDashboardView] Error fetching proposal URL:', e);
+        toast({
+          title: "Error",
+          description: "An error occurred while retrieving the proposal.",
+          variant: "destructive",
+        });
+      }
+    };
+    
+    fetchProposalUrl();
+  }, [viewingProposal, toast, supabase]);
 
   const handleDeleteBrief = async (briefId: string) => {
     try {
@@ -139,6 +200,97 @@ export const AdminDashboardView: React.FC = () => {
     }
   };
 
+  const handleUploadProposal = (brief: BriefFull) => {
+    setUploadingProposal({
+      id: brief.id,
+      title: brief.title || 'Untitled Brief'
+    });
+    setProposalFile(null);
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0];
+      if (file.type !== 'application/pdf') {
+        toast({
+          title: "Invalid File Type",
+          description: "Please upload a PDF file.",
+          variant: "destructive",
+        });
+        return;
+      }
+      setProposalFile(file);
+    }
+  };
+
+  const submitProposalUpload = async () => {
+    if (!uploadingProposal || !proposalFile) return;
+    
+    setIsUploading(true);
+    try {
+      const { fileId, error } = await briefService.uploadProposal(
+        uploadingProposal.id,
+        proposalFile
+      );
+      
+      if (error) {
+        console.error('[AdminDashboardView] Error uploading proposal:', error);
+        toast({
+          title: "Error Uploading Proposal",
+          description: error.message || "Could not upload the proposal. Please try again.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Proposal Uploaded",
+          description: "The proposal has been successfully uploaded and sent to the client.",
+        });
+        
+        // Update the local state to reflect changes
+        setBriefs(prevBriefs => 
+          prevBriefs.map(b => 
+            b.id === uploadingProposal.id 
+              ? { 
+                  ...b, 
+                  status: 'proposal_sent',
+                  proposal_file_id: fileId || undefined
+                } 
+              : b
+          )
+        );
+        
+        // Reset upload state
+        setUploadingProposal(null);
+        setProposalFile(null);
+      }
+    } catch (e:any) {
+      console.error('[AdminDashboardView] Unexpected error uploading proposal:', e);
+      toast({
+        title: "Error Uploading Proposal",
+        description: "An unexpected error occurred while uploading the proposal.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleViewProposal = (brief: BriefFull) => {
+    if (!brief.proposal_file_id) {
+      toast({
+        title: "No Proposal Available",
+        description: "There is no proposal available for this brief yet.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setViewingProposal({
+      id: brief.id,
+      fileId: brief.proposal_file_id
+    });
+  };
+
   if (authLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)]">
@@ -194,14 +346,21 @@ export const AdminDashboardView: React.FC = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent className="flex-grow">
+                {/* Progress Tracker */}
+                <ProgressTracker 
+                  status={brief.status as any || 'draft'} 
+                  className="mb-4" 
+                />
+                
                 <p className="text-sm text-muted-foreground">Status: <span className="font-semibold capitalize">{brief.status || 'Draft'}</span></p>
                 <p className="text-sm text-muted-foreground mt-1">Owner ID: <span className="font-mono text-xs">{brief.owner_id}</span></p>
               </CardContent>
-              <CardFooter className="flex justify-end space-x-2">
+              <CardFooter className="flex flex-wrap justify-end gap-2">
+                {/* Edit Title and View Brief buttons for all statuses */}
                 <Dialog>
                   <DialogTrigger asChild>
                     <Button variant="outline" size="sm" onClick={() => handleEditBrief(brief)}>
-                      <Pencil2Icon className="mr-2 h-4 w-4" /> Edit
+                      <Pencil2Icon className="mr-2 h-4 w-4" /> Edit Title
                     </Button>
                   </DialogTrigger>
                   <DialogContent>
@@ -236,9 +395,106 @@ export const AdminDashboardView: React.FC = () => {
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>
+                
                 <Button variant="outline" size="sm" onClick={() => navigate(`/design-brief/${brief.id}`)}>
-                  <Pencil2Icon className="mr-2 h-4 w-4" /> View Brief
+                  <EyeOpenIcon className="mr-2 h-4 w-4" /> View Brief
                 </Button>
+
+                {/* Additional buttons based on status */}
+                {brief.status === 'brief_ready' && (
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button variant="default" size="sm" onClick={() => handleUploadProposal(brief)}>
+                        <UploadIcon className="mr-2 h-4 w-4" /> Upload Proposal
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Upload Proposal</DialogTitle>
+                        <DialogDescription>
+                          Upload a proposal PDF for "{brief.title || 'Untitled Brief'}" to send to the client.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="space-y-4 py-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="proposal-file">Proposal PDF</Label>
+                          <Input 
+                            id="proposal-file" 
+                            type="file" 
+                            accept=".pdf"
+                            onChange={handleFileChange}
+                          />
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Upload a PDF file (max 10MB). This will be shared with the client.
+                          </p>
+                        </div>
+                      </div>
+                      <DialogFooter>
+                        <DialogClose asChild>
+                          <Button variant="outline">Cancel</Button>
+                        </DialogClose>
+                        <Button 
+                          onClick={submitProposalUpload} 
+                          disabled={isUploading || !proposalFile}
+                        >
+                          {isUploading ? 'Uploading...' : 'Upload & Send'}
+                        </Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
+                )}
+
+                {(brief.status === 'proposal_sent' || brief.status === 'proposal_accepted') && (
+                  <>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleViewProposal(brief)}
+                        >
+                          <EyeOpenIcon className="mr-2 h-4 w-4" /> View Proposal
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="sm:max-w-[900px]">
+                        <DialogHeader>
+                          <DialogTitle>
+                            Proposal for {brief.title || 'Untitled Brief'}
+                            {brief.status === 'proposal_accepted' && " (Accepted)"}
+                          </DialogTitle>
+                          <DialogDescription>
+                            {brief.status === 'proposal_accepted' 
+                              ? `This proposal was accepted by the client on ${brief.proposal_accepted_at ? new Date(brief.proposal_accepted_at).toLocaleDateString() : 'N/A'}.`
+                              : "This proposal has been sent to the client but has not been accepted yet."}
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="py-4">
+                          {proposalUrl ? (
+                            <PDFViewer url={proposalUrl} />
+                          ) : (
+                            <div className="flex items-center justify-center h-[500px]">
+                              <ReloadIcon className="mr-2 h-5 w-5 animate-spin" /> Loading proposal...
+                            </div>
+                          )}
+                        </div>
+                        {brief.status === 'proposal_accepted' && brief.acceptance_message && (
+                          <div className="border-t pt-4 mt-2">
+                            <h4 className="font-medium mb-2">Client Message:</h4>
+                            <p className="text-sm bg-muted p-3 rounded">{brief.acceptance_message}</p>
+                          </div>
+                        )}
+                      </DialogContent>
+                    </Dialog>
+                    
+                    {brief.status === 'proposal_accepted' && (
+                      <Button variant="secondary" size="sm" disabled>
+                        <CheckIcon className="mr-2 h-4 w-4" /> Proposal Accepted
+                      </Button>
+                    )}
+                  </>
+                )}
+
+                {/* Delete button always shown */}
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
                     <Button variant="destructive" size="sm">

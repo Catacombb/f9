@@ -5,6 +5,12 @@ import type { Database, Json } from '@/lib/supabase/database.types';
 // Define a more specific type for what briefService.getById and others will return
 export type BriefFull = Database['public']['Tables']['briefs']['Row'] & {
   user_profiles?: { full_name: string | null } | null;
+  // Add fields for proposal workflow
+  proposal_file_id?: string;
+  brief_ready_at?: string;
+  proposal_sent_at?: string;
+  proposal_accepted_at?: string;
+  acceptance_message?: string;
 };
 
 const supabase = createBrowserSupabaseClient();
@@ -513,6 +519,154 @@ export const briefService = {
 
     } catch (unexpectedError) {
       console.error('[briefService] Unexpected error in deleteFileFromBrief:', unexpectedError);
+      return { error: unexpectedError };
+    }
+  },
+
+  // --- Status Management Methods ---
+
+  async updateBriefStatus(
+    briefId: string, 
+    status: 'draft' | 'brief_ready' | 'proposal_sent' | 'proposal_accepted',
+    metadata?: {
+      proposalFileId?: string;
+      acceptanceMessage?: string;
+    }
+  ): Promise<{ error: any }> {
+    console.log('[briefService] updateBriefStatus called for ID:', briefId, 'new status:', status);
+    
+    try {
+      const updateData: any = { 
+        status,
+        updated_at: new Date().toISOString()
+      };
+      
+      // Add appropriate timestamps based on status
+      if (status === 'brief_ready') {
+        updateData.brief_ready_at = new Date().toISOString();
+      } else if (status === 'proposal_sent' && metadata?.proposalFileId) {
+        updateData.proposal_sent_at = new Date().toISOString();
+        updateData.proposal_file_id = metadata.proposalFileId;
+      } else if (status === 'proposal_accepted') {
+        updateData.proposal_accepted_at = new Date().toISOString();
+        if (metadata?.acceptanceMessage) {
+          updateData.acceptance_message = metadata.acceptanceMessage;
+        }
+      }
+      
+      const { error } = await supabase
+        .from('briefs')
+        .update(updateData)
+        .eq('id', briefId);
+      
+      if (error) {
+        console.error('[briefService] Error updating brief status:', error);
+        return { error };
+      }
+      
+      console.log('[briefService] Brief status successfully updated to', status, 'for ID:', briefId);
+      return { error: null };
+    } catch (unexpectedError) {
+      console.error('[briefService] Unexpected error in updateBriefStatus:', unexpectedError);
+      return { error: unexpectedError };
+    }
+  },
+  
+  async uploadProposal(
+    briefId: string,
+    file: File
+  ): Promise<{ fileId: string | null; error: any }> {
+    console.log('[briefService] uploadProposal called for brief:', briefId, 'file:', file.name);
+    
+    try {
+      // Upload proposal PDF using the existing file upload mechanism
+      const { data: fileData, error: uploadError } = await this.uploadFileToBrief(
+        briefId,
+        'proposal',
+        file
+      );
+      
+      if (uploadError || !fileData) {
+        console.error('[briefService] Error uploading proposal file:', uploadError);
+        return { fileId: null, error: uploadError };
+      }
+      
+      // Update brief status to proposal_sent with the file ID
+      const { error: statusError } = await this.updateBriefStatus(
+        briefId,
+        'proposal_sent',
+        { proposalFileId: fileData.id }
+      );
+      
+      if (statusError) {
+        console.error('[briefService] Error updating brief status after proposal upload:', statusError);
+        return { fileId: fileData.id, error: statusError };
+      }
+      
+      console.log('[briefService] Proposal successfully uploaded for brief:', briefId);
+      return { fileId: fileData.id, error: null };
+    } catch (unexpectedError) {
+      console.error('[briefService] Unexpected error in uploadProposal:', unexpectedError);
+      return { fileId: null, error: unexpectedError };
+    }
+  },
+  
+  async acceptProposal(
+    briefId: string,
+    acceptanceMessage?: string
+  ): Promise<{ error: any }> {
+    console.log('[briefService] acceptProposal called for brief:', briefId);
+    
+    try {
+      // First verify the user is the owner of this brief
+      const { data: sessionData } = await supabase.auth.getSession();
+      const user = sessionData?.session?.user;
+      
+      if (!user) {
+        console.error('[briefService] No authenticated user found for accepting proposal');
+        return { error: new Error('User not authenticated') };
+      }
+      
+      // Get the brief to check ownership
+      const { data: brief, error: fetchError } = await supabase
+        .from('briefs')
+        .select('owner_id, status')
+        .eq('id', briefId)
+        .single();
+      
+      if (fetchError || !brief) {
+        console.error('[briefService] Error fetching brief for ownership check:', fetchError);
+        return { error: fetchError || new Error('Brief not found') };
+      }
+      
+      // Verify ownership
+      if (brief.owner_id !== user.id) {
+        console.error('[briefService] User attempted to accept proposal for brief they do not own');
+        return { error: new Error('You are not authorized to accept this proposal') };
+      }
+      
+      // Verify status is proposal_sent
+      if (brief.status !== 'proposal_sent') {
+        console.error('[briefService] Cannot accept proposal: brief is not in proposal_sent status');
+        return { error: new Error('This brief does not have a proposal to accept') };
+      }
+      
+      // Update the status to accepted
+      const { error: updateError } = await this.updateBriefStatus(
+        briefId,
+        'proposal_accepted',
+        { acceptanceMessage }
+      );
+      
+      if (updateError) {
+        console.error('[briefService] Error updating brief status to accepted:', updateError);
+        return { error: updateError };
+      }
+      
+      console.log('[briefService] Proposal successfully accepted for brief:', briefId);
+      return { error: null };
+    } catch (unexpectedError) {
+      console.error('[briefService] Unexpected error in acceptProposal:', unexpectedError);
       return { error: unexpectedError };
     }
   }

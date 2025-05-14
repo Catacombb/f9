@@ -4,12 +4,16 @@ import { briefService, BriefFull } from '@/lib/supabase/services/briefService';
 import { useStableAuth } from '@/hooks/useStableAuth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { ReloadIcon, PlusCircledIcon, Pencil2Icon, TrashIcon } from '@radix-ui/react-icons';
+import { ReloadIcon, PlusCircledIcon, Pencil2Icon, TrashIcon, EyeOpenIcon, CheckIcon } from '@radix-ui/react-icons';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { useToast } from '@/hooks/use-toast';
+import { ProgressTracker } from '@/components/ui/ProgressTracker';
+import { PDFViewer } from '@/components/ui/PDFViewer';
+import { createBrowserSupabaseClient } from '@/lib/supabase/client';
 
 export const ClientDashboardView: React.FC = () => {
   const { user, isLoading: authLoading } = useStableAuth();
@@ -20,6 +24,12 @@ export const ClientDashboardView: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [editingBrief, setEditingBrief] = useState<{id: string, title: string} | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [viewingProposal, setViewingProposal] = useState<{id: string, fileId: string} | null>(null);
+  const [proposalUrl, setProposalUrl] = useState<string | null>(null);
+  const [acceptingProposal, setAcceptingProposal] = useState<{id: string, title: string} | null>(null);
+  const [acceptanceMessage, setAcceptanceMessage] = useState('');
+  const [isAccepting, setIsAccepting] = useState(false);
+  const supabase = createBrowserSupabaseClient();
 
   const fetchBriefs = useCallback(async () => {
     if (!user) return;
@@ -56,6 +66,58 @@ export const ClientDashboardView: React.FC = () => {
       fetchBriefs();
     }
   }, [user, fetchBriefs]);
+
+  // Fetch proposal file URL when viewingProposal changes
+  useEffect(() => {
+    const fetchProposalUrl = async () => {
+      if (!viewingProposal) {
+        setProposalUrl(null);
+        return;
+      }
+      
+      try {
+        // First, get the file record
+        const { data: fileData } = await supabase
+          .from('brief_files')
+          .select('storage_path, bucket_id')
+          .eq('id', viewingProposal.fileId)
+          .single();
+          
+        if (!fileData) {
+          toast({
+            title: "Error",
+            description: "Could not find the proposal file.",
+            variant: "destructive",
+          });
+          return;
+        }
+        
+        // Then get a temporary URL for the file
+        const { data: urlData } = await supabase.storage
+          .from(fileData.bucket_id)
+          .createSignedUrl(fileData.storage_path, 3600); // URL valid for 1 hour
+          
+        if (urlData?.signedUrl) {
+          setProposalUrl(urlData.signedUrl);
+        } else {
+          toast({
+            title: "Error",
+            description: "Could not generate a link to the proposal.",
+            variant: "destructive",
+          });
+        }
+      } catch (e) {
+        console.error('[ClientDashboardView] Error fetching proposal URL:', e);
+        toast({
+          title: "Error",
+          description: "An error occurred while retrieving the proposal.",
+          variant: "destructive",
+        });
+      }
+    };
+    
+    fetchProposalUrl();
+  }, [viewingProposal, toast, supabase]);
 
   const handleDeleteBrief = async (briefId: string) => {
     try {
@@ -138,6 +200,113 @@ export const ClientDashboardView: React.FC = () => {
     }
   };
 
+  const handleSubmitBrief = async (briefId: string) => {
+    try {
+      const { error } = await briefService.updateBriefStatus(briefId, 'brief_ready');
+      
+      if (error) {
+        console.error('[ClientDashboardView] Error submitting brief:', error);
+        toast({
+          title: "Error Submitting Brief",
+          description: "Could not submit your brief to F9. Please try again.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Brief Submitted",
+          description: "Your brief has been successfully submitted to F9 for review.",
+        });
+        
+        // Update the local state to reflect changes
+        setBriefs(prevBriefs => 
+          prevBriefs.map(b => 
+            b.id === briefId 
+              ? { ...b, status: 'brief_ready' } 
+              : b
+          )
+        );
+      }
+    } catch (e:any) {
+      console.error('[ClientDashboardView] Unexpected error submitting brief:', e);
+      toast({
+        title: "Error Submitting Brief",
+        description: "An unexpected error occurred while submitting your brief.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleViewProposal = (brief: BriefFull) => {
+    if (!brief.proposal_file_id) {
+      toast({
+        title: "No Proposal Available",
+        description: "There is no proposal available for this brief yet.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setViewingProposal({
+      id: brief.id,
+      fileId: brief.proposal_file_id
+    });
+  };
+
+  const handleAcceptProposal = (brief: BriefFull) => {
+    setAcceptingProposal({
+      id: brief.id,
+      title: brief.title || 'Untitled Brief'
+    });
+    setAcceptanceMessage('');
+  };
+
+  const submitAcceptProposal = async () => {
+    if (!acceptingProposal) return;
+    
+    setIsAccepting(true);
+    try {
+      const { error } = await briefService.acceptProposal(
+        acceptingProposal.id,
+        acceptanceMessage
+      );
+      
+      if (error) {
+        console.error('[ClientDashboardView] Error accepting proposal:', error);
+        toast({
+          title: "Error Accepting Proposal",
+          description: error.message || "Could not accept the proposal. Please try again.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Proposal Accepted",
+          description: "You have successfully accepted the proposal.",
+        });
+        
+        // Update the local state to reflect changes
+        setBriefs(prevBriefs => 
+          prevBriefs.map(b => 
+            b.id === acceptingProposal.id 
+              ? { ...b, status: 'proposal_accepted' } 
+              : b
+          )
+        );
+        
+        // Reset acceptance state
+        setAcceptingProposal(null);
+      }
+    } catch (e:any) {
+      console.error('[ClientDashboardView] Unexpected error accepting proposal:', e);
+      toast({
+        title: "Error Accepting Proposal",
+        description: "An unexpected error occurred while accepting the proposal.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsAccepting(false);
+    }
+  };
+
   if (authLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)]">
@@ -192,51 +361,184 @@ export const ClientDashboardView: React.FC = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent className="flex-grow">
+                {/* Progress Tracker */}
+                <ProgressTracker 
+                  status={brief.status as any || 'draft'} 
+                  className="mb-4" 
+                />
+                
                 <p className="text-sm text-muted-foreground">Status: <span className="font-semibold capitalize">{brief.status || 'Draft'}</span></p>
-                {/* Add more brief details here if needed */}
               </CardContent>
-              <CardFooter className="flex justify-end space-x-2">
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button variant="outline" size="sm" onClick={() => handleEditBrief(brief)}>
-                      <Pencil2Icon className="mr-2 h-4 w-4" /> Edit
+              <CardFooter className="flex flex-wrap justify-end gap-2">
+                {/* Actions based on status */}
+                {brief.status === 'draft' && (
+                  <>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" size="sm" onClick={() => handleEditBrief(brief)}>
+                          <Pencil2Icon className="mr-2 h-4 w-4" /> Edit Title
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Edit Brief</DialogTitle>
+                          <DialogDescription>
+                            Update the title of your brief. Click save when you're done.
+                          </DialogDescription>
+                        </DialogHeader>
+                        {editingBrief && (
+                          <div className="space-y-4 py-4">
+                            <div className="space-y-2">
+                              <Label htmlFor="title">Brief Title</Label>
+                              <Input 
+                                id="title" 
+                                value={editingBrief.title} 
+                                onChange={(e) => setEditingBrief({...editingBrief, title: e.target.value})}
+                              />
+                            </div>
+                          </div>
+                        )}
+                        <DialogFooter>
+                          <DialogClose asChild>
+                            <Button variant="outline">Cancel</Button>
+                          </DialogClose>
+                          <Button 
+                            onClick={handleUpdateBriefTitle} 
+                            disabled={isUpdating || !editingBrief?.title.trim()}
+                          >
+                            {isUpdating ? 'Saving...' : 'Save Changes'}
+                          </Button>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
+                    
+                    <Button variant="outline" size="sm" onClick={() => navigate(`/design-brief/${brief.id}`)}>
+                      <Pencil2Icon className="mr-2 h-4 w-4" /> Continue Editing
                     </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Edit Brief</DialogTitle>
-                      <DialogDescription>
-                        Update the title of your brief. Click save when you're done.
-                      </DialogDescription>
-                    </DialogHeader>
-                    {editingBrief && (
-                      <div className="space-y-4 py-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="title">Brief Title</Label>
-                          <Input 
-                            id="title" 
-                            value={editingBrief.title} 
-                            onChange={(e) => setEditingBrief({...editingBrief, title: e.target.value})}
-                          />
+                    
+                    <Button 
+                      variant="default" 
+                      size="sm" 
+                      onClick={() => handleSubmitBrief(brief.id)}
+                    >
+                      Submit to F9
+                    </Button>
+                  </>
+                )}
+                
+                {brief.status === 'brief_ready' && (
+                  <>
+                    <Button variant="outline" size="sm" onClick={() => navigate(`/design-brief/${brief.id}`)}>
+                      <EyeOpenIcon className="mr-2 h-4 w-4" /> View Brief
+                    </Button>
+                    <Button variant="secondary" size="sm" disabled>
+                      Awaiting Proposal
+                    </Button>
+                  </>
+                )}
+                
+                {brief.status === 'proposal_sent' && (
+                  <>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" size="sm">
+                          <EyeOpenIcon className="mr-2 h-4 w-4" /> View Proposal
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="sm:max-w-[900px]">
+                        <DialogHeader>
+                          <DialogTitle>Proposal for {brief.title || 'Untitled Brief'}</DialogTitle>
+                          <DialogDescription>
+                            Review your proposal from F9 Productions.
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="py-4">
+                          {proposalUrl ? (
+                            <PDFViewer url={proposalUrl} />
+                          ) : (
+                            <div className="flex items-center justify-center h-[500px]">
+                              <ReloadIcon className="mr-2 h-5 w-5 animate-spin" /> Loading proposal...
+                            </div>
+                          )}
                         </div>
-                      </div>
-                    )}
-                    <DialogFooter>
-                      <DialogClose asChild>
-                        <Button variant="outline">Cancel</Button>
-                      </DialogClose>
-                      <Button 
-                        onClick={handleUpdateBriefTitle} 
-                        disabled={isUpdating || !editingBrief?.title.trim()}
-                      >
-                        {isUpdating ? 'Saving...' : 'Save Changes'}
-                      </Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
-                <Button variant="outline" size="sm" onClick={() => navigate(`/design-brief/${brief.id}`)}>
-                  <Pencil2Icon className="mr-2 h-4 w-4" /> Continue Editing
-                </Button>
+                      </DialogContent>
+                    </Dialog>
+                    
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button variant="default" size="sm">
+                          <CheckIcon className="mr-2 h-4 w-4" /> Accept Proposal
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Accept Proposal</DialogTitle>
+                          <DialogDescription>
+                            Accept the proposal for "{brief.title || 'Untitled Brief'}". You can leave a message with your acceptance.
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="space-y-4 py-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="message">Message (Optional)</Label>
+                            <Textarea 
+                              id="message" 
+                              placeholder="Add any comments or questions here..." 
+                              rows={4}
+                              value={acceptanceMessage}
+                              onChange={(e) => setAcceptanceMessage(e.target.value)}
+                            />
+                          </div>
+                        </div>
+                        <DialogFooter>
+                          <DialogClose asChild>
+                            <Button variant="outline">Cancel</Button>
+                          </DialogClose>
+                          <Button 
+                            onClick={submitAcceptProposal} 
+                            disabled={isAccepting}
+                          >
+                            {isAccepting ? 'Accepting...' : 'Accept Proposal'}
+                          </Button>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
+                  </>
+                )}
+                
+                {brief.status === 'proposal_accepted' && (
+                  <>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" size="sm">
+                          <EyeOpenIcon className="mr-2 h-4 w-4" /> View Proposal
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="sm:max-w-[900px]">
+                        <DialogHeader>
+                          <DialogTitle>Accepted Proposal for {brief.title || 'Untitled Brief'}</DialogTitle>
+                          <DialogDescription>
+                            You have accepted this proposal on {brief.proposal_accepted_at ? new Date(brief.proposal_accepted_at).toLocaleDateString() : 'N/A'}.
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="py-4">
+                          {proposalUrl ? (
+                            <PDFViewer url={proposalUrl} />
+                          ) : (
+                            <div className="flex items-center justify-center h-[500px]">
+                              <ReloadIcon className="mr-2 h-5 w-5 animate-spin" /> Loading proposal...
+                            </div>
+                          )}
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                    
+                    <Button variant="secondary" size="sm" disabled>
+                      <CheckIcon className="mr-2 h-4 w-4" /> Proposal Accepted
+                    </Button>
+                  </>
+                )}
+                
+                {/* Delete button always shown */}
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
                     <Button variant="destructive" size="sm">
