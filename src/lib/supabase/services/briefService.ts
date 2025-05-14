@@ -160,7 +160,7 @@ export const briefService = {
       // Explicitly filter by owner_id for clarity and safety
       const { data, error } = await supabase
         .from('briefs')
-        .select('id, title, owner_id, created_at, updated_at, status')
+        .select('*')  // Select all columns including proposal_file_id
         .eq('owner_id', user.id)
         .order('updated_at', { ascending: false });
       
@@ -193,7 +193,7 @@ export const briefService = {
       // This function relies on RLS policies to limit data based on admin status
       const { data, error } = await supabase
         .from('briefs')
-        .select('id, title, owner_id, created_at, updated_at, status, user_profiles(full_name)')
+        .select('*, user_profiles(full_name)')  // Select all columns including proposal_file_id
         .order('updated_at', { ascending: false });
       
       if (error) {
