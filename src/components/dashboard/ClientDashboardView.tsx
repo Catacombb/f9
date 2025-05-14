@@ -4,7 +4,7 @@ import { briefService, BriefFull } from '@/lib/supabase/services/briefService';
 import { useStableAuth } from '@/hooks/useStableAuth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { ReloadIcon, PlusCircledIcon, Pencil2Icon, TrashIcon, EyeOpenIcon, CheckIcon } from '@radix-ui/react-icons';
+import { ReloadIcon, PlusCircledIcon, Pencil2Icon, TrashIcon, EyeOpenIcon, CheckIcon, DownloadIcon } from '@radix-ui/react-icons';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -425,7 +425,7 @@ export const ClientDashboardView: React.FC = () => {
                       size="sm" 
                       onClick={() => downloadProposal(brief)}
                     >
-                      <EyeOpenIcon className="mr-2 h-4 w-4" /> Download Proposal
+                      <DownloadIcon className="mr-2 h-4 w-4" /> Download Proposal
                     </Button>
                     
                     <Dialog>
@@ -476,7 +476,7 @@ export const ClientDashboardView: React.FC = () => {
                       size="sm" 
                       onClick={() => downloadProposal(brief)}
                     >
-                      <EyeOpenIcon className="mr-2 h-4 w-4" /> Download Proposal
+                      <DownloadIcon className="mr-2 h-4 w-4" /> Download Proposal
                     </Button>
                     
                     <Button variant="secondary" size="sm" disabled>
